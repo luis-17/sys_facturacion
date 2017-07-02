@@ -57,16 +57,20 @@ angular.module('app')
 
       // angular translate
       $scope.lang = { isopen: false };
-      $scope.langs = {en:'English', de_DE:'German', it_IT:'Italian'};
-      $scope.selectLang = $scope.langs[$translate.proposedLanguage()] || "English";
-      $scope.setLang = function(langKey, $event) {
+      $scope.langs = {es_SP:'Spanish', en:'English', de_DE:'German', it_IT:'Italian'};
+      // $scope.selectLang = $scope.langs[$translate.proposedLanguage()] || "Spanish";
+      $scope.selectLang = $scope.langs[$translate.proposedLanguage()] || "Spanish";
+      // console.log( $translate.proposedLanguage() , '$translate.proposedLanguage()'); 
+      $scope.setLang = function(langKey, $event) { 
+        // console.log(langKey,'langKey');
         // set the current lang
         $scope.selectLang = $scope.langs[langKey];
         // You can change the language during runtime
         $translate.use(langKey);
         $scope.lang.isopen = !$scope.lang.isopen;
       };
-
+      $scope.setLang('es_SP');
+      $scope.lang.isopen = false;
       function isSmartDevice( $window )
       {
           // Adapted from http://www.detectmobilebrowsers.com

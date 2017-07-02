@@ -1,7 +1,15 @@
 <!-- list -->
 <ul class="nav">
   <li class="hidden-folded padder m-t m-b-sm text-muted text-xs">
-    <span translate="aside.nav.HEADER">Navigation</span>
+    <span translate="aside.nav.HEADER">Navigation </span>
+  </li>
+<!-- -->  
+  
+  <li ui-sref-active="active">
+    <a ui-sref="app.dashboard-v1">
+      <i class="glyphicon glyphicon-stats icon text-primary-dker"></i>
+      <span class="font-bold" translate="aside.nav.DASHBOARD">Dashboard</span>
+    </a>
   </li>
   <li>
     <a href class="auto">      
@@ -10,28 +18,55 @@
         <i class="fa fa-fw fa-angle-down text-active"></i>
       </span>
       <i class="glyphicon glyphicon-stats icon text-primary-dker"></i>
-      <span class="font-bold" translate="aside.nav.DASHBOARD">Dashboard</span>
+      <span class="font-bold" translate="aside.nav.CLIENTE">Clientes</span>
     </a>
     <ul class="nav nav-sub dk">
       <li class="nav-sub-header">
         <a href>
-          <span translate="aside.nav.DASHBOARD">Dashboard</span>
+          <span translate="aside.nav.CLIENTE">Clientes</span>
         </a>
       </li>
       <li ui-sref-active="active">
-        <a ui-sref="app.dashboard-v1">
-          <span>Dashboard v1</span>
+        <a ui-sref="app.persona-natural">
+          <span>Persona Natural</span>
         </a>
       </li>
       <li ui-sref-active="active">
-        <a ui-sref="app.dashboard-v2">
-          <b class="label bg-info pull-right">N</b>
-          <span>Dashboard v2</span>
+        <a ui-sref="app.persona-juridica"> 
+          <span>Persona Jurídica</span>
         </a>
       </li>
     </ul>
-  </li>
-  <li ui-sref-active="active">
+  </li> 
+  <li>
+    <a href class="auto">      
+      <span class="pull-right text-muted">
+        <i class="fa fa-fw fa-angle-right text"></i>
+        <i class="fa fa-fw fa-angle-down text-active"></i>
+      </span>
+      <i class="glyphicon glyphicon-stats icon text-primary-dker"></i>
+      <span class="font-bold" translate="aside.nav.MANTENIMIENTO">Mantenimiento</span>
+    </a>
+    <ul class="nav nav-sub dk">
+      <li class="nav-sub-header">
+        <a href>
+          <span translate="aside.nav.MANTENIMIENTO">Mantenimiento</span>
+        </a>
+      </li>
+      <li ui-sref-active="active">
+        <a ui-sref="app.categoria-cliente">
+          <span> Categoria de Cliente </span>
+        </a>
+      </li>
+      <li ui-sref-active="active">
+        <a ui-sref="app.unidad-medida"> 
+          <span> Unidad de Medida </span>
+        </a>
+      </li>
+    </ul>
+  </li> 
+  
+  <!-- <li ui-sref-active="active">
     <a ui-sref="app.calendar">
       <i class="glyphicon glyphicon-calendar icon text-info-dker"></i>
       <span class="font-bold" translate="aside.nav.CALENDAR">Calendar</span>
@@ -423,6 +458,6 @@
       <i class="icon-question icon"></i>
       <span translate="aside.nav.your_stuff.DOCUMENTS">Documents</span>
     </a>
-  </li>
+  </li> -->
 </ul>
 <!-- / list -->

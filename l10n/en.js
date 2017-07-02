@@ -20,6 +20,7 @@
     "CALENDAR" : "Calendar",
     "EMAIL" : "Email",
     "WIDGETS" : "Widgets",
+    "CLIENTE" : "Cliente",
     "components" : {
       "COMPONENTS" : "Components",
       "ui_kits" : {
