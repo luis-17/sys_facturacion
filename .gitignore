@@ -1,4 +1,4 @@
 # Ignorar el contenido de la carpeta config
 application/config/
 assets/dinamic/
-app/config.js
+angular/config.js
