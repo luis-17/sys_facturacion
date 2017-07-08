@@ -51,23 +51,7 @@ angular.module('app')
                       
     }
   )
-  .constant('MODULE_CONFIG', [
-      {
-          name: 'ngGrid',
-          files: [
-              'assets/libs/angular/ng-grid/build/ng-grid.min.js',
-              'assets/libs/angular/ng-grid/ng-grid.min.css',
-              'assets/libs/angular/ng-grid/ng-grid.bootstrap.css'
-          ]
-      },
-      {
-          name: 'ui.grid',
-          files: [
-              'assets/libs/angular/angular-ui-grid/ui-grid.min.js',
-              'assets/libs/angular/angular-ui-grid/ui-grid.min.css',
-              'assets/libs/angular/angular-ui-grid/ui-grid.bootstrap.css'
-          ]
-      },
+  .constant('MODULE_CONFIG', [ 
       {
           name: 'ui.select',
           files: [

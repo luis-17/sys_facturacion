@@ -67,8 +67,8 @@
       "DOCUMENTS" : "Documents"
     }
   },
-  "MILESTONE" : "Milestone",
-  "RELEASE" : "Release"
+  "MILESTONE" : "Hito",
+  "RELEASE" : "Lanzamiento"
 }
 
 }

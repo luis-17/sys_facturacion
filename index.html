@@ -11,10 +11,19 @@
   <link rel="stylesheet" href="assets/css/simple-line-icons/css/simple-line-icons.css" type="text/css" />
   <link rel="stylesheet" href="assets/libs/jquery/bootstrap/dist/css/bootstrap.css" type="text/css" />
   
+  <link rel="stylesheet" href="assets/libs/jquery/pnotify/pnotify.core.css" />
+  <link rel="stylesheet" href="assets/libs/jquery/pnotify/pnotify.buttons.css" />
+  <link rel="stylesheet" href="assets/libs/jquery/pnotify/pnotify.history.css" />
+
+  <link rel="stylesheet" href="assets/libs/angular/angular-block/angular-block-ui.min.css" />
+  <link rel="stylesheet" href="assets/libs/angular/angular-ui-grid/ui-grid.min.css" />
+  <link rel="stylesheet" href="assets/libs/angular/angular-ui-grid/ui-grid.bootstrap.css" />
   <!-- build:css css/app.min.css -->
   <link rel="stylesheet" href="assets/css/font.css" type="text/css" />
   <link rel="stylesheet" href="assets/css/app.css" type="text/css" />
-  <!-- endbuild -->
+  <link rel="stylesheet" href="assets/css/custom.css" type="text/css" />
+  <!-- endbuild --> 
+  
 </head>
 <body ng-controller="AppCtrl">
   <div class="app" id="app" ng-class="{'app-header-fixed':app.settings.headerFixed, 'app-aside-fixed':app.settings.asideFixed, 'app-aside-folded':app.settings.asideFolded, 'app-aside-dock':app.settings.asideDock, 'container':app.settings.container}" ui-view></div>
@@ -22,8 +31,18 @@
 <!-- build:js js/app.angular.js -->
   <!-- jQuery -->
   <script src="assets/libs/jquery/jquery/dist/jquery.js"></script>
+  <!-- confirmation --> 
+  <script src="assets/libs/jquery/bootbox.js/bootbox.js"></script>
   <!-- Bootstrap -->
   <script src="assets/libs/jquery/bootstrap/dist/js/bootstrap.js"></script>
+  <!-- notification --> 
+  <script src="assets/libs/jquery/pnotify/pnotify.core.js"></script>
+  <script src="assets/libs/jquery/pnotify/pnotify.buttons.js"></script>
+  <script src="assets/libs/jquery/pnotify/pnotify.callbacks.js"></script>
+  <script src="assets/libs/jquery/pnotify/pnotify.confirm.js"></script>
+  <script src="assets/libs/jquery/pnotify/pnotify.desktop.js"></script>
+  <script src="assets/libs/jquery/pnotify/pnotify.history.js"></script>
+  <script src="assets/libs/jquery/pnotify/pnotify.nonblock.js"></script>
 
   <!-- Angular -->
   <script src="assets/libs/angular/angular/angular.js"></script>
@@ -35,24 +54,34 @@
   <script src="assets/libs/angular/angular-resource/angular-resource.js"></script>
   <script src="assets/libs/angular/angular-sanitize/angular-sanitize.js"></script>
   <script src="assets/libs/angular/angular-touch/angular-touch.js"></script>
+
+  <script src="assets/libs/angular/angular-block/angular-block-ui.min.js"></script>
   
   <script src="assets/libs/angular/angular-ui-router/release/angular-ui-router.js"></script> 
   <script src="assets/libs/angular/ngstorage/ngStorage.js"></script>
   <script src="assets/libs/angular/angular-ui-utils/ui-utils.js"></script>
 
+  <script src="assets/libs/angular/angular-ui-grid/ui-grid.min.js"></script>
+
   <!-- bootstrap -->
   <script src="assets/libs/angular/angular-bootstrap/ui-bootstrap-tpls.js"></script>
   <!-- lazyload -->
   <script src="assets/libs/angular/oclazyload/dist/ocLazyLoad.js"></script>
+
   <!-- translate -->
   <script src="assets/libs/angular/angular-translate/angular-translate.js"></script>
   <script src="assets/libs/angular/angular-translate-loader-static-files/angular-translate-loader-static-files.js"></script>
   <script src="assets/libs/angular/angular-translate-storage-cookie/angular-translate-storage-cookie.js"></script>
   <script src="assets/libs/angular/angular-translate-storage-local/angular-translate-storage-local.js"></script>
 
+  <!-- UI-GRID -->
+
+  <!-- END -->
+
   <!-- App -->
   <script src="angular/app.js"></script>
   <script src="angular/config.js"></script>
+  <script src="angular/config.lead.js"></script>
   <script src="angular/config.lazyload.js"></script>
   <script src="angular/config.router.js"></script>
   <script src="angular/main.js"></script>
@@ -68,8 +97,13 @@
   <script src="angular/directives/ui-scroll.js"></script>
   <script src="angular/directives/ui-shift.js"></script>
   <script src="angular/directives/ui-toggleclass.js"></script>
+  <script src="angular/factory.js"></script>
   <script src="angular/controllers/bootstrap.js"></script>
 <!-- endbuild -->
-  <!-- Lazy loading -->
+<!-- Lazy loading -->
+
+<!-- LÓGICA DE NEGOCIO 
+  <script src="angular/controllers/PersonaJuridicaCtrl.js"></script>
+  <script src="angular/controllers/PersonaNaturalCtrl.js"></script>   -->
 </body>
 </html>

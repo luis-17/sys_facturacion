@@ -1,5 +1,4 @@
 # Ignorar el contenido de la carpeta config
 application/config/
-assets/images/pacientes/
-assets/images/dinamic/
+assets/dinamic/
 app/config.js

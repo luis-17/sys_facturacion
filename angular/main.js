@@ -1,5 +1,20 @@
-'use strict';
-
+'use strict'; 
+if (!window.location.origin) {
+  window.location.origin = window.location.protocol+"//"+window.location.host;
+}
+var dirWebRoot =  window.location.origin + '/'+directoryApp+'/';
+angular.patchURL = dirWebRoot;
+angular.patchURLCI = dirWebRoot+'ci.php/';
+angular.dirViews = angular.patchURL+'/application/views/';
+function handleError( response ) {
+    if ( ! angular.isObject( response.data ) || ! response.data.message ) {
+        return( $q.reject( "An unknown error occurred." ) );
+    }
+    return( $q.reject( response.data.message ) );
+}
+function handleSuccess( response ) {
+    return( response.data );
+}
 /* Controllers */
 
 angular.module('app')
@@ -80,3 +95,4 @@ angular.module('app')
       }
 
   }]);
+

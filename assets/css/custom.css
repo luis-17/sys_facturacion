@@ -1,0 +1,18 @@
+/* Created and Modified by luisls1717@gmail.com */
+/* UI GRID FIX */
+.fs-mini-grid .ui-grid-cell-contents{ 
+    padding: 5px;
+}
+.fs-mini-grid .ui-grid-header-cell .ui-grid-cell-contents{ 
+	font-size: 12px; 
+}
+.fs-mini-grid .ui-grid-header-cell .ui-grid-cell-contents{ 
+    text-transform: uppercase;
+}
+.fs-mini-grid .ui-grid-cell, .ui-grid-row {
+    min-height: 28px;
+    height: 28px;
+}
+.fs-mini-grid .ui-grid-column-menu-button {
+     top: 0; 
+}

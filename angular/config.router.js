@@ -19,10 +19,10 @@ angular.module('app')
           if(window.location.href.indexOf("material") > 0){
             layout = "tpl/blocks/material.layout.html";
             $urlRouterProvider
-              .otherwise('/app/dashboard-v3');
+              .otherwise('/app/dashboard');
           }else{
             $urlRouterProvider
-              .otherwise('/app/dashboard-v1');
+              .otherwise('/app/dashboard');
           }
           
           $stateProvider
@@ -31,25 +31,22 @@ angular.module('app')
                   url: '/app',
                   templateUrl: layout
               })
-              .state('app.dashboard-v1', {
-                  url: '/dashboard-v1',
-                  templateUrl: 'tpl/app_dashboard_v1.html',
+              .state('app.dashboard', {
+                  url: '/dashboard',
+                  templateUrl: 'tpl/app_dashboard.html',
                   resolve: load(['angular/controllers/chart.js'])
               })
-              .state('app.dashboard-v2', {
-                  url: '/dashboard-v2',
-                  templateUrl: 'tpl/app_dashboard_v2.html',
-                  resolve: load(['angular/controllers/chart.js'])
+              .state('app.persona-natural', {
+                  url: '/persona-natural',
+                  templateUrl: 'tpl/persona-natural.html',
+                  resolve: load(['angular/controllers/PersonaNaturalCtrl.js']) 
               })
-              .state('app.dashboard-v3', {
-                  url: '/dashboard-v3',
-                  templateUrl: 'tpl/app_dashboard_v3.html',
-                  resolve: load(['angular/controllers/chart.js'])
+              .state('app.persona-juridica', {
+                  url: '/persona-juridica',
+                  templateUrl: 'tpl/persona-juridica.html',
+                  resolve: load(['angular/controllers/PersonaJuridicaCtrl.js'])
               })
-              .state('app.ui', {
-                  url: '/ui',
-                  template: '<div ui-view class="fade-in-up"></div>'
-              })
+
               .state('app.ui.buttons', {
                   url: '/buttons',
                   templateUrl: 'tpl/ui_buttons.html'
