@@ -49,7 +49,7 @@ class Model_cliente_empresa extends CI_Model {
 		$this->db->where('ce.estado_ce',1);
 		$this->db->where('ce.ruc',$ruc);
 		if( $excepcion ){
-			$this->db->where('ce.idclienteempresa',$idclienteempresa);
+			$this->db->where_not_in('ce.idclienteempresa',$idclienteempresa);
 		}
 		$this->db->limit(1);
 		return $this->db->get()->result_array();
@@ -57,39 +57,42 @@ class Model_cliente_empresa extends CI_Model {
 	public function m_registrar($datos)
 	{
 		$data = array(
-			'nombre_comercial' => $datos['nombre_comercial'], 
-			'nombre_corto' => $datos['nombre_corto'],
-			'razon_social' => $datos['razon_social'],	
+			'nombre_comercial' => strtoupper($datos['nombre_comercial']), 
+			'nombre_corto' => strtoupper($datos['nombre_corto']),
+			'razon_social' => strtoupper($datos['razon_social']),	
 			'ruc' => $datos['ruc'],	
 			'representante_legal' => $datos['representante_legal'],	
-			'direccion_legal' => $datos['direccion_legal'],	
-			'direccion_guia' => $datos['direccion_guia'],	
-			'telefono' => $datos['telefono'],
-			'createdAt' => date('Y-m-d H:i:s'),
-			'updatedAt' => date('Y-m-d H:i:s')
+			'direccion_legal' => empty($datos['direccion_legal']) ? NULL : $datos['direccion_legal'],	
+			'direccion_guia' => empty($datos['direccion_guia']) ? NULL : $datos['direccion_guia'],
+			'telefono' => empty($datos['telefono']) ? NULL : $datos['telefono'],
+			'idcategoriacliente' => $datos['categoria_cliente']['id'],
+			'createdat' => date('Y-m-d H:i:s'),
+			'updatedat' => date('Y-m-d H:i:s')
 		);
 		return $this->db->insert('cliente_empresa', $data);
 	}	
 	public function m_editar($datos){
 		$data = array(
-			'nombre_comercial' => $datos['nombre_comercial'], 
-			'nombre_corto' => $datos['nombre_corto'],
-			'razon_social' => $datos['razon_social'],	
+			'nombre_comercial' => strtoupper($datos['nombre_comercial']), 
+			'nombre_corto' => strtoupper($datos['nombre_corto']),
+			'razon_social' => strtoupper($datos['razon_social']),	
 			'ruc' => $datos['ruc'],	
-			'representante_legal' => $datos['representante_legal'],	
-			'direccion_legal' => $datos['direccion_legal'],	
-			'direccion_guia' => $datos['direccion_guia'],	
-			'telefono' => $datos['telefono'],
-			'updatedAt' => date('Y-m-d H:i:s')
+			'representante_legal' => strtoupper($datos['representante_legal']),	
+			'direccion_legal' => empty($datos['direccion_legal']) ? NULL : $datos['direccion_legal'],	
+			'direccion_guia' => empty($datos['direccion_guia']) ? NULL : $datos['direccion_guia'],
+			'telefono' => empty($datos['telefono']) ? NULL : $datos['telefono'],
+			'idcategoriacliente' => $datos['categoria_cliente']['id'],
+			'updatedat' => date('Y-m-d H:i:s')
 		);
-		$this->db->where('idclienteempresa',$datos['idclienteempresa']);
+		$this->db->where('idclienteempresa',$datos['id']);
 		return $this->db->update('cliente_empresa', $data);
 	}
 
 	public function m_anular($datos)
 	{
 		$data = array(
-			'estado_ce' => 0 
+			'estado_ce' => 0,
+			'updatedat' => date('Y-m-d H:i:s') 
 		);
 		$this->db->where('idclienteempresa',$datos['idclienteempresa']);
 		return $this->db->update('cliente_empresa', $data);

@@ -1,5 +1,5 @@
 angular.module('app')
-  .factory('$bootbox', ['$modal', '$window', function($modal, $window) {
+  .factory('$bootbox', ['$uibModal', '$window', function($uibModal, $window) {
     'use strict';
     // NOTE: this is a workaround to make BootboxJS somewhat compatible with
     // Angular UI Bootstrap in the absence of regular bootstrap.js
@@ -16,7 +16,7 @@ angular.module('app')
           return;
         }
 
-        var modalInstance = $modal.open({
+        var modalInstance = $uibModal.open({
           template: angular.element(this).find('.modal-content').html()
         });
         this.data('bs.modal', modalInstance);

@@ -1,13 +1,13 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class ClienteEmpresa extends CI_Controller {
+class ClientePersona extends CI_Controller {
 
 	public function __construct()
 	{
 		parent::__construct();
 		$this->load->helper(array('security','imagen_helper','otros_helper','fechas_helper'));
-		$this->load->model(array('model_cliente_empresa','model_categoria_cliente'));
+		$this->load->model(array('model_cliente_persona','model_categoria_cliente'));
 		//cache
 		$this->output->set_header("Cache-Control: no-store, no-cache, must-revalidate, no-transform, max-age=0, post-check=0, pre-check=0");
 		$this->output->set_header("Pragma: no-cache");
@@ -16,12 +16,12 @@ class ClienteEmpresa extends CI_Controller {
 		//if(!@$this->user) redirect ('inicio/login');
 		//$permisos = cargar_permisos_del_usuario($this->user->idusuario);
 	}
-	public function listar_cliente_empresa()
+	public function listar_cliente_persona()
 	{ 
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		$paramPaginate = $allInputs['paginate'];
-		$lista = $this->model_cliente_empresa->m_cargar_cliente_empresa($paramPaginate);
-		$fCount = $this->model_cliente_empresa->m_count_cliente_empresa($paramPaginate);
+		$lista = $this->model_cliente_persona->m_cargar_cliente_persona($paramPaginate);
+		$fCount = $this->model_cliente_persona->m_count_cliente_persona($paramPaginate);
 		$arrListado = array();
 		foreach ($lista as $row) { 
 			array_push($arrListado,
@@ -54,11 +54,11 @@ class ClienteEmpresa extends CI_Controller {
 	}
 	public function ver_popup_formulario()
 	{
-		$this->load->view('cliente-empresa/mant_clienteEmpresa');
+		$this->load->view('cliente-persona/mant_clienteEmpresa');
 	}
 	public function ver_popup_contactos()
 	{
-		$this->load->view('cliente-empresa/mant_contactoEmpresa');
+		$this->load->view('cliente-persona/mant_contactoEmpresa');
 	}
 	public function registrar()
 	{
@@ -66,8 +66,8 @@ class ClienteEmpresa extends CI_Controller {
 		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
     	$arrData['flag'] = 0;
     	// VALIDACIONES
-	    /* VALIDAR SI EL RUC YA EXISTE */ 
-    	$fCliente = $this->model_cliente_empresa->m_validar_cliente_empresa_num_documento($allInputs['ruc']);
+	    /* VALIDAR SI EL DNI YA EXISTE */ 
+    	$fCliente = $this->model_cliente_persona->m_validar_cliente_persona_num_documento($allInputs['ruc']);
     	if( !empty($fCliente) ) {
     		$arrData['message'] = 'El RUC ingresado, ya existe.';
 			$arrData['flag'] = 0;
@@ -77,7 +77,7 @@ class ClienteEmpresa extends CI_Controller {
 			return;
    		}
     	$this->db->trans_start();
-		if($this->model_cliente_empresa->m_registrar($allInputs)) { // registro de cliente empresa 
+		if($this->model_cliente_persona->m_registrar($allInputs)) { // registro de cliente empresa 
 			$arrData['message'] = 'Se registraron los datos correctamente';
 			$arrData['flag'] = 1;
 		}
@@ -93,7 +93,7 @@ class ClienteEmpresa extends CI_Controller {
     	$arrData['flag'] = 0;
     	// VALIDACIONES
 		/* VALIDAR SI EL RUC YA EXISTE */
-    	$fCliente = $this->model_cliente_empresa->m_validar_cliente_empresa_num_documento($allInputs['ruc'],TRUE,$allInputs['id']);
+    	$fCliente = $this->model_cliente_persona->m_validar_cliente_persona_num_documento($allInputs['ruc'],TRUE,$allInputs['id']);
     	if( $fCliente ) {
     		$arrData['message'] = 'El RUC ingresado, ya existe.';
 			$arrData['flag'] = 0;
@@ -102,7 +102,7 @@ class ClienteEmpresa extends CI_Controller {
 			    ->set_output(json_encode($arrData));
 			return;
    		}
-		if($this->model_cliente_empresa->m_editar($allInputs)){
+		if($this->model_cliente_persona->m_editar($allInputs)){
 			$arrData['message'] = 'Se editaron los datos correctamente';
 			$arrData['flag'] = 1;
 		}
@@ -117,7 +117,7 @@ class ClienteEmpresa extends CI_Controller {
 		$arrData['message'] = 'No se pudo anular los datos';
     	$arrData['flag'] = 0;
     	foreach ($allInputs as $row) {
-			if( $this->model_cliente_empresa->m_anular($row['idempresacliente']) ){ 
+			if( $this->model_cliente_persona->m_anular($row['idempresacliente']) ){ 
 				$arrData['message'] = 'Se anularon los datos correctamente';
 	    		$arrData['flag'] = 1;
 			}

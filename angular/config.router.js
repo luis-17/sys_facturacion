@@ -44,7 +44,7 @@ angular.module('app')
               .state('app.persona-juridica', {
                   url: '/persona-juridica',
                   templateUrl: 'tpl/persona-juridica.html',
-                  resolve: load(['angular/controllers/PersonaJuridicaCtrl.js'])
+                  resolve: load(['angular/controllers/PersonaJuridicaCtrl.js','angular/controllers/CategoriaClienteCtrl.js','angular/controllers/ContactoEmpresaCtrl.js'])
               })
 
               .state('app.ui.buttons', {

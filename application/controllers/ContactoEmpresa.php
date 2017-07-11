@@ -1,13 +1,13 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class ClienteEmpresa extends CI_Controller {
+class ContactoEmpresa extends CI_Controller {
 
 	public function __construct()
 	{
 		parent::__construct();
-		$this->load->helper(array('security','imagen_helper','otros_helper','fechas_helper'));
-		$this->load->model(array('model_cliente_empresa','model_categoria_cliente'));
+		$this->load->helper(array('security','otros_helper','fechas_helper'));
+		$this->load->model(array('model_contacto_empresa'));
 		//cache
 		$this->output->set_header("Cache-Control: no-store, no-cache, must-revalidate, no-transform, max-age=0, post-check=0, pre-check=0");
 		$this->output->set_header("Pragma: no-cache");
@@ -16,28 +16,26 @@ class ClienteEmpresa extends CI_Controller {
 		//if(!@$this->user) redirect ('inicio/login');
 		//$permisos = cargar_permisos_del_usuario($this->user->idusuario);
 	}
-	public function listar_cliente_empresa()
-	{ 
+	public function listar_contactos_esta_empresa()
+	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		$paramPaginate = $allInputs['paginate'];
-		$lista = $this->model_cliente_empresa->m_cargar_cliente_empresa($paramPaginate);
-		$fCount = $this->model_cliente_empresa->m_count_cliente_empresa($paramPaginate);
+		$paramDatos = $allInputs['datos'];
+		$lista = $this->model_contacto_empresa->m_cargar_contacto_esta_empresa($paramPaginate,$paramDatos);
+		$fCount = $this->model_contacto_empresa->m_count_contacto_esta_empresa($paramPaginate,$paramDatos);
 		$arrListado = array();
 		foreach ($lista as $row) { 
 			array_push($arrListado,
 				array(
-					'id' => trim($row['idclienteempresa']),
-					'nombre_comercial' => strtoupper($row['nombre_comercial']),
-					'nombre_corto' => strtoupper($row['nombre_corto']),
-					'razon_social' => strtoupper($row['razon_social']),
-					'categoria_cliente' => array(
-						'id'=> $row['idcategoriacliente'],
-						'descripcion'=> $row['descripcion_cc']
-					),
-					'ruc' => $row['ruc'],
-					'representante_legal' => $row['representante_legal'],
-					'direccion_legal' => $row['direccion_legal'],
-					'telefono' => $row['telefono']
+					'id' => trim($row['idcontacto']),
+					'nombres' => strtoupper($row['nombres']),
+					'apellidos' => strtoupper($row['apellidos']),
+					'contacto' => strtoupper($row['nombres'].' '.$row['apellidos']),
+					'fecha_nacimiento' => darFormatoDMY($row['fecha_nacimiento']),
+					'fecha_nacimiento_str' => formatoFechaReporte3($row['fecha_nacimiento']),
+					'telefono_fijo' => $row['telefono_fijo'],
+					'telefono_movil' => $row['telefono_movil'],
+					'email' => $row['email'] 
 				)
 			);
 		}
@@ -54,11 +52,7 @@ class ClienteEmpresa extends CI_Controller {
 	}
 	public function ver_popup_formulario()
 	{
-		$this->load->view('cliente-empresa/mant_clienteEmpresa');
-	}
-	public function ver_popup_contactos()
-	{
-		$this->load->view('cliente-empresa/mant_contactoEmpresa');
+		$this->load->view('contacto-empresa/mant_contacto_empresa');
 	}
 	public function registrar()
 	{
@@ -66,18 +60,9 @@ class ClienteEmpresa extends CI_Controller {
 		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
     	$arrData['flag'] = 0;
     	// VALIDACIONES
-	    /* VALIDAR SI EL RUC YA EXISTE */ 
-    	$fCliente = $this->model_cliente_empresa->m_validar_cliente_empresa_num_documento($allInputs['ruc']);
-    	if( !empty($fCliente) ) {
-    		$arrData['message'] = 'El RUC ingresado, ya existe.';
-			$arrData['flag'] = 0;
-			$this->output
-			    ->set_content_type('application/json')
-			    ->set_output(json_encode($arrData));
-			return;
-   		}
+	    
     	$this->db->trans_start();
-		if($this->model_cliente_empresa->m_registrar($allInputs)) { // registro de cliente empresa 
+		if($this->model_contacto_empresa->m_registrar($allInputs)) { // registro de contacto 
 			$arrData['message'] = 'Se registraron los datos correctamente';
 			$arrData['flag'] = 1;
 		}
@@ -92,17 +77,8 @@ class ClienteEmpresa extends CI_Controller {
 		$arrData['message'] = 'Error al editar los datos, inténtelo nuevamente';
     	$arrData['flag'] = 0;
     	// VALIDACIONES
-		/* VALIDAR SI EL RUC YA EXISTE */
-    	$fCliente = $this->model_cliente_empresa->m_validar_cliente_empresa_num_documento($allInputs['ruc'],TRUE,$allInputs['id']);
-    	if( $fCliente ) {
-    		$arrData['message'] = 'El RUC ingresado, ya existe.';
-			$arrData['flag'] = 0;
-			$this->output
-			    ->set_content_type('application/json')
-			    ->set_output(json_encode($arrData));
-			return;
-   		}
-		if($this->model_cliente_empresa->m_editar($allInputs)){
+
+		if($this->model_contacto_empresa->m_editar($allInputs)){
 			$arrData['message'] = 'Se editaron los datos correctamente';
 			$arrData['flag'] = 1;
 		}
@@ -116,11 +92,9 @@ class ClienteEmpresa extends CI_Controller {
 
 		$arrData['message'] = 'No se pudo anular los datos';
     	$arrData['flag'] = 0;
-    	foreach ($allInputs as $row) {
-			if( $this->model_cliente_empresa->m_anular($row['idempresacliente']) ){ 
-				$arrData['message'] = 'Se anularon los datos correctamente';
-	    		$arrData['flag'] = 1;
-			}
+		if( $this->model_contacto_empresa->m_anular($allInputs) ){ 
+			$arrData['message'] = 'Se anularon los datos correctamente';
+    		$arrData['flag'] = 1;
 		}
 		$this->output
 		    ->set_content_type('application/json')
