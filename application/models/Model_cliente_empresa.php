@@ -94,7 +94,7 @@ class Model_cliente_empresa extends CI_Model {
 			'estado_ce' => 0,
 			'updatedat' => date('Y-m-d H:i:s') 
 		);
-		$this->db->where('idclienteempresa',$datos['idclienteempresa']);
+		$this->db->where('idclienteempresa',$datos['id']);
 		return $this->db->update('cliente_empresa', $data);
 	}	
 }

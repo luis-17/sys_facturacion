@@ -24,20 +24,32 @@ class ClientePersona extends CI_Controller {
 		$fCount = $this->model_cliente_persona->m_count_cliente_persona($paramPaginate);
 		$arrListado = array();
 		foreach ($lista as $row) { 
+			if( $row['sexo'] == 'M' ){
+				$row['desc_sexo'] = 'MASCULINO';
+			}
+			if( $row['sexo'] == 'F' ){
+				$row['desc_sexo'] = 'FEMENINO';
+			}
 			array_push($arrListado,
 				array(
-					'id' => trim($row['idclienteempresa']),
-					'nombre_comercial' => strtoupper($row['nombre_comercial']),
-					'nombre_corto' => strtoupper($row['nombre_corto']),
-					'razon_social' => strtoupper($row['razon_social']),
+					'id' => trim($row['idclientepersona']),
+					'nombres' => strtoupper($row['nombres']),
+					'apellidos' => strtoupper($row['apellidos']),
+					'num_documento' => $row['num_documento'],
 					'categoria_cliente' => array(
 						'id'=> $row['idcategoriacliente'],
 						'descripcion'=> $row['descripcion_cc']
 					),
-					'ruc' => $row['ruc'],
-					'representante_legal' => $row['representante_legal'],
-					'direccion_legal' => $row['direccion_legal'],
-					'telefono' => $row['telefono']
+					'sexo'=> array(
+						'id'=> $row['sexo'],
+						'descripcion'=> $row['desc_sexo'] 
+					),
+					'edad' => devolverEdad($row['fecha_nacimiento']),
+					'fecha_nacimiento' => darFormatoDMY($row['fecha_nacimiento']),
+					'fecha_nacimiento_str' => formatoFechaReporte3($row['fecha_nacimiento']),
+					'telefono_fijo' => $row['telefono_fijo'],
+					'telefono_movil' => $row['telefono_movil'],
+					'email' => $row['email']
 				)
 			);
 		}
@@ -54,11 +66,7 @@ class ClientePersona extends CI_Controller {
 	}
 	public function ver_popup_formulario()
 	{
-		$this->load->view('cliente-persona/mant_clienteEmpresa');
-	}
-	public function ver_popup_contactos()
-	{
-		$this->load->view('cliente-persona/mant_contactoEmpresa');
+		$this->load->view('cliente-persona/mant_clientePersona');
 	}
 	public function registrar()
 	{
@@ -67,9 +75,9 @@ class ClientePersona extends CI_Controller {
     	$arrData['flag'] = 0;
     	// VALIDACIONES
 	    /* VALIDAR SI EL DNI YA EXISTE */ 
-    	$fCliente = $this->model_cliente_persona->m_validar_cliente_persona_num_documento($allInputs['ruc']);
+    	$fCliente = $this->model_cliente_persona->m_validar_cliente_persona_num_documento($allInputs['num_documento']); 
     	if( !empty($fCliente) ) {
-    		$arrData['message'] = 'El RUC ingresado, ya existe.';
+    		$arrData['message'] = 'El Documento de Identidad ingresado, ya existe.';
 			$arrData['flag'] = 0;
 			$this->output
 			    ->set_content_type('application/json')
@@ -93,7 +101,7 @@ class ClientePersona extends CI_Controller {
     	$arrData['flag'] = 0;
     	// VALIDACIONES
 		/* VALIDAR SI EL RUC YA EXISTE */
-    	$fCliente = $this->model_cliente_persona->m_validar_cliente_persona_num_documento($allInputs['ruc'],TRUE,$allInputs['id']);
+    	$fCliente = $this->model_cliente_persona->m_validar_cliente_persona_num_documento($allInputs['num_documento'],TRUE,$allInputs['id']);
     	if( $fCliente ) {
     		$arrData['message'] = 'El RUC ingresado, ya existe.';
 			$arrData['flag'] = 0;
@@ -116,11 +124,9 @@ class ClientePersona extends CI_Controller {
 
 		$arrData['message'] = 'No se pudo anular los datos';
     	$arrData['flag'] = 0;
-    	foreach ($allInputs as $row) {
-			if( $this->model_cliente_persona->m_anular($row['idempresacliente']) ){ 
-				$arrData['message'] = 'Se anularon los datos correctamente';
-	    		$arrData['flag'] = 1;
-			}
+		if( $this->model_cliente_persona->m_anular($allInputs) ){ 
+			$arrData['message'] = 'Se anularon los datos correctamente';
+    		$arrData['flag'] = 1;
 		}
 		$this->output
 		    ->set_content_type('application/json')

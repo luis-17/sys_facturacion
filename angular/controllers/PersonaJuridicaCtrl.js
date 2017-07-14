@@ -130,7 +130,7 @@ app.controller('PersonaJuridicaCtrl', ['$scope', '$filter', '$uibModal', '$bootb
       controller: function ($scope, $uibModalInstance) { 
       	blockUI.stop(); 
       	$scope.fData = {};
-      	$scope.titleForm = 'Registro de Cliente Empresa';
+      	$scope.titleForm = 'Registro de Cliente - Persona Jurídica';
       	$scope.cancel = function () {
       	  $uibModalInstance.dismiss('cancel');
       	}
@@ -176,7 +176,7 @@ app.controller('PersonaJuridicaCtrl', ['$scope', '$filter', '$uibModal', '$bootb
         }else{
           alert('Seleccione una sola fila');
         }
-      	$scope.titleForm = 'Edición de Cliente Empresa';
+      	$scope.titleForm = 'Edición de Cliente - Persona Jurídica';
       	$scope.cancel = function () {
       	  $uibModalInstance.dismiss('cancel');
       	}
@@ -414,6 +414,31 @@ app.controller('PersonaJuridicaCtrl', ['$scope', '$filter', '$uibModal', '$bootb
       }
     });
 	}
+	$scope.btnAnular = function() { 
+    var pMensaje = '¿Realmente desea anular el registro?';
+    $bootbox.confirm(pMensaje, function(result) {
+      if(result){
+        var arrParams = {
+          id: $scope.mySelectionGrid[0].id 
+        };
+        blockUI.start('Procesando información...');
+        ClienteEmpresaServices.sAnular(arrParams).then(function (rpta) {
+          if(rpta.flag == 1){
+            var pTitle = 'OK!';
+            var pType = 'success';
+            $scope.getPaginationServerSide();
+          }else if(rpta.flag == 0){
+            var pTitle = 'Error!';
+            var pType = 'danger';
+          }else{
+            alert('Error inesperado');
+          }
+          pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2500 });
+          blockUI.stop(); 
+        });
+      }
+    });
+  }
 }]);
 
 app.service("ClienteEmpresaServices",function($http, $q) {

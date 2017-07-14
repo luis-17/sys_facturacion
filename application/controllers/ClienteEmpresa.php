@@ -116,11 +116,9 @@ class ClienteEmpresa extends CI_Controller {
 
 		$arrData['message'] = 'No se pudo anular los datos';
     	$arrData['flag'] = 0;
-    	foreach ($allInputs as $row) {
-			if( $this->model_cliente_empresa->m_anular($row['idempresacliente']) ){ 
-				$arrData['message'] = 'Se anularon los datos correctamente';
-	    		$arrData['flag'] = 1;
-			}
+		if( $this->model_cliente_empresa->m_anular($allInputs) ){ 
+			$arrData['message'] = 'Se anularon los datos correctamente';
+    		$arrData['flag'] = 1;
 		}
 		$this->output
 		    ->set_content_type('application/json')

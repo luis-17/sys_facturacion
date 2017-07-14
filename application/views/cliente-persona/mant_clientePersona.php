@@ -2,50 +2,49 @@
 	<h4 class="modal-title"> {{ titleForm }} </h4>
 </div> 
 <div class="modal-body">  
-	<form class="row" name="formClienteEmpresa"> 
-		<div class="form-group col-md-4 mb-md ">
+	<form class="row" name="formClientePersona"> 
+		<div class="form-group col-md-6 mb-md ">
 			<label class="control-label mb-n"> Categoría: <small class="text-danger">(*)</small> </label>
             <select class="form-control input-sm" ng-model="fData.categoria_cliente" ng-options="item as item.descripcion for item in fArr.listaCategoriaCliente" required tabindex="10" ></select> 
 		</div>
-		<div class="form-group col-md-8 mb-md">
-			<label class="control-label mb-n"> Razón Social: <small class="text-danger">(*)</small> </label>
-			<input type="text" class="form-control input-sm" ng-model="fData.razon_social" placeholder="Ingrese razón social" required tabindex="30" />
+		
+		<div class="form-group col-md-6 mb-md">
+			<label class="control-label mb-n"> N° de Documento: <small class="text-danger">(*)</small> </label>
+			<input type="text" class="form-control input-sm" ng-model="fData.num_documento" placeholder="Ingrese N° de Documento" required tabindex="30" maxlength="8" minlength="8" />
 		</div>
-    	
-		<div class="form-group col-md-4 mb-md">
-			<label class="control-label mb-n"> RUC: <small class="text-danger">(*)</small> </label>
-			<input type="text" class="form-control input-sm" ng-model="fData.ruc" placeholder="Ingrese RUC" required tabindex="40" maxlength="40" />
+		<div class="form-group col-md-6 mb-md">
+			<label class="control-label mb-n"> Nombres: <small class="text-danger">(*)</small> </label>
+			<input type="text" class="form-control input-sm" ng-model="fData.nombres" placeholder="Ingrese nombres" required tabindex="40" />
 		</div>
-		<div class="form-group col-md-8 mb-md">
-			<label class="control-label mb-n"> Representante Legal <small class="text-danger">(*)</small> </label>
-			<input type="text" class="form-control input-sm" ng-model="fData.representante_legal" placeholder="Ingrese representante legal" required tabindex="50" />
+    	<div class="form-group col-md-6 mb-md">
+			<label class="control-label mb-n"> Apellidos: <small class="text-danger">(*)</small> </label>
+			<input type="text" class="form-control input-sm" ng-model="fData.apellidos" placeholder="Ingrese apellidos" required tabindex="50" />
 		</div>
-
-		<div class="form-group col-md-8 mb-md">
-			<label class="control-label mb-n"> Nombre Comercial: <small class="text-danger">(*)</small> </label>
-			<input type="text" class="form-control input-sm" ng-model="fData.nombre_comercial" placeholder="Ingrese nombre comercial" required tabindex="20" />
+		<div class="form-group col-md-3 mb-md">
+			<label class="control-label mb-n"> Sexo <small class="text-danger">(*)</small> </label>
+			<select class="form-control input-sm" ng-model="fData.sexo" ng-options="item as item.descripcion for item in fArr.listaSexo" required tabindex="60" ></select> 
 		</div>
-		<div class="form-group col-md-4 mb-md">
-			<label class="control-label mb-n"> Nombre Corto: <small class="text-danger">(*)</small> </label>
-			<input type="text" class="form-control input-sm" ng-model="fData.nombre_corto" placeholder="Ingrese nombre corto" required tabindex="25" />
+		<div class="form-group col-md-3 mb-md">
+			<label class="control-label mb-n"> Fecha de Nac.: </label>
+			<input type="tel" class="form-control input-sm" ng-model="fData.fecha_nacimiento" tabindex="70" input-mask mask-options="{alias: 'dd-mm-yyyy'}" />
 		</div>
-
-		<div class="form-group col-md-8 mb-md">
-			<label class="control-label mb-n"> Dirección Legal: </label>
-			<input type="text" class="form-control input-sm" ng-model="fData.direccion_legal" placeholder="Ingrese direción legal" tabindex="60" />
+		<div class="form-group col-md-6 mb-md">
+			<label class="control-label mb-n"> Teléfono movil: <small class="text-danger">(*)</small> </label>
+			<input type="text" class="form-control input-sm" ng-model="fData.telefono_movil" placeholder="Ingrese teléfono movil" required tabindex="80" />
+		</div>
+		<div class="form-group col-md-6 mb-md">
+			<label class="control-label mb-n"> Teléfono Fijo: </label>
+			<input type="text" class="form-control input-sm" ng-model="fData.telefono_fijo" placeholder="Ingrese teléfono fijo" tabindex="90" />
+		</div>
+		<div class="form-group col-md-6 mb-md">
+			<label class="control-label mb-n"> E-mail: </label>
+			<input type="email" class="form-control input-sm" ng-model="fData.email" placeholder="Ingrese email" tabindex="100" />
 		</div>
 		
-		<div class="form-group col-md-4 mb-md">
-			<label class="control-label mb-n"> Teléfono: </label>
-			<input type="tel" class="form-control input-sm" ng-model="fData.telefono" placeholder="Ingrese teléfono" tabindex="80" />
-		</div>
-		<div class="form-group col-md-8 mb-md">
-			<label class="control-label mb-n"> Dirección de la Guía: </label>
-			<input type="text" class="form-control input-sm" ng-model="fData.direccion_guia" placeholder="Ingrese Direccion que aparecerá en la guía" tabindex="70" />
-		</div>
+		
 	</form>
 </div>
 <div class="modal-footer">
-    <button class="btn btn-primary" ng-click="aceptar(); $event.preventDefault();" ng-disabled="formClienteEmpresa.$invalid">Aceptar</button>
+    <button class="btn btn-primary" ng-click="aceptar(); $event.preventDefault();" ng-disabled="formClientePersona.$invalid">Aceptar</button>
     <button class="btn btn-warning" ng-click="cancel()">Cerrar</button>
 </div> 

@@ -31,8 +31,8 @@
 
         <!-- link and dropdown -->
         <ul class="nav navbar-nav hidden-sm"> 
-          <li class="dropdown" dropdown>
-            <a href class="dropdown-toggle" dropdown-toggle>
+          <li class="dropdown" uib-dropdown>
+            <a href class="dropdown-toggle" uib-dropdown-toggle>
               <i class="fa fa-fw fa-plus visible-xs-inline-block"></i>
               <span translate="header.navbar.new.NEW">New</span> <span class="caret"></span>
             </a>
@@ -72,8 +72,8 @@
 
         <!-- nabar right -->
         <ul class="nav navbar-nav navbar-right">
-          <li class="dropdown hidden-sm" is-open="lang.isopen" dropdown>
-            <a href class="dropdown-toggle" dropdown-toggle>
+          <li class="dropdown hidden-sm" is-open="lang.isopen" uib-dropdown>
+            <a href class="dropdown-toggle" uib-dropdown-toggle>
               {{selectLang}} <b class="caret"></b>
             </a>
             <!-- dropdown -->
@@ -87,14 +87,14 @@
           <li class="hidden-xs">
             <a ui-fullscreen></a>
           </li>
-          <li class="dropdown" style="width:120px;">
-            <button class="btn btn-default no-shadow pos-abt" ui-toggle-class="active" target=".settings">
+          <li class="dropdown" >
+            <a style="border:none;" href="#" class="btn btn-default no-shadow dropdown-toggle" ui-toggle-class="active" target=".settings">
               <i class="fa fa-spin fa-gear"></i>
-            </button>
+            </a>
           </li>
           
-          <li class="dropdown" dropdown>
-            <a href class="dropdown-toggle clear" dropdown-toggle>
+          <li class="dropdown" uib-dropdown>
+            <a href class="dropdown-toggle clear" uib-dropdown-toggle>
               <span class="thumb-sm avatar pull-right m-t-n-sm m-b-n-sm m-l-sm">
                 <img src="img/a0.jpg" alt="...">
                 <i class="on md b-white bottom"></i>

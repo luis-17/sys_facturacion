@@ -39,7 +39,7 @@ angular.module('app')
               .state('app.persona-natural', {
                   url: '/persona-natural',
                   templateUrl: 'tpl/persona-natural.html',
-                  resolve: load(['angular/controllers/PersonaNaturalCtrl.js']) 
+                  resolve: load(['angular/controllers/PersonaNaturalCtrl.js','angular/controllers/CategoriaClienteCtrl.js']) 
               })
               .state('app.persona-juridica', {
                   url: '/persona-juridica',
