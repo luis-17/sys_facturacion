@@ -42,7 +42,7 @@ angular.module('app')
         },
         settings: {
           themeID: 1,
-          navbarHeaderColor: 'bg-white-only',
+          navbarHeaderColor: 'bg-black',
           navbarCollapseColor: 'bg-white-only',
           asideColor: 'bg-black',
           headerFixed: true,
@@ -52,7 +52,7 @@ angular.module('app')
           container: false
         }
       }
-
+      console.log($scope.app.settings.navbarHeaderColor,'$scope.app.settings.navbarHeaderColor'); 
       $scope.listaEmpresaAdminSession = []; 
       // save settings to local storage
       if ( angular.isDefined($localStorage.settings) ) {
