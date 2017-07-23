@@ -18,8 +18,8 @@ function handleSuccess( response ) {
 /* Controllers */
 
 angular.module('app')
-  .controller('AppCtrl', ['$scope', '$translate', '$localStorage', '$window', 
-    function(              $scope,   $translate,   $localStorage,   $window ) {
+  .controller('AppCtrl', ['$scope', '$translate', '$localStorage', '$location', '$window',  '$timeout', 'rootServices',  'blockUI', 'pinesNotifications',
+    function(              $scope,   $translate,   $localStorage,   $location,   $window,    $timeout,   rootServices,    blockUI ,  pinesNotifications ) {
       // add 'ie' classes to html
       var isIE = !!navigator.userAgent.match(/MSIE/i);
       if(isIE){ angular.element($window.document.body).addClass('ie');}
@@ -27,7 +27,7 @@ angular.module('app')
 
       // config
       $scope.app = {
-        name: 'Angulr',
+        name: 'CONEHOST.PE',
         version: '2.2.0',
         // for chart colors
         color: {
@@ -42,7 +42,7 @@ angular.module('app')
         },
         settings: {
           themeID: 1,
-          navbarHeaderColor: 'bg-black',
+          navbarHeaderColor: 'bg-white-only',
           navbarCollapseColor: 'bg-white-only',
           asideColor: 'bg-black',
           headerFixed: true,
@@ -53,6 +53,7 @@ angular.module('app')
         }
       }
 
+      $scope.listaEmpresaAdminSession = []; 
       // save settings to local storage
       if ( angular.isDefined($localStorage.settings) ) {
         $scope.app.settings = $localStorage.settings;
@@ -94,5 +95,136 @@ angular.module('app')
           return (/iPhone|iPod|iPad|Silk|Android|BlackBerry|Opera Mini|IEMobile/).test(ua);
       }
 
-  }]);
+      /* SESSION */
+      $scope.arrMain = {};
+      $scope.arrMain.empresaadmin = {};
+      $scope.arrMain.listaEmpresaAdminSession = [];
+      $scope.fSessionCI = {};
 
+      $scope.$on('$routeChangeStart', function() {
+        console.log('change me');
+      });
+      $scope.isLoggedIn = false;
+      $scope.logOut = function() {
+        $scope.isLoggedIn = false; 
+      }
+
+      $scope.logIn = function() {
+        $scope.isLoggedIn = true;
+      };
+      $scope.getListaEmpresasSession = function(){ 
+        $timeout(function() { 
+          rootServices.sListarEmpresaAdminSession().then(function (rpta) { 
+            $scope.arrMain.listaEmpresaAdminSession = rpta.datos; 
+            var objIndex = $scope.arrMain.listaEmpresaAdminSession.filter(function(obj) { 
+              return obj.idempresaadmin == $scope.fSessionCI.idempresaadmin;
+            }).shift(); 
+            $scope.arrMain.empresaadmin = objIndex; 
+          });
+        }, 50);
+      }
+      $scope.getValidateSession = function () { 
+        rootServices.sGetSessionCI().then(function (response) { 
+          if(response.flag == 1){
+            $scope.fSessionCI = response.datos;
+            $scope.getListaEmpresasSession();
+            $scope.logIn();
+            // $scope.CargaMenu();
+            if( $location.path() == '/access/login' ){ 
+              $location.path('/');
+            }
+          }else{
+            $scope.fSessionCI = {};
+            $scope.logOut();
+            $location.path('/access/login'); 
+            return false; 
+          }
+        });
+      }
+      $scope.onChangeEmpresaSession = function() {
+        var arrData = { 
+          'datos' : $scope.arrMain.empresaadmin,
+          'session' : $scope.fSessionCI
+        }
+        blockUI.start('Ejecutando proceso...');
+        rootServices.sCambiarEmpresaSession(arrData).then(function (rpta) {
+          if(rpta.flag == 1){
+            var pTitle = 'OK!';
+            var pType = 'success';
+            $scope.getValidateSession();
+          }else if(rpta.flag == 0){
+            var pTitle = 'Error!';
+            var pType = 'warning';
+          }else{
+            alert('Contacte con el Área de Sistemas');
+          }
+          blockUI.stop();
+          pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2000 });
+        });
+      }
+      $scope.btnLogoutToSystem = function () { 
+        blockUI.start('Cerrando sesión...');
+        rootServices.sLogoutSessionCI().then(function () {
+          blockUI.stop();
+          $scope.fSessionCI = {};
+          $scope.arrMain = {};
+          $scope.arrMain.empresaadmin = {};
+          $scope.arrMain.listaEmpresaAdminSession = [];
+          $scope.logOut();
+          $location.path('/access/login');
+        });
+      } 
+      $scope.getValidateSession();
+  }])
+  .service('rootServices', function($http, $q, handleBehavior) { 
+    return({
+        sLogoutSessionCI: sLogoutSessionCI,
+        sGetSessionCI: sGetSessionCI,
+        sListarEmpresaAdminSession: sListarEmpresaAdminSession, 
+        sCambiarEmpresaSession: sCambiarEmpresaSession,
+        sLoginToSystem: sLoginToSystem 
+    });
+    function sLogoutSessionCI(pDatos) {
+      var datos = pDatos || {};
+      var request = $http({
+            method : "post",
+            url :  angular.patchURLCI + "Acceso/logoutSessionCI",
+            data : datos
+      });
+      return (request.then(handleBehavior.success,handleBehavior.error));
+    }
+    function sGetSessionCI(pDatos) {
+      var datos = pDatos || {};
+      var request = $http({
+            method : "post",
+            url :  angular.patchURLCI + "Acceso/getSessionCI",
+            data : datos
+      });
+      return (request.then(handleBehavior.success,handleBehavior.error));
+    }
+    function sListarEmpresaAdminSession(datos) {
+      var request = $http({
+            method : "post",
+            url : angular.patchURLCI+"Acceso/lista_empresa_admin_session", 
+            data : datos
+      });
+      return (request.then(handleBehavior.success,handleBehavior.error));
+    }
+    function sCambiarEmpresaSession(datos) {
+      var request = $http({
+            method : "post",
+            url : angular.patchURLCI+"Acceso/cambiar_empresa_admin_session", 
+            data : datos
+      });
+      return (request.then(handleBehavior.success,handleBehavior.error));
+    }
+    function sLoginToSystem(datos) { 
+      var request = $http({
+            method : "post",
+            url : angular.patchURLCI+"Acceso/", 
+            data : datos
+      });
+      return (request.then(handleBehavior.success,handleBehavior.error));
+    }
+    
+  });

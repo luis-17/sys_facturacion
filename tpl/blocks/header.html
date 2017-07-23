@@ -8,9 +8,9 @@
         </button>
         <!-- brand -->
         <a href="#/" class="navbar-brand text-lt">
-          <i class="fa fa-btc"></i>
-          <img src="img/logo.png" alt="." class="hide">
-          <span class="hidden-folded m-l-xs">{{app.name}}</span>
+          <!-- <i class="fa fa-btc"></i> -->
+          <img class="img-responsive" src="assets/dinamic/empresa/{{fSessionCI.nombre_logo}}" alt="{{fSessionCI.nombre_comercial}}" > 
+          <!-- <span class="hidden-folded m-l-xs">{{app.name}}</span> -->
         </a>
         <!-- / brand -->
       </div>
@@ -23,9 +23,9 @@
           <a href class="btn no-shadow navbar-btn" ng-click="app.settings.asideFolded = !app.settings.asideFolded">
             <i class="fa {{app.settings.asideFolded ? 'fa-indent' : 'fa-dedent'}} fa-fw"></i>
           </a>
-          <a href class="btn no-shadow navbar-btn" ui-toggle-class="show" target="#aside-user">
+          <!-- <a href class="btn no-shadow navbar-btn" ui-toggle-class="show" target="#aside-user">
             <i class="icon-user fa-fw"></i>
-          </a>
+          </a> -->
         </div>
         <!-- / buttons -->
 
@@ -58,16 +58,18 @@
         <!-- / link and dropdown -->
 
         <!-- search form -->
-        <!-- <form class="navbar-form navbar-form-sm navbar-left shift" ui-shift="prependTo" target=".navbar-collapse" role="search" ng-controller="TypeaheadDemoCtrl">
+        <!-- -->
+        <form class="navbar-form navbar-form-sm navbar-left shift" ui-shift="prependTo" target=".navbar-collapse" role="search" ng-controller="TypeaheadDemoCtrl">
           <div class="form-group">
             <div class="input-group">
-              <input type="text" ng-model="selected" typeahead="state for state in states | filter:$viewValue | limitTo:8" class="form-control input-sm bg-light no-border rounded padder" placeholder="Search projects...">
+              <input type="text" ng-model="selected" typeahead="state for state in states | filter:$viewValue | limitTo:8" 
+                class="form-control input-sm bg-light no-border rounded padder" placeholder="Buscar cotizaciones..."> 
               <span class="input-group-btn">
                 <button type="submit" class="btn btn-sm bg-light rounded"><i class="fa fa-search"></i></button>
               </span>
             </div>
           </div>
-        </form> -->
+        </form> 
         <!-- / search form -->
 
         <!-- nabar right -->
@@ -96,37 +98,24 @@
           <li class="dropdown" uib-dropdown>
             <a href class="dropdown-toggle clear" uib-dropdown-toggle>
               <span class="thumb-sm avatar pull-right m-t-n-sm m-b-n-sm m-l-sm">
-                <img src="img/a0.jpg" alt="...">
+                <img class="img-responsive" ng-src="assets/dinamic/colaborador/{{fSessionCI.nombre_foto}}" alt="{{fSessionCI.nombres}} {{ fSessionCI.apellidos }}" style="max-height: 40px;">
                 <i class="on md b-white bottom"></i>
               </span>
-              <span class="hidden-sm hidden-md">John.Smith</span> <b class="caret"></b>
+              <span class="hidden-sm hidden-md"> {{ fSessionCI.nombres }} {{ fSessionCI.apellidos }} </span> <b class="caret"></b>
             </a>
             <!-- dropdown -->
-            <ul class="dropdown-menu animated fadeInRight w">
-              <!-- <li class="wrapper b-b m-b-sm bg-light m-t-n-xs">
-                <div>
-                  <p>300mb of 500mb used</p>
-                </div>
-                <progressbar value="60" class="progress-xs m-b-none bg-white"></progressbar>
-              </li> -->
+            <ul class="dropdown-menu animated fadeInRight w"> 
               <li>
-                <a href>
-                  <!-- <span class="badge bg-danger pull-right">30%</span> -->
+                <a href> 
                   <span>Configuración</span>
                 </a>
               </li>
               <li>
                 <a ui-sref="app.page.profile">Perfil</a>
-              </li>
-              <!-- <li>
-                <a ui-sref="app.docs">
-                  <span class="label bg-info pull-right">new</span>
-                  Help
-                </a>
-              </li> -->
+              </li> 
               <li class="divider"></li>
               <li>
-                <a ui-sref="access.signin">Cerrar Sesión</a>
+                <a href="" ng-click="btnLogoutToSystem();">Cerrar Sesión</a>
               </li>
             </ul>
             <!-- / dropdown -->

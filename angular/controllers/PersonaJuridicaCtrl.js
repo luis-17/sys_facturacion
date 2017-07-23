@@ -109,6 +109,9 @@ app.controller('PersonaJuridicaCtrl', ['$scope', '$filter', '$uibModal', '$bootb
 	    paginate : paginationOptions
 	  };
 	  ClienteEmpresaServices.sListar(arrParams).then(function (rpta) { 
+	  	if( rpta.datos.length == 0 ){
+	  		rpta.paginate = { totalRows: 0 };
+	  	}
 	    $scope.gridOptions.totalItems = rpta.paginate.totalRows;
 	    $scope.gridOptions.data = rpta.datos; 
 	    if( loader ){
@@ -323,32 +326,32 @@ app.controller('PersonaJuridicaCtrl', ['$scope', '$filter', '$uibModal', '$bootb
 				$scope.quitarContacto = function() {
 					console.log('click me quitarContactos');
 					var pMensaje = '¿Realmente desea anular el registro?';
-		      $bootbox.confirm(pMensaje, function(result) {
-		        if(result){
-		        	var arrParams = {
-		        		idcontacto: $scope.fContacto.id 
-		        	}
-		        	blockUI.start('Procesando información...');
-		          ContactoEmpresaServices.sQuitarContacto(arrParams).then(function (rpta) {
-		            if(rpta.flag == 1){
-		              var pTitle = 'OK!';
-		              var pType = 'success';
-		              $scope.getPaginationServerSideContactos();
-		              $scope.editClassForm = null; 
-					      	$scope.tituloBloque = 'Agregar Contacto';
-					      	$scope.contBotonesReg = true;
-					      	$scope.contBotonesEdit = false;
-		            }else if(rpta.flag == 0){
-		              var pTitle = 'Error!';
-		              var pType = 'danger';
-		            }else{
-		              alert('Error inesperado');
-		            }
-		            pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2500 });
-		            blockUI.stop(); 
-		          });
-		        }
-		      });
+			      $bootbox.confirm(pMensaje, function(result) {
+			        if(result){
+			        	var arrParams = {
+			        		idcontacto: $scope.fContacto.id 
+			        	}
+			        	blockUI.start('Procesando información...');
+			          ContactoEmpresaServices.sQuitarContacto(arrParams).then(function (rpta) {
+			            if(rpta.flag == 1){
+			              var pTitle = 'OK!';
+			              var pType = 'success';
+			              $scope.getPaginationServerSideContactos();
+			              $scope.editClassForm = null; 
+						      	$scope.tituloBloque = 'Agregar Contacto';
+						      	$scope.contBotonesReg = true;
+						      	$scope.contBotonesEdit = false;
+			            }else if(rpta.flag == 0){
+			              var pTitle = 'Error!';
+			              var pType = 'danger';
+			            }else{
+			              alert('Error inesperado');
+			            }
+			            pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2500 });
+			            blockUI.stop(); 
+			          });
+			        }
+			      });
 				}
 				$scope.actualizarContacto = function() { 
 					console.log('click me');
@@ -441,7 +444,7 @@ app.controller('PersonaJuridicaCtrl', ['$scope', '$filter', '$uibModal', '$bootb
   }
 }]);
 
-app.service("ClienteEmpresaServices",function($http, $q) {
+app.service("ClienteEmpresaServices",function($http, $q, handleBehavior) {
     return({
         sListar: sListar,
         sRegistrar: sRegistrar,
@@ -454,7 +457,7 @@ app.service("ClienteEmpresaServices",function($http, $q) {
             url : angular.patchURLCI+"ClienteEmpresa/listar_cliente_empresa",
             data : datos
       });
-      return (request.then( handleSuccess,handleError ));
+      return (request.then(handleBehavior.success,handleBehavior.error));
     }
     function sRegistrar (datos) {
       var request = $http({
@@ -462,7 +465,7 @@ app.service("ClienteEmpresaServices",function($http, $q) {
             url : angular.patchURLCI+"ClienteEmpresa/registrar",
             data : datos
       });
-      return (request.then( handleSuccess,handleError ));
+      return (request.then(handleBehavior.success,handleBehavior.error));
     }
     function sEditar (datos) {
       var request = $http({
@@ -470,7 +473,7 @@ app.service("ClienteEmpresaServices",function($http, $q) {
             url : angular.patchURLCI+"ClienteEmpresa/editar",
             data : datos
       });
-      return (request.then( handleSuccess,handleError ));
+      return (request.then(handleBehavior.success,handleBehavior.error));
     }
     function sAnular (datos) {
       var request = $http({
@@ -478,6 +481,6 @@ app.service("ClienteEmpresaServices",function($http, $q) {
             url : angular.patchURLCI+"ClienteEmpresa/anular",
             data : datos
       });
-      return (request.then( handleSuccess,handleError ));
+      return (request.then(handleBehavior.success,handleBehavior.error));
     }
 });

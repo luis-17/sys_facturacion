@@ -11,6 +11,7 @@ class Model_cliente_persona extends CI_Model {
 		$this->db->join('categoria_cliente cc', 'cp.idcategoriacliente = cc.idcategoriacliente');
 		$this->db->join('tipo_documento_cliente tdc', 'cp.idtipodocumentocliente = tdc.idtipodocumentocliente');
 		$this->db->where('cp.estado_cl', 1);
+		$this->db->where('cp.idempresaadmin', $this->sessionFactur['idempresaadmin']);
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
 			foreach ($paramPaginate['searchColumn'] as $key => $value) {
 				if(! empty($value)){
@@ -33,6 +34,7 @@ class Model_cliente_persona extends CI_Model {
 		$this->db->join('categoria_cliente cc', 'cp.idcategoriacliente = cc.idcategoriacliente');
 		$this->db->join('tipo_documento_cliente tdc', 'cp.idtipodocumentocliente = tdc.idtipodocumentocliente');
 		$this->db->where('cp.estado_cl', 1);
+		$this->db->where('cp.idempresaadmin', $this->sessionFactur['idempresaadmin']);
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
 			foreach ($paramPaginate['searchColumn'] as $key => $value) {
 				if(! empty($value)){
@@ -50,6 +52,7 @@ class Model_cliente_persona extends CI_Model {
 		$this->db->from('cliente_persona cp');
 		$this->db->where('cp.estado_cl',1);
 		$this->db->where('cp.num_documento',$numDocumento);
+		$this->db->where('cp.idempresaadmin', $this->sessionFactur['idempresaadmin']);
 		if( $excepcion ){
 			$this->db->where_not_in('cp.idclientepersona',$idclientepersona);
 		}
@@ -69,6 +72,7 @@ class Model_cliente_persona extends CI_Model {
 			'telefono_fijo' => empty($datos['telefono_fijo']) ? NULL : $datos['telefono_fijo'],	
 			'email' => empty($datos['email']) ? NULL : strtoupper($datos['email']),
 			'fecha_nacimiento' => empty($datos['fecha_nacimiento']) ? NULL : darFormatoYMD($datos['fecha_nacimiento']),	
+			'idempresaadmin' => $this->sessionFactur['idempresaadmin'],
 			'createdat' => date('Y-m-d H:i:s'),
 			'updatedat' => date('Y-m-d H:i:s')
 		);

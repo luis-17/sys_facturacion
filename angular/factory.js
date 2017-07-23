@@ -42,4 +42,35 @@ angular.module('app')
         return notification;
       },
     }
-  }]); 
+  }])
+  .factory("handleBehavior", function($bootbox,$location){ 
+      var handleBehavior = {
+        error: function (error) {
+          return function () {
+            return {success: false, message: Notification.warning({message: error})};
+          };
+        },
+        success: function (response) {
+            //console.log('response.data',response.data);
+            if(response.data.flag == 'session_expired' && !($location.path() == '/access/login') ){ 
+              $bootbox.alert({ 
+                title: "Mensaje del Sistema",
+                message: response.data.message,
+                buttons: { 
+                  ok: {
+                    label: 'INICIAR SESIÓN',
+                    className: 'btn-sm btn-primary' 
+                  }
+                },
+                callback: function () {
+                  // console.log('click me', $location.path() );
+                  $location.path('/access/login');
+                  return false; 
+                }
+              });
+            }
+            return( response.data );
+        }
+      }
+      return handleBehavior;
+    }); 

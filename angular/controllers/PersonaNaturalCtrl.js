@@ -111,6 +111,9 @@ app.controller('PersonaNaturalCtrl', ['$scope', '$filter', '$uibModal', '$bootbo
 	    paginate : paginationOptions
 	  };
 	  ClientePersonaServices.sListar(arrParams).then(function (rpta) { 
+      if( rpta.datos.length == 0 ){
+        rpta.paginate = { totalRows: 0 };
+      }
 	    $scope.gridOptions.totalItems = rpta.paginate.totalRows;
 	    $scope.gridOptions.data = rpta.datos; 
 	    if( loader ){
@@ -247,7 +250,7 @@ app.controller('PersonaNaturalCtrl', ['$scope', '$filter', '$uibModal', '$bootbo
   }
 }]);
 
-app.service("ClientePersonaServices",function($http, $q) {
+app.service("ClientePersonaServices",function($http, $q, handleBehavior) {
     return({
         sListar: sListar,
         sRegistrar: sRegistrar,
@@ -260,7 +263,7 @@ app.service("ClientePersonaServices",function($http, $q) {
             url : angular.patchURLCI+"ClientePersona/listar_cliente_persona",
             data : datos
       });
-      return (request.then( handleSuccess,handleError ));
+      return (request.then(handleBehavior.success,handleBehavior.error));
     }
     function sRegistrar (datos) {
       var request = $http({
@@ -268,7 +271,7 @@ app.service("ClientePersonaServices",function($http, $q) {
             url : angular.patchURLCI+"ClientePersona/registrar",
             data : datos
       });
-      return (request.then( handleSuccess,handleError ));
+      return (request.then(handleBehavior.success,handleBehavior.error));
     }
     function sEditar (datos) {
       var request = $http({
@@ -276,7 +279,7 @@ app.service("ClientePersonaServices",function($http, $q) {
             url : angular.patchURLCI+"ClientePersona/editar",
             data : datos
       });
-      return (request.then( handleSuccess,handleError ));
+      return (request.then(handleBehavior.success,handleBehavior.error));
     }
     function sAnular (datos) {
       var request = $http({
@@ -284,6 +287,6 @@ app.service("ClientePersonaServices",function($http, $q) {
             url : angular.patchURLCI+"ClientePersona/anular",
             data : datos
       });
-      return (request.then( handleSuccess,handleError ));
+      return (request.then(handleBehavior.success,handleBehavior.error));
     }
 });

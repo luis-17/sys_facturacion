@@ -1,4 +1,4 @@
-app.service("CategoriaClienteServices",function($http, $q) {
+app.service("CategoriaClienteServices",function($http, $q, handleBehavior) {
     return({
         sListar: sListar,
         sListarCbo: sListarCbo,
@@ -12,7 +12,7 @@ app.service("CategoriaClienteServices",function($http, $q) {
             url : angular.patchURLCI+"CategoriaCliente/listar_categoria_cliente",
             data : datos
       });
-      return (request.then( handleSuccess,handleError ));
+      return (request.then(handleBehavior.success,handleBehavior.error));
     }
     function sListarCbo(datos) {
       var request = $http({
@@ -20,7 +20,7 @@ app.service("CategoriaClienteServices",function($http, $q) {
             url : angular.patchURLCI+"CategoriaCliente/listar_categoria_cliente_cbo",
             data : datos
       });
-      return (request.then( handleSuccess,handleError ));
+      return (request.then(handleBehavior.success,handleBehavior.error));
     }
     function sRegistrar (datos) {
       var request = $http({
@@ -28,7 +28,7 @@ app.service("CategoriaClienteServices",function($http, $q) {
             url : angular.patchURLCI+"CategoriaCliente/registrar",
             data : datos
       });
-      return (request.then( handleSuccess,handleError ));
+      return (request.then(handleBehavior.success,handleBehavior.error));
     }
     function sEditar (datos) {
       var request = $http({
@@ -36,7 +36,7 @@ app.service("CategoriaClienteServices",function($http, $q) {
             url : angular.patchURLCI+"CategoriaCliente/editar",
             data : datos
       });
-      return (request.then( handleSuccess,handleError ));
+      return (request.then(handleBehavior.success,handleBehavior.error));
     }
     function sAnular (datos) {
       var request = $http({
@@ -44,6 +44,6 @@ app.service("CategoriaClienteServices",function($http, $q) {
             url : angular.patchURLCI+"CategoriaCliente/anular",
             data : datos
       });
-      return (request.then( handleSuccess,handleError ));
+      return (request.then(handleBehavior.success,handleBehavior.error));
     }
 });

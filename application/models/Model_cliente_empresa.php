@@ -5,11 +5,13 @@ class Model_cliente_empresa extends CI_Model {
 		parent::__construct();
 	}
 	public function m_cargar_cliente_empresa($paramPaginate){
-		$this->db->select('ce.idclienteempresa, ce.nombre_comercial, ce.nombre_corto, ce.razon_social, ce.ruc, ce.representante_legal, ce.direccion_legal, ce.direccion_guia, ce.telefono, 
+		$this->db->select('ce.idclienteempresa, ce.nombre_comercial, ce.nombre_corto, ce.razon_social, ce.ruc, ce.representante_legal, ce.dni_representante_legal, 
+			ce.direccion_legal, ce.direccion_guia, ce.telefono, 
 			cc.idcategoriacliente, cc.descripcion_cc');
 		$this->db->from('cliente_empresa ce');
 		$this->db->join('categoria_cliente cc', 'ce.idcategoriacliente = cc.idcategoriacliente');
 		$this->db->where('estado_ce', 1);
+		$this->db->where('ce.idempresaadmin', $this->sessionFactur['idempresaadmin']);
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
 			foreach ($paramPaginate['searchColumn'] as $key => $value) {
 				if(! empty($value)){
@@ -31,6 +33,7 @@ class Model_cliente_empresa extends CI_Model {
 		$this->db->from('cliente_empresa ce');
 		$this->db->join('categoria_cliente cc', 'ce.idcategoriacliente = cc.idcategoriacliente');
 		$this->db->where('estado_ce', 1);
+		$this->db->where('ce.idempresaadmin', $this->sessionFactur['idempresaadmin']);
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
 			foreach ($paramPaginate['searchColumn'] as $key => $value) {
 				if(! empty($value)){
@@ -48,6 +51,7 @@ class Model_cliente_empresa extends CI_Model {
 		$this->db->from('cliente_empresa ce');
 		$this->db->where('ce.estado_ce',1);
 		$this->db->where('ce.ruc',$ruc);
+		$this->db->where('ce.idempresaadmin', $this->sessionFactur['idempresaadmin']);
 		if( $excepcion ){
 			$this->db->where_not_in('ce.idclienteempresa',$idclienteempresa);
 		}
@@ -61,11 +65,13 @@ class Model_cliente_empresa extends CI_Model {
 			'nombre_corto' => strtoupper($datos['nombre_corto']),
 			'razon_social' => strtoupper($datos['razon_social']),	
 			'ruc' => $datos['ruc'],	
-			'representante_legal' => $datos['representante_legal'],	
-			'direccion_legal' => empty($datos['direccion_legal']) ? NULL : $datos['direccion_legal'],	
+			'representante_legal' => empty($datos['representante_legal']) ? NULL : strtoupper($datos['representante_legal']),	
+			'dni_representante_legal' => empty($datos['dni_representante_legal']) ? NULL : $datos['dni_representante_legal'],	
+			'direccion_legal' => $datos['direccion_legal'],	
 			'direccion_guia' => empty($datos['direccion_guia']) ? NULL : $datos['direccion_guia'],
 			'telefono' => empty($datos['telefono']) ? NULL : $datos['telefono'],
 			'idcategoriacliente' => $datos['categoria_cliente']['id'],
+			'idempresaadmin' => $this->sessionFactur['idempresaadmin'],
 			'createdat' => date('Y-m-d H:i:s'),
 			'updatedat' => date('Y-m-d H:i:s')
 		);
@@ -77,8 +83,9 @@ class Model_cliente_empresa extends CI_Model {
 			'nombre_corto' => strtoupper($datos['nombre_corto']),
 			'razon_social' => strtoupper($datos['razon_social']),	
 			'ruc' => $datos['ruc'],	
-			'representante_legal' => strtoupper($datos['representante_legal']),	
-			'direccion_legal' => empty($datos['direccion_legal']) ? NULL : $datos['direccion_legal'],	
+			'representante_legal' => empty($datos['representante_legal']) ? NULL : strtoupper($datos['representante_legal']),	
+			'dni_representante_legal' => empty($datos['dni_representante_legal']) ? NULL : $datos['dni_representante_legal'],	
+			'direccion_legal' => $datos['direccion_legal'],	
 			'direccion_guia' => empty($datos['direccion_guia']) ? NULL : $datos['direccion_guia'],
 			'telefono' => empty($datos['telefono']) ? NULL : $datos['telefono'],
 			'idcategoriacliente' => $datos['categoria_cliente']['id'],

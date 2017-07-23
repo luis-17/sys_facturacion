@@ -39,3 +39,15 @@
 form.edit-form input, form.edit-form select { 
 	background-color: #fcfcbc; 
 }
+
+.navbar-brand img { 
+    max-height: 80px;
+}
+
+.navi-wrap .ambiente select{
+	width: 88%;
+    margin: auto;
+    height: 24px;
+    font-size: 10px;
+    padding: 4px;
+}

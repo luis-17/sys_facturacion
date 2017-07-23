@@ -6,8 +6,7 @@
 		<div class="form-group col-md-6 mb-md ">
 			<label class="control-label mb-n"> Categoría: <small class="text-danger">(*)</small> </label>
             <select class="form-control input-sm" ng-model="fData.categoria_cliente" ng-options="item as item.descripcion for item in fArr.listaCategoriaCliente" required tabindex="10" ></select> 
-		</div>
-		
+		</div> 
 		<div class="form-group col-md-6 mb-md">
 			<label class="control-label mb-n"> N° de Documento: <small class="text-danger">(*)</small> </label>
 			<input type="text" class="form-control input-sm" ng-model="fData.num_documento" placeholder="Ingrese N° de Documento" required tabindex="30" maxlength="8" minlength="8" />

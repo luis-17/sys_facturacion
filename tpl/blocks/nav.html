@@ -1,5 +1,11 @@
+<div class="block text-center mt ambiente">
+    <label class="label" > EMPRESA </label>
+    <select class="form-control input-sm" ng-change="onChangeEmpresaSession(); $event.preventDefault();" ng-model="arrMain.empresaadmin" 
+      ng-options="item as item.descripcion for item in arrMain.listaEmpresaAdminSession"> </select>
+</div>
+<li class="line dk"></li>
 <!-- list -->
-<ul class="nav">
+<ul class="nav" ng-show="isLoggedIn">
   <li class="hidden-folded padder m-t m-b-sm text-muted text-xs">
     <span translate="aside.nav.HEADER">Navigation </span>
   </li>
