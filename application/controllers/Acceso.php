@@ -52,8 +52,7 @@ class Acceso extends CI_Controller {
 	public function lista_empresa_admin_session()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true); 
-		$this->sessionFactur = @$this->session->userdata('sess_fact_'.substr(base_url(),-20,7));
-		var_dump(substr(base_url(),-20,7), base_url() ); exit();
+		$this->sessionFactur = @$this->session->userdata('sess_fact_'.substr(base_url(),-20,7)); 
 		$lista = $this->model_acceso->m_cargar_combo_empresa_admin_matriz_session();
 		$arrListado = array();
 		foreach ($lista as $row) { 
