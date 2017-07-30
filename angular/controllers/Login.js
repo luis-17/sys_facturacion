@@ -30,7 +30,7 @@ app.controller('LogInFormController', ['$scope', '$http', '$state','$timeout','b
         blockUI.stop();
         $timeout(function() { 
           $scope.fAlert.visible = false;
-        },3000)
+        },12000)
       });
     };
 }]);

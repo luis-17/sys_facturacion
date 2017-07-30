@@ -24,17 +24,24 @@ class Acceso extends CI_Controller {
 					$arrPerfilUsuario = $this->model_colaborador->m_cargar_perfil($loggedUser['idusuario']);
 					$arrPerfilUsuario['nombre_foto'] = empty($arrPerfilUsuario['nombre_foto']) ? 'sin-imagen.png' : $arrPerfilUsuario['nombre_foto']; 
 					// GUARDAMOS EN EL LOG DE LOGEO LA SESION INICIADA. 
-					//$this->model_acceso->m_registrar_log_sesion($arrPerfilUsuario);
-					// ACTUALIZAMOS EL ULTIMO LOGEO DEL USUARIO. 
-					$this->model_acceso->m_actualizar_fecha_ultima_sesion($arrPerfilUsuario);
-					$arrData['message'] = 'Usuario inició sesión correctamente';
-					if( isset($arrPerfilUsuario['idusuario']) ){ 
-						$this->session->set_userdata('sess_fact_'.substr(base_url(),-20,7),$arrPerfilUsuario);
-						
+					//$this->model_acceso->m_registrar_log_sesion($arrPerfilUsuario); 
+
+					if( empty($arrPerfilUsuario['idusuario']) ){ 
+						$arrData['flag'] = 2;
+						$arrData['message'] = 'Hay problemas con su cuenta. <br>Las posibles causas son: <br> - No se le ha asignado ninguna empresa. <br> - No se le ha asignado empresa por defecto.';
 					}else{
-						$arrData['flag'] = 0;
-	    				$arrData['message'] = 'No se encontró los datos del usuario.';
+						// ACTUALIZAMOS EL ULTIMO LOGEO DEL USUARIO. 
+						$this->model_acceso->m_actualizar_fecha_ultima_sesion($arrPerfilUsuario);
+						$arrData['message'] = 'Usuario inició sesión correctamente';
+						if( isset($arrPerfilUsuario['idusuario']) ){ 
+							$this->session->set_userdata('sess_fact_'.substr(base_url(),-20,7),$arrPerfilUsuario);
+							
+						}else{
+							$arrData['flag'] = 0;
+		    				$arrData['message'] = 'No se encontró los datos del usuario.';
+						}
 					}
+					
 				}elseif($loggedUser['estado_us'] == 2){
 					$arrData['flag'] = 2;
 					$arrData['message'] = 'Su cuenta se encuentra deshabilitada. Contactar con Sistemas';
