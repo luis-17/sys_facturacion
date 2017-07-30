@@ -6,8 +6,8 @@ class CategoriaCliente extends CI_Controller {
     {
         parent::__construct();
         // Se le asigna a la informacion a la variable $sessionVP.
-        // $this->sessionVP = @$this->session->userdata('sess_vp_'.substr(base_url(),-8,7));
-        $this->sessionFactur = @$this->session->userdata('sess_fact_'.substr(base_url(),-8,7));
+        // $this->sessionVP = @$this->session->userdata('sess_vp_'.substr(base_url(),-20,7));
+        $this->sessionFactur = @$this->session->userdata('sess_fact_'.substr(base_url(),-20,7));
         $this->load->helper(array('fechas','otros')); 
         $this->load->model(array('model_categoria_cliente')); 
 

@@ -29,7 +29,7 @@ class Acceso extends CI_Controller {
 					$this->model_acceso->m_actualizar_fecha_ultima_sesion($arrPerfilUsuario);
 					$arrData['message'] = 'Usuario inició sesión correctamente';
 					if( isset($arrPerfilUsuario['idusuario']) ){ 
-						$this->session->set_userdata('sess_fact_'.substr(base_url(),-8,7),$arrPerfilUsuario);
+						$this->session->set_userdata('sess_fact_'.substr(base_url(),-20,7),$arrPerfilUsuario);
 						
 					}else{
 						$arrData['flag'] = 0;
@@ -52,7 +52,8 @@ class Acceso extends CI_Controller {
 	public function lista_empresa_admin_session()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true); 
-		$this->sessionFactur = @$this->session->userdata('sess_fact_'.substr(base_url(),-8,7));
+		$this->sessionFactur = @$this->session->userdata('sess_fact_'.substr(base_url(),-20,7));
+		var_dump(substr(base_url(),-20,7), base_url() ); exit();
 		$lista = $this->model_acceso->m_cargar_combo_empresa_admin_matriz_session();
 		$arrListado = array();
 		foreach ($lista as $row) { 
@@ -77,10 +78,10 @@ class Acceso extends CI_Controller {
 	}
 	public function cambiar_empresa_admin_session(){ 
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true); 
-		$this->sessionFactur = @$this->session->userdata('sess_fact_'.substr(base_url(),-8,7));
+		$this->sessionFactur = @$this->session->userdata('sess_fact_'.substr(base_url(),-20,7));
 		$fila = $this->model_acceso->m_cambiar_empresa_session($allInputs['datos']['idusuarioempresaadmin']); 
 		foreach ($fila as $key => $val) {
-			$_SESSION['sess_fact_'.substr(base_url(),-8,7)][$key] = $val;
+			$_SESSION['sess_fact_'.substr(base_url(),-20,7)][$key] = $val;
 		} 
 		if($allInputs['datos']){
 			$arrData['flag'] = 1;
@@ -96,17 +97,17 @@ class Acceso extends CI_Controller {
 	public function getSessionCI(){
 		$arrData['flag'] = 0;
 		$arrData['datos'] = array();
-		if( $this->session->has_userdata( 'sess_fact_'.substr(base_url(),-8,7) ) && 
-			!empty($_SESSION['sess_fact_'.substr(base_url(),-8,7) ]['idusuario']) ){
+		if( $this->session->has_userdata( 'sess_fact_'.substr(base_url(),-20,7) ) && 
+			!empty($_SESSION['sess_fact_'.substr(base_url(),-20,7) ]['idusuario']) ){
 			$arrData['flag'] = 1;
-			$arrData['datos'] = $_SESSION['sess_fact_'.substr(base_url(),-8,7) ];
+			$arrData['datos'] = $_SESSION['sess_fact_'.substr(base_url(),-20,7) ];
 		} 
 		$this->output
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
 	public function logoutSessionCI(){
-		$this->session->unset_userdata('sess_fact_'.substr(base_url(),-8,7));
+		$this->session->unset_userdata('sess_fact_'.substr(base_url(),-20,7));
         //$this->cache->clean();
         $arrData['flag'] = 1;
 		$arrData['datos'] = 'Cerró sesión correctamente.';

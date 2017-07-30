@@ -65,7 +65,7 @@ angular.module('app')
                 callback: function () {
                   // console.log('click me', $location.path() );
                   $location.path('/access/login');
-                  return false; 
+                  // return false; 
                 }
               });
             }

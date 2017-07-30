@@ -177,49 +177,11 @@ angular.module('app')
                   templateUrl: 'tpl/apps_note_material.html',
                   resolve: load(['angular/app/note/note.js', 'moment'])
               })
-              .state('music', {
-                  url: '/music',
-                  templateUrl: 'tpl/music.html',
-                  controller: 'MusicCtrl',
-                  resolve: load([
-                            'com.2fdevs.videogular', 
-                            'com.2fdevs.videogular.plugins.controls', 
-                            'com.2fdevs.videogular.plugins.overlayplay',
-                            'com.2fdevs.videogular.plugins.poster',
-                            'com.2fdevs.videogular.plugins.buffering',
-                            'angular/app/music/ctrl.js', 
-                            'angular/app/music/theme.css'
-                          ])
-              })
-                  .state('music.home', {
-                      url: '/home',
-                      templateUrl: 'tpl/music.home.html'
-                  })
-                  .state('music.genres', {
-                      url: '/genres',
-                      templateUrl: 'tpl/music.genres.html'
-                  })
-                  .state('music.detail', {
-                      url: '/detail',
-                      templateUrl: 'tpl/music.detail.html'
-                  })
-                  .state('music.mtv', {
-                      url: '/mtv',
-                      templateUrl: 'tpl/music.mtv.html'
-                  })
-                  .state('music.mtvdetail', {
-                      url: '/mtvdetail',
-                      templateUrl: 'tpl/music.mtv.detail.html'
-                  })
-                  .state('music.playlist', {
-                      url: '/playlist/{fold}',
-                      templateUrl: 'tpl/music.playlist.html'
-                  })
               .state('app.material', {
-                  url: '/material',
-                  template: '<div ui-view class="wrapper-md"></div>',
-                  resolve: load(['angular/controllers/material.js'])
-                })
+                url: '/material',
+                template: '<div ui-view class="wrapper-md"></div>',
+                resolve: load(['angular/controllers/material.js'])
+              })
                 .state('app.material.button', {
                   url: '/button',
                   templateUrl: 'tpl/material/button.html'
