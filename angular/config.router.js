@@ -39,12 +39,12 @@ angular.module('app')
               .state('app.persona-natural', {
                   url: '/persona-natural',
                   templateUrl: 'tpl/persona-natural.html',
-                  resolve: load(['angular/controllers/PersonaNaturalCtrl.js','angular/controllers/CategoriaClienteCtrl.js']) 
+                  resolve: load(['angular/controllers/PersonaNaturalCtrl.js','angular/controllers/CategoriaClienteCtrl.js','angular/controllers/ColaboradorCtrl.js']) 
               })
               .state('app.persona-juridica', {
                   url: '/persona-juridica',
                   templateUrl: 'tpl/persona-juridica.html',
-                  resolve: load(['angular/controllers/PersonaJuridicaCtrl.js','angular/controllers/CategoriaClienteCtrl.js','angular/controllers/ContactoEmpresaCtrl.js'])
+                  resolve: load(['angular/controllers/PersonaJuridicaCtrl.js','angular/controllers/CategoriaClienteCtrl.js','angular/controllers/ContactoEmpresaCtrl.js','angular/controllers/ColaboradorCtrl.js'])
               })
               .state('lockme', {
                   url: '/lockme',

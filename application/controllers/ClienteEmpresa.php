@@ -34,6 +34,10 @@ class ClienteEmpresa extends CI_Controller {
 						'id'=> $row['idcategoriacliente'],
 						'descripcion'=> $row['descripcion_cc']
 					),
+					'colaborador' => array(
+						'id'=> $row['idcolaborador'],
+						'descripcion'=> $row['colaborador']
+					),
 					'ruc' => $row['ruc'],
 					'representante_legal' => $row['representante_legal'],
 					'dni_representante_legal' => $row['dni_representante_legal'],
@@ -77,6 +81,7 @@ class ClienteEmpresa extends CI_Controller {
 			    ->set_output(json_encode($arrData));
 			return;
    		}
+    	
     	$this->db->trans_start();
 		if($this->model_cliente_empresa->m_registrar($allInputs)) { // registro de cliente empresa 
 			$arrData['message'] = 'Se registraron los datos correctamente';
@@ -125,5 +130,4 @@ class ClienteEmpresa extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
-	
 }

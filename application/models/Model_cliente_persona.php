@@ -4,12 +4,14 @@ class Model_cliente_persona extends CI_Model {
 	{
 		parent::__construct();
 	}
-	public function m_cargar_cliente_persona($paramPaginate){
+	public function m_cargar_cliente_persona($paramPaginate){ 
+		$this->db->select("co.idcolaborador, CONCAT(co.nombres, ' ', co.apellidos) As colaborador",FALSE);
 		$this->db->select('cp.idclientepersona, cp.num_documento, cp.nombres, cp.apellidos, cp.sexo, cp.telefono_fijo, cp.telefono_movil, cp.email, cp.fecha_nacimiento, 
 			cc.idcategoriacliente, cc.descripcion_cc, tdc.idtipodocumentocliente, tdc.descripcion_tdc');
 		$this->db->from('cliente_persona cp');
 		$this->db->join('categoria_cliente cc', 'cp.idcategoriacliente = cc.idcategoriacliente');
 		$this->db->join('tipo_documento_cliente tdc', 'cp.idtipodocumentocliente = tdc.idtipodocumentocliente');
+		$this->db->join('colaborador co', 'cp.idcolaborador = co.idcolaborador','left');
 		$this->db->where('cp.estado_cl', 1);
 		$this->db->where('cp.idempresaadmin', $this->sessionFactur['idempresaadmin']);
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
@@ -73,6 +75,7 @@ class Model_cliente_persona extends CI_Model {
 			'email' => empty($datos['email']) ? NULL : strtoupper($datos['email']),
 			'fecha_nacimiento' => empty($datos['fecha_nacimiento']) ? NULL : darFormatoYMD($datos['fecha_nacimiento']),	
 			'idempresaadmin' => $this->sessionFactur['idempresaadmin'],
+			'idcolaborador' => empty($datos['colaborador']['id']) ? NULL : $datos['colaborador']['id'], 
 			'createdat' => date('Y-m-d H:i:s'),
 			'updatedat' => date('Y-m-d H:i:s')
 		);
@@ -82,6 +85,7 @@ class Model_cliente_persona extends CI_Model {
 		$data = array(
 			'idtipodocumentocliente' => 1, // DNI 
 			'idcategoriacliente' => $datos['categoria_cliente']['id'],
+			'idcolaborador' => empty($datos['colaborador']['id']) ? NULL : $datos['colaborador']['id'], 
 			'num_documento' => $datos['num_documento'],
 			'nombres' => strtoupper($datos['nombres']),	
 			'apellidos' => strtoupper($datos['apellidos']),	

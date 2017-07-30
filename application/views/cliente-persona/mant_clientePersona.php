@@ -39,7 +39,10 @@
 			<label class="control-label mb-n"> E-mail: </label>
 			<input type="email" class="form-control input-sm" ng-model="fData.email" placeholder="Ingrese email" tabindex="100" />
 		</div>
-		
+		<div class="form-group col-md-6 mb-md ">
+			<label class="control-label mb-n"> Vendedor/Colaborador </label>
+            <select ng-disabled="disabledVendedor" class="form-control input-sm" ng-model="fData.colaborador" ng-options="item as item.descripcion for item in fArr.listaColaboradores" tabindex="120" ></select> 
+		</div>
 		
 	</form>
 </div>

@@ -48,6 +48,10 @@
 			<label class="control-label mb-n"> Dirección de la Guía: </label>
 			<input type="text" class="form-control input-sm" ng-model="fData.direccion_guia" placeholder="Ingrese Direccion que aparecerá en la guía" tabindex="100" />
 		</div>
+		<div class="form-group col-md-4 mb-md ">
+			<label class="control-label mb-n"> Vendedor/Colaborador </label>
+            <select ng-disabled="disabledVendedor" class="form-control input-sm" ng-model="fData.colaborador" ng-options="item as item.descripcion for item in fArr.listaColaboradores" tabindex="120" ></select> 
+		</div>
 	</form>
 </div>
 <div class="modal-footer">

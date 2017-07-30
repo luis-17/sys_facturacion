@@ -5,11 +5,13 @@ class Model_cliente_empresa extends CI_Model {
 		parent::__construct();
 	}
 	public function m_cargar_cliente_empresa($paramPaginate){
+		$this->db->select("co.idcolaborador, CONCAT(co.nombres, ' ', co.apellidos) As colaborador",FALSE);
 		$this->db->select('ce.idclienteempresa, ce.nombre_comercial, ce.nombre_corto, ce.razon_social, ce.ruc, ce.representante_legal, ce.dni_representante_legal, 
 			ce.direccion_legal, ce.direccion_guia, ce.telefono, 
 			cc.idcategoriacliente, cc.descripcion_cc');
 		$this->db->from('cliente_empresa ce');
 		$this->db->join('categoria_cliente cc', 'ce.idcategoriacliente = cc.idcategoriacliente');
+		$this->db->join('colaborador co', 'ce.idcolaborador = co.idcolaborador','left');
 		$this->db->where('estado_ce', 1);
 		$this->db->where('ce.idempresaadmin', $this->sessionFactur['idempresaadmin']);
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
@@ -72,6 +74,7 @@ class Model_cliente_empresa extends CI_Model {
 			'telefono' => empty($datos['telefono']) ? NULL : $datos['telefono'],
 			'idcategoriacliente' => $datos['categoria_cliente']['id'],
 			'idempresaadmin' => $this->sessionFactur['idempresaadmin'],
+			'idcolaborador' => empty($datos['colaborador']['id']) ? NULL : $datos['colaborador']['id'], 
 			'createdat' => date('Y-m-d H:i:s'),
 			'updatedat' => date('Y-m-d H:i:s')
 		);
@@ -89,6 +92,7 @@ class Model_cliente_empresa extends CI_Model {
 			'direccion_guia' => empty($datos['direccion_guia']) ? NULL : $datos['direccion_guia'],
 			'telefono' => empty($datos['telefono']) ? NULL : $datos['telefono'],
 			'idcategoriacliente' => $datos['categoria_cliente']['id'],
+			'idcolaborador' => empty($datos['colaborador']['id']) ? NULL : $datos['colaborador']['id'], 
 			'updatedat' => date('Y-m-d H:i:s')
 		);
 		$this->db->where('idclienteempresa',$datos['id']);

@@ -2,10 +2,12 @@ app.controller('PersonaJuridicaCtrl', ['$scope', '$filter', '$uibModal', '$bootb
 	'ClienteEmpresaServices',
 	'CategoriaClienteServices', 
 	'ContactoEmpresaServices', 
+	'ColaboradorServices',
 	function($scope, $filter, $uibModal, $bootbox, $log, $timeout, pinesNotifications, uiGridConstants, blockUI, 
 	ClienteEmpresaServices,
 	CategoriaClienteServices,
-	ContactoEmpresaServices
+	ContactoEmpresaServices,
+	ColaboradorServices
 ) {
   // $scope.fData = {}; 
   $scope.metodos = {};
@@ -20,6 +22,13 @@ app.controller('PersonaJuridicaCtrl', ['$scope', '$filter', '$uibModal', '$bootb
 		var myCallback = myCallback || function() { };
 		CategoriaClienteServices.sListarCbo().then(function(rpta) {
 			$scope.fArr.listaCategoriaCliente = rpta.datos; 
+			myCallback();
+		});
+	};
+	$scope.metodos.listaColaboradores = function(myCallback) {
+		var myCallback = myCallback || function() { };
+		ColaboradorServices.sListarCbo().then(function(rpta) {
+			$scope.fArr.listaColaboradores = rpta.datos; 
 			myCallback();
 		});
 	};
@@ -137,11 +146,18 @@ app.controller('PersonaJuridicaCtrl', ['$scope', '$filter', '$uibModal', '$bootb
       	$scope.cancel = function () {
       	  $uibModalInstance.dismiss('cancel');
       	}
-      	var myCallBack = function() { 
+      	var myCallBackCC = function() { 
       		$scope.fArr.listaCategoriaCliente.splice(0,0,{ id : '0', descripcion:'--Seleccione la categoría de cliente--'}); 
       		$scope.fData.categoria_cliente = $scope.fArr.listaCategoriaCliente[0]; 
       	}
-      	$scope.metodos.listaCategoriasCliente(myCallBack); 
+      	$scope.metodos.listaCategoriasCliente(myCallBackCC); 
+
+      	var myCallBackCO = function() { 
+      		$scope.fArr.listaColaboradores.splice(0,0,{ id : '0', descripcion:'--Seleccione vendedor--'}); 
+      		$scope.fData.colaborador = $scope.fArr.listaColaboradores[0]; 
+      	}
+      	$scope.metodos.listaColaboradores(myCallBackCO); 
+
       	$scope.aceptar = function () { 
       		blockUI.start('Procesando información...');
           ClienteEmpresaServices.sRegistrar($scope.fData).then(function (rpta) {
@@ -174,6 +190,7 @@ app.controller('PersonaJuridicaCtrl', ['$scope', '$filter', '$uibModal', '$bootb
       controller: function ($scope, $uibModalInstance) { 
       	blockUI.stop(); 
       	$scope.fData = {};
+      	$scope.disabledVendedor = false;
       	if( $scope.mySelectionGrid.length == 1 ){ 
           $scope.fData = $scope.mySelectionGrid[0];
         }else{
@@ -183,13 +200,33 @@ app.controller('PersonaJuridicaCtrl', ['$scope', '$filter', '$uibModal', '$bootb
       	$scope.cancel = function () {
       	  $uibModalInstance.dismiss('cancel');
       	}
-      	var myCallBack = function() { 
+      	var myCallBackCC = function() { 
       		var objIndex = $scope.fArr.listaCategoriaCliente.filter(function(obj) { 
             return obj.id == $scope.fData.categoria_cliente.id;
           }).shift(); 
       		$scope.fData.categoria_cliente = objIndex; 
       	}
-      	$scope.metodos.listaCategoriasCliente(myCallBack); 
+      	$scope.metodos.listaCategoriasCliente(myCallBackCC); 
+
+      	// BINDEO COLABORADOR 
+      	var myCallBackCO = function() { 
+      		$scope.fArr.listaColaboradores.splice(0,0,{ id : '0', descripcion:'--Seleccione vendedor--'}); 
+          var objIndex = $scope.fArr.listaColaboradores.filter(function(obj) { 
+            return obj.id == $scope.fData.colaborador.id;
+          }).shift(); 
+          $scope.fData.colaborador = objIndex; 
+          if( angular.isUndefined(objIndex)){ 
+            $scope.fData.colaborador = $scope.fArr.listaColaboradores[0]; 
+          }
+        } 
+        $scope.metodos.listaColaboradores(myCallBackCO); 
+
+      	// bloquear combo de vendedor dependiendo del tipo de usuario 
+      	console.log($scope.fSessionCI.categoria,'$scope.fSessionCI.categoria');
+      	if( $scope.fSessionCI.categoria == 2 ){
+					$scope.disabledVendedor = true; 
+      	} 
+      	
       	$scope.aceptar = function () { 
       		blockUI.start('Procesando información...');
           ClienteEmpresaServices.sEditar($scope.fData).then(function (rpta) {

@@ -9,7 +9,7 @@ class Model_colaborador extends CI_Model {
 		$this->db->select('co.idcolaborador, co.nombres, co.apellidos, co.email, 
 			co.fecha_nacimiento, co.nombre_foto, 
 			us.idusuario ,us.username, us.ultimo_inicio_sesion, 
-			tu.idtipousuario, tu.descripcion_tu, tu.key_tu,
+			tu.idtipousuario, tu.descripcion_tu, tu.key_tu, tu.categoria, 
 			ea.idempresaadmin, ea.razon_social, ea.nombre_comercial, ea.ruc, ea.nombre_logo, 
 			uea.idusuarioempresaadmin, uea.select_por_defecto',FALSE);
 		$this->db->from('colaborador co');

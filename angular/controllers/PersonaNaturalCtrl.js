@@ -1,9 +1,11 @@
 app.controller('PersonaNaturalCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$log', '$timeout', 'pinesNotifications', 'uiGridConstants', 'blockUI', 
 	'ClientePersonaServices',
 	'CategoriaClienteServices',
+  'ColaboradorServices',
 	function($scope, $filter, $uibModal, $bootbox, $log, $timeout, pinesNotifications, uiGridConstants, blockUI, 
 	ClientePersonaServices,
-	CategoriaClienteServices
+	CategoriaClienteServices,
+  ColaboradorServices
 ) {
   // $scope.fData = {}; 
   $scope.metodos = {};
@@ -21,6 +23,13 @@ app.controller('PersonaNaturalCtrl', ['$scope', '$filter', '$uibModal', '$bootbo
 			myCallback();
 		});
 	};
+  $scope.metodos.listaColaboradores = function(myCallback) {
+    var myCallback = myCallback || function() { };
+    ColaboradorServices.sListarCbo().then(function(rpta) {
+      $scope.fArr.listaColaboradores = rpta.datos; 
+      myCallback();
+    });
+  };
   $scope.fArr.listaSexo = [ 
     { id:'M', descripcion:'MASCULINO' },
     { id:'F', descripcion:'FEMENINO' }
@@ -146,6 +155,11 @@ app.controller('PersonaNaturalCtrl', ['$scope', '$filter', '$uibModal', '$bootbo
       		$scope.fData.categoria_cliente = $scope.fArr.listaCategoriaCliente[0]; 
       	}
       	$scope.metodos.listaCategoriasCliente(myCallBack); 
+        var myCallBackCO = function() { 
+          $scope.fArr.listaColaboradores.splice(0,0,{ id : '0', descripcion:'--Seleccione vendedor--'}); 
+          $scope.fData.colaborador = $scope.fArr.listaColaboradores[0]; 
+        }
+        $scope.metodos.listaColaboradores(myCallBackCO); 
       	$scope.aceptar = function () { 
       		blockUI.start('Procesando información...');
           ClientePersonaServices.sRegistrar($scope.fData).then(function (rpta) {
@@ -201,6 +215,26 @@ app.controller('PersonaNaturalCtrl', ['$scope', '$filter', '$uibModal', '$bootbo
           return obj.id == $scope.fData.sexo.id;
         }).shift(); 
         $scope.fData.sexo = objIndex; 
+
+        // BINDEO COLABORADOR  
+        var myCallBackCO = function() { 
+          $scope.fArr.listaColaboradores.splice(0,0,{ id : '0', descripcion:'--Seleccione vendedor--'}); 
+          var objIndex = $scope.fArr.listaColaboradores.filter(function(obj) { 
+            return obj.id == $scope.fData.colaborador.id;
+          }).shift(); 
+          $scope.fData.colaborador = objIndex; 
+          if( angular.isUndefined(objIndex)){ 
+            
+            $scope.fData.colaborador = $scope.fArr.listaColaboradores[0]; 
+          }
+        }
+        $scope.metodos.listaColaboradores(myCallBackCO); 
+
+        // bloquear combo de vendedor dependiendo del tipo de usuario 
+        console.log($scope.fSessionCI.categoria,'$scope.fSessionCI.categoria');
+        if( $scope.fSessionCI.categoria == 2 ){
+          $scope.disabledVendedor = true; 
+        } 
 
       	$scope.aceptar = function () { 
       		blockUI.start('Procesando información...');

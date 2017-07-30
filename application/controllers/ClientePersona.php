@@ -40,6 +40,10 @@ class ClientePersona extends CI_Controller {
 						'id'=> $row['idcategoriacliente'],
 						'descripcion'=> $row['descripcion_cc']
 					),
+					'colaborador' => array(
+						'id'=> $row['idcolaborador'],
+						'descripcion'=> $row['colaborador']
+					),
 					'sexo'=> array(
 						'id'=> $row['sexo'],
 						'descripcion'=> $row['desc_sexo'] 
