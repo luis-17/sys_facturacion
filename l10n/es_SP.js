@@ -16,12 +16,19 @@
 "aside" : {
   "nav" : {
     "HEADER" : "Navegacion",
-    "CLIENTE" : "Clientes",
     "DASHBOARD" : "Dashboard",
-    "MANTENIMIENTO" : "Mantenimiento",
-    "EMAIL" : "Email",
-    "WIDGETS" : "Widgets",
-    "WIDGETS" : "Widgets",
+    "SEGURIDAD" : "Seguridad",
+    "CLIENTE" : "Clientes",
+    "ELEMENTO" : "Elementos",
+    "OTROS_MANT" : "Otros",
+    "COTIZACION" : "Cotizaciones",
+    "NOTA_PEDIDO" : "Notas de Pedido",
+    "CAJA_VENTA" : "Cajas y Ventas",
+    "GUIA_REM" : "Guía de Rem.",
+    "TESORERIA" : "Tesorería",
+    "CONSULTAS" : "Consultas",
+    "CENTRAL_REPORTES" : "Central de Reportes",
+    "EMAIL" : "Email", 
     "components" : {
       "COMPONENTS" : "Components",
       "ui_kits" : {
