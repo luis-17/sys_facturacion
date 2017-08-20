@@ -2,3 +2,5 @@
 application/config/
 assets/dinamic/
 angular/config.js
+.idea/
+/.idea/vcs.xml
