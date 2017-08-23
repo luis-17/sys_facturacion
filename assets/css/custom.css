@@ -51,3 +51,12 @@ form.edit-form input, form.edit-form select {
     font-size: 10px;
     padding: 4px;
 }
+
+.text-ellipsis{
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    /*width: 106px;*/
+    display: block;
+}
+    
