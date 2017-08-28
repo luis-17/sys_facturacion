@@ -1,21 +1,18 @@
-app.controller('PersonaNaturalCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$log', '$timeout', 'pinesNotifications', 'uiGridConstants', 'blockUI', 
+app.controller('ClientePersonaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$log', '$timeout', 'pinesNotifications', 'uiGridConstants', 'blockUI', 
+  'ClientePersonaFactory',
 	'ClientePersonaServices',
 	'CategoriaClienteServices',
   'ColaboradorServices',
 	function($scope, $filter, $uibModal, $bootbox, $log, $timeout, pinesNotifications, uiGridConstants, blockUI, 
+  ClientePersonaFactory,
 	ClientePersonaServices,
 	CategoriaClienteServices,
   ColaboradorServices
 ) {
-  // $scope.fData = {}; 
+ 
   $scope.metodos = {};
 	$scope.fArr = {};
   
-  $scope.mySelectionGrid = [];
-    $scope.btnBuscar = function(){
-	  $scope.gridOptions.enableFiltering = !$scope.gridOptions.enableFiltering;
-	  $scope.gridApi.core.notifyDataChange( uiGridConstants.dataChange.COLUMN );
-	};
 	$scope.metodos.listaCategoriasCliente = function(myCallback) {
 		var myCallback = myCallback || function() { };
 		CategoriaClienteServices.sListarCbo().then(function(rpta) {
@@ -34,6 +31,11 @@ app.controller('PersonaNaturalCtrl', ['$scope', '$filter', '$uibModal', '$bootbo
     { id:'M', descripcion:'MASCULINO' },
     { id:'F', descripcion:'FEMENINO' }
   ]; 
+  $scope.mySelectionGrid = [];
+  $scope.btnBuscar = function(){
+    $scope.gridOptions.enableFiltering = !$scope.gridOptions.enableFiltering;
+    $scope.gridApi.core.notifyDataChange( uiGridConstants.dataChange.COLUMN );
+  };
 	var paginationOptions = { 
       pageNumber: 1,
       firstRow: 0,
@@ -86,13 +88,13 @@ app.controller('PersonaNaturalCtrl', ['$scope', '$filter', '$uibModal', '$bootbo
 	          paginationOptions.sort = sortColumns[0].sort.direction;
 	          paginationOptions.sortName = sortColumns[0].name;
 	        }
-	        $scope.getPaginationServerSide(true);
+	        $scope.metodos.getPaginationServerSide(true);
 	      });
 	      gridApi.pagination.on.paginationChanged($scope, function (newPage, pageSize) {
 	        paginationOptions.pageNumber = newPage;
 	        paginationOptions.pageSize = pageSize;
 	        paginationOptions.firstRow = (paginationOptions.pageNumber - 1) * paginationOptions.pageSize;
-	        $scope.getPaginationServerSide(true);
+	        $scope.metodos.getPaginationServerSide(true);
 	      });
 	      $scope.gridApi.core.on.filterChanged( $scope, function(grid, searchColumns) {
 	        var grid = this.grid;
@@ -107,12 +109,12 @@ app.controller('PersonaNaturalCtrl', ['$scope', '$filter', '$uibModal', '$bootbo
 	          'ce.email' : grid.columns[8].filters[0].term,
 	          'cc.descripcion_cc' : grid.columns[9].filters[0].term 
 	        }
-	        $scope.getPaginationServerSide();
+	        $scope.metodos.getPaginationServerSide();
 	      });
 	    }
 	};
 	paginationOptions.sortName = $scope.gridOptions.columnDefs[0].name;
-	$scope.getPaginationServerSide = function(loader) {
+	$scope.metodos.getPaginationServerSide = function(loader) {
 	  if( loader ){
 	  	blockUI.start('Procesando información...');
 	  }
@@ -131,131 +133,23 @@ app.controller('PersonaNaturalCtrl', ['$scope', '$filter', '$uibModal', '$bootbo
 	  });
 	  $scope.mySelectionGrid = [];
 	};
-	$scope.getPaginationServerSide(true); 
+	$scope.metodos.getPaginationServerSide(true); 
 	// MAS ACCIONES
 	$scope.btnNuevo = function() { 
-		blockUI.start('Abriendo formulario...');
-		$uibModal.open({ 
-      templateUrl: angular.patchURLCI+'ClientePersona/ver_popup_formulario',
-      size: 'md',
-      backdrop: 'static',
-      keyboard:false,
-      scope: $scope,
-      controller: function ($scope, $uibModalInstance) { 
-      	blockUI.stop(); 
-      	$scope.fData = {};
-      	$scope.titleForm = 'Registro de Cliente - Persona Natural';
-      	$scope.cancel = function () {
-      	  $uibModalInstance.dismiss('cancel');
-      	}
-        $scope.fArr.listaSexo.splice(0,0,{ id : '0', descripcion:'--Seleccione sexo--'}); 
-        $scope.fData.sexo = $scope.fArr.listaSexo[0]; 
-      	var myCallBack = function() { 
-      		$scope.fArr.listaCategoriaCliente.splice(0,0,{ id : '0', descripcion:'--Seleccione la categoría de cliente--'}); 
-      		$scope.fData.categoria_cliente = $scope.fArr.listaCategoriaCliente[0]; 
-      	}
-      	$scope.metodos.listaCategoriasCliente(myCallBack); 
-        var myCallBackCO = function() { 
-          $scope.fArr.listaColaboradores.splice(0,0,{ id : '0', descripcion:'--Seleccione vendedor--'}); 
-          $scope.fData.colaborador = $scope.fArr.listaColaboradores[0]; 
-        }
-        $scope.metodos.listaColaboradores(myCallBackCO); 
-      	$scope.aceptar = function () { 
-      		blockUI.start('Procesando información...');
-          ClientePersonaServices.sRegistrar($scope.fData).then(function (rpta) {
-            if(rpta.flag == 1){
-              var pTitle = 'OK!';
-              var pType = 'success';
-              $uibModalInstance.dismiss('cancel');
-              $scope.getPaginationServerSide(true);
-            }else if(rpta.flag == 0){
-              var pTitle = 'Error!';
-              var pType = 'danger';
-            }else{
-              alert('Error inesperado');
-            }
-            blockUI.stop(); 
-            pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2500 });
-          });
-        } 
-      }
-    });
+		var arrParams = {
+      'metodos': $scope.metodos,
+      'fArr': $scope.fArr 
+    }
+    ClientePersonaFactory.regClientePersonaModal(arrParams); 
 	}
 	$scope.btnEditar = function() { 
-		blockUI.start('Abriendo formulario...');
-		$uibModal.open({ 
-      templateUrl: angular.patchURLCI+'ClientePersona/ver_popup_formulario',
-      size: 'md',
-      backdrop: 'static',
-      keyboard:false,
-      scope: $scope,
-      controller: function ($scope, $uibModalInstance) { 
-      	blockUI.stop(); 
-      	$scope.fData = {};
-      	if( $scope.mySelectionGrid.length == 1 ){ 
-          $scope.fData = $scope.mySelectionGrid[0];
-        }else{
-          alert('Seleccione una sola fila');
-        }
-      	$scope.titleForm = 'Edición de Cliente - Persona Natural';
-      	$scope.cancel = function () {
-      	  $uibModalInstance.dismiss('cancel');
-      	}
-        // BINDEO CATEGORIA CLIENTE 
-      	var myCallBack = function() { 
-      		var objIndex = $scope.fArr.listaCategoriaCliente.filter(function(obj) { 
-            return obj.id == $scope.fData.categoria_cliente.id;
-          }).shift(); 
-      		$scope.fData.categoria_cliente = objIndex; 
-      	}
-      	$scope.metodos.listaCategoriasCliente(myCallBack); 
-
-        // BINDEO SEXO 
-        var objIndex = $scope.fArr.listaSexo.filter(function(obj) { 
-          return obj.id == $scope.fData.sexo.id;
-        }).shift(); 
-        $scope.fData.sexo = objIndex; 
-
-        // BINDEO COLABORADOR  
-        var myCallBackCO = function() { 
-          $scope.fArr.listaColaboradores.splice(0,0,{ id : '0', descripcion:'--Seleccione vendedor--'}); 
-          var objIndex = $scope.fArr.listaColaboradores.filter(function(obj) { 
-            return obj.id == $scope.fData.colaborador.id;
-          }).shift(); 
-          $scope.fData.colaborador = objIndex; 
-          if( angular.isUndefined(objIndex)){ 
-            
-            $scope.fData.colaborador = $scope.fArr.listaColaboradores[0]; 
-          }
-        }
-        $scope.metodos.listaColaboradores(myCallBackCO); 
-
-        // bloquear combo de vendedor dependiendo del tipo de usuario 
-        console.log($scope.fSessionCI.categoria,'$scope.fSessionCI.categoria');
-        if( $scope.fSessionCI.categoria == 2 ){
-          $scope.disabledVendedor = true; 
-        } 
-
-      	$scope.aceptar = function () { 
-      		blockUI.start('Procesando información...');
-          ClientePersonaServices.sEditar($scope.fData).then(function (rpta) {
-            if(rpta.flag == 1){
-              var pTitle = 'OK!';
-              var pType = 'success';
-              $uibModalInstance.dismiss('cancel');
-              $scope.getPaginationServerSide(true);
-            }else if(rpta.flag == 0){
-              var pTitle = 'Error!';
-              var pType = 'danger';
-            }else{
-              alert('Error inesperado');
-            }
-            blockUI.stop(); 
-            pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2500 });
-          });
-        } 
-      }
-    });
+    var arrParams = {
+      'metodos': $scope.metodos,
+      'mySelectionGrid': $scope.mySelectionGrid,
+      'fArr': $scope.fArr,
+      'fSessionCI': $scope.fSessionCI 
+    }
+    ClientePersonaFactory.editClientePersonaModal(arrParams); 
 	}
   $scope.btnAnular = function() { 
     var pMensaje = '¿Realmente desea anular el registro?';
@@ -269,7 +163,7 @@ app.controller('PersonaNaturalCtrl', ['$scope', '$filter', '$uibModal', '$bootbo
           if(rpta.flag == 1){
             var pTitle = 'OK!';
             var pType = 'success';
-            $scope.getPaginationServerSide();
+            $scope.metodos.getPaginationServerSide();
           }else if(rpta.flag == 0){
             var pTitle = 'Error!';
             var pType = 'danger';
@@ -324,3 +218,148 @@ app.service("ClientePersonaServices",function($http, $q, handleBehavior) {
       return (request.then(handleBehavior.success,handleBehavior.error));
     }
 });
+
+app.factory("ClientePersonaFactory", function($uibModal, pinesNotifications, blockUI, ClientePersonaServices) { 
+  var interfaz = {
+    regClientePersonaModal: function (arrParams) {
+      blockUI.start('Abriendo formulario...');
+      $uibModal.open({ 
+        templateUrl: angular.patchURLCI+'ClientePersona/ver_popup_formulario',
+        size: 'md',
+        backdrop: 'static',
+        keyboard:false,
+        controller: function ($scope, $uibModalInstance, arrParams) { 
+          blockUI.stop(); 
+          $scope.fData = {};
+          $scope.metodos = arrParams.metodos;
+          $scope.fArr = arrParams.fArr;
+          $scope.titleForm = 'Registro de Cliente - Persona Natural';
+          $scope.cancel = function () {
+            $uibModalInstance.dismiss('cancel');
+          }
+          $scope.fArr.listaSexo.splice(0,0,{ id : '0', descripcion:'--Seleccione sexo--'}); 
+          $scope.fData.sexo = $scope.fArr.listaSexo[0]; 
+          var myCallBack = function() { 
+            $scope.fArr.listaCategoriaCliente.splice(0,0,{ id : '0', descripcion:'--Seleccione la categoría de cliente--'}); 
+            $scope.fData.categoria_cliente = $scope.fArr.listaCategoriaCliente[0]; 
+          }
+          $scope.metodos.listaCategoriasCliente(myCallBack); 
+          var myCallBackCO = function() { 
+            $scope.fArr.listaColaboradores.splice(0,0,{ id : '0', descripcion:'--Seleccione vendedor--'}); 
+            $scope.fData.colaborador = $scope.fArr.listaColaboradores[0]; 
+          }
+          $scope.metodos.listaColaboradores(myCallBackCO); 
+          $scope.aceptar = function () { 
+            blockUI.start('Procesando información...');
+            ClientePersonaServices.sRegistrar($scope.fData).then(function (rpta) {
+              if(rpta.flag == 1){
+                var pTitle = 'OK!';
+                var pType = 'success';
+                $uibModalInstance.dismiss('cancel');
+                if(typeof $scope.metodos.getPaginationServerSide == 'function'){ 
+                  $scope.metodos.getPaginationServerSide(true);
+                } 
+              }else if(rpta.flag == 0){
+                var pTitle = 'Error!';
+                var pType = 'danger';
+              }else{
+                alert('Error inesperado');
+              }
+              blockUI.stop(); 
+              pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2500 });
+            });
+          } 
+        },
+        resolve: {
+          arrParams: function() {
+            return arrParams;
+          }
+        }
+      });
+    },
+    editClientePersonaModal: function (arrParams) {
+      blockUI.start('Abriendo formulario...');
+      $uibModal.open({ 
+        templateUrl: angular.patchURLCI+'ClientePersona/ver_popup_formulario',
+        size: 'md',
+        backdrop: 'static',
+        keyboard:false,
+        controller: function ($scope, $uibModalInstance, arrParams) { 
+          blockUI.stop(); 
+          $scope.fData = {};
+          $scope.metodos = arrParams.metodos;
+          $scope.fArr = arrParams.fArr;
+          if( arrParams.mySelectionGrid.length == 1 ){ 
+            $scope.fData = arrParams.mySelectionGrid[0];
+          }else{
+            alert('Seleccione una sola fila');
+          }
+          $scope.titleForm = 'Edición de Cliente - Persona Natural';
+          $scope.cancel = function () {
+            $uibModalInstance.dismiss('cancel');
+          }
+          // BINDEO CATEGORIA CLIENTE 
+          var myCallBack = function() { 
+            var objIndex = $scope.fArr.listaCategoriaCliente.filter(function(obj) { 
+              return obj.id == $scope.fData.categoria_cliente.id;
+            }).shift(); 
+            $scope.fData.categoria_cliente = objIndex; 
+          }
+          $scope.metodos.listaCategoriasCliente(myCallBack); 
+
+          // BINDEO SEXO 
+          var objIndex = $scope.fArr.listaSexo.filter(function(obj) { 
+            return obj.id == $scope.fData.sexo.id;
+          }).shift(); 
+          $scope.fData.sexo = objIndex; 
+
+          // BINDEO COLABORADOR  
+          var myCallBackCO = function() { 
+            $scope.fArr.listaColaboradores.splice(0,0,{ id : '0', descripcion:'--Seleccione vendedor--'}); 
+            var objIndex = $scope.fArr.listaColaboradores.filter(function(obj) { 
+              return obj.id == $scope.fData.colaborador.id;
+            }).shift(); 
+            $scope.fData.colaborador = objIndex; 
+            if( angular.isUndefined(objIndex)){ 
+              
+              $scope.fData.colaborador = $scope.fArr.listaColaboradores[0]; 
+            }
+          }
+          $scope.metodos.listaColaboradores(myCallBackCO); 
+
+          // bloquear combo de vendedor dependiendo del tipo de usuario 
+          if( arrParams.fSessionCI.categoria == 2 ){
+            $scope.disabledVendedor = true; 
+          } 
+
+          $scope.aceptar = function () { 
+            blockUI.start('Procesando información...');
+            ClientePersonaServices.sEditar($scope.fData).then(function (rpta) {
+              if(rpta.flag == 1){
+                var pTitle = 'OK!';
+                var pType = 'success';
+                $uibModalInstance.dismiss('cancel');
+                if(typeof $scope.metodos.getPaginationServerSide == 'function'){ 
+                  $scope.metodos.getPaginationServerSide(true);
+                }
+              }else if(rpta.flag == 0){
+                var pTitle = 'Error!';
+                var pType = 'danger';
+              }else{
+                alert('Error inesperado');
+              }
+              blockUI.stop(); 
+              pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2500 });
+            });
+          } 
+        },
+        resolve: {
+          arrParams: function() {
+            return arrParams;
+          }
+        }
+      });
+    }
+  }
+  return interfaz; 
+}); 

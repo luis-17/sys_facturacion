@@ -15,11 +15,13 @@ function handleError( response ) {
 function handleSuccess( response ) {
     return( response.data );
 }
-/* Controllers */
 
+/* Controllers */ 
 angular.module('app')
-  .controller('AppCtrl', ['$scope', '$translate', '$localStorage', '$location', '$window',  '$timeout', 'rootServices',  'blockUI', 'pinesNotifications',
-    function(              $scope,   $translate,   $localStorage,   $location,   $window,    $timeout,   rootServices,    blockUI ,  pinesNotifications ) {
+  .controller('AppCtrl', ['$scope', '$translate', '$localStorage', '$location', '$window',  '$timeout', 'rootServices',  'blockUI', 'pinesNotifications', 
+      '$state',/*'$routeParams', */ 
+    function(              $scope,   $translate,   $localStorage,   $location,   $window,    $timeout,   rootServices,    blockUI ,  pinesNotifications   
+        ,$state/*, $routeParams */) { 
       // add 'ie' classes to html
       var isIE = !!navigator.userAgent.match(/MSIE/i);
       if(isIE){ angular.element($window.document.body).addClass('ie');}
@@ -52,7 +54,12 @@ angular.module('app')
           container: false
         }
       }
-      console.log($scope.app.settings.navbarHeaderColor,'$scope.app.settings.navbarHeaderColor'); 
+      // console.log($state,'$state'); 
+      $scope.reloadPage = function() { 
+        $state.reload();
+        // $location.path( $state.current.url );
+        // console.log($state.current.url,'$state.current.url');
+      }
       $scope.listaEmpresaAdminSession = []; 
       // save settings to local storage
       if ( angular.isDefined($localStorage.settings) ) {
@@ -74,11 +81,8 @@ angular.module('app')
       // angular translate
       $scope.lang = { isopen: false };
       $scope.langs = {es_SP:'Spanish', en:'English', de_DE:'German', it_IT:'Italian'};
-      // $scope.selectLang = $scope.langs[$translate.proposedLanguage()] || "Spanish";
       $scope.selectLang = $scope.langs[$translate.proposedLanguage()] || "Spanish";
-      // console.log( $translate.proposedLanguage() , '$translate.proposedLanguage()'); 
       $scope.setLang = function(langKey, $event) { 
-        // console.log(langKey,'langKey');
         // set the current lang
         $scope.selectLang = $scope.langs[langKey];
         // You can change the language during runtime
@@ -132,7 +136,10 @@ angular.module('app')
             // $scope.CargaMenu();
             if( $location.path() == '/access/login' ){ 
               $location.path('/');
+            }else{
+              $scope.reloadPage(); 
             }
+            
           }else{
             $scope.fSessionCI = {};
             $scope.logOut();

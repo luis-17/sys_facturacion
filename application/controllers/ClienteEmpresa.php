@@ -42,6 +42,7 @@ class ClienteEmpresa extends CI_Controller {
 					'representante_legal' => $row['representante_legal'],
 					'dni_representante_legal' => $row['dni_representante_legal'],
 					'direccion_legal' => $row['direccion_legal'],
+					'direccion_guia' => $row['direccion_guia'],
 					'telefono' => $row['telefono']
 				)
 			);

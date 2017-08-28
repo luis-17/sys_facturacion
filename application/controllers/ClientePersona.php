@@ -53,7 +53,7 @@ class ClientePersona extends CI_Controller {
 					'fecha_nacimiento_str' => formatoFechaReporte3($row['fecha_nacimiento']),
 					'telefono_fijo' => $row['telefono_fijo'],
 					'telefono_movil' => $row['telefono_movil'],
-					'email' => $row['email']
+					'email' => strtoupper($row['email'])
 				)
 			);
 		}

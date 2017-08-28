@@ -46,6 +46,20 @@ class Model_cliente_empresa extends CI_Model {
 		$fData = $this->db->get()->row_array();
 		return $fData;
 	}
+	public function m_buscar_cliente_empresa($datos)
+	{
+		$this->db->select("co.idcolaborador, CONCAT(co.nombres, ' ', co.apellidos) As colaborador",FALSE);
+		$this->db->select('ce.idclienteempresa, ce.nombre_comercial, ce.razon_social, ce.ruc, ce.representante_legal, ce.dni_representante_legal, 
+			ce.direccion_legal, ce.direccion_guia, ce.telefono,
+			cc.idcategoriacliente, cc.descripcion_cc');
+		$this->db->from('cliente_empresa ce');
+		$this->db->join('categoria_cliente cc', 'ce.idcategoriacliente = cc.idcategoriacliente');
+		$this->db->join('colaborador co', 'ce.idcolaborador = co.idcolaborador','left');
+		$this->db->where('ce.estado_ce', 1); // activo  
+		$this->db->where('ce.ruc', $datos['num_documento']);
+		$this->db->limit(1);
+		return $this->db->get()->row_array();
+	}
 	// VALIDACIONES 
 	public function m_validar_cliente_empresa_num_documento($ruc,$excepcion = FALSE,$idclienteempresa=NULL) 
 	{

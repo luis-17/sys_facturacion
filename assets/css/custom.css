@@ -29,6 +29,19 @@
 	background-color: #f6f8f8;
  	border-top: 1px solid #ccdbe6;
 }
+/*FONT SIZE*/
+.f-10{
+    font-size: 10px; 
+    margin: 0;
+}
+.f-9{
+    font-size: 9px; 
+    margin: 0;
+}
+
+.form-group-sm{
+    margin-bottom: 8px;
+}
 
 .fieldset-sm legend{
 	text-transform: uppercase;
@@ -60,3 +73,14 @@ form.edit-form input, form.edit-form select {
     display: block;
 }
     
+.lead.lead-sm {
+    margin-bottom: 10px; 
+}
+
+.input-xs {
+    height: 24px;
+    padding: 3px 6px;
+    font-size: 11px;
+    line-height: 1.2;
+    border-radius: 3px;
+}
