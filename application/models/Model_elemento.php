@@ -10,7 +10,7 @@ class Model_elemento extends CI_Model {
 			cael.idcategoriaelemento, cael.descripcion_cael, cael.color_cael');
 		$this->db->from('elemento el');
 		$this->db->join('categoria_elemento cael', 'el.idcategoriaelemento = cael.idcategoriaelemento');
-		$this->db->join('unidad_medida um', 'el.idunidadmedida = um.idunidadmedida');
+		$this->db->join('unidad_medida um', 'el.idunidadmedida = um.idunidadmedida','left');
 		$this->db->where('el.estado_ele', 1);
 		$this->db->where('el.tipo_elemento', $paramDatos['tipo_elemento']);
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
@@ -33,7 +33,7 @@ class Model_elemento extends CI_Model {
 		$this->db->select('COUNT(*) AS contador');
 		$this->db->from('elemento el');
 		$this->db->join('categoria_elemento cael', 'el.idcategoriaelemento = cael.idcategoriaelemento');
-		$this->db->join('unidad_medida um', 'el.idunidadmedida = um.idunidadmedida');
+		$this->db->join('unidad_medida um', 'el.idunidadmedida = um.idunidadmedida','left');
 		$this->db->where('el.estado_ele', 1);
 		$this->db->where('el.tipo_elemento', $paramDatos['tipo_elemento']);
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
@@ -50,7 +50,7 @@ class Model_elemento extends CI_Model {
 	{
 		$data = array(
 			'idcategoriaelemento' => $datos['categoria_elemento']['id'], 
-			'idunidadmedida' => $datos['unidad_medida']['id'],
+			'idunidadmedida' => empty($datos['unidad_medida']['id']) ? NULL : $datos['unidad_medida']['id'],
 			'descripcion_ele' => strtoupper($datos['descripcion_ele']),	
 			'tipo_elemento' => strtoupper($datos['tipo_elemento']['id']),	
 			'precio_referencial' => $datos['precio_referencial'], 
@@ -63,7 +63,7 @@ class Model_elemento extends CI_Model {
 	{
 		$data = array(
 			'idcategoriaelemento' => $datos['categoria_elemento']['id'], 
-			'idunidadmedida' => $datos['unidad_medida']['id'],
+			'idunidadmedida' => empty($datos['unidad_medida']['id']) ? NULL : $datos['unidad_medida']['id'],
 			'descripcion_ele' => strtoupper($datos['descripcion_ele']),	
 			'tipo_elemento' => strtoupper($datos['tipo_elemento']['id']), 
 			'precio_referencial' => $datos['precio_referencial'], 

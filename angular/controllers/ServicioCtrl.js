@@ -1,12 +1,10 @@
-app.controller('ProductoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$log', '$timeout', 'pinesNotifications', 'uiGridConstants', 'blockUI', 
-	'ProductoFactory',
-	'ProductoServices',
-	'UnidadMedidaServices',
+app.controller('ServicioCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$log', '$timeout', 'pinesNotifications', 'uiGridConstants', 'blockUI', 
+	'ServicioFactory',
+	'ServicioServices',
 	'CategoriaElementoServices', 
 	function($scope, $filter, $uibModal, $bootbox, $log, $timeout, pinesNotifications, uiGridConstants, blockUI, 
-	ProductoFactory,
-	ProductoServices,
-	UnidadMedidaServices,
+	ServicioFactory,
+	ServicioServices,
 	CategoriaElementoServices,
 	) {
 		$scope.metodos = {}; // contiene todas las funciones 
@@ -29,16 +27,6 @@ app.controller('ProductoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$
 				myCallback();
 			});
 		};
-		// UNIDADES DE MEDIDA 
-	  $scope.metodos.listaUnidadMedida = function(myCallback) { 
-	    var myCallback = myCallback || function() { };
-	    UnidadMedidaServices.sListarCbo().then(function(rpta) { 
-	      if( rpta.flag == 1){
-	        $scope.fArr.listaUnidadMedida = rpta.datos; 
-	        myCallback();
-	      } 
-	    });
-	  }
 
 		var paginationOptions = {
       pageNumber: 1,
@@ -63,11 +51,7 @@ app.controller('ProductoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$
 	    multiSelect: false,
 	    columnDefs: [ 
 	      { field: 'id', name: 'el.idelemento', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
-	      { field: 'descripcion_ele', name: 'el.descripcion_ele', displayName: 'Producto', minWidth: 160 },
-	      { field: 'unidad_medida', type: 'object', name: 'um.descripcion_um', displayName: 'Unidad Medida Ref.', minWidth: 100,
-	      	cellTemplate:'<div class="ui-grid-cell-contents text-center ">'+ 
-	            '{{ COL_FIELD.descripcion }}</div>' 
-	      },
+	      { field: 'descripcion_ele', name: 'el.descripcion_ele', displayName: 'Servicio', minWidth: 160 },
 	      { field: 'precio_referencial', name: 'el.precio_referencial', displayName: 'Precio Ref.', minWidth: 100 },
 	      { field: 'categoria_elemento', type: 'object', name: 'cael.descripcion_cael', displayName: 'Categoria', minWidth: 80, enableColumnMenus: false, enableColumnMenu: false, 
 	          cellTemplate:'<div class="ui-grid-cell-contents text-center ">'+ 
@@ -104,9 +88,8 @@ app.controller('ProductoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$
 	        paginationOptions.searchColumn = {
 	          'el.idelemento' : grid.columns[1].filters[0].term,
 	          'el.descripcion_ele' : grid.columns[2].filters[0].term,
-	          'um.descripcion_um' : grid.columns[3].filters[0].term,
-	          'el.precio_referencial' : grid.columns[4].filters[0].term,
-	          'cael.descripcion_cael' : grid.columns[5].filters[0].term 
+	          'el.precio_referencial' : grid.columns[3].filters[0].term,
+	          'cael.descripcion_cael' : grid.columns[4].filters[0].term 
 	        }
 	        $scope.metodos.getPaginationServerSide();
 	      });
@@ -120,7 +103,7 @@ app.controller('ProductoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$
 		  var arrParams = {
 		    paginate : paginationOptions
 		  };
-		  ProductoServices.sListar(arrParams).then(function (rpta) { 
+		  ServicioServices.sListar(arrParams).then(function (rpta) { 
 		  	if( rpta.datos.length == 0 ){
 		  		rpta.paginate = { totalRows: 0 };
 		  	}
@@ -139,7 +122,7 @@ app.controller('ProductoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$
 				'metodos': $scope.metodos,
 				'fArr': $scope.fArr 
 			}
-			ProductoFactory.regProductoModal(arrParams); 
+			ServicioFactory.regServicioModal(arrParams); 
 		}
 		$scope.btnEditar = function() { 
 			var arrParams = {
@@ -147,7 +130,7 @@ app.controller('ProductoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$
 				'mySelectionGrid': $scope.mySelectionGrid,
 				'fArr': $scope.fArr 
 			}
-			ProductoFactory.editProductoModal(arrParams); 
+			ServicioFactory.editServicioModal(arrParams); 
 		}
 		$scope.btnAnular = function() { 
 	    var pMensaje = '¿Realmente desea anular el registro?';
@@ -157,7 +140,7 @@ app.controller('ProductoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$
 	          id: $scope.mySelectionGrid[0].id 
 	        };
 	        blockUI.start('Procesando información...');
-	        ProductoServices.sAnular(arrParams).then(function (rpta) {
+	        ServicioServices.sAnular(arrParams).then(function (rpta) {
 	          if(rpta.flag == 1){
 	            var pTitle = 'OK!';
 	            var pType = 'success';
@@ -176,7 +159,7 @@ app.controller('ProductoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$
 	  }
 }]);
 
-app.service("ProductoServices",function($http, $q, handleBehavior) {
+app.service("ServicioServices",function($http, $q, handleBehavior) {
     return({
         sListar: sListar,
         sRegistrar: sRegistrar,
@@ -186,7 +169,7 @@ app.service("ProductoServices",function($http, $q, handleBehavior) {
     function sListar(datos) {
       var request = $http({
             method : "post",
-            url : angular.patchURLCI+"Producto/listar_producto",
+            url : angular.patchURLCI+"Servicio/listar_servicio",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
@@ -194,7 +177,7 @@ app.service("ProductoServices",function($http, $q, handleBehavior) {
     function sRegistrar (datos) {
       var request = $http({
             method : "post",
-            url : angular.patchURLCI+"Producto/registrar",
+            url : angular.patchURLCI+"Servicio/registrar",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
@@ -202,7 +185,7 @@ app.service("ProductoServices",function($http, $q, handleBehavior) {
     function sEditar (datos) {
       var request = $http({
             method : "post",
-            url : angular.patchURLCI+"Producto/editar",
+            url : angular.patchURLCI+"Servicio/editar",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
@@ -210,19 +193,19 @@ app.service("ProductoServices",function($http, $q, handleBehavior) {
     function sAnular (datos) {
       var request = $http({
             method : "post",
-            url : angular.patchURLCI+"Producto/anular",
+            url : angular.patchURLCI+"Servicio/anular",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
     }
 });
 
-app.factory("ProductoFactory", function($uibModal, pinesNotifications, blockUI, ProductoServices) { 
+app.factory("ServicioFactory", function($uibModal, pinesNotifications, blockUI, ServicioServices) { 
 	var interfaz = {
-		regProductoModal: function (arrParams) {
+		regServicioModal: function (arrParams) {
 			blockUI.start('Abriendo formulario...');
 			$uibModal.open({ 
-	      templateUrl: angular.patchURLCI+'Producto/ver_popup_formulario',
+	      templateUrl: angular.patchURLCI+'Servicio/ver_popup_formulario',
 	      size: 'md',
 	      backdrop: 'static',
 	      keyboard:false,
@@ -231,32 +214,26 @@ app.factory("ProductoFactory", function($uibModal, pinesNotifications, blockUI, 
 	      	$scope.fData = {};
 	      	$scope.metodos = arrParams.metodos;
 	      	$scope.fArr = arrParams.fArr;
-	      	$scope.titleForm = 'Registro de Producto';
+	      	$scope.titleForm = 'Registro de Servicio';
 	      	$scope.cancel = function () {
 	      	  $uibModalInstance.dismiss('cancel');
 	      	}
 	      	// BINDEO TIPO DE ELEMENTO 
 	      	var objIndex = $scope.fArr.listaTipoElemento.filter(function(obj) { 
-            return obj.id == 'P';
+            return obj.id == 'S';
           }).shift(); 
           $scope.fData.tipo_elemento = objIndex; 
 
 	      	// BINDEO CATEGORIA DE ELEMENTO 
 	      	var myCallBackCC = function() { 
-	      		$scope.fArr.listaCategoriasElemento.splice(0,0,{ id : '0', descripcion:'--Seleccione categoría de producto--'}); 
+	      		$scope.fArr.listaCategoriasElemento.splice(0,0,{ id : '0', descripcion:'--Seleccione categoría de servicio--'}); 
 	      		$scope.fData.categoria_elemento = $scope.fArr.listaCategoriasElemento[0]; 
 	      	}
 	      	$scope.metodos.listaCategoriasElemento(myCallBackCC); 
-	      	// BINDEO UNIDAD DE MEDIDA  
-	      	var myCallBackCO = function() { 
-	      		$scope.fArr.listaUnidadMedida.splice(0,0,{ id : '0', descripcion:'--Seleccione unidad de medida--'}); 
-	      		$scope.fData.unidad_medida = $scope.fArr.listaUnidadMedida[0]; 
-	      	}
-	      	$scope.metodos.listaUnidadMedida(myCallBackCO); 
 
 	      	$scope.aceptar = function () { 
 	      		blockUI.start('Procesando información...');
-	          ProductoServices.sRegistrar($scope.fData).then(function (rpta) {
+	          ServicioServices.sRegistrar($scope.fData).then(function (rpta) {
 	            if(rpta.flag == 1){
 	              var pTitle = 'OK!';
 	              var pType = 'success';
@@ -282,10 +259,10 @@ app.factory("ProductoFactory", function($uibModal, pinesNotifications, blockUI, 
         }
 	    });
 		},
-		editProductoModal: function (arrParams) {
+		editServicioModal: function (arrParams) {
 			blockUI.start('Abriendo formulario...');
 			$uibModal.open({ 
-	      templateUrl: angular.patchURLCI+'Producto/ver_popup_formulario',
+	      templateUrl: angular.patchURLCI+'Servicio/ver_popup_formulario',
 	      size: 'md',
 	      backdrop: 'static',
 	      keyboard:false,
@@ -299,7 +276,7 @@ app.factory("ProductoFactory", function($uibModal, pinesNotifications, blockUI, 
 	        }else{
 	          alert('Seleccione una sola fila');
 	        }
-	      	$scope.titleForm = 'Edición de Producto';
+	      	$scope.titleForm = 'Edición de Servicio';
 	      	$scope.cancel = function () {
 	      	  $uibModalInstance.dismiss('cancel');
 	      	}
@@ -318,21 +295,9 @@ app.factory("ProductoFactory", function($uibModal, pinesNotifications, blockUI, 
 	      	}
 	      	$scope.metodos.listaCategoriasElemento(myCallBackCC); 
 
-	      	// BINDEO UNIDAD DE MEDIDA  
-	      	var myCallBackCO = function() { 
-	      		$scope.fArr.listaUnidadMedida.splice(0,0,{ id : '0', descripcion:'--Seleccione vendedor--'}); 
-	          var objIndex = $scope.fArr.listaUnidadMedida.filter(function(obj) { 
-	            return obj.id == $scope.fData.unidad_medida.id;
-	          }).shift(); 
-	          $scope.fData.unidad_medida = objIndex; 
-	          if( angular.isUndefined(objIndex)){ 
-	            $scope.fData.unidad_medida = $scope.fArr.listaUnidadMedida[0]; 
-	          }
-	        } 
-	        $scope.metodos.listaUnidadMedida(myCallBackCO); 
 	      	$scope.aceptar = function () { 
 	      		blockUI.start('Procesando información...');
-	          ProductoServices.sEditar($scope.fData).then(function (rpta) {
+	          ServicioServices.sEditar($scope.fData).then(function (rpta) {
 	            if(rpta.flag == 1){
 	              var pTitle = 'OK!';
 	              var pType = 'success';

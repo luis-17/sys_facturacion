@@ -7,7 +7,7 @@
 			<div class="col-md-6 col-sm-12" >
 				<fieldset >
 					<legend class="lead lead-sm"> Datos del Cliente
-            <div class="btn-group pull-right" ng-if="submodulo != 'edicion'">
+            <div class="btn-group pull-right">
               <button type="button" class="btn btn-success dropdown-toggle btn-xs" data-toggle="dropdown">
                   <i class="fa fa-tasks"> </i>  ACCIONES <span class="caret"></span>
               </button>
@@ -111,7 +111,18 @@
 			</div>
 			<div class="col-xs-12" >
 				<fieldset >
-					<legend class="lead lead-sm"> Detalle de Cotización </legend> 
+					<legend class="lead lead-sm"> Detalle de Cotización 
+						<div class="btn-group pull-right">
+              <button type="button" class="btn btn-success dropdown-toggle btn-xs" data-toggle="dropdown">
+                  <i class="fa fa-tasks"> </i>  ACCIONES <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu" role="menu">
+                  <li><a href="" ng-click='btnNuevoProducto();'><i class="fa fa-file"></i> Nuevo Producto </a></li>
+                  <li><a href="" ng-click='btnNuevoServicio();'><i class="fa fa-file"></i> Nuevo Servicio </a></li>
+                  <li><a href="" ng-click="btnBusquedaCliente();"><i class="fa fa-search"></i> Buscar </a></li>
+              </ul>
+            </div>
+					</legend> 
 					<div class="form-group-sm pull-in clearfix">
 						<div class="col-md-5 col-xs-12"> 
 				      <label class="control-label"> Producto </label>

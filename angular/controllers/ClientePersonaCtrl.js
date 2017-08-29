@@ -10,8 +10,8 @@ app.controller('ClientePersonaCtrl', ['$scope', '$filter', '$uibModal', '$bootbo
   ColaboradorServices
 ) {
  
-  $scope.metodos = {};
-	$scope.fArr = {};
+  $scope.metodos = {}; // contiene todas las funciones 
+  $scope.fArr = {}; // contiene todos los arrays generados por las funciones 
   
 	$scope.metodos.listaCategoriasCliente = function(myCallback) {
 		var myCallback = myCallback || function() { };

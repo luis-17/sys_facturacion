@@ -1,6 +1,8 @@
 app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$log', '$timeout', 'pinesNotifications', 'uiGridConstants', 'blockUI', 
     'ClientePersonaFactory',
     'ClienteEmpresaFactory',
+    'ServicioFactory',
+    'ProductoFactory',
 		'CotizacionServices',
 		'ClienteEmpresaServices',
 		'ClientePersonaServices', 
@@ -8,12 +10,15 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     'TipoDocumentoClienteServices',
     'ClienteServices', 
     'CategoriaClienteServices',
+    'CategoriaElementoServices',
     'SedeServices',
     'FormaPagoServices',
     'UnidadMedidaServices',
 	function($scope, $filter, $uibModal, $bootbox, $log, $timeout, pinesNotifications, uiGridConstants, blockUI, 
     ClientePersonaFactory,
     ClienteEmpresaFactory,
+    ServicioFactory,
+    ProductoFactory,
 		CotizacionServices,
 		ClienteEmpresaServices,
 		ClientePersonaServices,
@@ -21,6 +26,7 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     TipoDocumentoClienteServices,
     ClienteServices,
     CategoriaClienteServices,
+    CategoriaElementoServices,
     SedeServices,
     FormaPagoServices,
     UnidadMedidaServices
@@ -121,6 +127,20 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     $scope.fData.forma_pago = $scope.fArr.listaFormaPago[0]; 
   }
   $scope.metodos.listaFormaPago(myCallback); 
+
+  // TIPOS DE ELEMENTO 
+  $scope.fArr.listaTipoElemento = [ 
+    {'id' : 'P', 'descripcion' : 'PRODUCTO'},
+    {'id' : 'S', 'descripcion' : 'SERVICIO'}
+  ]; 
+  // CATEGORIAS DE ELEMENTOS 
+  $scope.metodos.listaCategoriasElemento = function(myCallback) {
+    var myCallback = myCallback || function() { };
+    CategoriaElementoServices.sListarCbo().then(function(rpta) {
+      $scope.fArr.listaCategoriasElemento = rpta.datos; 
+      myCallback();
+    });
+  };
 
   // UNIDADES DE MEDIDA 
   $scope.metodos.listaUnidadMedida = function(myCallback) { 
@@ -383,7 +403,24 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
       ClientePersonaFactory.editClientePersonaModal(arrParams); 
     }
   }
-  // CESTA DE PRODUCTOS 
+
+  // NUEVO PRODUCTO 
+  $scope.btnNuevoProducto = function() {
+      var arrParams = { 
+        'metodos': $scope.metodos,
+        'fArr': $scope.fArr 
+      }
+      ProductoFactory.regProductoModal(arrParams); 
+  }
+  // NUEVO PRODUCTO 
+  $scope.btnNuevoServicio = function() {
+      var arrParams = { 
+        'metodos': $scope.metodos,
+        'fArr': $scope.fArr 
+      }
+      ServicioFactory.regServicioModal(arrParams); 
+  }
+  // CESTA DE ELEMENTOS 
   $scope.mySelectionGrid = [];
   $scope.gridOptions = { 
     paginationPageSize: 50,

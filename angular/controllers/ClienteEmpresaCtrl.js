@@ -11,8 +11,8 @@ app.controller('ClienteEmpresaCtrl', ['$scope', '$filter', '$uibModal', '$bootbo
 	ContactoEmpresaServices,
 	ColaboradorServices
 	) {
-		$scope.metodos = {};
-		$scope.fArr = {};
+		$scope.metodos = {}; // contiene todas las funciones 
+		$scope.fArr = {}; // contiene todos los arrays generados por las funciones 
   	$scope.mySelectionGrid = [];
   	var paginationOptions = {
       pageNumber: 1,

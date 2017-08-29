@@ -5,7 +5,7 @@
 	<form name="formBusquedaCliente" class=""> 
 		<div class="row">
 			<div class="col-xs-12">
-				<div class="form-group"> 
+				<div class="inline"> 
 		            <label class="radio-inline">
 		              <input type="radio" value="cp" ng-model="fBusqueda.tipo_cliente" ng-change="metodos.cambioColumnas();metodos.getPaginationServerSideBC(true);"> Cliente Persona 
 		            </label>
@@ -13,8 +13,8 @@
 		              <input type="radio" value="ce" ng-model="fBusqueda.tipo_cliente" ng-change="metodos.cambioColumnas();metodos.getPaginationServerSideBC(true);"> Cliente Empresa 
 		            </label>
 		        </div>
-		        <div class="form-group pull-right"> 
-		        	<button class="btn m-b-xs btn-success btn-xs" ng-click="btnNuevo();">
+		        <div class="inline pull-right"> 
+		        	<button class="btn m-b-xs btn-success btn-xs" ng-click="btnNuevoCliente();">
 	        			<i class="fa fa-file-text"></i> Nuevo </button> 
 		        </div>
 			</div>

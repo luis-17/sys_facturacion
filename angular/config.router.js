@@ -64,9 +64,12 @@ angular.module('app')
               'angular/controllers/NuevaCotizacionCtrl.js',
               'angular/controllers/ClienteEmpresaCtrl.js',
               'angular/controllers/ClientePersonaCtrl.js',
+              'angular/controllers/ProductoCtrl.js',
+              'angular/controllers/ServicioCtrl.js',
               'angular/controllers/ClienteCtrl.js',
               'angular/controllers/ColaboradorCtrl.js',
               'angular/controllers/CategoriaClienteCtrl.js',
+              'angular/controllers/CategoriaElementoCtrl.js',
               'angular/controllers/TipoDocumentoClienteCtrl.js',
               'angular/controllers/SedeCtrl.js',
               'angular/controllers/FormaPagoCtrl.js',
@@ -80,6 +83,14 @@ angular.module('app')
               'angular/controllers/ProductoCtrl.js',
               'angular/controllers/CategoriaElementoCtrl.js',
               'angular/controllers/UnidadMedidaCtrl.js'
+            ]) 
+          })
+          .state('app.servicio', {
+            url: '/servicio',
+            templateUrl: 'tpl/servicio.html',
+            resolve: load([
+              'angular/controllers/ServicioCtrl.js',
+              'angular/controllers/CategoriaElementoCtrl.js' 
             ]) 
           })
           .state('lockme', {
