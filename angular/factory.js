@@ -73,4 +73,17 @@ angular.module('app')
         }
       }
       return handleBehavior;
+  })
+  .factory('MathFactory', function() {
+    var interfaz = {
+        redondear: function (num, decimal) { 
+          var decimal = decimal || 2;
+          if (isNaN(num) || num === 0){
+            return parseFloat(0);
+          }
+          var factor = Math.pow(10,decimal);
+          return Math.round(num * factor ) / factor;
+        }
+      }
+      return interfaz;
   }); 

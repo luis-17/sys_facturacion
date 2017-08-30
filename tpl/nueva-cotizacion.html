@@ -20,15 +20,15 @@
         	</legend>
 					<div class="form-group-sm pull-in clearfix"> 
 						<div class="col-md-3">
-              <label class="control-label"> Documento de Cliente </label>
+              <label class="control-label text-ellipsis"> Documento de Cliente </label>
               <select class="form-control input-sm" ng-model="fData.tipo_documento_cliente" ng-options="item as item.descripcion for item in fArr.listaTiposDocumentoCliente" 
               	tabindex="102" focus-me required > </select> 
           	</div>
 						<div class="col-md-3"> 
-							<label class="control-label"> Num. Documento. <small class="text-danger">(*)</small></label> 
+							<label class="control-label text-ellipsis"> Num. Documento. <small class="text-danger">(*)</small></label> 
               <input id="ruc" type="text" class="form-control input-sm" ng-model="fData.num_documento" ng-enter="obtenerDatosCliente(); $event.preventDefault();" 
               	placeholder="Numero de Documento" ng-change="limpiarCampos();" tabindex="101" ng-pattern="pNumeroDocumento" ng-readonly="submodulo == 'edicion'" required /> 
-              <span class="help-block m-b-none f-10">Presiones "Enter" para buscar.</span>
+              <span class="help-block m-b-none f-10 text-ellipsis">Presiones "Enter" para buscar.</span>
 						</div>	
 						<div class="col-md-6" ng-show="fData.tipo_documento_cliente.destino == 1"> <!-- EMPRESA -->
 							<label class="control-label"> Razón Social <small class="text-danger">(*)</small> </label> 
@@ -54,7 +54,7 @@
 							<input type="text" class="form-control input-sm" ng-model="fData.cliente.email" placeholder="Correo Electrónico" readonly="readonly" tabindex="50" /> 
 						</div> 
 						<div class="col-md-3">
-              <label class="control-label"> Telefono Móvil</label>
+              <label class="control-label text-ellipsis"> Telefono Móvil</label>
               <input type="text" class="form-control input-sm" ng-model="fData.cliente.telefono_movil" placeholder="Telefono" readonly="readonly" /> 
           	</div>
           	<div class="col-md-3">
@@ -97,13 +97,13 @@
               <span class="help-block m-b-none f-10"> <a href="" class="text-info pull-right" ng-click="metodos.verPlazosPago"> VER PLAZOS DE PAGO. </a> </span> 
           	</div>
           	<div class="col-md-4 col-sm-12">
-              <label class="control-label"> Estado de Cotización </label> 
+              <label class="control-label text-ellipsis"> Estado de Cotización </label> 
               <select class="form-control input-sm" ng-model="fData.estado_cotizacion" ng-options="item as item.descripcion for item in fArr.listaEstadosCotizacion" 
               	tabindex="104" > </select> 
           	</div>
           	<div class="col-md-4 col-sm-12">
               <label class="control-label"> Colaborador </label> 
-              <label class="control-label text-info text-bold"> {{ fSessionCI.nombres + ' ' + fSessionCI.apellidos }} </label> 
+              <label class="control-label text-info text-bold text-ellipsis"> {{ fSessionCI.nombres + ' ' + fSessionCI.apellidos }} </label> 
           	</div>
           </div>
 
@@ -119,46 +119,52 @@
               <ul class="dropdown-menu" role="menu">
                   <li><a href="" ng-click='btnNuevoProducto();'><i class="fa fa-file"></i> Nuevo Producto </a></li>
                   <li><a href="" ng-click='btnNuevoServicio();'><i class="fa fa-file"></i> Nuevo Servicio </a></li>
-                  <li><a href="" ng-click="btnBusquedaCliente();"><i class="fa fa-search"></i> Buscar </a></li>
+                  <li><a href="" ng-click="btnBusquedaElemento();"><i class="fa fa-search"></i> Buscar </a></li>
               </ul>
             </div>
 					</legend> 
 					<div class="form-group-sm pull-in clearfix">
 						<div class="col-md-5 col-xs-12"> 
-				      <label class="control-label"> Producto </label>
+				      <label class="control-label"> Elemento </label> 
 				      <div class="input-group"> 
-								<input id="temporalElemento" type="text" ng-model="fData.temporal.elemento" class="form-control input-sm"
+								<input id="temporalElemento" type="text" ng-model="fData.temporal.elemento" class="form-control input-sm {{ fData.classValid }}"
 									placeholder="Busque Elemento" typeahead-loading="loadingLocations" uib-typeahead="item as item.elemento for item in getElementoAutocomplete($viewValue)"
-	            		typeahead-on-select="getSelectedElemento($item, $model, $label)" typeahead-min-length="2" autocomplete ="off" ng-change="limpiarId();"  tabindex=""/> 
+	            		typeahead-on-select="getSelectedElemento($item, $model, $label)" typeahead-min-length="2" autocomplete ="off" ng-blur="validateElemento();" tabindex=""/> 
 	            	<span class="input-group-btn">
-	                <button class="btn btn-default btn-sm" type="button" ng-click="btnBuscarElemento();"><i class="fa fa-search"></i> </button>
-	                <button class="btn btn-default btn-sm" type="button" ng-click="btnGestionCaracteristicas();" ng-disabled="!fDataVenta.temporal.producto.id"> CARACTERÍSTICAS [F7] </button> 
+	                <button class="btn btn-default btn-sm" type="button" ng-click="btnBusquedaElemento();"><i class="fa fa-search"></i> </button>
+	                <button class="btn btn-default btn-sm" type="button" ng-click="btnGestionCaracteristicas();" ng-disabled="!fData.temporal.elemento.id"> CARACTERÍSTICAS [F7] </button> 
 	              </span>
 				    	</div>
 	            <i ng-show="loadingLocations" class="fa fa-refresh"></i>
-	            <div ng-show="noResultsELE">
+	            <div ng-show="noResultsELE" class="text-danger">
 	                <i class="fa fa-remove"></i> No se encontró resultados 
 	            </div>
 				    </div>
-				    <div class="col-md-1 col-sm-6">
+				    <div class="col-md-2 col-sm-6">
 	            <label class="control-label"> U. Med. </label>
 	            <select class="form-control input-sm" ng-model="fData.temporal.unidad_medida" ng-options="item as item.descripcion for item in fArr.listaUnidadMedida" 
 	            	tabindex="" > </select> 
 		        </div>
 		        <div class="col-md-1 col-sm-6">
               <label class="control-label"> Cantidad </label>
-              <input id="temporalCantidad" type="text" class="form-control input-sm" ng-model="fData.temporal.cantidad" tabindex="112" placeholder="Cantidad"  ng-change="calcularImporte();"/> 
+              <input id="temporalCantidad" type="text" class="form-control input-sm" ng-model="fData.temporal.cantidad" tabindex="112" 
+              	placeholder="Cantidad" ng-change="calcularImporte();"/> 
           	</div>  
           	<div class="col-md-1 col-sm-6">
               <label class="control-label"> P. Unit.</label>
-              <input id="temporalPrecio" type="text" class="form-control input-sm" ng-model="fData.temporal.precio_unitario" placeholder="Precio" tabindex="113" ng-change="calcularImporte();"/> 
+              <input id="temporalPrecioUnit" type="text" class="form-control input-sm" ng-model="fData.temporal.precio_unitario" 
+              	placeholder="Precio" tabindex="113" ng-change="calcularImporte();"/> 
           	</div>
           	<div class="col-md-1 col-sm-6">
               <label class="control-label"> Importe </label>
               <!-- NO INCLUYE IGV -->
-              <input id="temporalImporte" type="text" class="form-control input-sm" ng-model="fData.temporal.importe_sin_igv" placeholder="Importe" ng-if="fData.modo_igv == 2"/> 
-              <!-- INCLUYE IGV -->
-              <input id="temporalImporte" type="text" class="form-control input-sm" ng-model="fData.temporal.importe_con_igv" placeholder="Importe" ng-if="fData.modo_igv == 1"/> 
+              <div style="position:relative;">
+	              <input id="temporalImporte" disabled type="text" class="form-control input-sm" ng-model="fData.temporal.importe_sin_igv" 
+	              	placeholder="Importe" ng-show="fData.modo_igv == 2" style="position:absolute;"/> 
+	              <!-- INCLUYE IGV -->
+	              <input id="temporalImporte" disabled type="text" class="form-control input-sm" ng-model="fData.temporal.importe_con_igv" 
+	              	placeholder="Importe" ng-show="fData.modo_igv == 1" style="position:absolute;"/> 
+	            </div>
           	</div>
           	<div class="col-md-2 col-sm-6 col-xs-12"> 
 	            <a style="margin-top: 22px;" href="" class="btn btn-info btn-sm btn-block" ng-click="agregarItem(); $event.preventDefault();" tabindex="115">Agregar</a> 
@@ -166,7 +172,7 @@
 					</div>
 					<div class="form-group-sm pull-in clearfix">
 						<div class="col-xs-12"> 
-	            <label class="control-label hidden">Agregar al detalle: </label>
+	            <label class="control-label hidden"> Agregar al detalle: </label>
 	            <div ui-if="gridOptions.data.length>0" ui-grid="gridOptions" ui-grid-edit ui-grid-resize-columns ui-grid-auto-resize 
 	            	class="grid table-responsive fs-mini-grid" style="overflow: hidden;" ng-style="getTableHeight();"></div>
 	          </div>
@@ -196,13 +202,13 @@
 								<div class="col-sm-6 col-xs-12" style="margin-top: -15px;"> 
 									<div class="inline-block">
 										<label>
-											<span> Plazo de entrega </span>
+											<span> Plazo de entrega (en días) </span>
 				              <input type="text" ng-model="fData.plazo_entrega" placeholder="En días útiles" class="form-control input-xs" style="display:inline;"> 
 				            </label>
 									</div>
 				          <div class="inline-block"> 
 				          	<label> 
-				          		<span> Validez de oferta </span> 
+				          		<span> Validez de oferta (en días) </span> 
 				              <input type="text" ng-model="fData.validez_oferta" placeholder="Cant. de días" class="form-control input-xs" style="display:inline;" >
 				            </label>
 				          </div> 
@@ -211,12 +217,12 @@
 				    </div>
 				    <div class="col-md-2 col-sm-6" style="margin-top:15px;">
 				      <label class="radio">
-								<input type="radio" name="optionsRadios" id="optionsRadios1" value="1" ng-model="fData.modo_igv" ng-change="cambiarModo();calcularImporte();" checked  tabindex="117">
-								Precios sin IGV
+								<input type="radio" name="optionsRadios" id="optionsRadios1" value="2" ng-model="fData.modo_igv" ng-change="cambiarModo();calcularImporte();" checked  tabindex="117">
+								Precios no incluye IGV
 							</label>
 							<label class="radio">
-								<input type="radio" name="optionsRadios" id="optionsRadios2" value="2" ng-model="fData.modo_igv" ng-change="cambiarModo();calcularImporte();"  tabindex="118">
-								Precios con IGV
+								<input type="radio" name="optionsRadios" id="optionsRadios2" value="1" ng-model="fData.modo_igv" ng-change="cambiarModo();calcularImporte();"  tabindex="118">
+								Precios incluye IGV
 							</label>
 				    </div>
 		        <div class="col-md-4 col-sm-6">

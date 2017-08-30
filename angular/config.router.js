@@ -64,6 +64,7 @@ angular.module('app')
               'angular/controllers/NuevaCotizacionCtrl.js',
               'angular/controllers/ClienteEmpresaCtrl.js',
               'angular/controllers/ClientePersonaCtrl.js',
+              'angular/controllers/ElementoCtrl.js',
               'angular/controllers/ProductoCtrl.js',
               'angular/controllers/ServicioCtrl.js',
               'angular/controllers/ClienteCtrl.js',

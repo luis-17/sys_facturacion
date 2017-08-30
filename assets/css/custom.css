@@ -22,6 +22,10 @@
 .fs-mini-grid.ui-grid .ui-grid-contents-wrapper{ 
 	background-color: #e3e7ea;
 }
+.ui-grid-viewport .ui-editCell, .ui-editPanel{
+    background-color: #fcfbcd !important;
+    font-style: oblique !important;
+}
 .btn {
 	text-transform: uppercase;
 }
@@ -38,7 +42,15 @@
     font-size: 9px; 
     margin: 0;
 }
-
+.input-normal-border{
+    border-color: #cfdadd;
+}
+.input-danger-border{
+    border-color: #f05050;
+}
+.input-success-border{
+    border-color: #27c24c;
+}
 .form-group-sm{
     margin-bottom: 8px;
 }
