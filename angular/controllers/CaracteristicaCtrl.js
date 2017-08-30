@@ -1,9 +1,9 @@
-app.controller('UnidadMedidaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$log', '$timeout', 'pinesNotifications', 'uiGridConstants', 'blockUI', 
-  'UnidadMedidaFactory',
-  'UnidadMedidaServices',
+app.controller('CaracteristicaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$log', '$timeout', 'pinesNotifications', 'uiGridConstants', 'blockUI', 
+  'CaracteristicaFactory',
+  'CaracteristicaServices',
   function($scope, $filter, $uibModal, $bootbox, $log, $timeout, pinesNotifications, uiGridConstants, blockUI, 
-  UnidadMedidaFactory,
-  UnidadMedidaServices
+  CaracteristicaFactory,
+  CaracteristicaServices
   ) {
     $scope.metodos = {}; // contiene todas las funciones 
     $scope.fArr = {}; // contiene todos los arrays generados por las funciones 
@@ -34,9 +34,8 @@ app.controller('UnidadMedidaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox'
       enableFullRowSelection: true,
       multiSelect: false,
       columnDefs: [ 
-        { field: 'id', name: 'um.idunidadmedida', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
-        { field: 'descripcion_um', name: 'um.descripcion_um', displayName: 'Descripción', minWidth: 160 },
-        { field: 'abreviatura_um', name: 'um.abreviatura_um', displayName: 'Abreviatura', minWidth: 100 }
+        { field: 'id', name: 'ca.idcaracteristica', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
+        { field: 'descripcion_car', name: 'ca.descripcion_car', displayName: 'Descripción', minWidth: 160 } 
       ],
       onRegisterApi: function(gridApi) { 
         $scope.gridApi = gridApi;
@@ -66,9 +65,9 @@ app.controller('UnidadMedidaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox'
           var grid = this.grid;
           paginationOptions.search = true; 
           paginationOptions.searchColumn = {
-            'um.idunidadmedida' : grid.columns[1].filters[0].term,
-            'um.descripcion_um' : grid.columns[2].filters[0].term,
-            'um.abreviatura_um' : grid.columns[3].filters[0].term
+            'ca.idcaracteristica' : grid.columns[1].filters[0].term,
+            'ca.descripcion_car' : grid.columns[2].filters[0].term
+
           }
           $scope.metodos.getPaginationServerSide();
         });
@@ -82,7 +81,7 @@ app.controller('UnidadMedidaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox'
       var arrParams = {
         paginate : paginationOptions
       };
-      UnidadMedidaServices.sListar(arrParams).then(function (rpta) { 
+      CaracteristicaServices.sListar(arrParams).then(function (rpta) { 
         if( rpta.datos.length == 0 ){
           rpta.paginate = { totalRows: 0 };
         }
@@ -101,7 +100,7 @@ app.controller('UnidadMedidaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox'
         'metodos': $scope.metodos,
         'fArr': $scope.fArr 
       }
-      UnidadMedidaFactory.regUnidadMedidaModal(arrParams); 
+      CaracteristicaFactory.regCaracteristicaModal(arrParams); 
     }
     $scope.btnEditar = function() { 
       var arrParams = {
@@ -109,7 +108,7 @@ app.controller('UnidadMedidaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox'
         'mySelectionGrid': $scope.mySelectionGrid,
         'fArr': $scope.fArr 
       }
-      UnidadMedidaFactory.editUnidadMedidaModal(arrParams); 
+      CaracteristicaFactory.editCaracteristicaModal(arrParams); 
     }
     $scope.btnAnular = function() { 
       var pMensaje = '¿Realmente desea anular el registro?';
@@ -119,7 +118,7 @@ app.controller('UnidadMedidaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox'
             id: $scope.mySelectionGrid[0].id 
           };
           blockUI.start('Procesando información...');
-          UnidadMedidaServices.sAnular(arrParams).then(function (rpta) {
+          CaracteristicaServices.sAnular(arrParams).then(function (rpta) {
             if(rpta.flag == 1){
               var pTitle = 'OK!';
               var pType = 'success';
@@ -138,18 +137,17 @@ app.controller('UnidadMedidaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox'
     }
 }]);
 
-app.service("UnidadMedidaServices",function($http, $q, handleBehavior) {
+app.service("CaracteristicaServices",function($http, $q, handleBehavior) {
     return({
         sListar: sListar,
         sRegistrar: sRegistrar,
         sEditar: sEditar,
         sAnular: sAnular,
-        sListarCbo: sListarCbo
     });
     function sListar(datos) {
       var request = $http({
             method : "post",
-            url : angular.patchURLCI+"UnidadMedida/listar_unidad_medida",
+            url : angular.patchURLCI+"Caracteristica/listar_caracteristica",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
@@ -157,7 +155,7 @@ app.service("UnidadMedidaServices",function($http, $q, handleBehavior) {
     function sRegistrar (datos) {
       var request = $http({
             method : "post",
-            url : angular.patchURLCI+"UnidadMedida/registrar",
+            url : angular.patchURLCI+"Caracteristica/registrar",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
@@ -165,7 +163,7 @@ app.service("UnidadMedidaServices",function($http, $q, handleBehavior) {
     function sEditar (datos) {
       var request = $http({
             method : "post",
-            url : angular.patchURLCI+"UnidadMedida/editar",
+            url : angular.patchURLCI+"Caracteristica/editar",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
@@ -173,27 +171,19 @@ app.service("UnidadMedidaServices",function($http, $q, handleBehavior) {
     function sAnular (datos) {
       var request = $http({
             method : "post",
-            url : angular.patchURLCI+"UnidadMedida/anular",
+            url : angular.patchURLCI+"Caracteristica/anular",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
-    }       
-    function sListarCbo(datos) {
-      var request = $http({
-            method : "post",
-            url : angular.patchURLCI+"UnidadMedida/listar_unidad_medida_cbo",
-            data : datos
-      });
-      return (request.then(handleBehavior.success,handleBehavior.error));
-    }
+    }      
 });
 
-app.factory("UnidadMedidaFactory", function($uibModal, pinesNotifications, blockUI, UnidadMedidaServices) { 
+app.factory("CaracteristicaFactory", function($uibModal, pinesNotifications, blockUI, CaracteristicaServices) { 
   var interfaz = {
-    regUnidadMedidaModal: function (arrParams) {
+    regCaracteristicaModal: function (arrParams) {
       blockUI.start('Abriendo formulario...');
       $uibModal.open({ 
-        templateUrl: angular.patchURLCI+'UnidadMedida/ver_popup_formulario',
+        templateUrl: angular.patchURLCI+'Caracteristica/ver_popup_formulario',
         size: 'md',
         backdrop: 'static',
         keyboard:false,
@@ -208,7 +198,7 @@ app.factory("UnidadMedidaFactory", function($uibModal, pinesNotifications, block
           }
           $scope.aceptar = function () { 
             blockUI.start('Procesando información...');
-            UnidadMedidaServices.sRegistrar($scope.fData).then(function (rpta) {
+            CaracteristicaServices.sRegistrar($scope.fData).then(function (rpta) {
               if(rpta.flag == 1){
                 var pTitle = 'OK!';
                 var pType = 'success';
@@ -234,10 +224,10 @@ app.factory("UnidadMedidaFactory", function($uibModal, pinesNotifications, block
         }
       });
     },
-    editUnidadMedidaModal: function (arrParams) {
+    editCaracteristicaModal: function (arrParams) {
       blockUI.start('Abriendo formulario...');
       $uibModal.open({ 
-        templateUrl: angular.patchURLCI+'UnidadMedida/ver_popup_formulario',
+        templateUrl: angular.patchURLCI+'Caracteristica/ver_popup_formulario',
         size: 'md',
         backdrop: 'static',
         keyboard:false,
@@ -257,7 +247,7 @@ app.factory("UnidadMedidaFactory", function($uibModal, pinesNotifications, block
           }
           $scope.aceptar = function () { 
             blockUI.start('Procesando información...');
-            UnidadMedidaServices.sEditar($scope.fData).then(function (rpta) {
+            CaracteristicaServices.sEditar($scope.fData).then(function (rpta) {
               if(rpta.flag == 1){
                 var pTitle = 'OK!';
                 var pType = 'success';
