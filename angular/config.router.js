@@ -94,6 +94,27 @@ angular.module('app')
               'angular/controllers/CategoriaElementoCtrl.js' 
             ]) 
           })
+          .state('app.unidad-medida', {
+            url: '/unidad-medida',
+            templateUrl: 'tpl/unidad-medida.html',
+            resolve: load([
+              'angular/controllers/UnidadMedidaCtrl.js'
+            ]) 
+          })
+          .state('app.caracteristica', {
+            url: '/caracteristica',
+            templateUrl: 'tpl/caracteristica.html',
+            resolve: load([
+              'angular/controllers/CaracteristicaCtrl.js'
+            ]) 
+          })
+          .state('app.banco', {
+            url: '/banco',
+            templateUrl: 'tpl/banco.html',
+            resolve: load([
+              'angular/controllers/BancoCtrl.js'
+            ]) 
+          })                     
           .state('lockme', {
               url: '/lockme',
               templateUrl: 'tpl/page_lockme.html'

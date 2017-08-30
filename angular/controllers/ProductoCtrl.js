@@ -7,7 +7,7 @@ app.controller('ProductoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$
 	ProductoFactory,
 	ProductoServices,
 	UnidadMedidaServices,
-	CategoriaElementoServices,
+	CategoriaElementoServices
 	) {
 		$scope.metodos = {}; // contiene todas las funciones 
 		$scope.fArr = {}; // contiene todos los arrays generados por las funciones 
