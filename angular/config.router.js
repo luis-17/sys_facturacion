@@ -71,6 +71,7 @@ angular.module('app')
               'angular/controllers/ColaboradorCtrl.js',
               'angular/controllers/CategoriaClienteCtrl.js',
               'angular/controllers/CategoriaElementoCtrl.js',
+              'angular/controllers/CaracteristicaCtrl.js',
               'angular/controllers/TipoDocumentoClienteCtrl.js',
               'angular/controllers/SedeCtrl.js',
               'angular/controllers/FormaPagoCtrl.js',

@@ -21,7 +21,7 @@
 		</div> 
 		<div class="row"> 
 			<div class="col-xs-12">
-				<div ui-grid="gridOptionsBC" ui-grid-pagination ui-grid-selection ui-grid-resize-columns ui-grid-auto-resize class="grid table-responsive fs-mini-grid"></div> 
+				<div ui-grid="fArr.gridOptionsBC" ui-grid-pagination ui-grid-selection ui-grid-resize-columns ui-grid-auto-resize class="grid table-responsive fs-mini-grid"></div> 
 			</div>
 		</div>
 	</form>

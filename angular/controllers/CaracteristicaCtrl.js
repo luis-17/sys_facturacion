@@ -140,6 +140,7 @@ app.controller('CaracteristicaCtrl', ['$scope', '$filter', '$uibModal', '$bootbo
 app.service("CaracteristicaServices",function($http, $q, handleBehavior) {
     return({
         sListar: sListar,
+        sListarCaracteristicasAgregar: sListarCaracteristicasAgregar,
         sRegistrar: sRegistrar,
         sEditar: sEditar,
         sAnular: sAnular,
@@ -148,6 +149,14 @@ app.service("CaracteristicaServices",function($http, $q, handleBehavior) {
       var request = $http({
             method : "post",
             url : angular.patchURLCI+"Caracteristica/listar_caracteristica",
+            data : datos
+      });
+      return (request.then(handleBehavior.success,handleBehavior.error));
+    }
+    function sListarCaracteristicasAgregar(datos) {
+      var request = $http({
+            method : "post",
+            url : angular.patchURLCI+"Caracteristica/listar_caracteristicas_agregar",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
@@ -178,9 +187,9 @@ app.service("CaracteristicaServices",function($http, $q, handleBehavior) {
     }      
 });
 
-app.factory("CaracteristicaFactory", function($uibModal, pinesNotifications, blockUI, CaracteristicaServices) { 
+app.factory("CaracteristicaFactory", function($uibModal, pinesNotifications, blockUI, CaracteristicaServices ) { 
   var interfaz = {
-    regCaracteristicaModal: function (arrParams) {
+    regCaracteristicaModal: function (arrParams) { 
       blockUI.start('Abriendo formulario...');
       $uibModal.open({ 
         templateUrl: angular.patchURLCI+'Caracteristica/ver_popup_formulario',
@@ -206,12 +215,14 @@ app.factory("CaracteristicaFactory", function($uibModal, pinesNotifications, blo
                 if(typeof $scope.metodos.getPaginationServerSide == 'function'){ 
                   $scope.metodos.getPaginationServerSide(true);
                 }
+
               }else if(rpta.flag == 0){
                 var pTitle = 'Error!';
                 var pType = 'danger';
               }else{
                 alert('Error inesperado');
               }
+              arrParams.callback();
               blockUI.stop(); 
               pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2500 });
             });

@@ -36,12 +36,38 @@ class Caracteristica extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
-
+	public function listar_caracteristicas_agregar()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$lista = $this->model_caracteristica->m_cargar_caracteristica_agregar();
+		$arrListado = array();
+		foreach ($lista as $row) { 
+			array_push($arrListado,
+				array(
+					'id' => $row['idcaracteristica'], 
+					'descripcion' => strtoupper($row['descripcion_car']), 
+					'valor'=> NULL 
+				)
+			);
+		}
+    	$arrData['datos'] = $arrListado; 
+    	$arrData['message'] = '';
+    	$arrData['flag'] = 1;
+		if(empty($lista)){
+			$arrData['flag'] = 0;
+		}
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
 	public function ver_popup_formulario()
 	{
 		$this->load->view('caracteristica/mant_caracteristica');
 	}	
-
+	public function ver_popup_agregar_caracteristica()
+	{
+		$this->load->view('caracteristica/agregar_caracteristica');
+	}
 	public function registrar()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
