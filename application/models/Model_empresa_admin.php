@@ -6,12 +6,9 @@ class Model_empresa_admin extends CI_Model {
 	}
 
 	public function m_cargar_empresa_admin($paramPaginate){ 
-		$this->db->select("bea.idbancoempresaadmin,bea.idbanco,, ba.descripcion_ba, ea.nombre_comercial,bea.num_cuenta,bea.num_cuenta_inter,bea.moneda");
-		$this->db->from('banco_empresa_admin bea');
-		$this->db->join('empresa_admin ea', 'bea.idempresaadmin = ea.idempresaadmin');
-		$this->db->join('banco ba', 'bea.idbanco = ba.idbanco');
-		$this->db->where('estado_bea', 1);
-		$this->db->where('bea.idempresaadmin', $this->sessionFactur['idempresaadmin']);
+		$this->db->select("ea.idempresaadmin,ea.razon_social,ea.nombre_comercial,ea.ruc,ea.direccion_legal,ea.representante_legal,ea.telefono,ea.pagina_web");
+		$this->db->from('empresa_admin ea');
+		$this->db->where('estado_ea', 1);
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
 			foreach ($paramPaginate['searchColumn'] as $key => $value) {
 				if(! empty($value)){
@@ -31,8 +28,8 @@ class Model_empresa_admin extends CI_Model {
 
 	public function m_count_empresa_admin($paramPaginate){
 		$this->db->select('COUNT(*) AS contador');
-		$this->db->from('banco_empresa_admin bea');
-		$this->db->where('estado_bea', 1);
+		$this->db->from('empresa_admin ea');
+		$this->db->where('estado_ea', 1);
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
 			foreach ($paramPaginate['searchColumn'] as $key => $value) {
 				if(! empty($value)){
@@ -47,35 +44,39 @@ class Model_empresa_admin extends CI_Model {
 	public function m_registrar($datos)
 	{
 		$data = array(
-			'idbanco' => $datos['banco']['id'], 
-			'idempresaadmin' => $this->sessionFactur['idempresaadmin'],
-			'num_cuenta' => strtoupper($datos['num_cuenta']),	
-			'num_cuenta_inter' => strtoupper($datos['num_cuenta_inter']),
-			'moneda' => $datos['moneda']['id']
+			'razon_social' => strtoupper($datos['razon_social']),	
+			'nombre_comercial' => strtoupper($datos['nombre_comercial']),
+			'ruc' => strtoupper($datos['ruc']),
+			'direccion_legal' => strtoupper($datos['direccion_legal']),
+			'representante_legal' => strtoupper($datos['representante_legal']),
+			'telefono' => $datos['telefono'],
+			'pagina_web' => $datos['pagina_web'],
 		);
-		return $this->db->insert('banco_empresa_admin', $data); 
+		return $this->db->insert('empresa_admin', $data); 
 	}
 
 	public function m_editar($datos)
 	{
 		$data = array(
-			'idbanco' => $datos['banco']['id'], 
-			'idempresaadmin' => $this->sessionFactur['idempresaadmin'],
-			'num_cuenta' => strtoupper($datos['num_cuenta']),	
-			'num_cuenta_inter' => strtoupper($datos['num_cuenta_inter']),
-			'moneda' => $datos['moneda']['id']
+			'razon_social' => strtoupper($datos['razon_social']),	
+			'nombre_comercial' => strtoupper($datos['nombre_comercial']),
+			'ruc' => strtoupper($datos['ruc']),
+			'direccion_legal' => strtoupper($datos['direccion_legal']),
+			'representante_legal' => strtoupper($datos['representante_legal']),
+			'telefono' => $datos['telefono'],
+			'pagina_web' => $datos['pagina_web'],
 		);
-		$this->db->where('idbancoempresaadmin',$datos['id']);
-		return $this->db->update('banco_empresa_admin', $data); 
+		$this->db->where('idempresaadmin',$datos['id']);
+		return $this->db->update('empresa_admin', $data); 
 	}
 
 	public function m_anular($datos)
 	{
 		$data = array( 
-			'estado_bea' => 0
+			'estado_ea' => 0
 		);
-		$this->db->where('idbancoempresaadmin',$datos['id']); 
-		return $this->db->update('banco_empresa_admin', $data); 
+		$this->db->where('idempresaadmin',$datos['id']); 
+		return $this->db->update('empresa_admin', $data); 
 	}
 }
 ?>
