@@ -30,8 +30,7 @@ class Model_colaborador extends CI_Model {
 		return $this->db->get()->row_array();
 	} 
 	public function m_cargar_colaborador($paramPaginate=FALSE){ 
-		$this->db->select('co.idcolaborador, co.nombres, co.apellidos, co.email, co.fecha_nacimiento, co.nombre_foto, 
-			us.idusuario, us.username, us.ultimo_inicio_sesion, tu.idtipousuario, tu.descripcion_tu, tu.key_tu');
+		$this->db->select('co.idcolaborador, co.nombres, co.apellidos, co.email, co.fecha_nacimiento, co.nombre_foto,co.telefono,co.num_documento,us.idusuario, us.username, us.ultimo_inicio_sesion, tu.idtipousuario, tu.descripcion_tu, tu.key_tu');
 		$this->db->from('colaborador co');
 		$this->db->join('usuario us', 'co.idusuario = us.idusuario AND us.estado_us = 1','left'); 
 		$this->db->join('tipo_usuario tu', 'us.idtipousuario = tu.idtipousuario');

@@ -70,5 +70,13 @@ class Model_banco extends CI_Model {
 		return $this->db->update('banco', $data); 
 	}
 
+	public function m_cargar_banco_cbo($datos = FALSE){ 
+		$this->db->select("ba.idbanco, ba.descripcion_ba");
+		$this->db->from('banco ba');
+		$this->db->where('estado_ba', 1); //activo
+		$this->db->order_by('ba.descripcion_ba','ASC');
+		return $this->db->get()->result_array();
+	}
+
 }
 ?>
