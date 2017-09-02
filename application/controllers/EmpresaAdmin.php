@@ -17,28 +17,17 @@ class EmpresaAdmin extends CI_Controller {
 		$lista = $this->model_empresa_admin->m_cargar_empresa_admin($paramPaginate);
 		$fCount = $this->model_empresa_admin->m_count_empresa_admin($paramPaginate);
 		$arrListado = array();
-		foreach ($lista as $row) { 
-			if( $row['moneda'] == 'S' ){
-				$row['desc_moneda'] = 'S/.';
-			}
-			if( $row['moneda'] == 'D' ){
-				$row['desc_moneda'] = 'US$';
-			}			
+		foreach ($lista as $row) { 	
 			array_push($arrListado,
 				array(
-
-					'id' => $row['idbancoempresaadmin'],		
-					'cuenta_bancaria' => array(
-						'id'=> $row['idbanco'],
-						'descripcion'=> strtoupper($row['descripcion_ba'])				
-					),	
-					'moneda'=> array(
-						'id'=> $row['moneda'],
-						'descripcion'=> $row['desc_moneda'] 
-					),									
+					'id' => $row['idempresaadmin'],	
+					'razon_social' => strtoupper($row['razon_social']),
 					'nombre_comercial' => strtoupper($row['nombre_comercial']),
-					'num_cuenta' => strtoupper($row['num_cuenta']),
-					'num_cuenta_inter' => strtoupper($row['num_cuenta_inter'])	
+					'ruc' => strtoupper($row['ruc']),
+					'direccion_legal' => strtoupper($row['direccion_legal']),
+					'representante_legal' => strtoupper($row['representante_legal']),
+					'telefono' => strtoupper($row['telefono']),
+					'pagina_web' => strtoupper($row['pagina_web'])		
 				)
 			);
 		}
@@ -58,6 +47,11 @@ class EmpresaAdmin extends CI_Controller {
 	{
 		$this->load->view('empresa-admin/mant_empresaAdmin');
 	}	
+
+	public function ver_popup_bancos()
+	{
+		$this->load->view('empresa-admin/mant_bancoEmpresaAdmin');
+	}
 
 	public function registrar()
 	{

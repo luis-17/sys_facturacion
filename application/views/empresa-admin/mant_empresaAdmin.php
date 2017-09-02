@@ -3,22 +3,34 @@
 </div> 
 <div class="modal-body">  
 	<form class="row" name="formEmpresaAdmin">
-		<div class="form-group col-md-6 mb-md ">
-			<label class="control-label mb-n"> Cuentas Bancarias: <small class="text-danger">(*)</small> </label>
-            <select class="form-control input-sm" ng-model="fData.banco" ng-options="item as item.descripcion for item in fArr.listaBanco" required tabindex="10" ></select> 
+		<div class="form-group col-md-6 mb-md">
+			<label class="control-label mb-n"> Razón Social: <small class="text-danger">(*)</small> </label>
+			<input type="text" class="form-control input-sm" ng-model="fData.razon_social" placeholder="Ingrese razón social" required tabindex="70" />
 		</div>
 		<div class="form-group col-md-6 mb-md">
-			<label class="control-label mb-n"> N° Cuenta: <small class="text-danger">(*)</small> </label>
-			<input type="text" class="form-control input-sm" ng-model="fData.num_cuenta" placeholder="Ingrese número de cuenta" required tabindex="70" />
+			<label class="control-label mb-n"> Nombre Comercial: <small class="text-danger">(*)</small> </label>
+			<input type="text" class="form-control input-sm" ng-model="fData.nombre_comercial" placeholder="Ingrese nombre comercial" required tabindex="70" />
+		</div>	
+		<div class="form-group col-md-3 mb-md">
+			<label class="control-label mb-n"> R.U.C: <small class="text-danger">(*)</small> </label>
+			<input type="text" class="form-control input-sm" ng-model="fData.ruc" placeholder="Ingrese ruc" required tabindex="70" />
+		</div>	
+		<div class="form-group col-md-3 mb-md">
+			<label class="control-label mb-n"> Teléfono: <small class="text-danger">(*)</small> </label>
+			<input type="text" class="form-control input-sm" ng-model="fData.telefono" placeholder="Ingrese teléfono" required tabindex="70" />
+		</div>	
+		<div class="form-group col-md-6 mb-md">
+			<label class="control-label mb-n"> Dirección Legal: <small class="text-danger">(*)</small> </label>
+			<input type="text" class="form-control input-sm" ng-model="fData.direccion_legal" placeholder="Ingrese dirección legal" required tabindex="70" />
+		</div>	
+		<div class="form-group col-md-6 mb-md">
+			<label class="control-label mb-n"> Representante Legal: <small class="text-danger">(*)</small> </label>
+			<input type="text" class="form-control input-sm" ng-model="fData.representante_legal" placeholder="Ingrese representante legal" required tabindex="70" />
 		</div>
 		<div class="form-group col-md-6 mb-md">
-			<label class="control-label mb-n"> N° Cuenta Interbancaria: <small class="text-danger">(*)</small> </label>
-			<input type="text" class="form-control input-sm" ng-model="fData.num_cuenta_inter" placeholder="Ingrese número de cuenta interbancaria" required tabindex="70" />
-		</div>		
-		<div class="form-group col-md-6 mb-md ">
-			<label class="control-label mb-n"> Moneda: <small class="text-danger">(*)</small> </label>
-            <select class="form-control input-sm" ng-model="fData.moneda" ng-options="item as item.descripcion for item in fArr.listaMoneda" required tabindex="10" ></select> 
-		</div>
+			<label class="control-label mb-n"> Página Web: </label>
+			<input type="text" class="form-control input-sm" ng-model="fData.pagina_web" placeholder="Ingrese página web" required tabindex="70" />
+		</div>	
 	</form>
 </div>
 <div class="modal-footer">

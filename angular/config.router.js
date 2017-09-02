@@ -121,7 +121,8 @@ angular.module('app')
             templateUrl: 'tpl/empresa-admin.html',
             resolve: load([
               'angular/controllers/EmpresaAdminCtrl.js',
-              'angular/controllers/BancoCtrl.js'
+              'angular/controllers/BancoCtrl.js',
+              'angular/controllers/BancoEmpresaAdminCtrl.js'
             ]) 
           })  
           .state('app.categoria-elemento', {
