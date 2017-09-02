@@ -192,7 +192,7 @@ app.factory("CaracteristicaFactory", function($uibModal, pinesNotifications, blo
           $scope.fData = {};
           $scope.metodos = arrParams.metodos;
           $scope.fArr = arrParams.fArr;
-          $scope.titleForm = 'Registro de Unidad Medida';
+          $scope.titleForm = 'Registro de Característica';
           $scope.cancel = function () {
             $uibModalInstance.dismiss('cancel');
           }
@@ -241,7 +241,7 @@ app.factory("CaracteristicaFactory", function($uibModal, pinesNotifications, blo
           }else{
             alert('Seleccione una sola fila');
           }
-          $scope.titleForm = 'Edición de Unidad Medida';
+          $scope.titleForm = 'Edición de Característica';
           $scope.cancel = function () {
             $uibModalInstance.dismiss('cancel');
           }

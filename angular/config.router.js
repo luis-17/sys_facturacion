@@ -114,7 +114,36 @@ angular.module('app')
             resolve: load([
               'angular/controllers/BancoCtrl.js'
             ]) 
-          })                     
+          })     
+          .state('app.empresa-admin', {
+            url: '/empresa-admin',
+            templateUrl: 'tpl/empresa-admin.html',
+            resolve: load([
+              'angular/controllers/EmpresaAdminCtrl.js',
+              'angular/controllers/BancoCtrl.js'
+            ]) 
+          })  
+          .state('app.categoria-elemento', {
+            url: '/categoria-elemento',
+            templateUrl: 'tpl/categoria-elemento.html',
+            resolve: load([
+              'angular/controllers/CategoriaElementoCtrl.js'         
+            ]) 
+          })  
+          .state('app.colaborador', {
+            url: '/colaborador',
+            templateUrl: 'tpl/colaborador.html',
+            resolve: load([
+              'angular/controllers/ColaboradorCtrl.js'         
+            ]) 
+          })    
+          .state('app.sede', {
+            url: '/sede',
+            templateUrl: 'tpl/sede.html',
+            resolve: load([
+              'angular/controllers/SedeCtrl.js'      
+            ]) 
+          })                              
           .state('lockme', {
               url: '/lockme',
               templateUrl: 'tpl/page_lockme.html'
