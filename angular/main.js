@@ -19,9 +19,9 @@ function handleSuccess( response ) {
 /* Controllers */ 
 angular.module('app')
   .controller('AppCtrl', ['$scope', '$translate', '$localStorage', '$location', '$window',  '$timeout', 'rootServices',  'blockUI', 'pinesNotifications', 
-      '$state',/*'$routeParams', */ 
+      '$state', 
     function(              $scope,   $translate,   $localStorage,   $location,   $window,    $timeout,   rootServices,    blockUI ,  pinesNotifications   
-        ,$state/*, $routeParams */) { 
+        ,$state) { 
       // add 'ie' classes to html
       var isIE = !!navigator.userAgent.match(/MSIE/i);
       if(isIE){ angular.element($window.document.body).addClass('ie');}
@@ -104,6 +104,7 @@ angular.module('app')
       $scope.arrMain.empresaadmin = {};
       $scope.arrMain.listaEmpresaAdminSession = [];
       $scope.fSessionCI = {};
+      $scope.fConfigSys = {};
 
       $scope.$on('$routeChangeStart', function() {
         console.log('change me');
@@ -142,11 +143,25 @@ angular.module('app')
             
           }else{
             $scope.fSessionCI = {};
+            $scope.fConfigSys = {};
             $scope.logOut();
             $location.path('/access/login'); 
             return false; 
           }
         });
+      }
+      $scope.getConfiguracionSys = function() {
+        rootServices.sGetConfiguracionSys().then(function (response) { 
+          if(response.flag == 1){
+            $scope.fConfigSys = response.datos;
+          }else{
+            $scope.fSessionCI = {};
+            $scope.fConfigSys = {};
+            $scope.logOut();
+            $location.path('/access/login'); 
+            return false; 
+          }
+        }); 
       }
       $scope.onChangeEmpresaSession = function() {
         var arrData = { 
@@ -182,11 +197,13 @@ angular.module('app')
         });
       } 
       $scope.getValidateSession();
+      $scope.getConfiguracionSys();
   }])
   .service('rootServices', function($http, $q, handleBehavior) { 
     return({
         sLogoutSessionCI: sLogoutSessionCI,
         sGetSessionCI: sGetSessionCI,
+        sGetConfiguracionSys : sGetConfiguracionSys,
         sListarEmpresaAdminSession: sListarEmpresaAdminSession, 
         sCambiarEmpresaSession: sCambiarEmpresaSession,
         sLoginToSystem: sLoginToSystem 
@@ -205,6 +222,15 @@ angular.module('app')
       var request = $http({
             method : "post",
             url :  angular.patchURLCI + "Acceso/getSessionCI",
+            data : datos
+      });
+      return (request.then(handleBehavior.success,handleBehavior.error));
+    }
+    function sGetConfiguracionSys(datos) {
+      var datos = datos || {};
+      var request = $http({
+            method : "post",
+            url :  angular.patchURLCI + "Configuracion/getConfigSys",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));

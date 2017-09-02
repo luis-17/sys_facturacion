@@ -3,9 +3,9 @@
 	function obtener_parametros_configuracion(){
 		$ci =& get_instance();
     	$arrConfig = array();
-    	$lista = $ci->model_config->m_listar_configuraciones();
+    	$lista = $ci->model_configuracion->m_cargar_configuracion();
     	foreach ($lista as $key => $row) {
-    		$arrConfig[$row['key_cf']] = $row['valor_cf'];
+    		$arrConfig[$row['param_key']] = $row['param_value'];
     	}
 		return $arrConfig;
 	}
