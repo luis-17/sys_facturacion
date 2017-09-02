@@ -51,6 +51,8 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
   $scope.fData.modo_igv = 1; // INCLUYE IGV 
   $scope.fData.plazo_entrega = 5;
   $scope.fData.validez_oferta = 10;
+  $scope.fData.idcotizacionanterior = null;
+  $scope.fData.isRegisterSuccess = false;
   $scope.fData.temporal = {};
   $scope.fData.temporal.cantidad = 1;
   $scope.fData.temporal.caracteristicas = null; 
@@ -613,9 +615,8 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
         blockUI.stop(); 
         $scope.fAdd = {};
         $scope.titleForm = 'Agregar Característica'; 
+        $scope.vista = 'agregar';
         $scope.fArr.gridOptionsCR = { 
-          paginationPageSizes: [1000, 10000],
-          paginationPageSize: 100,
           useExternalPagination: false,
           useExternalSorting: false,
           enableGridMenu: false,
@@ -692,6 +693,7 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     columnDefs: [
       { field: 'idelemento', displayName: 'COD.', width: 50, enableCellEdit: false, enableSorting: false },
       { field: 'descripcion', displayName: 'DESCRIPCION', minWidth: 130, enableCellEdit: false, enableSorting: false,
+        cellTemplate:'<div class="ui-grid-cell-contents "> <a class="text-info" href="" ng-click="grid.appScope.btnGestionCaracteristicasDetalle(row)">'+ '{{ COL_FIELD }}</a></div>', 
         cellTooltip: function( row, col ) {
           return row.entity.descripcion;
         }
@@ -867,40 +869,100 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     // $scope.fData.temporal.caracteristicas = null;
     // console.log($scope.fData.classValid,'$scope.fData.classValid');
   }
-  $scope.btnGestionCaracteristicasDetalle = function(row) {
+  $scope.btnGestionCaracteristicasDetalle = function(row) { 
     console.log(row,'row');
+    blockUI.start('Procesando información...'); 
+    $uibModal.open({ 
+      templateUrl: angular.patchURLCI+'Caracteristica/ver_popup_agregar_caracteristica',
+      size: 'md',
+      backdrop: 'static',
+      keyboard:false,
+      scope: $scope,
+      controller: function ($scope, $uibModalInstance) { 
+        blockUI.stop(); 
+        $scope.fAdd = {};
+        $scope.vista = 'detalle';
+        $scope.titleForm = 'Característica del Elemento';
+        $scope.metodos.getPaginationServerSideCR = function(loader,callback) { 
+          if(loader){
+            blockUI.start('Procesando información...'); 
+          }
+          CaracteristicaServices.sListarCaracteristicasAgregar().then(function (rpta) { 
+            row.entity.caracteristicas = rpta.datos;
+            // row.entity.caracteristicas = rpta.datos;
+            callback();
+            if(loader){
+              blockUI.stop(); 
+            }
+          });
+        } 
+        //console.log(row.entity.caracteristicas);
+        $scope.fArr.gridOptionsCRDet = { 
+          useExternalPagination: false,
+          useExternalSorting: false,
+          enableGridMenu: false,
+          enableRowSelection: false,
+          enableSelectAll: false,
+          enableFiltering: true,
+          enableFullRowSelection: false,
+          enableCellEditOnFocus: true,
+          multiSelect: false,
+          //data: row.entity.caracteristicas,
+          columnDefs: [ 
+            { field: 'id', displayName: 'ID', width: '75', enableCellEdit: false, visible: false },
+            { field: 'descripcion', displayName: 'Descripción', minWidth: 160, enableCellEdit: false }, 
+            { field: 'valor', displayName: 'Valor', minWidth: 160, cellClass:'ui-editCell', enableCellEdit: true, sort: { direction: uiGridConstants.ASC } } 
+          ], 
+          onRegisterApi: function(gridApi) { 
+            $scope.gridApi = gridApi; 
+          }
+        }; 
+        var myCallback = function() {
+          $scope.fArr.gridOptionsCRDet.data = row.entity.caracteristicas;
+        }
+        if( !(row.entity.caracteristicas) ){
+          $scope.metodos.getPaginationServerSideCR(true,myCallback); 
+        }else{
+          myCallback();
+        }
+        //var rowCaracteristicas = row.caracteristicas; 
+        
+        $scope.cancel = function () {
+          $uibModalInstance.dismiss('cancel');
+        } 
+      }
+    });
   }
   $scope.btnQuitarDeLaCesta = function (row) { 
     var index = $scope.gridOptions.data.indexOf(row.entity); 
     $scope.gridOptions.data.splice(index,1);
     $scope.calcularTotales(); 
   }
-  $scope.cambiarModo = function(){
+  $scope.cambiarModo = function(){ // 
     if( $scope.fData.modo_igv == 2){
       console.log('Calculando modo NO INCLUYE IGV');
       angular.forEach($scope.gridOptions.data,function (value, key) { 
-        $scope.gridOptions.data[key].importe_sin_igv = (parseFloat($scope.gridOptions.data[key].precio_unitario) * parseFloat($scope.gridOptions.data[key].cantidad)).toFixed($scope.fConfigSys.num_decimal_total_key);
+        $scope.gridOptions.data[key].importe_sin_igv = (parseFloat($scope.gridOptions.data[key].precio_unitario) * parseFloat($scope.gridOptions.data[key].cantidad)).toFixed($scope.fConfigSys.num_decimal_precio_key);
         if( $scope.gridOptions.data[key].excluye_igv == 1 ){
           $scope.gridOptions.data[key].igv = 0.00;
         }else{
-          $scope.gridOptions.data[key].igv = (parseFloat($scope.gridOptions.data[key].importe_sin_igv)*0.18).toFixed($scope.fConfigSys.num_decimal_total_key);
+          $scope.gridOptions.data[key].igv = (parseFloat($scope.gridOptions.data[key].importe_sin_igv)*0.18).toFixed($scope.fConfigSys.num_decimal_precio_key);
         }
-        $scope.gridOptions.data[key].importe_con_igv = (parseFloat($scope.gridOptions.data[key].importe_sin_igv) + parseFloat($scope.gridOptions.data[key].igv)).toFixed($scope.fConfigSys.num_decimal_total_key);
+        $scope.gridOptions.data[key].importe_con_igv = (parseFloat($scope.gridOptions.data[key].importe_sin_igv) + parseFloat($scope.gridOptions.data[key].igv)).toFixed($scope.fConfigSys.num_decimal_precio_key);
         
       });
     }
     if( $scope.fData.modo_igv == 1 ){ 
       console.log('Calculando modo INCLUYE IGV');
       angular.forEach($scope.gridOptions.data,function (value, key) {
-        $scope.gridOptions.data[key].importe_con_igv = (parseFloat($scope.gridOptions.data[key].precio_unitario) * parseFloat($scope.gridOptions.data[key].cantidad)).toFixed($scope.fConfigSys.num_decimal_total_key);
+        $scope.gridOptions.data[key].importe_con_igv = (parseFloat($scope.gridOptions.data[key].precio_unitario) * parseFloat($scope.gridOptions.data[key].cantidad)).toFixed($scope.fConfigSys.num_decimal_precio_key);
         if( $scope.gridOptions.data[key].excluye_igv == 1 ){
-          $scope.gridOptions.data[key].importe_sin_igv = (parseFloat($scope.gridOptions.data[key].importe_con_igv)).toFixed($scope.fConfigSys.num_decimal_total_key);
+          $scope.gridOptions.data[key].importe_sin_igv = (parseFloat($scope.gridOptions.data[key].importe_con_igv)).toFixed($scope.fConfigSys.num_decimal_precio_key);
           $scope.gridOptions.data[key].igv = 0.00;
         } else{
-          $scope.gridOptions.data[key].importe_sin_igv = (parseFloat($scope.gridOptions.data[key].importe_con_igv) / 1.18).toFixed($scope.fConfigSys.num_decimal_total_key);
-          $scope.gridOptions.data[key].igv = (parseFloat($scope.gridOptions.data[key].importe_sin_igv)*0.18).toFixed($scope.fConfigSys.num_decimal_total_key);
-        }
-        
+          $scope.gridOptions.data[key].importe_sin_igv = (parseFloat($scope.gridOptions.data[key].importe_con_igv) / 1.18).toFixed($scope.fConfigSys.num_decimal_precio_key);
+          $scope.gridOptions.data[key].igv = (parseFloat($scope.gridOptions.data[key].importe_sin_igv)*0.18).toFixed($scope.fConfigSys.num_decimal_precio_key);
+        } 
       });
     }
     $scope.calcularTotales();
@@ -923,15 +985,15 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     if($scope.fData.temporal.precio_unitario != '' && $scope.fData.temporal.cantidad != '' && angular.isObject($scope.fData.temporal.elemento) ){ 
       if( $scope.fData.modo_igv == 2 ){ 
         console.log('Calculando modo NO INCLUYE IGV');
-        $scope.fData.temporal.importe_sin_igv = (parseFloat($scope.fData.temporal.precio_unitario) * parseFloat($scope.fData.temporal.cantidad)).toFixed($scope.fConfigSys.num_decimal_total_key);
-        $scope.fData.temporal.igv = ($scope.fData.temporal.importe_sin_igv * 0.18).toFixed($scope.fConfigSys.num_decimal_total_key);
-        $scope.fData.temporal.importe_con_igv = (parseFloat($scope.fData.temporal.importe_sin_igv) + parseFloat($scope.fData.temporal.igv)).toFixed($scope.fConfigSys.num_decimal_total_key);
+        $scope.fData.temporal.importe_sin_igv = (parseFloat($scope.fData.temporal.precio_unitario) * parseFloat($scope.fData.temporal.cantidad)).toFixed($scope.fConfigSys.num_decimal_precio_key);
+        $scope.fData.temporal.igv = ($scope.fData.temporal.importe_sin_igv * 0.18).toFixed($scope.fConfigSys.num_decimal_precio_key);
+        $scope.fData.temporal.importe_con_igv = (parseFloat($scope.fData.temporal.importe_sin_igv) + parseFloat($scope.fData.temporal.igv)).toFixed($scope.fConfigSys.num_decimal_precio_key);
       }
       if( $scope.fData.modo_igv == 1 ){ 
         console.log('Calculando modo INCLUYE IGV');
-        $scope.fData.temporal.importe_con_igv = (parseFloat($scope.fData.temporal.precio_unitario) * parseFloat($scope.fData.temporal.cantidad)).toFixed($scope.fConfigSys.num_decimal_total_key);
-        $scope.fData.temporal.importe_sin_igv = ($scope.fData.temporal.importe_con_igv / 1.18).toFixed($scope.fConfigSys.num_decimal_total_key);
-        $scope.fData.temporal.igv =($scope.fData.temporal.importe_sin_igv * 0.18).toFixed($scope.fConfigSys.num_decimal_total_key);
+        $scope.fData.temporal.importe_con_igv = (parseFloat($scope.fData.temporal.precio_unitario) * parseFloat($scope.fData.temporal.cantidad)).toFixed($scope.fConfigSys.num_decimal_precio_key);
+        $scope.fData.temporal.importe_sin_igv = ($scope.fData.temporal.importe_con_igv / 1.18).toFixed($scope.fConfigSys.num_decimal_precio_key);
+        $scope.fData.temporal.igv =($scope.fData.temporal.importe_sin_igv * 0.18).toFixed($scope.fConfigSys.num_decimal_precio_key);
       }
     }else{
       $scope.fData.temporal.importe_sin_igv = null;
@@ -939,7 +1001,6 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
       $scope.fData.temporal.elemento = null;
     }
   } 
-
   $scope.mismoCliente = function() { 
     $scope.fData.temporal = {
       cantidad: 1,
@@ -962,8 +1023,49 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     $scope.metodos.generarNumeroCotizacion();
     $('#temporalElemento').focus();
   }
-  $scope.grabar = function() {
-    
+  $scope.grabar = function() { 
+    if($scope.fData.isRegisterSuccess){
+      pinesNotifications.notify({ title: 'Advertencia.', text: 'La cotización ya fue registrada', type: 'warning', delay: 3000 });
+      return false;
+    }
+    if( $scope.fData.tipo_documento_cliente.destino == 1 ){ // empresa 
+      if( $scope.fData.cliente.razon_social == '' || $scope.fData.cliente.razon_social == null || $scope.fData.cliente.razon_social == undefined ){
+        $scope.fData.num_documento = null;
+        $('#numDocumento').focus();
+        pinesNotifications.notify({ title: 'Advertencia.', text: 'No ha ingresado un cliente', type: 'warning', delay: 3000 });
+        return false;
+      }
+    }
+    if( $scope.fData.tipo_documento_cliente.destino == 2 ){ // persona 
+      if( $scope.fData.cliente.cliente == '' || $scope.fData.cliente.cliente == null || $scope.fData.cliente.cliente == undefined ){
+        $scope.fData.num_documento = null;
+        $('#numDocumento').focus();
+        pinesNotifications.notify({ title: 'Advertencia.', text: 'No ha ingresado un cliente', type: 'warning', delay: 3000 });
+        return false;
+      }
+    }
+    $scope.fData.detalle = angular.copy($scope.gridOptions.data);
+    if( $scope.fData.detalle.length < 1 ){ 
+      $('#temporalElemento').focus();
+      pinesNotifications.notify({ title: 'Advertencia.', text: 'No se ha agregado ningún elemento', type: 'warning', delay: 3000 }); 
+      return false; 
+    }
+    blockUI.start('Ejecutando proceso...');
+    CotizacionServices.sRegistrar($scope.fData).then(function (rpta) { 
+      blockUI.stop();
+      if(rpta.flag == 1){
+        pTitle = 'OK!';
+        pType = 'success'; 
+        $scope.fData.isRegisterSuccess = true;
+        $scope.fData.idcotizacionanterior = rpta.idcotizacion;
+      }else if(rpta.flag == 0){
+        var pTitle = 'Advertencia!';
+        var pType = 'warning';
+      }else{
+        alert('Algo salió mal...');
+      }
+      pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 3000 });
+    });
   }
 }]);
 

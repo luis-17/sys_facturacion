@@ -15,7 +15,8 @@
 		</div> 
 		<div class="row"> 
 			<div class="col-xs-12">
-				<div ui-grid="fArr.gridOptionsCR" ui-grid-edit ui-grid-resize-columns ui-grid-auto-resize class="grid table-responsive fs-mini-grid"></div> 
+				<div ng-if="vista === 'agregar'" ui-grid="fArr.gridOptionsCR" ui-grid-edit ui-grid-resize-columns ui-grid-auto-resize class="grid table-responsive fs-mini-grid"></div> 
+				<div ng-if="vista === 'detalle'" ui-grid="fArr.gridOptionsCRDet" ui-grid-edit ui-grid-resize-columns ui-grid-auto-resize class="grid table-responsive fs-mini-grid"></div> 
 			</div>
 		</div>
 	</form>
