@@ -33,6 +33,9 @@
 	background-color: #f6f8f8;
  	border-top: 1px solid #ccdbe6;
 }
+.modal-xlg { 
+    width: 900px;
+}
 /*FONT SIZE*/
 .f-10{
     font-size: 10px; 

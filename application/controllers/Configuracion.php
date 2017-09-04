@@ -23,5 +23,9 @@ class Configuracion extends CI_Controller {
 		$this->output
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
-	}
+	} 
+	public function ver_popup_reporte()
+	{
+		$this->load->view('reportes/popup_reporte_pdf');
+	}	
 }

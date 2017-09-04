@@ -51,6 +51,8 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
   $scope.fData.modo_igv = 1; // INCLUYE IGV 
   $scope.fData.plazo_entrega = 5;
   $scope.fData.validez_oferta = 10;
+  $scope.fData.incluye_tras_prov = 2; // no 
+  $scope.fData.incluye_entr_dom = 2;  // no 
   $scope.fData.idcotizacionanterior = null;
   $scope.fData.isRegisterSuccess = false;
   $scope.fData.temporal = {};
@@ -80,8 +82,8 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
 
   // TIPOS DE MONEDA 
   $scope.fArr.listaMoneda = [
-    {'id' : 1, 'descripcion' : 'S/.'},
-    {'id' : 2, 'descripcion' : 'US$'}
+    {'id' : 1, 'descripcion' : 'S/.', 'str_moneda' : 'S'},
+    {'id' : 2, 'descripcion' : 'US$', 'str_moneda' : 'D'}
   ];
   $scope.fData.moneda = $scope.fArr.listaMoneda[0];
 
@@ -188,6 +190,10 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
   
   // OBTENER DATOS DE CLIENTE 
   $scope.obtenerDatosCliente = function() { 
+    if( !($scope.fData.num_documento) ){
+      $scope.btnBusquedaCliente();
+      return; 
+    }
     blockUI.start('Procesando información...'); 
     $scope.fData.cliente = {};
     var arrParams = {
@@ -693,7 +699,7 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     columnDefs: [
       { field: 'idelemento', displayName: 'COD.', width: 50, enableCellEdit: false, enableSorting: false },
       { field: 'descripcion', displayName: 'DESCRIPCION', minWidth: 130, enableCellEdit: false, enableSorting: false,
-        cellTemplate:'<div class="ui-grid-cell-contents "> <a class="text-info" href="" ng-click="grid.appScope.btnGestionCaracteristicasDetalle(row)">'+ '{{ COL_FIELD }}</a></div>', 
+        cellTemplate:'<div class="ui-grid-cell-contents "> <a class="text-info block" href="" ng-click="grid.appScope.btnGestionCaracteristicasDetalle(row)">'+ '{{ COL_FIELD }}</a></div>', 
         cellTooltip: function( row, col ) {
           return row.entity.descripcion;
         }
@@ -815,28 +821,28 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
       pinesNotifications.notify({ title: 'Advertencia.', text: 'Ingrese una cantidad válida', type: 'warning', delay: 2000 });
       return false;
     }
-    var elementoNew = true;
-    angular.forEach($scope.gridOptions.data, function(value, key) { 
-      if(value.id == $scope.fData.temporal.elemento.id ){ 
-        elementoNew = false;
-      }
-    });
-    if( elementoNew === false ){
-      $scope.fData.temporal = {
-        cantidad: 1,
-        descuento: 0,
-        importe_con_igv: null,
-        importe_sin_igv: null,
-        elemento: null,
-        excluye_igv: 2,
-        agrupacion: 0,
-        unidad_medida : $scope.fArr.listaUnidadMedida[0],
-        caracteristicas: null
-      };
-      $('#temporalElemento').focus();
-      pinesNotifications.notify({ title: 'Advertencia.', text: 'El elemento ya ha sido agregado a la cesta.', type: 'warning', delay: 2000 });
-      return false;
-    } 
+    // var elementoNew = true;
+    // angular.forEach($scope.gridOptions.data, function(value, key) { 
+    //   if(value.id == $scope.fData.temporal.elemento.id ){ 
+    //     elementoNew = false;
+    //   }
+    // });
+    // if( elementoNew === false ){
+    //   $scope.fData.temporal = {
+    //     cantidad: 1,
+    //     descuento: 0,
+    //     importe_con_igv: null,
+    //     importe_sin_igv: null,
+    //     elemento: null,
+    //     excluye_igv: 2,
+    //     agrupacion: 0,
+    //     unidad_medida : $scope.fArr.listaUnidadMedida[0],
+    //     caracteristicas: null
+    //   };
+    //   $('#temporalElemento').focus();
+    //   pinesNotifications.notify({ title: 'Advertencia.', text: 'El elemento ya ha sido agregado a la cesta.', type: 'warning', delay: 2000 });
+    //   return false;
+    // } 
     // empieza el juego... 
     $scope.arrTemporal = { 
       'id' : $scope.fData.temporal.elemento.id,
@@ -1013,13 +1019,12 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
       unidad_medida : $scope.fArr.listaUnidadMedida[0],
       caracteristicas: null
     };
-    console.log('mismo cliente');
+    // console.log('mismo cliente');
     $scope.gridOptions.data = [];
     $scope.fData.subtotal = null;
     $scope.fData.igv = null;
     $scope.fData.total = null;
-    // $scope.fData.entrega = null;
-    // $scope.fData.vuelto = null;
+    $scope.fData.isRegisterSuccess = false;
     $scope.metodos.generarNumeroCotizacion();
     $('#temporalElemento').focus();
   }
@@ -1072,6 +1077,7 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
 app.service("CotizacionServices",function($http, $q, handleBehavior) {
     return({
         sGenerarNumeroCotizacion: sGenerarNumeroCotizacion,
+        sListarHistorialCotizaciones: sListarHistorialCotizaciones,
         sRegistrar: sRegistrar,
         sEditar: sEditar,
         sAnular: sAnular
@@ -1084,7 +1090,14 @@ app.service("CotizacionServices",function($http, $q, handleBehavior) {
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
     }
-    
+    function sListarHistorialCotizaciones(datos) {
+      var request = $http({
+            method : "post",
+            url : angular.patchURLCI+"Cotizacion/lista_cotizaciones_historial",
+            data : datos
+      });
+      return (request.then(handleBehavior.success,handleBehavior.error));
+    }
     function sRegistrar (datos) {
       var request = $http({
             method : "post",

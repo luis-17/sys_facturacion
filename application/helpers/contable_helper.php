@@ -1,5 +1,5 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-  function ValorEnLetras($x, $Moneda ){ 
+  function ValorEnLetras($x, $moneda ){ 
 
       $Void = ""; 
       $Dot = "."; 
@@ -56,7 +56,7 @@
          $s = $s . " con " . $Frc. "/100 "; 
          //$s = $s . " " . $Frc . "/100"; 
       } 
-      $s = strtoupper($s) . $Moneda; 
+      $s = strtoupper($s) . $moneda; 
       $letrass=$Signo . $s . ""; 
       return ($Signo . $s . ""); 
   } 

@@ -185,8 +185,7 @@ app.service("BancoServices",function($http, $q, handleBehavior) {
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
-    }
-
+    } 
 });
 
 app.factory("BancoFactory", function($uibModal, pinesNotifications, blockUI, BancoServices) { 

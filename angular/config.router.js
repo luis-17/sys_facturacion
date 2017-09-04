@@ -78,6 +78,15 @@ angular.module('app')
               'angular/controllers/UnidadMedidaCtrl.js' 
             ])
           })
+          .state('app.historial-cotizacion', {
+            url: '/historial-cotizacion',
+            templateUrl: 'tpl/historial-cotizacion.html',
+            resolve: load([
+              'angular/controllers/HistorialCotizacionCtrl.js',
+              'angular/controllers/NuevaCotizacionCtrl.js',
+              'angular/controllers/SedeCtrl.js',
+            ])
+          })
           .state('app.producto', {
             url: '/producto',
             templateUrl: 'tpl/producto.html',

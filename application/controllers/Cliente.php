@@ -30,7 +30,7 @@ class Cliente extends CI_Controller {
 		$arrListado = array();
 		if( $allInputs['tipo_documento']['destino'] == 1 ){ // empresa 
 			$fCliente = $this->model_cliente_empresa->m_buscar_cliente_empresa($allInputs);
-			$fCliente['id'] = $fCliente['idclienteempresa'];
+			$fCliente['id'] = @$fCliente['idclienteempresa'];
 		}
 		if( $allInputs['tipo_documento']['destino'] == 2 ){ // persona 
 			$fCliente = $this->model_cliente_persona->m_buscar_cliente_persona($allInputs);
@@ -41,31 +41,34 @@ class Cliente extends CI_Controller {
 				$fCliente['desc_sexo'] = 'FEMENINO';
 			}
 			$fCliente['email'] = strtoupper($fCliente['email']); 
-			$fCliente['id'] = $fCliente['idclientepersona'];
-			$fCliente['cliente'] = strtoupper($fCliente['nombres'].' '.$fCliente['apellidos']); 
+			$fCliente['id'] = @$fCliente['idclientepersona'];
+			$fCliente['cliente'] = strtoupper(@$fCliente['nombres'].' '.@$fCliente['apellidos']); 
 			$fCliente['sexo'] = array( 
-				'id'=> $fCliente['sexo'],
-				'descripcion'=> $fCliente['desc_sexo'] 
+				'id'=> @$fCliente['sexo'],
+				'descripcion'=> @$fCliente['desc_sexo'] 
 			);
 		}
-		$fCliente['categoria_cliente'] = array( 
-			'id'=> $fCliente['idcategoriacliente'],
-			'descripcion'=> $fCliente['descripcion_cc']
-		); 
+		// var_dump($fCliente); exit();
+		if( !empty($fCliente['id']) ){
+			$fCliente['categoria_cliente'] = array( 
+				'id'=> $fCliente['idcategoriacliente'],
+				'descripcion'=> $fCliente['descripcion_cc']
+			); 
 
-		$fCliente['colaborador'] = array(
-			'id'=> $fCliente['idcolaborador'],
-			'descripcion'=> $fCliente['colaborador']
-		);
-    	$arrData['datos'] = array(
-    		'cliente'=> $fCliente 
-    	);
-    	$arrData['message'] = 'Cliente seleccionado correctamente.';
-    	$arrData['flag'] = 1;
-		if(empty($fCliente)){ 
+			$fCliente['colaborador'] = array(
+				'id'=> $fCliente['idcolaborador'],
+				'descripcion'=> $fCliente['colaborador']
+			);
+	    	$arrData['datos'] = array(
+	    		'cliente'=> $fCliente 
+	    	);
+	    	$arrData['message'] = 'Cliente seleccionado correctamente.';
+	    	$arrData['flag'] = 1;
+		}else{
 			$arrData['message'] = 'No se encontró al cliente..';
 			$arrData['flag'] = 0;
 		}
+		
 		$this->output
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
