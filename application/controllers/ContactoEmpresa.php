@@ -16,6 +16,46 @@ class ContactoEmpresa extends CI_Controller {
 		//if(!@$this->user) redirect ('inicio/login');
 		//$permisos = cargar_permisos_del_usuario($this->user->idusuario);
 	}
+	public function listar_contacto(){ 
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$paramPaginate = $allInputs['paginate'];
+		$lista = $this->model_contacto_empresa->m_cargar_contacto($paramPaginate);
+		$fCount = $this->model_contacto_empresa->m_count_contacto($paramPaginate);
+		$arrListado = array();
+		foreach ($lista as $row) { 
+			array_push($arrListado,
+				array(
+					'id' => trim($row['idcontacto']),
+					'nombres' => strtoupper($row['nombres']),
+					'apellidos' => strtoupper($row['apellidos']),	
+					'fecha_nacimiento' => darFormatoDMY($row['fecha_nacimiento']),			
+					'telefono_fijo' => $row['telefono_fijo'],
+					'telefono_movil' => $row['telefono_movil'],
+					'email' => $row['email'],
+					'tipo_cliente' => array(
+						'id'=> $row['idclienteempresa'],
+						'descripcion'=> strtoupper($row['nombre_comercial'])				
+					),					
+				)
+			);
+		}
+    	$arrData['datos'] = $arrListado;
+    	$arrData['paginate']['totalRows'] = $fCount['contador'];
+    	$arrData['message'] = '';
+    	$arrData['flag'] = 1;
+		if(empty($lista)){
+			$arrData['flag'] = 0;
+		}
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
+
+	public function ver_popup_formulario()
+	{
+		$this->load->view('contacto/mant_contacto');
+	}	
+
 	public function listar_contactos_esta_empresa()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
@@ -50,10 +90,10 @@ class ContactoEmpresa extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
-	public function ver_popup_formulario()
-	{
-		$this->load->view('contacto-empresa/mant_contacto_empresa');
-	}
+	// public function ver_popup_formulario()
+	// {
+	// 	$this->load->view('contacto-empresa/mant_contacto_empresa');
+	// }
 	public function registrar()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);

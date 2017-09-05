@@ -1,13 +1,11 @@
-app.controller('ColaboradorCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$log', '$timeout', 'pinesNotifications', 'uiGridConstants', 'blockUI', 
-  'ColaboradorFactory',
-  'ColaboradorServices',
-  'UsuarioServices',
+app.controller('UsuarioCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$log', '$timeout', 'pinesNotifications', 'uiGridConstants', 'blockUI', 
   'UsuarioFactory',
+  'UsuarioServices',
+  'ColaboradorFactory',
   function($scope, $filter, $uibModal, $bootbox, $log, $timeout, pinesNotifications, uiGridConstants, blockUI, 
-  ColaboradorFactory,
-  ColaboradorServices,
+  UsuarioFactory,
   UsuarioServices,
-  UsuarioFactory
+  ColaboradorFactory
   ) {
     $scope.metodos = {}; // contiene todas las funciones 
     $scope.fArr = {}; // contiene todos los arrays generados por las funciones 
@@ -22,7 +20,7 @@ app.controller('ColaboradorCtrl', ['$scope', '$filter', '$uibModal', '$bootbox',
         $scope.fArr.listaTipoUsuario = rpta.datos; 
         myCallback();
       });
-    };
+    };    
     var paginationOptions = {
       pageNumber: 1,
       firstRow: 0,
@@ -45,16 +43,11 @@ app.controller('ColaboradorCtrl', ['$scope', '$filter', '$uibModal', '$bootbox',
       enableFullRowSelection: true,
       multiSelect: false,
       columnDefs: [ 
-        { field: 'id', name: 'idcolaborador', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
-        { field: 'nombres', name: 'nombres', displayName: 'Nombres', minWidth: 140 },
-        { field: 'apellidos', name: 'apellidos', displayName: 'Apellidos', minWidth: 140 },
-        { field: 'num_documento', name: 'num_documento', displayName: 'N° Documento', minWidth: 100 },
-        { field: 'telefono', name: 'telefono', displayName: 'Telefono', minWidth: 120 },  
-        { field: 'email', name: 'email', displayName: 'Correo', minWidth: 180 },
-        { field: 'fecha_nacimiento', name: 'fecha_nacimiento', displayName: 'Fecha de Nacimiento', minWidth: 100},
-        // { field: 'username', name: 'username', displayName: 'Username', visible: false,minWidth: 100},
-        { field: 'tipo_usuario', type: 'object', name: 'tipo_usuario', displayName: 'Tipo usuario', minWidth: 100, enableColumnMenus: false, enableColumnMenu: false,cellTemplate:'<div class="ui-grid-cell-contents text-center ">'+'<label class="label bg-primary block">{{ COL_FIELD.descripcion }}</label></div>' 
-        }         
+        { field: 'id', name: 'idusuario', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
+        { field: 'tipo_usuario', name: 'descripcion_tu',cellTemplate:'<div class="ui-grid-cell-contents text-left ">'+ '{{ COL_FIELD.descripcion }}</div>',  displayName: 'Tipo Usuario', minWidth: 160 },
+        { field: 'username', name: 'username', displayName: 'Username', minWidth: 100 },
+         { field: 'password', name: 'password',visible: false, displayName: 'Password', minWidth: 100 },
+        { field: 'password_view', name: 'password_view', displayName: 'Contraseña', minWidth: 100 }
       ],
       onRegisterApi: function(gridApi) { 
         $scope.gridApi = gridApi;
@@ -84,13 +77,11 @@ app.controller('ColaboradorCtrl', ['$scope', '$filter', '$uibModal', '$bootbox',
           var grid = this.grid;
           paginationOptions.search = true; 
           paginationOptions.searchColumn = {
-            'co.idcolaborador' : grid.columns[1].filters[0].term,
-            'co.nombres' : grid.columns[2].filters[0].term,
-            'co.apellidos' : grid.columns[3].filters[0].term,
-            'co.num_documento' : grid.columns[4].filters[0].term,
-            'co.telefono' : grid.columns[5].filters[0].term,
-            'co.email' : grid.columns[6].filters[0].term,
-            'co.fecha_nacimiento' : grid.fecha_nacimiento[7].filters[0].term         
+            'u.idusuario' : grid.columns[1].filters[0].term,
+            'ut.descripcion_tu' : grid.columns[2].filters[0].term,
+            'u.username' : grid.columns[4].filters[0].term,
+            'u.password_view' : grid.columns[5].filters[0].term,
+            'u.password_view' : grid.columns[6].filters[0].term
           }
           $scope.metodos.getPaginationServerSide();
         });
@@ -104,7 +95,7 @@ app.controller('ColaboradorCtrl', ['$scope', '$filter', '$uibModal', '$bootbox',
       var arrParams = {
         paginate : paginationOptions
       };
-      ColaboradorServices.sListar(arrParams).then(function (rpta) { 
+      UsuarioServices.sListar(arrParams).then(function (rpta) { 
         if( rpta.datos.length == 0 ){
           rpta.paginate = { totalRows: 0 };
         }
@@ -123,7 +114,7 @@ app.controller('ColaboradorCtrl', ['$scope', '$filter', '$uibModal', '$bootbox',
         'metodos': $scope.metodos,
         'fArr': $scope.fArr 
       }
-      ColaboradorFactory.regColaboradorModal(arrParams); 
+      UsuarioFactory.regUsuarioModal(arrParams); 
     }
     $scope.btnEditar = function() { 
       var arrParams = {
@@ -131,10 +122,8 @@ app.controller('ColaboradorCtrl', ['$scope', '$filter', '$uibModal', '$bootbox',
         'mySelectionGrid': $scope.mySelectionGrid,
         'fArr': $scope.fArr 
       }
-      ColaboradorFactory.editColaboradorModal(arrParams); 
+      UsuarioFactory.editUsuarioModal(arrParams); 
     }
-
-
     $scope.btnAnular = function() { 
       var pMensaje = '¿Realmente desea anular el registro?';
       $bootbox.confirm(pMensaje, function(result) {
@@ -143,7 +132,7 @@ app.controller('ColaboradorCtrl', ['$scope', '$filter', '$uibModal', '$bootbox',
             id: $scope.mySelectionGrid[0].id 
           };
           blockUI.start('Procesando información...');
-          ColaboradorServices.sAnular(arrParams).then(function (rpta) {
+          UsuarioServices.sAnular(arrParams).then(function (rpta) {
             if(rpta.flag == 1){
               var pTitle = 'OK!';
               var pType = 'success';
@@ -162,26 +151,18 @@ app.controller('ColaboradorCtrl', ['$scope', '$filter', '$uibModal', '$bootbox',
     }
 }]);
 
-app.service("ColaboradorServices",function($http, $q, handleBehavior) {
+app.service("UsuarioServices",function($http, $q, handleBehavior) {
     return({
         sListar: sListar,
-        sListarCbo: sListarCbo,
         sRegistrar: sRegistrar,
         sEditar: sEditar,
-        sAnular: sAnular
+        sAnular: sAnular,
+        sListarCbo: sListarCbo
     });
     function sListar(datos) {
       var request = $http({
             method : "post",
-            url : angular.patchURLCI+"Colaborador/listar_colaboradores",
-            data : datos
-      });
-      return (request.then(handleBehavior.success,handleBehavior.error));
-    }
-    function sListarCbo(datos) {
-      var request = $http({
-            method : "post",
-            url : angular.patchURLCI+"Colaborador/listar_colaboradores_cbo",
+            url : angular.patchURLCI+"Usuario/listar_usuario",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
@@ -189,63 +170,71 @@ app.service("ColaboradorServices",function($http, $q, handleBehavior) {
     function sRegistrar (datos) {
       var request = $http({
             method : "post",
-            url : angular.patchURLCI+"Colaborador/registrar",
+            url : angular.patchURLCI+"Usuario/registrar",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
-    }
+    }  
     function sEditar (datos) {
       var request = $http({
             method : "post",
-            url : angular.patchURLCI+"Colaborador/editar",
+            url : angular.patchURLCI+"Usuario/editar",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
-    }
+    }   
     function sAnular (datos) {
       var request = $http({
             method : "post",
-            url : angular.patchURLCI+"Colaborador/anular",
+            url : angular.patchURLCI+"Usuario/anular",
+            data : datos
+      });
+      return (request.then(handleBehavior.success,handleBehavior.error));
+    }       
+    function sListarCbo(datos) {
+      var request = $http({
+            method : "post",
+            url : angular.patchURLCI+"Usuario/listar_usuario_cbo",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
     }
 });
 
-app.factory("ColaboradorFactory", function($uibModal, pinesNotifications, blockUI, ColaboradorServices,UsuarioServices,UsuarioFactory) { 
+app.factory("UsuarioFactory", function($uibModal, pinesNotifications, blockUI, UsuarioServices) { 
   var interfaz = {
-    regColaboradorModal: function (arrParams) {
+    regUsuarioModal: function (arrParams) {
       blockUI.start('Abriendo formulario...');
       $uibModal.open({ 
-        templateUrl: angular.patchURLCI+'Colaborador/ver_popup_formulario',
+        templateUrl: angular.patchURLCI+'Usuario/ver_popup_formulario',
         size: 'md',
         backdrop: 'static',
         keyboard:false,
-        controller: function ($scope, $uibModalInstance, arrParams,UsuarioFactory) { 
+        controller: function ($scope, $uibModalInstance, arrParams) { 
           blockUI.stop(); 
           $scope.fData = {};
+          console.log($scope.fData,'$scope.fData');
           $scope.metodos = arrParams.metodos;
           $scope.fArr = arrParams.fArr;
-          $scope.titleForm = 'Registro de Colaborador';
+          $scope.titleForm = 'Registro de Usuario';
           $scope.cancel = function () {
             $uibModalInstance.dismiss('cancel');
           }
-
-          $scope.btnNuevoUsuario = function() { 
-            UsuarioFactory.regUsuarioModal(arrParams); 
+          var myCallBackCC = function() { 
+            $scope.fArr.listaTipoUsuario.splice(0,0,{ id : '0', descripcion:'--Seleccione tipo usuario--'}); 
+            $scope.fData.tipo_usuario = $scope.fArr.listaTipoUsuario[0]; 
           }
-          // $$scope.fData.username='aqui';
-          console.log('aqui',$scope.fData);
-          // console.log($scope.fData.username,'aqui');
-
-
+          $scope.metodos.listaTipoUsuario(myCallBackCC); 
+          $scope.modoEdit = true;
           $scope.aceptar = function () { 
             blockUI.start('Procesando información...');
-            console.log($scope.fData,'$scope.fData');
-            ColaboradorServices.sRegistrar($scope.fData).then(function (rpta) {
+            console.log('aqui');
+            UsuarioServices.sRegistrar($scope.fData).then(function (rpta) {
               if(rpta.flag == 1){
                 var pTitle = 'OK!';
                 var pType = 'success';
+                console.log($scope.fData,'$scope.fData');
+                  $scope.fData.username='aqui';
                 $uibModalInstance.dismiss('cancel');
                 if(typeof $scope.metodos.getPaginationServerSide == 'function'){ 
                   $scope.metodos.getPaginationServerSide(true);
@@ -268,10 +257,11 @@ app.factory("ColaboradorFactory", function($uibModal, pinesNotifications, blockU
         }
       });
     },
-    editColaboradorModal: function (arrParams) {
+    editUsuarioModal: function (arrParams) {
+      console.log(arrParams,'arrParams');
       blockUI.start('Abriendo formulario...');
       $uibModal.open({ 
-        templateUrl: angular.patchURLCI+'Colaborador/ver_popup_formulario',
+        templateUrl: angular.patchURLCI+'Usuario/ver_popup_formulario',
         size: 'md',
         backdrop: 'static',
         keyboard:false,
@@ -280,18 +270,30 @@ app.factory("ColaboradorFactory", function($uibModal, pinesNotifications, blockU
           $scope.fData = {};
           $scope.metodos = arrParams.metodos;
           $scope.fArr = arrParams.fArr; 
+
           if( arrParams.mySelectionGrid.length == 1 ){ 
             $scope.fData = arrParams.mySelectionGrid[0];
+            console.log($scope.fData ,'$scope.fData ');
           }else{
             alert('Seleccione una sola fila');
           }
-          $scope.titleForm = 'Edición de Colaborador';
+          $scope.titleForm = 'Edición de Usuario';
           $scope.cancel = function () {
             $uibModalInstance.dismiss('cancel');
           }
+          //BINDEO TIPO USUARIO
+          var myCallBackCC = function() { 
+            var objIndex = $scope.fArr.listaTipoUsuario.filter(function(obj) { 
+
+              return obj.id == $scope.fData.tipo_usuario.id;
+            }).shift(); 
+            $scope.fData.tipo_usuario = objIndex; 
+          }
+          $scope.metodos.listaTipoUsuario(myCallBackCC); 
+          $scope.modoEdit = false;
           $scope.aceptar = function () { 
             blockUI.start('Procesando información...');
-            ColaboradorServices.sEditar($scope.fData).then(function (rpta) {
+            UsuarioServices.sEditar($scope.fData).then(function (rpta) {
               if(rpta.flag == 1){
                 var pTitle = 'OK!';
                 var pType = 'success';
@@ -320,3 +322,4 @@ app.factory("ColaboradorFactory", function($uibModal, pinesNotifications, blockU
   }
   return interfaz;
 })
+

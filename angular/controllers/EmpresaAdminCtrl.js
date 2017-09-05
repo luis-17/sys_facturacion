@@ -450,15 +450,7 @@ app.factory("EmpresaAdminFactory", function($uibModal, pinesNotifications, block
           $scope.titleForm = 'Registro de Empresa';
           $scope.cancel = function () {
             $uibModalInstance.dismiss('cancel');
-          }
-          // var myCallBackBa = function() { 
-          //   $scope.fArr.listaBanco.splice(0,0,{ id : '0', descripcion:'--Seleccione banco--'}); 
-          //   $scope.fData.banco = $scope.fArr.listaBanco[0]; 
-          // }
-          // $scope.metodos.listaBanco(myCallBackBa); 
-
-          // $scope.fArr.listaMoneda.splice(0,0,{ id : '0', descripcion:'--Seleccione sexo--'}); 
-          // $scope.fData.moneda = $scope.fArr.listaMoneda[0];           
+          }       
           $scope.aceptar = function () { 
             blockUI.start('Procesando información...');
             EmpresaAdminServices.sRegistrar($scope.fData).then(function (rpta) {
@@ -507,20 +499,7 @@ app.factory("EmpresaAdminFactory", function($uibModal, pinesNotifications, block
           $scope.titleForm = 'Edición de Empresa';
           $scope.cancel = function () {
             $uibModalInstance.dismiss('cancel');
-          }
-          // BINDEO BANCO
-          // var myCallBackBa = function() { 
-          //   var objIndex = $scope.fArr.listaBanco.filter(function(obj) { 
-          //     return obj.id == $scope.fData.cuenta_bancaria.id;
-          //   }).shift(); 
-          //   $scope.fData.banco = objIndex; 
-          // }
-          // $scope.metodos.listaBanco(myCallBackBa);           
-          // // BINDEO MONEDA 
-          // var objIndex = $scope.fArr.listaMoneda.filter(function(obj) { 
-          //   return obj.id == $scope.fData.moneda.id;
-          // }).shift(); 
-          // $scope.fData.moneda = objIndex;           
+          }         
           $scope.aceptar = function () { 
             blockUI.start('Procesando información...');
             EmpresaAdminServices.sEditar($scope.fData).then(function (rpta) {

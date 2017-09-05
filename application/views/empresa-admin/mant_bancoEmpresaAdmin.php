@@ -23,7 +23,7 @@
 						<label class="control-label"> Banco: <small class="text-danger">(*)</small> </label>
 			            <select class="form-control input-sm" ng-model="fBanco.banco" ng-options="item as item.descripcion for item in fArr.listaBanco" required tabindex="40" ></select> 
 					</div>					
-					<div class="form-group col-md-6 pl-n">
+					<div class="form-group col-md-6 pr-n">
 						<label class="control-label"> Moneda: <small class="text-danger">(*)</small> </label>
 			            <select class="form-control input-sm" ng-model="fBanco.moneda" ng-options="item as item.descripcion for item in fArr.listaMoneda" required tabindex="40" ></select> 
 					</div>		

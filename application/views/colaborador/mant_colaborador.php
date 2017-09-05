@@ -21,14 +21,21 @@
 		</div>	
 		<div class="form-group col-md-6 mb-md">
 			<label class="control-label mb-n"> Teléfono: </label>
-			<input type="text" class="form-control input-sm" ng-model="fData.telefono" placeholder="Ingrese teléfono " required tabindex="80" />
+			<input type="text" class="form-control input-sm" ng-model="fData.telefono" placeholder="Ingrese teléfono "  tabindex="80" />
 		</div>	
-
 		<div class="form-group col-md-6 mb-md">
 			<label class="control-label mb-n"> E-mail: </label>
 			<input type="email" class="form-control input-sm" ng-model="fData.email" placeholder="Ingrese correo electrónico" tabindex="60"  />
 		</div>
-
+		<div class="form-group col-md-6">
+		<label class="control-label mb-n"> Usuario: </label>
+			<div class="input-group">
+			    <input type="text" class="form-control input-sm" ng-model="fData.username"  disabled="" placeholder="Ingrese el usuario" tabindex="60"  />
+			    <span class="input-group-btn">
+			        <button tabindex="250" ng-click="btnNuevoUsuario();" type="button" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-user"></i> </button>
+			    </span>			                    
+			</div>
+	 	</div>
 	</form>
 </div>
 <div class="modal-footer">
