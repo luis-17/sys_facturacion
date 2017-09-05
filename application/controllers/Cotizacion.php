@@ -8,7 +8,7 @@ class Cotizacion extends CI_Controller {
         $this->load->helper(array('fechas','otros','pdf','contable','config')); 
         $this->load->model(array('model_cotizacion','model_categoria_cliente','model_cliente_persona','model_cliente_empresa','model_configuracion')); 
         $this->load->library('excel');
-    	$this->load->library('fpdfext');
+    	$this->load->library('Fpdfext');
         //cache
 		$this->output->set_header("Cache-Control: no-store, no-cache, must-revalidate, no-transform, max-age=0, post-check=0, pre-check=0");
 		$this->output->set_header("Pragma: no-cache"); 
