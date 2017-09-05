@@ -385,7 +385,8 @@ app.service("ClienteEmpresaServices",function($http, $q, handleBehavior) {
         sListar: sListar,
         sRegistrar: sRegistrar,
         sEditar: sEditar,
-        sAnular: sAnular
+        sAnular: sAnular,
+        sListarCbo: sListarCbo
     });
     function sListar(datos) {
       var request = $http({
@@ -419,6 +420,16 @@ app.service("ClienteEmpresaServices",function($http, $q, handleBehavior) {
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
     }
+    function sListarCbo(datos) {
+      var request = $http({
+            method : "post",
+            url : angular.patchURLCI+"ClienteEmpresa/listar_cliente_cbo",
+            data : datos
+      });
+      return (request.then(handleBehavior.success,handleBehavior.error));
+    }
+
+
 });
 
 app.factory("ClienteEmpresaFactory", function($uibModal, pinesNotifications, blockUI, ClienteEmpresaServices) { 

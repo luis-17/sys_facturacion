@@ -29,7 +29,7 @@
 		</div>
 		<div class="form-group col-md-6 mb-md">
 			<label class="control-label mb-n"> Página Web: </label>
-			<input type="text" class="form-control input-sm" ng-model="fData.pagina_web" placeholder="Ingrese página web" required tabindex="70" />
+			<input type="text" class="form-control input-sm" ng-model="fData.pagina_web" placeholder="Ingrese página web"  tabindex="70" />
 		</div>	
 	</form>
 </div>

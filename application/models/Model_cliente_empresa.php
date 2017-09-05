@@ -121,6 +121,16 @@ class Model_cliente_empresa extends CI_Model {
 		);
 		$this->db->where('idclienteempresa',$datos['id']);
 		return $this->db->update('cliente_empresa', $data);
-	}	
+	}
+
+	public function m_cargar_cliente_empresa_cbo($datos = FALSE){ 
+		$this->db->select("cl.idclienteempresa, cl.nombre_comercial");
+		$this->db->from('cliente_empresa cl');
+		$this->db->where('estado_ce', 1); //activo
+		$this->db->order_by('cl.nombre_comercial','ASC');
+		return $this->db->get()->result_array();
+	}
+
+
 }
 ?>

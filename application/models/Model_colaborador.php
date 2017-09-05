@@ -74,6 +74,7 @@ class Model_colaborador extends CI_Model {
 	}
 	public function m_registrar($datos)
 	{
+		var_dump($datos);exit();
 		$data = array(
 			'idusuario' => $datos['idusuario'],
 			'nombres' => strtoupper_total($datos['nombres']),
@@ -82,7 +83,7 @@ class Model_colaborador extends CI_Model {
 			'telefono'=> empty($datos['telefono']) ? NULL : $datos['telefono'],
 			'email' => empty($datos['email'])? NULL : strtoupper_total($datos['email']), 
 			'fecha_nacimiento' => empty($datos['fecha_nacimiento'])? NULL : darFormatoYMD($datos['fecha_nacimiento']), 
-			'nombre_foto' => empty($datos['nombre_foto']) ? 'sin-imagen.png' : $datos['nombre_foto'],											
+			// 'nombre_foto' => empty($datos['nombre_foto']) ? 'sin-imagen.png' : $datos['nombre_foto'],										
 			'createdat' => date('Y-m-d H:i:s'),
 			'updatedat' => date('Y-m-d H:i:s')
 		);
@@ -98,7 +99,7 @@ class Model_colaborador extends CI_Model {
 	}	
 	public function m_editar($datos){
 		$data = array(
-			'idusuario' => $datos['idusuario'],
+			// 'idusuario' => $datos['idusuario'],
 			'nombres' => strtoupper_total($datos['nombres']),
 			'apellidos' => strtoupper_total($datos['apellidos']),
 			'num_documento'=> $datos['num_documento'],
@@ -108,7 +109,7 @@ class Model_colaborador extends CI_Model {
 			'updatedat' => date('Y-m-d H:i:s') 
 		);
 		// var_dump($datos['fecha_nacimiento'],darFormatoYMD($datos['fecha_nacimiento'])); exit();
-		$this->db->where('idcolaborador',$datos['idcolaborador']);
+		$this->db->where('idcolaborador',$datos['id']);
 		return $this->db->update('colaborador', $data);
 	}
 
@@ -118,7 +119,7 @@ class Model_colaborador extends CI_Model {
 			'estado_col' => 0,
 			'updatedat' => date('Y-m-d H:i:s')
 		);
-		$this->db->where('idcolaborador',$datos['idcolaborador']);
+		$this->db->where('idcolaborador',$datos['id']);
 		return $this->db->update('colaborador', $data);
 	}	
 

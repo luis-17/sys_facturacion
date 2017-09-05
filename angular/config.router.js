@@ -136,7 +136,8 @@ angular.module('app')
             url: '/colaborador',
             templateUrl: 'tpl/colaborador.html',
             resolve: load([
-              'angular/controllers/ColaboradorCtrl.js'         
+              'angular/controllers/ColaboradorCtrl.js',
+              'angular/controllers/UsuarioCtrl.js'         
             ]) 
           })    
           .state('app.sede', {
@@ -145,7 +146,23 @@ angular.module('app')
             resolve: load([
               'angular/controllers/SedeCtrl.js'      
             ]) 
-          })                              
+          })  
+          .state('app.usuario', {
+            url: '/usuario',
+            templateUrl: 'tpl/usuario.html',
+            resolve: load([
+              'angular/controllers/UsuarioCtrl.js',   
+              'angular/controllers/ColaboradorCtrl.js'      
+            ]) 
+          })    
+          .state('app.contacto', {
+            url: '/contacto',
+            templateUrl: 'tpl/contacto.html',
+            resolve: load([      
+              'angular/controllers/ContactoEmpresaCtrl.js', 
+              'angular/controllers/ClienteEmpresaCtrl.js'   
+            ]) 
+          })                                               
           .state('lockme', {
               url: '/lockme',
               templateUrl: 'tpl/page_lockme.html'

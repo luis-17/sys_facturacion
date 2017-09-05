@@ -1,38 +1,33 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Colaborador extends CI_Controller {
+class Usuario extends CI_Controller {
 	public function __construct()
     {
         parent::__construct();
         // Se le asigna a la informacion a la variable $sessionVP.
         $this->sessionFactur = @$this->session->userdata('sess_fact_'.substr(base_url(),-20,7));
         $this->load->helper(array('fechas','otros')); 
-        $this->load->model(array('model_colaborador')); 
-
+        $this->load->model(array('model_usuario')); 
     }
 
-	public function listar_colaboradores(){ 
+	public function listar_usuario(){ 
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		$paramPaginate = $allInputs['paginate'];
-		$lista = $this->model_colaborador->m_cargar_colaborador($paramPaginate);
-		$fCount = $this->model_colaborador->m_count_colaborador($paramPaginate);
+		$lista = $this->model_usuario->m_cargar_usuario($paramPaginate);
+		$fCount = $this->model_usuario->m_count_usuario($paramPaginate);
 		$arrListado = array();
 		foreach ($lista as $row) { 
 			array_push($arrListado,
 				array(
-					'id' => trim($row['idcolaborador']),
-					'nombres' => strtoupper($row['nombres']),
-					'apellidos' => strtoupper($row['apellidos']),
-					'num_documento' => $row['num_documento'],
-					'telefono' => $row['telefono'],
-					'email' => strtoupper($row['email']),
-					'fecha_nacimiento' => darFormatoDMY($row['fecha_nacimiento']),
+					'id' => $row['idusuario'],
 					'tipo_usuario' => array(
-							'id'=> $row['idtipousuario'],
-							'descripcion'=> $row['descripcion_tu']
-					),	
-					'username' => $row['username']
+						'id'=> $row['idtipousuario'],
+						'descripcion'=> $row['descripcion_tu']
+					),					
+					'username' => strtoupper($row['username']),
+					'password_view' => strtoupper($row['password_view']),
+					'password' => strtoupper($row['password'])  
 				)
 			);
 		}
@@ -50,20 +45,25 @@ class Colaborador extends CI_Controller {
 
 	public function ver_popup_formulario()
 	{
-		$this->load->view('colaborador/mant_colaborador');
-	}	
+		$this->load->view('usuario/mant_usuario');
+	}
 
 	public function registrar()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
     	$arrData['flag'] = 0;
-    	// VALIDACIONES
-    	
+    	// VALIDACIONES    	
     	$this->db->trans_start();
-		if($this->model_colaborador->m_registrar($allInputs)) { // registro de elemento
-			$arrData['message'] = 'Se registraron los datos correctamente';
-			$arrData['flag'] = 1;
+
+		if($allInputs['password']==$allInputs['password_view']){
+			if($this->model_usuario->m_registrar($allInputs)) { // registro de elemento
+				$arrData['message'] = 'Se registraron los datos correctamente';
+				$arrData['flag'] = 1;
+			}
+		}else{
+		$arrData['message'] = 'Las contraseñas no coinciden, inténtelo nuevamente';
+    	$arrData['flag'] = 0;
 		}
 		$this->db->trans_complete();
 		$this->output
@@ -76,10 +76,9 @@ class Colaborador extends CI_Controller {
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
     	$arrData['flag'] = 0;
-    	// VALIDACIONES
-    	
+    	// VALIDACIONES    	
     	$this->db->trans_start();
-		if($this->model_colaborador->m_editar($allInputs)) { // edicion de elemento
+		if($this->model_usuario->m_editar($allInputs)) { // edicion de elemento
 			$arrData['message'] = 'Se registraron los datos correctamente';
 			$arrData['flag'] = 1;
 		}
@@ -89,29 +88,15 @@ class Colaborador extends CI_Controller {
 		    ->set_output(json_encode($arrData));
 	}
 
-	public function anular()
-	{
+	 public function listar_usuario_cbo(){ 
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
-		$arrData['message'] = 'No se pudo anular los datos';
-    	$arrData['flag'] = 0;
-		if( $this->model_colaborador->m_anular($allInputs) ){ 
-			$arrData['message'] = 'Se anularon los datos correctamente';
-    		$arrData['flag'] = 1;
-		}
-		$this->output
-		    ->set_content_type('application/json')
-		    ->set_output(json_encode($arrData));
-	} 
-
-	 public function listar_colaboradores_cbo(){ 
-		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
-		$lista = $this->model_colaborador->m_cargar_colaborador_cbo();
+		$lista = $this->model_usuario->m_cargar_usuario_cbo();
 		$arrListado = array();
 		foreach ($lista as $row) {
 			array_push($arrListado,
 				array(
-					'id' => $row['idcolaborador'],
-					'descripcion' => strtoupper($row['colaborador']) 
+					'id' => $row['idtipousuario'],
+					'descripcion' => strtoupper($row['descripcion_tu']) 
 				)
 			);
 		} 
@@ -125,4 +110,5 @@ class Colaborador extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
+
 }

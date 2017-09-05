@@ -5,7 +5,7 @@ app.controller('ServicioCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$
 	function($scope, $filter, $uibModal, $bootbox, $log, $timeout, pinesNotifications, uiGridConstants, blockUI, 
 	ServicioFactory,
 	ServicioServices,
-	CategoriaElementoServices,
+	CategoriaElementoServices
 	) {
 		$scope.metodos = {}; // contiene todas las funciones 
 		$scope.fArr = {}; // contiene todos los arrays generados por las funciones 
