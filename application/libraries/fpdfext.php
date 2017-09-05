@@ -360,8 +360,6 @@
           $this->Text($x,$y,$txt);
           $this->Rotate(0);
       }
-
-
       function Rotate($angle,$x=-1,$y=-1)
       {
           if($x==-1)
