@@ -386,7 +386,8 @@ app.service("ClienteEmpresaServices",function($http, $q, handleBehavior) {
         sRegistrar: sRegistrar,
         sEditar: sEditar,
         sAnular: sAnular,
-        sListarCbo: sListarCbo
+        sListarCbo: sListarCbo,
+        sListarClienteEmpresaAutoComplete:sListarClienteEmpresaAutoComplete
     });
     function sListar(datos) {
       var request = $http({
@@ -428,8 +429,14 @@ app.service("ClienteEmpresaServices",function($http, $q, handleBehavior) {
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
     }
-
-
+    function sListarClienteEmpresaAutoComplete(datos) {
+      var request = $http({
+            method : "post",
+            url : angular.patchURLCI+"ClienteEmpresa/listar_cliente_empresa_autocomplete",
+            data : datos
+      });
+      return (request.then(handleBehavior.success,handleBehavior.error));
+    }    
 });
 
 app.factory("ClienteEmpresaFactory", function($uibModal, pinesNotifications, blockUI, ClienteEmpresaServices) { 

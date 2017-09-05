@@ -30,6 +30,7 @@ class ContactoEmpresa extends CI_Controller {
 					'apellidos' => strtoupper($row['apellidos']),	
 					'fecha_nacimiento' => darFormatoDMY($row['fecha_nacimiento']),			
 					'telefono_fijo' => $row['telefono_fijo'],
+					'nombre_comercial' => strtoupper($row['nombre_comercial']),
 					'telefono_movil' => $row['telefono_movil'],
 					'email' => $row['email'],
 					'tipo_cliente' => array(
@@ -90,10 +91,7 @@ class ContactoEmpresa extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
-	// public function ver_popup_formulario()
-	// {
-	// 	$this->load->view('contacto-empresa/mant_contacto_empresa');
-	// }
+	
 	public function registrar()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
@@ -114,6 +112,7 @@ class ContactoEmpresa extends CI_Controller {
 	public function editar()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		var_dump($allInputs);exit();
 		$arrData['message'] = 'Error al editar los datos, inténtelo nuevamente';
     	$arrData['flag'] = 0;
     	// VALIDACIONES

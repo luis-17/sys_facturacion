@@ -14,15 +14,6 @@ app.controller('ContactoEmpresaCtrl', ['$scope', '$filter', '$uibModal', '$bootb
       $scope.gridOptions.enableFiltering = !$scope.gridOptions.enableFiltering;
       $scope.gridApi.core.notifyDataChange( uiGridConstants.dataChange.COLUMN );
     };
-    $scope.metodos.listaClienteEmpresa = function(myCallback) {
-      var myCallback = myCallback || function() { };
-        ClienteEmpresaServices.sListarCbo().then(function(rpta) {
-          console.log(rpta,'rpta');
-              $scope.fArr.listaClienteEmpresa = rpta.datos; 
-              myCallback();
-      });
-    };
-
     var paginationOptions = {
       pageNumber: 1,
       firstRow: 0,
@@ -51,7 +42,7 @@ app.controller('ContactoEmpresaCtrl', ['$scope', '$filter', '$uibModal', '$bootb
         { field: 'fecha_nacimiento', name: 'fecha_nacimiento', displayName: 'Fecha Nacimiento', minWidth: 160 },
         { field: 'telefono_fijo', name: 'telefono_fijo', displayName: 'Teléfono Fijo', minWidth: 160 },
         { field: 'telefono_movil', name: 'telefono_movil', displayName: 'Teléfono Móvil', minWidth: 100 },
-        { field: 'tipo_cliente', name: 'nombre_comercial',cellTemplate:'<div class="ui-grid-cell-contents text-left ">'+ '{{ COL_FIELD.descripcion }}</div>',  displayName: 'Cliente', minWidth: 160 },
+        { field: 'nombre_comercial', name: 'nombre_comercial',  displayName: 'Cliente', minWidth: 160 },
         { field: 'email', name: 'email', displayName: 'Teléfono Móvil', minWidth: 100 }
       ],
       onRegisterApi: function(gridApi) { 
@@ -235,7 +226,7 @@ app.service("ContactoEmpresaServices",function($http, $q, handleBehavior) {
     }
 });
 
-app.factory("ContactoEmpresaFactory", function($uibModal, pinesNotifications, blockUI, ContactoEmpresaServices) { 
+app.factory("ContactoEmpresaFactory", function($uibModal, pinesNotifications, blockUI, ContactoEmpresaServices,ClienteEmpresaServices) { 
   var interfaz = {
     regContactoModal: function (arrParams) {
       blockUI.start('Abriendo formulario...');
@@ -253,11 +244,23 @@ app.factory("ContactoEmpresaFactory", function($uibModal, pinesNotifications, bl
           $scope.cancel = function () {
             $uibModalInstance.dismiss('cancel');
           }
-          var myCallBackCC = function() { 
-            $scope.fArr.listaClienteEmpresa.splice(0,0,{ id : '0', descripcion:'--Seleccione la categoría de cliente--'}); 
-            $scope.fData.tipo_cliente = $scope.fArr.listaClienteEmpresa[0]; 
-          }
-          $scope.metodos.listaClienteEmpresa(myCallBackCC); 
+
+          $scope.getElementoAutocomplete = function (value) { 
+            console.log('aqui');
+            var params = {
+              searchText: value, 
+              searchColumn: "nombre_comercial",
+              sensor: false
+            }
+            return ClienteEmpresaServices.sListarClienteEmpresaAutoComplete(params).then(function(rpta) {
+              console.log('Datos: ',rpta);
+              $scope.noResultsELE = false;
+              if( rpta.flag === 0 ){
+                $scope.noResultsELE = true;
+              }
+              return rpta.datos;
+            });
+          } 
 
           $scope.aceptar = function () { 
             blockUI.start('Procesando información...');
@@ -307,19 +310,23 @@ app.factory("ContactoEmpresaFactory", function($uibModal, pinesNotifications, bl
           $scope.titleForm = 'Edición de Contacto';
           $scope.cancel = function () {
             $uibModalInstance.dismiss('cancel');
-          }
-          // BINDEO CLIENTE EMPRESA  
-          var myCallBackCO = function() { 
-            // $scope.fArr.listaClienteEmpresa.splice(0,0,{ id : '0', descripcion:'--Seleccione vendedor--'}); 
-            var objIndex = $scope.fArr.listaClienteEmpresa.filter(function(obj) { 
-              return obj.id == $scope.fData.tipo_cliente.id;
-            }).shift(); 
-            $scope.fData.tipo_cliente = objIndex; 
-            if( angular.isUndefined(objIndex)){ 
-              $scope.fData.tipo_cliente = $scope.fArr.listaClienteEmpresa[0]; 
-            }
           } 
-          $scope.metodos.listaClienteEmpresa(myCallBackCO);           
+          $scope.getElementoAutocomplete = function (value) { 
+            console.log('aqui');
+            var params = {
+              searchText: value, 
+              searchColumn: "nombre_comercial",
+              sensor: false
+            }
+            return ClienteEmpresaServices.sListarClienteEmpresaAutoComplete(params).then(function(rpta) {
+              console.log('Datos: ',rpta);
+              $scope.noResultsELE = false;
+              if( rpta.flag === 0 ){
+                $scope.noResultsELE = true;
+              }
+              return rpta.datos;
+            });
+          } 
           $scope.aceptar = function () { 
             blockUI.start('Procesando información...');
             ContactoEmpresaServices.sEditar($scope.fData).then(function (rpta) {
