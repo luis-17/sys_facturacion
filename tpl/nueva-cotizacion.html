@@ -53,7 +53,7 @@
           		<label class="control-label"> Correo Electrónico </label>
 							<input type="text" class="form-control input-sm" ng-model="fData.cliente.email" placeholder="Correo Electrónico" readonly="readonly" tabindex="160" /> 
 						</div> 
-						<!-- <div class="col-md-3" ng-show="fData.tipo_documento_cliente.destino == 1"> 
+						<div class="col-md-3" ng-show="fData.tipo_documento_cliente.destino == 1"> 
 							<label class="control-label text-ellipsis"> Contacto. </label> 
 							<div class="input-group"> 
               	<input type="text" ng-model="fData.contacto" class="form-control input-sm "
@@ -67,8 +67,8 @@
 	            <div ng-show="noResultsCT" class="text-danger">
 	                <i class="fa fa-remove"></i> No se encontró resultados 
 	            </div>
-						</div>  -->
-						<div class="col-md-3" >
+						</div> <!--  -->
+						<div class="col-md-3" ng-show="fData.tipo_documento_cliente.destino == 2">
               <label class="control-label text-ellipsis"> Telefono Móvil</label>
               <input type="text" class="form-control input-sm" ng-model="fData.cliente.telefono_movil" placeholder="Telefono" readonly="readonly" tabindex="170" /> 
           	</div>

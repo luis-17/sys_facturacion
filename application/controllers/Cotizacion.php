@@ -314,12 +314,6 @@ class Cotizacion extends CI_Controller {
      //  	$this->Cell(120,10,utf8_decode($this->getTitulo()),0,0);
      //  	$this->Line(350,20,4,20);
       	// $this->pdf->Ln(20);
-      	// var_dump($this->pdf->getEstado()); exit();
-      	// if( $this->pdf->getEstado()  == 0 ){ 
-      	//   $this->pdf->SetFont('Arial','B',50);
-      	//   $this->pdf->SetTextColor(255,192,203);
-      	//   $this->pdf->RotatedText(70,190,'A N U L A D O',45);  
-      	// }
       	$this->pdf->SetTextColor(0,0,0);
       	$this->pdf->SetXY(8,46);
       	// $this->pdf->SetFont('Arial','B',9);
@@ -353,15 +347,22 @@ class Cotizacion extends CI_Controller {
 		);
 		$this->pdf->Row($arrBarra['data'],true,0,FALSE,6,$arrBarra['textColor'],$arrBarra['bgColor'],FALSE,FALSE,$arrBarra['fontSize']);
 
-		$this->pdf->SetXY(8,85);
-      	$this->pdf->SetFont('Arial','',8);
-      	$this->pdf->MultiCell(75,3,'Señores: '.$fila['cliente_persona_empresa']);
-      	// $this->pdf->SetFont('Arial','B',9);
-      	// $this->pdf->Cell(24,6,'RUC');
-      	// $this->pdf->Cell(3,6,':',0,0,'C');
-      	$this->pdf->SetFont('Arial','',8);
+		$this->pdf->SetTextColor(0,0,0);
+		
+		$this->pdf->SetXY(8,52); 
+      	$this->pdf->SetFont('Arial','',9); 
+      	$this->pdf->Cell(24,6,'Contacto '); 
+      	$this->pdf->Cell(3,6,':',0,0,'C'); 
+      	//$this->pdf->SetFont('Arial','',8); 
       	$this->pdf->Cell(75,6,$fila['contacto']);
-      	$this->pdf->Ln(4);
+
+      	$this->pdf->SetXY(8,58); 
+      	$this->pdf->SetFont('Arial','',9); 
+      	$this->pdf->Cell(24,6,'Cliente '); 
+      	$this->pdf->Cell(3,6,':',0,0,'C'); 
+      	//$this->pdf->SetFont('Arial','',8); 
+      	$this->pdf->Cell(75,6,$fila['cliente_persona_empresa']);
+      	// $this->pdf->Ln(4);
       	// $this->pdf->SetFont('Arial','B',9);
       	// $this->pdf->Cell(24,6,utf8_decode('Nombre Com.'));
       	// $this->pdf->Cell(3,6,':',0,0,'C');
