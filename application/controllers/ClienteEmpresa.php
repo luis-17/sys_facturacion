@@ -156,4 +156,32 @@ class ClienteEmpresa extends CI_Controller {
 		    ->set_output(json_encode($arrData));
 	}
 
+	public function listar_cliente_empresa_autocomplete()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$allInputs['limite'] = 15;
+		$lista = $this->model_cliente_empresa->m_cargar_cliente_empresa_limite($allInputs);
+		$hayStock = true;
+		$arrListado = array();
+
+		foreach ($lista as $row) { 
+			array_push($arrListado,
+				array(
+					'id' => $row['idclienteempresa'],
+					'nombre_comercial' => strtoupper($row['nombre_comercial'])
+				)
+			);
+		}
+		
+    	$arrData['datos'] = $arrListado;
+    	$arrData['message'] = '';
+    	$arrData['flag'] = 1;
+		if(empty($lista)){
+			$arrData['flag'] = 0;
+		}
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData)); 
+	}
+
 }

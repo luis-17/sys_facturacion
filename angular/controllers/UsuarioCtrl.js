@@ -47,7 +47,7 @@ app.controller('UsuarioCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$l
         { field: 'tipo_usuario', name: 'descripcion_tu',cellTemplate:'<div class="ui-grid-cell-contents text-left ">'+ '{{ COL_FIELD.descripcion }}</div>',  displayName: 'Tipo Usuario', minWidth: 160 },
         { field: 'username', name: 'username', displayName: 'Username', minWidth: 100 },
          { field: 'password', name: 'password',visible: false, displayName: 'Password', minWidth: 100 },
-        { field: 'password_view', name: 'password_view', displayName: 'Contraseña', minWidth: 100 }
+        { field: 'password_view', name: 'password_view',visible: false, displayName: 'Contraseña', minWidth: 100 }
       ],
       onRegisterApi: function(gridApi) { 
         $scope.gridApi = gridApi;

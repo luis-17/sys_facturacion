@@ -131,6 +131,18 @@ class Model_cliente_empresa extends CI_Model {
 		return $this->db->get()->result_array();
 	}
 
+	public function m_cargar_cliente_empresa_limite($datos)
+	{
+		$this->db->select('ce.idclienteempresa, ce.nombre_comercial');
+		$this->db->from('cliente_empresa ce');
+		$this->db->where('ce.estado_ce', 1);
+		$this->db->like($datos['searchColumn'], $datos['searchText']);
+		$this->db->order_by('ce.nombre_comercial');
+		$this->db->limit($datos['limite']);
+		return $this->db->get()->result_array();
+	}
+
+
 
 }
 ?>

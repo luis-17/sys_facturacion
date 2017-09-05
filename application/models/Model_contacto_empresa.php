@@ -28,7 +28,6 @@ class Model_contacto_empresa extends CI_Model {
 		return $this->db->get()->result_array();
 	}
 
-
 	public function m_count_contacto($paramPaginate){
 		$this->db->select('COUNT(*) AS contador');
 		$this->db->from('contacto co');
@@ -92,8 +91,7 @@ class Model_contacto_empresa extends CI_Model {
 	public function m_registrar($datos)
 	{
 		$data = array(
-			// 'idclienteempresa' => $datos['idclienteempresa'], 
-			'idclienteempresa' => $datos['tipo_cliente']['id'], 
+			'idclienteempresa' => $datos['nombre_comercial']['id'], 
 			'nombres' => $datos['nombres'],
 			'apellidos' => $datos['apellidos'],	
 			'fecha_nacimiento' => empty($datos['fecha_nacimiento']) ? NULL : darFormatoYMD($datos['fecha_nacimiento']),	
@@ -108,7 +106,7 @@ class Model_contacto_empresa extends CI_Model {
 	public function m_editar($datos){
 		// var_dump($datos);exit();
 		$data = array( 
-			'idclienteempresa' => $datos['tipo_cliente']['id'], 
+			'idclienteempresa' => $datos['nombre_comercial']['id'],  
 			'nombres' => $datos['nombres'],
 			'apellidos' => $datos['apellidos'],	
 			'fecha_nacimiento' => empty($datos['fecha_nacimiento']) ? NULL : darFormatoYMD($datos['fecha_nacimiento']),	
