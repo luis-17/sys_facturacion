@@ -86,4 +86,46 @@ angular.module('app')
         }
       }
       return interfaz;
+  })
+  .factory("ModalReporteFactory", function($uibModal,$http,blockUI){ 
+    var interfazReporte = {
+      getPopupReporte: function(arrParams){ 
+        if( arrParams.salida == 'pdf' || angular.isUndefined(arrParams.salida) ){
+          $uibModal.open({
+            templateUrl: angular.patchURLCI+'Configuracion/ver_popup_reporte',
+            size: 'xlg',
+            controller: function ($scope,$uibModalInstance,arrParams) {
+              $scope.titleModalReporte = arrParams.titulo;
+              $scope.cancel = function () {
+                $uibModalInstance.dismiss('cancel');
+              }
+              blockUI.start('Preparando reporte');
+              $http.post(arrParams.url, arrParams.datos)
+                .success(function(data, status) {
+                  blockUI.stop();
+                  $('#frameReporte').attr("src", data.urlTempPDF); 
+                })
+                .error(function(data, status){
+                  blockUI.stop();
+                });
+            },
+            resolve: { 
+              arrParams: function() {
+                return arrParams;
+              }
+            }
+          });
+        }else if( arrParams.datos.salida == 'excel' ){
+          blockUI.start('Preparando reporte');
+          $http.post(arrParams.url, arrParams.datos)
+            .success(function(data, status) {
+              blockUI.stop();
+              if(data.flag == 1){ 
+                window.location = data.urlTempEXCEL;
+              }
+          });
+        }
+      }
+    }
+    return interfazReporte;
   }); 

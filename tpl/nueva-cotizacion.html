@@ -53,7 +53,22 @@
           		<label class="control-label"> Correo Electrónico </label>
 							<input type="text" class="form-control input-sm" ng-model="fData.cliente.email" placeholder="Correo Electrónico" readonly="readonly" tabindex="160" /> 
 						</div> 
-						<div class="col-md-3">
+						<div class="col-md-3" ng-show="fData.tipo_documento_cliente.destino == 1"> 
+							<label class="control-label text-ellipsis"> Contacto. </label> 
+							<div class="input-group"> 
+              	<input type="text" ng-model="fData.contacto" class="form-control input-sm "
+									placeholder="Busque Contacto" typeahead-loading="loadingCT" uib-typeahead="item as item.elemento for item in getContactoAutocomplete($viewValue)"
+	            		typeahead-on-select="getSelectedContacto($item, $model, $label)" typeahead-min-length="2" autocomplete ="off" ng-blur="validateContacto();" tabindex="240"/> 
+	            	<span class="input-group-btn">
+	                <button class="btn btn-default btn-sm" type="button" ng-click="btnBusquedaContacto();" tabindex="250"><i class="fa fa-search"></i> </button>
+	              </span>
+	            </div>
+	            <i ng-show="loadingCT" class="fa fa-refresh"></i>
+	            <div ng-show="noResultsCT" class="text-danger">
+	                <i class="fa fa-remove"></i> No se encontró resultados 
+	            </div>
+						</div> 
+						<div class="col-md-3" ng-show="fData.tipo_documento_cliente.destino == 2">
               <label class="control-label text-ellipsis"> Telefono Móvil</label>
               <input type="text" class="form-control input-sm" ng-model="fData.cliente.telefono_movil" placeholder="Telefono" readonly="readonly" tabindex="170" /> 
           	</div>
@@ -250,18 +265,16 @@
 	    </div>
 	    <div class="line line-dashed b-b line-lg pull-in"></div>
 	    <div class="col-xs-12 text-right" >
-	    	<button class="btn-primary btn" ng-click="grabar(); $event.preventDefault();" ng-disabled="formCotizacion.$invalid && !fData.isRegisterSuccess" tabindex="420"> 
-	    		<i class="fa fa-save"> </i> [F2] Grabar </button>
-
-<!-- 	    		<button class="btn-primary btn" ng-click="grabar(); $event.preventDefault();" ng-disabled="false && false" tabindex="420"> 
-	    		<i class="fa fa-save"> </i> [F2] Grabar {{ formCotizacion.$invalid }} {{ fData.isRegisterSuccess }} </button>
-
-	    	<button class="btn-primary btn" ng-click="grabar(); $event.preventDefault();" ng-disabled="true && true" tabindex="420"> 
-	    		<i class="fa fa-save"> </i> [F2] Grabar {{ formCotizacion.$invalid }} {{ fData.isRegisterSuccess }} </button> -->
-
-        <button class="btn-default btn" ng-click="reloadPage(); $event.preventDefault();" tabindex="430"> <i class="fa fa-file"> </i> [F3] Nuevo </button>
-        <button class="btn-success btn" ng-click="imprimir(); $event.preventDefault();" ng-disabled="!fData.isRegisterSuccess" tabindex="440"> <i class="fa fa-print"> </i> [F4] Imprimir </button>
-        <button class="btn-warning btn" ng-click="mismoCliente(); $event.preventDefault();" tabindex="450" > <i class="fa fa-file"> </i> [F6] Mismo Cliente </button>
+	    	<button type="button" class="btn-info btn pull-left" ng-click="goToUrl('/app/historial-cotizacion'); $event.preventDefault();" tabindex="415"> 
+	    		<i class="fa fa-save"> </i> COTIZACIONES </button> 
+	    	<button type="button" class="btn-primary btn" ng-click="grabar(); $event.preventDefault();" ng-disabled="formCotizacion.$invalid && !fData.isRegisterSuccess" tabindex="420"> 
+	    		<i class="fa fa-save"> </i> [F2] GRABAR </button> 
+	        <button type="button" class="btn-default btn" ng-click="reloadPage(); $event.preventDefault();" tabindex="430"> 
+	        	<i class="fa fa-file"> </i> [F3] NUEVO </button>
+	        <button type="button" class="btn-success btn" ng-click="imprimir(); $event.preventDefault();" ng-disabled="!fData.isRegisterSuccess" tabindex="440"> 
+	        	<i class="fa fa-print"> </i> [F4] IMPRIMIR </button>
+	        <button type="button" class="btn-warning btn" ng-click="mismoCliente(); $event.preventDefault();" tabindex="450" > 
+	        	<i class="fa fa-file"> </i> [F6] MISMO CLIENTE </button>
 	    </div>
 	  </div>
 	</form>

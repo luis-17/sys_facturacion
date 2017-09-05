@@ -10,15 +10,7 @@
       var $widths;
       var $aligns;
       var $angle=0;
-      // El encabezado del PDF
-      /*
-          $htmlPlantilla .= '<div class="header-mini"> USUARIO:'.strtoupper($ci2->sessionHospital['username']).'    /   FECHA DE IMPRESIÓN: '.date('Y-m-d H:i:s') .'</div>';
-          $htmlPlantilla .= '<div class="header-logo"> <img width="200" src="'.base_url('assets/img/dinamic/empresa/'.$fConfig['nombre_logo']).'" /> ';
-          $htmlPlantilla .= '<div class="block razon_social">'.$fConfig['razon_social'].'</div>';
-          $htmlPlantilla .= '<div class="block domicilio_fiscal">'.$fConfig['domicilio_fiscal'].'</div>';
-          $htmlPlantilla .= '</div>';
-          $htmlPlantilla .= '<div class="headerTitle">'.$datos['titulo'].'</div> <hr />';
-      */
+
       public function setModeReport($modeReport){
         $this->modeReport = $modeReport;
       }
@@ -98,13 +90,13 @@
       public function setIdEmpresaFarm($param){
         $this->idEmpresaFarm = $param;
       }
-      public function Row($data,$fill=FALSE,$border=0,$arrBolds=FALSE,$heigthCell=FALSE,$arrTextColor=FALSE,$arrBGColor=FALSE,$arrImage=FALSE,$bug=FALSE,$fontSize=FALSE)
+      public function Row($data,$fill=FALSE,$border=0,$arrBolds=FALSE,$heigthCell=FALSE,$arrTextColor=FALSE,$arrBGColor=FALSE,$arrImage=FALSE,$bug=FALSE,$arrFontSize=FALSE)
       {
           //Calculate the height of the row
           //var_dump($heigthCell); exit();
-          if(empty($fontSize)){
-            $fontSize = 7;
-          }
+          // if(empty($fontSize)){
+          //   $fontSize = 7;
+          // }
           if( empty($heigthCell) ){
             $heigthCell = 5;
           }
@@ -125,21 +117,24 @@
               //Draw the border
               // $this->Rect($x,$y,$w,$h);
               //Print the text
-              if( $arrBolds ){
-                if( $arrBolds[$i] == 'B'){
-                  $this->SetFont('Arial','B',$fontSize+1);
-                }else{
-                  $this->SetFont('Arial','',$fontSize);
-                }
-              }
+              // if( $arrBolds ){
+              //   if( $arrBolds[$i] == 'B'){
+              //     $this->SetFont('Arial','B',$fontSize+1);
+              //   }else{
+              //     $this->SetFont('Arial','',$fontSize);
+              //   }
+              // }
               if( $arrTextColor ){
                 if( $arrTextColor[$i] == 'red'){
                   $this->SetTextColor(225,22,22);
                 }elseif( $arrTextColor[$i] == 'green'){
                   $this->SetTextColor(12,162,10);
                 }else{
-                  $this->SetTextColor(0);
+                  $this->SetTextColor($arrTextColor[$i]['r'],$arrTextColor[$i]['g'],$arrTextColor[$i]['b']);
                 }
+              }
+              if( $arrFontSize ){
+                $this->SetFont($arrFontSize[$i]['family'],$arrFontSize[$i]['weight'],$arrFontSize[$i]['size']);
               }
               if( $arrBGColor ){
                 $fill=TRUE;
@@ -154,8 +149,8 @@
                 }elseif( $arrBGColor[$i] == 'p5'){
                   $this->SetFillColor(240);
                 }else{
-                  $fill=FALSE;
-                  $this->SetFillColor(255);
+                  // $fill=FALSE;
+                  $this->SetFillColor($arrBGColor[$i]['r'],$arrBGColor[$i]['g'],$arrBGColor[$i]['b']);
                 }
               }
               $textoCell = $data[$i];
@@ -172,11 +167,9 @@
               // if( empty($heigthCell) ){
               //   $heigthCell = 5;
               // }
-              if( !empty($fontSize) ){
-
-              }
+              
               $this->MultiCell($w,$heigthCell,$textoCell,$border,$a,$fill);
-              $this->SetFont('Arial','',$fontSize);
+              //$this->SetFont('Arial','',$fontSize);
               //Put the position to the right of the cell
               $this->SetXY($x+$w,($y));
               // var_dump($i);
@@ -347,9 +340,14 @@
           return $nl;
       }
       public function Header(){
-        // var_dump($this->tituloAbr); exit();
+        // var_dump($this->tituloAbr); exit(); SetMargins
         $this->SetAutoPageBreak(TRUE,25);
-
+        $ci2 =& get_instance(); 
+        $this->SetFont('Arial','',6);
+        $this->SetXY(-70,0);
+        $this->MultiCell(120,6,'USUARIO: '.strtoupper($ci2->sessionFactur['username']).utf8_decode('    /   FECHA DE IMPRESIÓN: ').date('Y-m-d H:i:s')); 
+        $this->Image($this->getImagenCab(),8,8,50); 
+        
       }
        // El pie del pdf
       public function Footer(){

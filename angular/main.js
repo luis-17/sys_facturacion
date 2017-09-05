@@ -54,11 +54,11 @@ angular.module('app')
           container: false
         }
       }
-      // console.log($state,'$state'); 
       $scope.reloadPage = function() { 
         $state.reload();
-        // $location.path( $state.current.url );
-        // console.log($state.current.url,'$state.current.url');
+      }
+      $scope.goToUrl = function(param) { 
+        $location.path(param); // Ejm: '/access/login'
       }
       $scope.listaEmpresaAdminSession = []; 
       // save settings to local storage

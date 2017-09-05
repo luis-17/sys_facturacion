@@ -1,21 +1,15 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 function mostrar_plantilla_pdf($obj,$titulo,$subTitulo = false,$tituloAbr=false,$arrConfig = FALSE)
 {
-    $ci2 =& get_instance(); 
-    if( empty($arrConfig) ){
-        $fConfig = $ci2->model_config->m_cargar_empresa_usuario_activa(); 
-        $fConfig['mode_report'] = FALSE;
-    }else{ 
-        $fConfig = $arrConfig;
-    }
-    $obj->setNombreEmpresa($fConfig['razon_social']);
-    $obj->setDireccion($fConfig['domicilio_fiscal']); //var_dump($fConfig['domicilio_fiscal']); exit();
-    $obj->setImagenCab('assets/img/dinamic/empresa/'.$fConfig['nombre_logo']);
-    $obj->setTitulo($titulo);
-    $obj->setTituloAbr($tituloAbr);
-    $obj->setEstado($arrConfig['estado']);
-    $obj->setModeReport($fConfig['mode_report']);
-    return true;
+    // $ci2 =& get_instance(); 
+    // if( empty($arrConfig) ){
+    //     $fConfig = $ci2->model_config->m_cargar_empresa_usuario_activa(); 
+    //     $fConfig['mode_report'] = FALSE;
+    // }else{ 
+    //     $fConfig = $arrConfig;
+    // }
+   
+    // return true;
 
 }
 function textIntoCols($strOriginal,$noCols,$pdf,$iMaxCharRow)
