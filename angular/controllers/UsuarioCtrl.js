@@ -233,8 +233,6 @@ app.factory("UsuarioFactory", function($uibModal, pinesNotifications, blockUI, U
               if(rpta.flag == 1){
                 var pTitle = 'OK!';
                 var pType = 'success';
-                console.log($scope.fData,'$scope.fData');
-                  $scope.fData.username='aqui';
                 $uibModalInstance.dismiss('cancel');
                 if(typeof $scope.metodos.getPaginationServerSide == 'function'){ 
                   $scope.metodos.getPaginationServerSide(true);
@@ -245,6 +243,8 @@ app.factory("UsuarioFactory", function($uibModal, pinesNotifications, blockUI, U
               }else{
                 alert('Error inesperado');
               }
+              $scope.fData.idusuario=rpta.idusuario;
+              arrParams.callback($scope.fData);
               blockUI.stop(); 
               pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2500 });
             });

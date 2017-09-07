@@ -250,8 +250,8 @@ class Model_cotizacion extends CI_Model {
 			'subtotal' => $datos['subtotal'],
 			'igv' => $datos['igv'],
 			'total' => $datos['total'],
-			'estado_cot' => $datos['estado_cotizacion']['id'] 
-
+			'estado_cot' => $datos['estado_cotizacion']['id'],
+			'idcontacto' => empty($datos['contacto']['id']) ? NULL : $datos['contacto']['id']
 		); 
 		return $this->db->insert('cotizacion', $data); 
 	}

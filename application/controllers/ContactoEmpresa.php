@@ -36,7 +36,7 @@ class ContactoEmpresa extends CI_Controller {
 					'tipo_cliente' => array(
 						'id'=> $row['idclienteempresa'],
 						'descripcion'=> strtoupper($row['nombre_comercial'])				
-					),					
+					),
 				)
 			);
 		}
@@ -61,7 +61,7 @@ class ContactoEmpresa extends CI_Controller {
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		$paramPaginate = $allInputs['paginate'];
-		$paramDatos = $allInputs['datos'];
+		$paramDatos = @$allInputs['datos'];
 		$lista = $this->model_contacto_empresa->m_cargar_contacto_esta_empresa($paramPaginate,$paramDatos);
 		$fCount = $this->model_contacto_empresa->m_count_contacto_esta_empresa($paramPaginate,$paramDatos);
 		$arrListado = array();
@@ -109,10 +109,10 @@ class ContactoEmpresa extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
+
 	public function editar()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
-		var_dump($allInputs);exit();
 		$arrData['message'] = 'Error al editar los datos, inténtelo nuevamente';
     	$arrData['flag'] = 0;
     	// VALIDACIONES
@@ -125,6 +125,7 @@ class ContactoEmpresa extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
+
 	public function anular()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
@@ -139,5 +140,85 @@ class ContactoEmpresa extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
-	
+
+	public function buscar_contacto_para_lista()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$paramDatos = @$allInputs['datos'];
+		$paramPaginate = $allInputs['paginate'];
+		$arrListado = array();
+		$fCount = array();
+		$lista = $this->model_contacto_empresa->m_cargar_contacto_esta_empresa($paramPaginate,$paramDatos);
+		$fCount = $this->model_contacto_empresa->m_count_contacto_esta_empresa($paramPaginate,$paramDatos);
+		foreach ($lista as $row) { 
+			array_push($arrListado,
+				array(
+					'id' => trim($row['idcontacto']),
+					'nombres' => strtoupper($row['nombres']),
+					'apellidos' => strtoupper($row['apellidos']),	
+					'fecha_nacimiento' => darFormatoDMY($row['fecha_nacimiento']),			
+					'telefono_fijo' => $row['telefono_fijo'],
+					'nombre_comercial' => strtoupper($row['nombre_comercial']),
+					'telefono_movil' => $row['telefono_movil'],
+					'email' => $row['email'],
+					'tipo_cliente' => array(
+						'id'=> $row['idclienteempresa'],
+						'descripcion'=> strtoupper($row['nombre_comercial'])				
+					),	
+					'contacto' => strtoupper($row['nombres'].' '.$row['apellidos']),			
+					'razon_social' => strtoupper($row['razon_social']),
+					'representante_legal' => strtoupper($row['representante_legal']),
+					'dni_representante_legal' => strtoupper($row['dni_representante_legal'])					
+				)
+			);
+		}
+    	$arrData['datos'] = $arrListado;
+    	$arrData['paginate']['totalRows'] = $fCount['contador'];
+    	$arrData['message'] = '';
+    	$arrData['flag'] = 1;
+		if(empty($lista)){
+			$arrData['flag'] = 0;
+		}
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
+
+	public function listar_contacto_empresa_autocomplete()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);	
+		$allInputs['limite'] = 15;
+		$paramDatos = @$allInputs['datos'];
+		$lista = $this->model_contacto_empresa->m_cargar_contacto_empresa_limite($allInputs,$paramDatos);
+		$hayStock = true;
+		$arrListado = array();
+		foreach ($lista as $row) { 
+			array_push($arrListado,
+				array(
+					'id' => $row['idcontacto'],
+					'contacto' => strtoupper($row['contacto']),
+					'ruc' => strtoupper($row['ruc']),
+					'razon_social' => strtoupper($row['razon_social']),
+					'representante_legal' => strtoupper($row['representante_legal']),
+					'dni_representante_legal' => strtoupper($row['dni_representante_legal'])
+				)
+			);
+		}
+		
+    	$arrData['datos'] = $arrListado;
+    	$arrData['message'] = '';
+    	$arrData['flag'] = 1;
+		if(empty($lista)){
+			$arrData['flag'] = 0;
+		}
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData)); 
+	}
+
+	public function ver_popup_busqueda_contacto()
+	{
+		$this->load->view('contacto/busq_contacto_popup');
+	}	
+
 }

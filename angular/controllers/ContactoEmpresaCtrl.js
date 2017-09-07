@@ -79,7 +79,8 @@ app.controller('ContactoEmpresaCtrl', ['$scope', '$filter', '$uibModal', '$bootb
             'co.fecha_nacimiento' : grid.columns[4].filters[0].term,
             'co.telefono_fijo' : grid.columns[5].filters[0].term,
             'co.telefono_movil' : grid.columns[6].filters[0].term,
-            'co.email' : grid.columns[6].filters[0].term
+            'co.nombre_comercial' : grid.columns[7].filters[0].term,
+            'co.email' : grid.columns[8].filters[0].term
           }
           $scope.metodos.getPaginationServerSide();
         });
@@ -158,7 +159,9 @@ app.service("ContactoEmpresaServices",function($http, $q, handleBehavior) {
         sListarContactosDeEstaEmpresa: sListarContactosDeEstaEmpresa, 
         sAgregarContacto: sAgregarContacto,
         sActualizarContacto: sActualizarContacto,
-        sQuitarContacto: sQuitarContacto
+        sQuitarContacto: sQuitarContacto,
+        sListarContactoAutoComplete:sListarContactoAutoComplete,
+        sListarContactoBusqueda:sListarContactoBusqueda
     });
     function sListar(datos) {
       var request = $http({
@@ -224,6 +227,24 @@ app.service("ContactoEmpresaServices",function($http, $q, handleBehavior) {
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
     }
+    function sListarContactoAutoComplete (datos) {
+      var request = $http({
+            method : "post",
+            url : angular.patchURLCI+"ContactoEmpresa/listar_contacto_empresa_autocomplete",
+            data : datos
+      });
+      return (request.then(handleBehavior.success,handleBehavior.error));
+    }
+
+    function sListarContactoBusqueda (datos) {
+      var request = $http({
+            method : "post",
+            url : angular.patchURLCI+"ContactoEmpresa/buscar_contacto_para_lista",
+            data : datos
+      });
+      return (request.then(handleBehavior.success,handleBehavior.error));
+    }
+    
 });
 
 app.factory("ContactoEmpresaFactory", function($uibModal, pinesNotifications, blockUI, ContactoEmpresaServices,ClienteEmpresaServices) { 

@@ -60,6 +60,7 @@ class Usuario extends CI_Controller {
 			if($this->model_usuario->m_registrar($allInputs)) { // registro de elemento
 				$arrData['message'] = 'Se registraron los datos correctamente';
 				$arrData['flag'] = 1;
+				$arrData['idusuario'] = GetLastId('idusuario','usuario');
 			}
 		}else{
 		$arrData['message'] = 'Las contraseñas no coinciden, inténtelo nuevamente';

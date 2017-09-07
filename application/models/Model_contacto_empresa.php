@@ -46,13 +46,16 @@ class Model_contacto_empresa extends CI_Model {
 	}
 
 	public function m_cargar_contacto_esta_empresa($paramPaginate,$paramDatos){
-		$this->db->select('co.idcontacto, co.nombres, co.apellidos, co.fecha_nacimiento, co.telefono_fijo, co.telefono_movil, co.email, 
-			ce.idclienteempresa, ce.nombre_comercial, ce.nombre_corto');
+		// var_dump($paramDatos);exit();
+		$this->db->select('co.idcontacto, co.nombres, co.apellidos, co.fecha_nacimiento, co.telefono_fijo, co.telefono_movil, co.email,ce.idclienteempresa, ce.nombre_comercial, ce.nombre_corto,ce.razon_social,ce.representante_legal,ce.dni_representante_legal');
 		$this->db->from('cliente_empresa ce');
 		$this->db->join('contacto co', 'ce.idclienteempresa = co.idclienteempresa');
 		$this->db->where('ce.estado_ce', 1);
 		$this->db->where('co.estado_co', 1);
-		$this->db->where('ce.idclienteempresa', $paramDatos['id']);
+		if(!empty($paramDatos['cliente'])){ 
+			$this->db->where('ce.idclienteempresa', $paramDatos['cliente']['id']);
+		}
+		// $this->db->where('ce.idclienteempresa', $paramDatos['id']);
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
 			foreach ($paramPaginate['searchColumn'] as $key => $value) {
 				if(! empty($value)){
@@ -68,13 +71,17 @@ class Model_contacto_empresa extends CI_Model {
 		}
 		return $this->db->get()->result_array();
 	}
+
 	public function m_count_contacto_esta_empresa($paramPaginate,$paramDatos){
 		$this->db->select('COUNT(*) AS contador');
 		$this->db->from('cliente_empresa ce');
 		$this->db->join('contacto co', 'ce.idclienteempresa = co.idclienteempresa');
 		$this->db->where('ce.estado_ce', 1);
 		$this->db->where('co.estado_co', 1);
-		$this->db->where('ce.idclienteempresa', $paramDatos['id']);
+		if(!empty($paramDatos['cliente'])){ 
+			$this->db->where('ce.idclienteempresa', $paramDatos['cliente']['id']);
+		} 		
+		// $this->db->where('ce.idclienteempresa', $paramDatos['id']);
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
 			foreach ($paramPaginate['searchColumn'] as $key => $value) {
 				if(! empty($value)){
@@ -128,5 +135,18 @@ class Model_contacto_empresa extends CI_Model {
 		$this->db->where('idcontacto',$datos['idcontacto']);
 		return $this->db->update('contacto', $data);
 	} 
+
+	public function m_cargar_contacto_empresa_limite($datos,$paramDatos)
+	{
+		$this->db->select('co.idcontacto,CONCAT(co.nombres, " ", co.apellidos) as contacto,ce.ruc,ce.razon_social,co.idclienteempresa,ce.representante_legal,ce.dni_representante_legal');
+		$this->db->from('contacto co');
+		$this->db->join('cliente_empresa ce', 'co.idclienteempresa = ce.idclienteempresa');
+		$this->db->where('co.estado_co', 1);
+		$this->db->where('ce.estado_ce', 1);
+		$this->db->like('CONCAT(co.nombres, " ", co.apellidos)', $datos['searchText']);
+		$this->db->order_by('co.apellidos');
+		$this->db->limit($datos['limite']);
+		return $this->db->get()->result_array();
+	}
 }
 ?>

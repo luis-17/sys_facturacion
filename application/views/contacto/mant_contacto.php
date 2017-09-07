@@ -3,11 +3,11 @@
 </div> 
 <div class="modal-body">  
 	<form class="row" name="formContacto">
-		<div class="form-group col-md-8 mb-md">
+		<div class="form-group col-md-6 mb-md">
 			<label class="control-label mb-n"> Nombres: <small class="text-danger">(*)</small> </label>
 			<input type="text" class="form-control input-sm" ng-model="fData.nombres" placeholder="Ingres nombres" required tabindex="60" />
 		</div>
-		<div class="form-group col-md-4 mb-md">
+		<div class="form-group col-md-6 mb-md">
 			<label class="control-label mb-n"> Apellidos: <small class="text-danger">(*)</small> </label>
 			<input type="text" class="form-control input-sm" ng-model="fData.apellidos" placeholder="Ingrese apellidos" required tabindex="70" />
 		</div>

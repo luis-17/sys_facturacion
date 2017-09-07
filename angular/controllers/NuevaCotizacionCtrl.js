@@ -4,6 +4,7 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     'ServicioFactory',
     'ProductoFactory',
     'CaracteristicaFactory',
+    'ContactoEmpresaFactory',
     'MathFactory',
 		'CotizacionServices',
 		'ClienteEmpresaServices',
@@ -18,12 +19,14 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     'UnidadMedidaServices',
     'ElementoServices',
     'CaracteristicaServices',
+    'ContactoEmpresaServices',
 	function($scope, $filter, $uibModal, $bootbox, $log, $timeout, pinesNotifications, uiGridConstants, blockUI, 
     ClientePersonaFactory,
     ClienteEmpresaFactory,
     ServicioFactory,
     ProductoFactory,
     CaracteristicaFactory,
+    ContactoEmpresaFactory,
     MathFactory,
 		CotizacionServices,
 		ClienteEmpresaServices,
@@ -37,7 +40,8 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     FormaPagoServices,
     UnidadMedidaServices,
     ElementoServices,
-    CaracteristicaServices 
+    CaracteristicaServices,
+    ContactoEmpresaServices 
 ) {
    
   $scope.metodos = {}; // contiene todas las funciones 
@@ -353,7 +357,8 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
           }
           var arrParams = {
             paginate : paginationOptionsBC,
-            datos: $scope.fBusqueda 
+            datos: $scope.fBusqueda,
+            datosCo: $scope.fData  
           };
           ClienteServices.sListarClientesBusqueda(arrParams).then(function (rpta) {
             $scope.fArr.gridOptionsBC.totalItems = rpta.paginate.totalRows;
@@ -454,7 +459,7 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     });
   } 
   $scope.getSelectedElemento = function (item, model) { 
-    // console.log(item, model, 'item, model')
+    console.log(item, model, 'item, model');
     $scope.fData.temporal.precio_unitario = model.precio_referencial;
     if( angular.isObject( $scope.fData.temporal.elemento ) ){
       $scope.fData.classValid = ' input-success-border';
@@ -607,6 +612,173 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
         
       }
     });
+  }
+
+  // NUEVO CONTACTO 
+  $scope.btnNuevoContacto = function() { 
+    var arrParams = {
+        'metodos': $scope.metodos,
+        'fArr': $scope.fArr 
+    }
+    ContactoEmpresaFactory.regContactoModal(arrParams); 
+  }
+
+  $scope.getContactoAutocomplete = function (value) { 
+    var params = {
+      searchText: value, 
+      searchColumn: "contacto",
+      sensor: false,
+      datos: $scope.fData
+    }
+    return ContactoEmpresaServices.sListarContactoAutoComplete(params).then(function(rpta) {
+
+      $scope.noResultsCT = false;
+      if( rpta.flag === 0 ){
+        $scope.noResultsCT = true;
+      }
+      return rpta.datos;
+    });
+  } 
+
+  $scope.getSelectedContacto = function (item, model) { 
+    console.log(item, model, 'item, model');
+    $scope.fData.cliente.razon_social = model.razon_social;
+    $scope.fData.cliente.representante_legal = model.representante_legal;
+    $scope.fData.cliente.dni_representante_legal = model.dni_representante_legal;  
+  }
+
+  $scope.validateContacto = function() { 
+    if( angular.isObject( $scope.fData.contacto ) ){
+      $scope.fData.classValid = ' input-success-border';
+      $scope.noResultsCT = false;
+    }else{
+      if( $scope.fData.temporal.elemento ){
+        $scope.fData.classValid = ' input-danger-border';
+        $scope.noResultsCT = true;
+      }else{
+        $scope.fData.classValid = ' input-normal-border';
+        $scope.noResultsCT = false;
+      }      
+    }
+  }  
+
+  // BUSCAR Contactos  
+  $scope.btnBusquedaContacto = function() { 
+    blockUI.start('Procesando información...'); 
+    $uibModal.open({ 
+      templateUrl: angular.patchURLCI+'ContactoEmpresa/ver_popup_busqueda_contacto',
+      size: 'md',
+      backdrop: 'static',
+      keyboard:false,
+      scope: $scope,
+      controller: function ($scope, $uibModalInstance) { 
+        blockUI.stop(); 
+        $scope.fBusqueda = {};
+
+        $scope.titleForm = 'Búsqueda de Contactos'; 
+        var paginationOptionsCO = {
+          pageNumber: 1,
+          firstRow: 0,
+          pageSize: 100,
+          sort: uiGridConstants.ASC,
+          sortName: null,
+          search: null
+        };
+        $scope.mySelectionGridCO = [];
+        $scope.gridOptionsCO = {
+          paginationPageSizes: [100, 500, 1000, 10000],
+          paginationPageSize: 100,
+          useExternalPagination: true,
+          useExternalSorting: true,
+          enableGridMenu: true,
+          enableRowSelection: false,
+          enableSelectAll: false,
+          enableFiltering: true,
+          enableFullRowSelection: true,
+          multiSelect: false,
+          columnDefs: [ 
+            { field: 'id', name: 'idcontacto', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
+            { field: 'nombres', name: 'nombres', displayName: 'Nombre', minWidth: 160 },
+            { field: 'apellidos', name: 'apellidos', displayName: 'Apellidos', minWidth: 160 },
+            { field: 'fecha_nacimiento', name: 'fecha_nacimiento', displayName: 'Fecha Nacimiento', minWidth: 160 },
+            { field: 'telefono_fijo', name: 'telefono_fijo', displayName: 'Teléfono Fijo', minWidth: 160 },
+            { field: 'telefono_movil', name: 'telefono_movil', displayName: 'Teléfono Móvil', minWidth: 100 },
+            { field: 'nombre_comercial', name: 'nombre_comercial',  displayName: 'Cliente', minWidth: 160 },
+            { field: 'email', name: 'email', displayName: 'Teléfono Móvil', minWidth: 100 },
+            { field: 'contacto', name: 'contacto',visible: false, displayName: 'Contacto', minWidth: 100 },
+            { field: 'razon_social', name: 'razon_social',visible: false, displayName: 'Razón social', minWidth: 100 },
+            { field: 'representante_legal', name: 'representante_legal',visible: false, displayName: 'Representante Legal', minWidth: 100 },
+            { field: 'dni_representante_legal', name: 'dni_representante_legal',visible: false, displayName: 'Dni', minWidth: 100 }
+          ],
+          onRegisterApi: function(gridApi) { // gridComboOptions
+            $scope.gridApi = gridApi;
+            gridApi.selection.on.rowSelectionChanged($scope,function(row){
+              $scope.mySelectionGridCO = gridApi.selection.getSelectedRows();
+              console.log($scope.mySelectionGridCO,'$scope.mySelectionGridCO');
+              $scope.fData.contacto=$scope.mySelectionGridCO[0];
+              $scope.fData.cliente.razon_social = $scope.mySelectionGridCO[0].razon_social;
+              $scope.fData.cliente.representante_legal = $scope.mySelectionGridCO[0].representante_legal;
+              $scope.fData.cliente.dni_representante_legal = $scope.mySelectionGridCO[0].dni_representante_legal;              
+              $uibModalInstance.dismiss('cancel');
+            });
+            $scope.gridApi.core.on.sortChanged($scope, function(grid, sortColumns) {
+              if (sortColumns.length == 0) {
+                paginationOptionsCO.sort = null;
+                paginationOptionsCO.sortName = null;
+              } else {
+                paginationOptionsCO.sort = sortColumns[0].sort.direction;
+                paginationOptionsCO.sortName = sortColumns[0].name;
+              }
+              $scope.metodos.getPaginationServerSideCO(true);
+            });
+            gridApi.pagination.on.paginationChanged($scope, function (newPage, pageSize) {
+              paginationOptionsCO.pageNumber = newPage;
+              paginationOptionsCO.pageSize = pageSize;
+              paginationOptionsCO.firstRow = (paginationOptionsCO.pageNumber - 1) * paginationOptionsCO.pageSize;
+              $scope.metodos.getPaginationServerSideCO(true);
+            });
+            $scope.gridApi.core.on.filterChanged( $scope, function(grid, searchColumns) {
+              var grid = this.grid;
+              paginationOptionsCO.search = true;
+              paginationOptionsCO.searchColumn = { 
+                'co.idcontacto' : grid.columns[1].filters[0].term,
+                'co.nombres' : grid.columns[2].filters[0].term,
+                'co.apellidos' : grid.columns[3].filters[0].term,
+                'co.fecha_nacimiento' : grid.columns[4].filters[0].term,
+                'co.telefono_fijo' : grid.columns[5].filters[0].term,
+                'co.telefono_movil' : grid.columns[6].filters[0].term,
+                'co.nombre_comercial' : grid.columns[7].filters[0].term,
+                'co.email' : grid.columns[8].filters[0].term
+              }; 
+              $scope.metodos.getPaginationServerSideCO();
+            });
+          }
+        }; 
+
+        $scope.metodos.getPaginationServerSideCO = function(loader) { 
+          if(loader){
+            blockUI.start('Procesando información...'); 
+          }
+          var arrParams = {
+            paginate : paginationOptionsCO,
+            datos: $scope.fData 
+          }; 
+          ContactoEmpresaServices.sListarContactoBusqueda(arrParams).then(function (rpta) {
+            $scope.gridOptionsCO.totalItems = rpta.paginate.totalRows;
+            $scope.gridOptionsCO.data = rpta.datos;
+            if(loader){
+              blockUI.stop(); 
+            }
+          });
+          $scope.mySelectionClienteGrid = [];  
+        }
+        $scope.metodos.getPaginationServerSideCO(true); 
+        $scope.cancel = function () {
+          $uibModalInstance.dismiss('cancel');
+        }
+        
+      }
+    });  
   }
   // GESTIÓN DE CARACTERÍSTICAS 
   $scope.btnGestionCaracteristicas = function() {

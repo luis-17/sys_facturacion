@@ -57,7 +57,7 @@
 							<label class="control-label text-ellipsis"> Contacto. </label> 
 							<div class="input-group"> 
               	<input type="text" ng-model="fData.contacto" class="form-control input-sm "
-									placeholder="Busque Contacto" typeahead-loading="loadingCT" uib-typeahead="item as item.elemento for item in getContactoAutocomplete($viewValue)"
+									placeholder="Busque Contacto" typeahead-loading="loadingCT" uib-typeahead="item as item.contacto for item in getContactoAutocomplete($viewValue)"
 	            		typeahead-on-select="getSelectedContacto($item, $model, $label)" typeahead-min-length="2" autocomplete ="off" ng-blur="validateContacto();" tabindex="240"/> 
 	            	<span class="input-group-btn">
 	                <button class="btn btn-default btn-sm" type="button" ng-click="btnBusquedaContacto();" tabindex="250"><i class="fa fa-search"></i> </button>

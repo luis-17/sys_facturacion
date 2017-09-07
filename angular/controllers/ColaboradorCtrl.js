@@ -231,12 +231,24 @@ app.factory("ColaboradorFactory", function($uibModal, pinesNotifications, blockU
             $uibModalInstance.dismiss('cancel');
           }
 
+          // $scope.btnNuevoUsuario = function() { 
+          //   UsuarioFactory.regUsuarioModal(arrParams); 
+          // }
           $scope.btnNuevoUsuario = function() { 
+            var arrParams = {
+              'metodos': $scope.metodos,
+              'fArr': $scope.fArr, 
+              callback: function(datos) {
+            console.log(datos,'aa');
+          $scope.fData.username=datos.username;
+              // $scope.fData.username;
+                // $scope.fData={};
+                // $scope.fData.username="aqui";
+                //     console.log('aqui');
+              }
+            }
             UsuarioFactory.regUsuarioModal(arrParams); 
-          }
-          // $$scope.fData.username='aqui';
-          console.log('aqui',$scope.fData);
-          // console.log($scope.fData.username,'aqui');
+          };
 
 
           $scope.aceptar = function () { 
