@@ -641,7 +641,8 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
   } 
 
   $scope.getSelectedContacto = function (item, model) { 
-    console.log(item, model, 'item, model');
+    $scope.fData.num_documento = model.ruc;
+    $scope.fData.cliente.id = model.idclienteempresa;
     $scope.fData.cliente.razon_social = model.razon_social;
     $scope.fData.cliente.representante_legal = model.representante_legal;
     $scope.fData.cliente.dni_representante_legal = model.dni_representante_legal;  
@@ -708,17 +709,20 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
             { field: 'contacto', name: 'contacto',visible: false, displayName: 'Contacto', minWidth: 100 },
             { field: 'razon_social', name: 'razon_social',visible: false, displayName: 'Razón social', minWidth: 100 },
             { field: 'representante_legal', name: 'representante_legal',visible: false, displayName: 'Representante Legal', minWidth: 100 },
+            { field: 'idclienteempresa', name: 'idclienteempresa',visible: false, displayName: 'Cliente', minWidth: 100 },
+            { field: 'ruc', name: 'ruc',visible: false, displayName: 'Ruc', minWidth: 100 },
             { field: 'dni_representante_legal', name: 'dni_representante_legal',visible: false, displayName: 'Dni', minWidth: 100 }
           ],
           onRegisterApi: function(gridApi) { // gridComboOptions
             $scope.gridApi = gridApi;
             gridApi.selection.on.rowSelectionChanged($scope,function(row){
               $scope.mySelectionGridCO = gridApi.selection.getSelectedRows();
-              console.log($scope.mySelectionGridCO,'$scope.mySelectionGridCO');
               $scope.fData.contacto=$scope.mySelectionGridCO[0];
               $scope.fData.cliente.razon_social = $scope.mySelectionGridCO[0].razon_social;
               $scope.fData.cliente.representante_legal = $scope.mySelectionGridCO[0].representante_legal;
-              $scope.fData.cliente.dni_representante_legal = $scope.mySelectionGridCO[0].dni_representante_legal;              
+              $scope.fData.cliente.dni_representante_legal = $scope.mySelectionGridCO[0].dni_representante_legal; 
+              $scope.fData.cliente.id = $scope.mySelectionGridCO[0].idclienteempresa; 
+              $scope.fData.num_documento = $scope.mySelectionGridCO[0].ruc;      
               $uibModalInstance.dismiss('cancel');
             });
             $scope.gridApi.core.on.sortChanged($scope, function(grid, sortColumns) {

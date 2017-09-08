@@ -47,7 +47,7 @@ class Model_contacto_empresa extends CI_Model {
 
 	public function m_cargar_contacto_esta_empresa($paramPaginate,$paramDatos){
 		// var_dump($paramDatos);exit();
-		$this->db->select('co.idcontacto, co.nombres, co.apellidos, co.fecha_nacimiento, co.telefono_fijo, co.telefono_movil, co.email,ce.idclienteempresa, ce.nombre_comercial, ce.nombre_corto,ce.razon_social,ce.representante_legal,ce.dni_representante_legal');
+		$this->db->select('co.idcontacto, co.nombres, co.apellidos, co.fecha_nacimiento, co.telefono_fijo, co.telefono_movil, co.email,ce.idclienteempresa, ce.nombre_comercial,ce.ruc, ce.nombre_corto,ce.razon_social,ce.representante_legal,ce.dni_representante_legal');
 		$this->db->from('cliente_empresa ce');
 		$this->db->join('contacto co', 'ce.idclienteempresa = co.idclienteempresa');
 		$this->db->where('ce.estado_ce', 1);

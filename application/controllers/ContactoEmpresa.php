@@ -168,7 +168,9 @@ class ContactoEmpresa extends CI_Controller {
 					'contacto' => strtoupper($row['nombres'].' '.$row['apellidos']),			
 					'razon_social' => strtoupper($row['razon_social']),
 					'representante_legal' => strtoupper($row['representante_legal']),
-					'dni_representante_legal' => strtoupper($row['dni_representante_legal'])					
+					'dni_representante_legal' => strtoupper($row['dni_representante_legal']),
+					'idclienteempresa' => $row['idclienteempresa'],
+					'ruc' => strtoupper($row['ruc'])						
 				)
 			);
 		}
@@ -200,7 +202,8 @@ class ContactoEmpresa extends CI_Controller {
 					'ruc' => strtoupper($row['ruc']),
 					'razon_social' => strtoupper($row['razon_social']),
 					'representante_legal' => strtoupper($row['representante_legal']),
-					'dni_representante_legal' => strtoupper($row['dni_representante_legal'])
+					'dni_representante_legal' => strtoupper($row['dni_representante_legal']),
+					'idclienteempresa' => $row['idclienteempresa']
 				)
 			);
 		}
