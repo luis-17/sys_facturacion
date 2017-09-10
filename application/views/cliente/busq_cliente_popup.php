@@ -3,7 +3,7 @@
 </div> 
 <div class="modal-body">  
 	<form name="formBusquedaCliente" class=""> 
-		<div class="row">
+		<div class="row" ng-show="!(fBusqueda.origen == 'contacto')">
 			<div class="col-xs-12">
 				<div class="inline"> 
 		            <label class="radio-inline">

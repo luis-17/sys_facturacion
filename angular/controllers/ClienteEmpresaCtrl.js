@@ -201,9 +201,10 @@ app.controller('ClienteEmpresaCtrl', ['$scope', '$filter', '$uibModal', '$bootbo
 				      { field: 'id', name: 'idcontacto', displayName: 'ID', visible: false, width: '50',  sort: { direction: uiGridConstants.DESC} },
 				      { field: 'nombres', name: 'nombres', displayName: 'Contacto', width: 140 },
 				      { field: 'telefono_fijo', name: 'telefono_fijo', displayName: 'Tel. Fijo', width: 100 },
+				      { field: 'anexo', name: 'anexo', displayName: 'Anexo', width: 75 },
 				      { field: 'telefono_movil', name: 'telefono_movil', displayName: 'Tel. Movil', width: 100 },
 				      { field: 'email', name: 'email', displayName: 'E-mail', width: 120 },
-				      { field: 'fecha_nacimiento_str', name: 'fecha_nacimiento_str', displayName: 'Fecha de Nacimiento', width: 100, enableFiltering: false } 
+				      { field: 'fecha_nacimiento_str', name: 'fecha_nacimiento_str', displayName: 'Fecha de Nac.', width: 100, enableFiltering: false, visible: false } 
 				    ],
 				    onRegisterApi: function(gridApiContacto) { 
 				      $scope.gridApiContacto = gridApiContacto;
@@ -221,6 +222,7 @@ app.controller('ClienteEmpresaCtrl', ['$scope', '$filter', '$uibModal', '$bootbo
 					      	$scope.tituloBloque = 'Agregar Contacto';
 					      	$scope.contBotonesReg = true;
 					      	$scope.contBotonesEdit = false;
+					      	$scope.fContacto = {};
 					      }
 					      /* END */
 				      });
@@ -385,9 +387,7 @@ app.service("ClienteEmpresaServices",function($http, $q, handleBehavior) {
         sListar: sListar,
         sRegistrar: sRegistrar,
         sEditar: sEditar,
-        sAnular: sAnular,
-        sListarCbo: sListarCbo,
-        sListarClienteEmpresaAutoComplete:sListarClienteEmpresaAutoComplete
+        sAnular: sAnular 
     });
     function sListar(datos) {
       var request = $http({
@@ -421,22 +421,6 @@ app.service("ClienteEmpresaServices",function($http, $q, handleBehavior) {
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
     }
-    function sListarCbo(datos) {
-      var request = $http({
-            method : "post",
-            url : angular.patchURLCI+"ClienteEmpresa/listar_cliente_cbo",
-            data : datos
-      });
-      return (request.then(handleBehavior.success,handleBehavior.error));
-    }
-    function sListarClienteEmpresaAutoComplete(datos) {
-      var request = $http({
-            method : "post",
-            url : angular.patchURLCI+"ClienteEmpresa/listar_cliente_empresa_autocomplete",
-            data : datos
-      });
-      return (request.then(handleBehavior.success,handleBehavior.error));
-    }    
 });
 
 app.factory("ClienteEmpresaFactory", function($uibModal, pinesNotifications, blockUI, ClienteEmpresaServices) { 

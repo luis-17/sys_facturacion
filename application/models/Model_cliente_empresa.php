@@ -4,7 +4,7 @@ class Model_cliente_empresa extends CI_Model {
 	{
 		parent::__construct();
 	}
-	public function m_cargar_cliente_empresa($paramPaginate,$paramDatosCo){
+	public function m_cargar_cliente_empresa($paramPaginate=FALSE){
 		// var_dump($paramDatosCo);
 		$this->db->select("co.idcolaborador, CONCAT(co.nombres, ' ', co.apellidos) As colaborador",FALSE);
 		$this->db->select('ce.idclienteempresa, ce.nombre_comercial, ce.nombre_corto, ce.razon_social, ce.ruc, ce.representante_legal, ce.dni_representante_legal, 
@@ -13,20 +13,15 @@ class Model_cliente_empresa extends CI_Model {
 		$this->db->from('cliente_empresa ce');
 		$this->db->join('categoria_cliente cc', 'ce.idcategoriacliente = cc.idcategoriacliente');
 		$this->db->join('colaborador co', 'ce.idcolaborador = co.idcolaborador','left');
-		$this->db->join('contacto con', 'con.idclienteempresa = ce.idclienteempresa','left');
 		$this->db->where('estado_ce', 1);
-		$this->db->where('ce.idempresaadmin', $this->sessionFactur['idempresaadmin']);
-		if(isset($paramDatosCo['contacto']) && ($paramDatosCo['contacto'])!='') { 
-			$this->db->where('con.idcontacto', $paramDatosCo['contacto']['id']);
-		} 			
+		$this->db->where('ce.idempresaadmin', $this->sessionFactur['idempresaadmin']); 			
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
 			foreach ($paramPaginate['searchColumn'] as $key => $value) {
 				if(! empty($value)){
 					$this->db->like($key ,strtoupper_total($value) ,FALSE);
 				}
 			}
-		}
-
+		} 
 		if( $paramPaginate['sortName'] ){
 			$this->db->order_by($paramPaginate['sortName'], $paramPaginate['sort']);
 		}
@@ -35,24 +30,19 @@ class Model_cliente_empresa extends CI_Model {
 		}
 		return $this->db->get()->result_array();
 	}
-	public function m_count_cliente_empresa($paramPaginate=FALSE,$paramDatosCo){
+	public function m_count_cliente_empresa($paramPaginate=FALSE){
 		$this->db->select('COUNT(*) AS contador');
 		$this->db->from('cliente_empresa ce');
 		$this->db->join('categoria_cliente cc', 'ce.idcategoriacliente = cc.idcategoriacliente');
-		$this->db->join('contacto con', 'con.idclienteempresa = ce.idclienteempresa','left');
 		$this->db->where('estado_ce', 1);
 		$this->db->where('ce.idempresaadmin', $this->sessionFactur['idempresaadmin']);
-		if(isset($paramDatosCo['contacto']) && ($paramDatosCo['contacto']!='')) { 
-			$this->db->where('con.idcontacto', $paramDatosCo['contacto']['id']);
-		} 
-
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
 			foreach ($paramPaginate['searchColumn'] as $key => $value) {
 				if(! empty($value)){
 					$this->db->like($key ,strtoupper_total($value) ,FALSE);
 				}
 			}
-		}
+		} 
 		$fData = $this->db->get()->row_array();
 		return $fData;
 	}

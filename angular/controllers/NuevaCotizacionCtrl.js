@@ -173,6 +173,17 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
   }
   $scope.metodos.listaUnidadMedida(myCallback); 
 
+  //WATCHERS 
+  $scope.$watch('fData.num_documento', function(newValue,oldValue){ 
+    if( oldValue == newValue ){
+      return false; 
+    }
+    if( !(newValue) ){
+      $scope.fData.cliente = {};
+      $scope.fData.classEditCliente = 'disabled';
+    }
+  }, true);
+
   // GENERACION DE NUMERO DE COTIZACION 
   $scope.metodos.generarNumeroCotizacion = function(loader) { 
     if(loader){
@@ -357,8 +368,7 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
           }
           var arrParams = {
             paginate : paginationOptionsBC,
-            datos: $scope.fBusqueda,
-            datosCo: $scope.fData  
+            datos: $scope.fBusqueda 
           };
           ClienteServices.sListarClientesBusqueda(arrParams).then(function (rpta) {
             $scope.fArr.gridOptionsBC.totalItems = rpta.paginate.totalRows;
@@ -717,12 +727,14 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
             $scope.gridApi = gridApi;
             gridApi.selection.on.rowSelectionChanged($scope,function(row){
               $scope.mySelectionGridCO = gridApi.selection.getSelectedRows();
-              $scope.fData.contacto=$scope.mySelectionGridCO[0];
-              $scope.fData.cliente.razon_social = $scope.mySelectionGridCO[0].razon_social;
-              $scope.fData.cliente.representante_legal = $scope.mySelectionGridCO[0].representante_legal;
-              $scope.fData.cliente.dni_representante_legal = $scope.mySelectionGridCO[0].dni_representante_legal; 
-              $scope.fData.cliente.id = $scope.mySelectionGridCO[0].idclienteempresa; 
-              $scope.fData.num_documento = $scope.mySelectionGridCO[0].ruc;      
+              $scope.fData.contacto = $scope.mySelectionGridCO[0];
+              $scope.fData.cliente = $scope.mySelectionGridCO[0].cliente_empresa;
+              // $scope.fData.cliente.razon_social = $scope.mySelectionGridCO[0].razon_social;
+              // $scope.fData.cliente.representante_legal = $scope.mySelectionGridCO[0].representante_legal;
+              // $scope.fData.cliente.dni_representante_legal = $scope.mySelectionGridCO[0].dni_representante_legal; 
+              // $scope.fData.cliente.id = $scope.mySelectionGridCO[0].idclienteempresa; 
+              $scope.fData.num_documento = $scope.mySelectionGridCO[0].cliente_empresa.ruc; 
+              $scope.fData.classEditCliente = '';
               $uibModalInstance.dismiss('cancel');
             });
             $scope.gridApi.core.on.sortChanged($scope, function(grid, sortColumns) {

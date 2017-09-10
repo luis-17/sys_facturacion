@@ -78,7 +78,7 @@ class Cliente extends CI_Controller {
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		// var_dump($allInputs);
 		$paramDatos = $allInputs['datos'];
-		$paramDatosCo = @$allInputs['datosCo'];
+		// $paramDatosCo = @$allInputs['datosCo']; // contacto 
 		$paramPaginate = $allInputs['paginate'];
 		if(empty($paramDatos['tipo_cliente'])){ 
 			$arrData['message'] = 'No hay datos.';
@@ -91,8 +91,8 @@ class Cliente extends CI_Controller {
 		$arrListado = array();
 		$fCount = array();
 		if( $paramDatos['tipo_cliente'] == 'ce' ){ // empresa 
-			$lista = $this->model_cliente_empresa->m_cargar_cliente_empresa($paramPaginate,$paramDatosCo);
-			$fCount = $this->model_cliente_empresa->m_count_cliente_empresa($paramPaginate,$paramDatosCo);
+			$lista = $this->model_cliente_empresa->m_cargar_cliente_empresa($paramPaginate);
+			$fCount = $this->model_cliente_empresa->m_count_cliente_empresa($paramPaginate);
 			foreach ($lista as $row) { 
 				array_push($arrListado,
 					array(

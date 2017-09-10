@@ -170,7 +170,8 @@ angular.module('app')
             templateUrl: 'tpl/contacto.html',
             resolve: load([      
               'angular/controllers/ContactoEmpresaCtrl.js', 
-              'angular/controllers/ClienteEmpresaCtrl.js'   
+              'angular/controllers/ClienteEmpresaCtrl.js',
+              'angular/controllers/ClienteCtrl.js'   
             ]) 
           })                                               
           .state('lockme', {
