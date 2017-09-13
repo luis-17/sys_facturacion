@@ -168,8 +168,14 @@ class Model_cotizacion extends CI_Model {
 		$this->db->from('cotizacion co');
 		$this->db->join('sede se', 'co.idsede = se.idsede');
 		$this->db->where_in('co.estado_cot',array(1,2)); // solo "por enviar" y "enviado" 
-		$this->db->where('se.idsede',$datos['sede']['id']);
-		$this->db->where('DATE(co.fecha_registro)',date('Y-m-d'));
+		//$this->db->where('se.idsede',$datos['sede']['id']);
+		if($fConfig['incluye_mes_en_codigo_cot'] == 'no' && $fConfig['incluye_dia_en_codigo_cot'] == 'no'){
+			$this->db->where('YEAR(DATE(co.fecha_registro))', (int)date('Y')); // año 
+		}
+		
+		$this->db->where('YEAR(DATE(co.fecha_registro))',date('Y-m-d')); // año y mes 
+		$this->db->where('DATE(co.fecha_registro)',date('Y-m-d')); // año, mes y dia
+
 		$this->db->where('co.idempresaadmin', $this->sessionFactur['idempresaadmin']); // empresa session 
 		$this->db->order_by('co.fecha_registro','DESC');
 		$this->db->limit(1);
@@ -277,7 +283,7 @@ class Model_cotizacion extends CI_Model {
 			'tipo_detalle' => 'C', // COTIZACIÓN 
 			'iddetalle' => $datos['iddetallecotizacion'],
 			'idcaracteristica' => $datos['id'],
-			'valor' => $datos['valor']
+			'valor' => strtoupper($datos['valor'])
 		);
 		return $this->db->insert('detalle_caracteristica', $data); 
 	} 
