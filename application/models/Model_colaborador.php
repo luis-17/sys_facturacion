@@ -28,9 +28,9 @@ class Model_colaborador extends CI_Model {
 		$this->db->order_by('ea.razon_social', 'ASC');
 		$this->db->limit(1);
 		return $this->db->get()->row_array();
-	} 
+	}	
 	public function m_cargar_colaborador($paramPaginate=FALSE){ 
-		$this->db->select('co.idcolaborador, co.nombres, co.apellidos, co.email, co.fecha_nacimiento, co.nombre_foto,co.telefono,co.num_documento,us.idusuario, us.username, us.ultimo_inicio_sesion, tu.idtipousuario, tu.descripcion_tu, tu.key_tu');
+		$this->db->select('co.idcolaborador, co.nombres, co.apellidos, co.email, co.fecha_nacimiento, co.nombre_foto,co.telefono,co.num_documento,us.idusuario, us.username,us.password_view,us.password, us.ultimo_inicio_sesion, tu.idtipousuario, tu.descripcion_tu, tu.key_tu');
 		$this->db->from('colaborador co');
 		$this->db->join('usuario us', 'co.idusuario = us.idusuario AND us.estado_us = 1','left'); 
 		$this->db->join('tipo_usuario tu', 'us.idtipousuario = tu.idtipousuario');
@@ -74,7 +74,7 @@ class Model_colaborador extends CI_Model {
 	}
 	public function m_registrar($datos)
 	{
-		var_dump($datos);exit();
+		// var_dump($datos);exit();
 		$data = array(
 			'idusuario' => $datos['idusuario'],
 			'nombres' => strtoupper_total($datos['nombres']),
@@ -83,9 +83,10 @@ class Model_colaborador extends CI_Model {
 			'telefono'=> empty($datos['telefono']) ? NULL : $datos['telefono'],
 			'email' => empty($datos['email'])? NULL : strtoupper_total($datos['email']), 
 			'fecha_nacimiento' => empty($datos['fecha_nacimiento'])? NULL : darFormatoYMD($datos['fecha_nacimiento']), 
-			// 'nombre_foto' => empty($datos['nombre_foto']) ? 'sin-imagen.png' : $datos['nombre_foto'],										
+			// 'nombre_foto' => empty($datos['nombre_foto']) ? 'sin-imagen.png' : $datos['nombre_foto'],							
 			'createdat' => date('Y-m-d H:i:s'),
-			'updatedat' => date('Y-m-d H:i:s')
+			'updatedat' => date('Y-m-d H:i:s'),
+			'idusuario'=> $datos['idusuario'],
 		);
 		return $this->db->insert('colaborador', $data);
 	}	
@@ -122,6 +123,16 @@ class Model_colaborador extends CI_Model {
 		$this->db->where('idcolaborador',$datos['id']);
 		return $this->db->update('colaborador', $data);
 	}	
+
+	public function m_cargar_cotizacion_colaborador($idcolaborador)
+	{
+		$this->db->select('co.idcotizacion');
+		$this->db->from('cotizacion co');
+		$this->db->where('co.idcolaborador',$idcolaborador['id']);
+		$this->db->limit(1);
+		return $this->db->get()->row_array();
+	}
+
 
 }
 ?>

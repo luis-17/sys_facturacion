@@ -43,7 +43,7 @@ app.controller('UsuarioCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$l
       enableFullRowSelection: true,
       multiSelect: false,
       columnDefs: [ 
-        { field: 'id', name: 'idusuario', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
+        { field: 'idusuario', name: 'idusuario', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
         { field: 'tipo_usuario', name: 'descripcion_tu',cellTemplate:'<div class="ui-grid-cell-contents text-left ">'+ '{{ COL_FIELD.descripcion }}</div>',  displayName: 'Tipo Usuario', minWidth: 160 },
         { field: 'username', name: 'username', displayName: 'Username', minWidth: 100 },
          { field: 'password', name: 'password',visible: false, displayName: 'Password', minWidth: 100 },
@@ -112,7 +112,9 @@ app.controller('UsuarioCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$l
     $scope.btnNuevo = function() { 
       var arrParams = {
         'metodos': $scope.metodos,
-        'fArr': $scope.fArr 
+        'fArr': $scope.fArr ,
+        callback: function() {      
+        }        
       }
       UsuarioFactory.regUsuarioModal(arrParams); 
     }
@@ -120,7 +122,9 @@ app.controller('UsuarioCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$l
       var arrParams = {
         'metodos': $scope.metodos,
         'mySelectionGrid': $scope.mySelectionGrid,
-        'fArr': $scope.fArr 
+        'fArr': $scope.fArr,
+        callback: function() {      
+        }     
       }
       UsuarioFactory.editUsuarioModal(arrParams); 
     }
@@ -129,7 +133,7 @@ app.controller('UsuarioCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$l
       $bootbox.confirm(pMensaje, function(result) {
         if(result){
           var arrParams = {
-            id: $scope.mySelectionGrid[0].id 
+            idusuario: $scope.mySelectionGrid[0].idusuario 
           };
           blockUI.start('Procesando información...');
           UsuarioServices.sAnular(arrParams).then(function (rpta) {
@@ -229,7 +233,7 @@ app.factory("UsuarioFactory", function($uibModal, pinesNotifications, blockUI, U
           $scope.aceptar = function () { 
             blockUI.start('Procesando información...');
             console.log('aqui');
-            UsuarioServices.sRegistrar($scope.fData).then(function (rpta) {
+            UsuarioServices.sRegistrar($scope.fData).then(function (rpta) {    
               if(rpta.flag == 1){
                 var pTitle = 'OK!';
                 var pType = 'success';
@@ -243,8 +247,7 @@ app.factory("UsuarioFactory", function($uibModal, pinesNotifications, blockUI, U
               }else{
                 alert('Error inesperado');
               }
-              $scope.fData.idusuario=rpta.idusuario;
-              arrParams.callback($scope.fData);
+              arrParams.callback($scope.fData,rpta);
               blockUI.stop(); 
               pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2500 });
             });
@@ -270,7 +273,7 @@ app.factory("UsuarioFactory", function($uibModal, pinesNotifications, blockUI, U
           $scope.fData = {};
           $scope.metodos = arrParams.metodos;
           $scope.fArr = arrParams.fArr; 
-
+            console.log(arrParams,'arrParams.mySelectionGrid');
           if( arrParams.mySelectionGrid.length == 1 ){ 
             $scope.fData = arrParams.mySelectionGrid[0];
             console.log($scope.fData ,'$scope.fData ');
@@ -307,6 +310,7 @@ app.factory("UsuarioFactory", function($uibModal, pinesNotifications, blockUI, U
               }else{
                 alert('Error inesperado');
               }
+              arrParams.callback($scope.fData);
               blockUI.stop(); 
               pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2500 });
             });

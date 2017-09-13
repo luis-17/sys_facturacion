@@ -133,14 +133,13 @@ app.controller('ColaboradorCtrl', ['$scope', '$filter', '$uibModal', '$bootbox',
       }
       ColaboradorFactory.editColaboradorModal(arrParams); 
     }
-
-
     $scope.btnAnular = function() { 
       var pMensaje = '¿Realmente desea anular el registro?';
       $bootbox.confirm(pMensaje, function(result) {
         if(result){
           var arrParams = {
-            id: $scope.mySelectionGrid[0].id 
+            id: $scope.mySelectionGrid[0].id,
+            idusuario: $scope.mySelectionGrid[0].idusuario  
           };
           blockUI.start('Procesando información...');
           ColaboradorServices.sAnular(arrParams).then(function (rpta) {
@@ -230,27 +229,17 @@ app.factory("ColaboradorFactory", function($uibModal, pinesNotifications, blockU
           $scope.cancel = function () {
             $uibModalInstance.dismiss('cancel');
           }
-
-          // $scope.btnNuevoUsuario = function() { 
-          //   UsuarioFactory.regUsuarioModal(arrParams); 
-          // }
           $scope.btnNuevoUsuario = function() { 
             var arrParams = {
               'metodos': $scope.metodos,
               'fArr': $scope.fArr, 
-              callback: function(datos) {
-            console.log(datos,'aa');
-          $scope.fData.username=datos.username;
-              // $scope.fData.username;
-                // $scope.fData={};
-                // $scope.fData.username="aqui";
-                //     console.log('aqui');
+              callback: function(datos,rpta) {
+                $scope.fData.username=datos.username;
+                $scope.fData.idusuario=rpta.idusuario;
               }
             }
             UsuarioFactory.regUsuarioModal(arrParams); 
           };
-
-
           $scope.aceptar = function () { 
             blockUI.start('Procesando información...');
             console.log($scope.fData,'$scope.fData');
@@ -300,6 +289,18 @@ app.factory("ColaboradorFactory", function($uibModal, pinesNotifications, blockU
           $scope.titleForm = 'Edición de Colaborador';
           $scope.cancel = function () {
             $uibModalInstance.dismiss('cancel');
+          }
+          $scope.btnNuevoUsuario = function() { 
+            var arrParamss = {
+              'metodos': $scope.metodos,
+              'mySelectionGrid': arrParams.mySelectionGrid,
+              'fArr': $scope.fArr,
+              callback: function(datos) {
+                console.log(datos,'datos');
+              } 
+            }
+            console.log(arrParams,'arrParams');
+            UsuarioFactory.editUsuarioModal(arrParamss); 
           }
           $scope.aceptar = function () { 
             blockUI.start('Procesando información...');
