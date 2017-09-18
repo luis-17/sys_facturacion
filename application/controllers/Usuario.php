@@ -20,7 +20,7 @@ class Usuario extends CI_Controller {
 		foreach ($lista as $row) { 
 			array_push($arrListado,
 				array(
-					'id' => $row['idusuario'],
+					'idusuario' => $row['idusuario'],
 					'tipo_usuario' => array(
 						'id'=> $row['idtipousuario'],
 						'descripcion'=> $row['descripcion_tu']
@@ -53,19 +53,35 @@ class Usuario extends CI_Controller {
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
     	$arrData['flag'] = 0;
-    	// VALIDACIONES    	
-    	$this->db->trans_start();
 
-		if($allInputs['password']==$allInputs['password_view']){
+    	// VALIDACIONES  
+    	/* VALIDAR SI EL USUARIO YA EXISTE */	
+		if($allInputs['password'] != $allInputs['password_view']){
+		$arrData['message'] = 'Las contraseñas no coinciden, inténtelo nuevamente';
+    	$arrData['flag'] = 0;
+			$this->output
+			    ->set_content_type('application/json')
+			    ->set_output(json_encode($arrData));
+			return;
+		}
+
+    	$fUsuario = $this->model_usuario->m_validar_usuario_username($allInputs['username']);
+    	if( !empty($fUsuario) ) {
+    		$arrData['message'] = 'El Usuario ingresado, ya existe.';
+			$arrData['flag'] = 0;
+			$this->output
+			    ->set_content_type('application/json')
+			    ->set_output(json_encode($arrData));
+			return;
+   		}   	
+
+		$this->db->trans_start();
 			if($this->model_usuario->m_registrar($allInputs)) { // registro de elemento
 				$arrData['message'] = 'Se registraron los datos correctamente';
 				$arrData['flag'] = 1;
 				$arrData['idusuario'] = GetLastId('idusuario','usuario');
 			}
-		}else{
-		$arrData['message'] = 'Las contraseñas no coinciden, inténtelo nuevamente';
-    	$arrData['flag'] = 0;
-		}
+	
 		$this->db->trans_complete();
 		$this->output
 		    ->set_content_type('application/json')
@@ -78,6 +94,16 @@ class Usuario extends CI_Controller {
 		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
     	$arrData['flag'] = 0;
     	// VALIDACIONES    	
+		/* VALIDAR SI EL USUARIO YA EXISTE */
+    	$fUsuario = $this->model_usuario->m_validar_usuario_username($allInputs['username'],TRUE,$allInputs['idusuario']);
+    	if( $fUsuario ) {
+    		$arrData['message'] = 'El Usuario ingresado, ya existe.';
+			$arrData['flag'] = 0;
+			$this->output
+			    ->set_content_type('application/json')
+			    ->set_output(json_encode($arrData));
+			return;
+   		}
     	$this->db->trans_start();
 		if($this->model_usuario->m_editar($allInputs)) { // edicion de elemento
 			$arrData['message'] = 'Se registraron los datos correctamente';
@@ -88,6 +114,20 @@ class Usuario extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
+
+	public function anular()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$arrData['message'] = 'No se pudo anular los datos';
+    	$arrData['flag'] = 0;
+		if( $this->model_usuario->m_anular($allInputs) ){ 
+			$arrData['message'] = 'Se anularon los datos correctamente';
+    		$arrData['flag'] = 1;
+		}
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	} 	
 
 	 public function listar_usuario_cbo(){ 
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);

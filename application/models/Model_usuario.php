@@ -49,14 +49,30 @@ class Model_usuario extends CI_Model {
 		$this->db->select("tu.idtipousuario, tu.descripcion_tu",FALSE);
 		$this->db->from('tipo_usuario tu');
 		$this->db->where('estado_tu', 1);
+		if($this->sessionFactur['key_tu']!='key_root'){
+			$this->db->where_not_in( 'tu.key_tu', array('key_root')); 
+		}
 		return $this->db->get()->result_array();
 	}
+	// VALIDACIONES 
+	public function m_validar_usuario_username($username,$excepcion = FALSE,$idusuario=NULL) 
+	{
+		$this->db->select('u.idusuario');
+		$this->db->from('usuario u');
+		$this->db->where('u.estado_us',1);
+		$this->db->where('u.username',$username);
+		if( $excepcion ){
+			$this->db->where_not_in('u.idusuario',$idusuario);
+		}
+		$this->db->limit(1);
+		return $this->db->get()->result_array();
+	}	
 	public function m_registrar($datos)
 	{
 		// var_dump($datos);exit();
 		$data = array(
 			'idtipousuario' => $datos['tipo_usuario']['id'],
-			'username' => strtoupper_total($datos['username']),
+			'username' => $datos['username'],
 			'password'=> md5($datos['password_view']),			
 			'password_view'=>strtoupper_total($datos['password_view']),		
 			'ultimo_inicio_sesion' => date('Y-m-d H:i:s'),	
@@ -75,19 +91,30 @@ class Model_usuario extends CI_Model {
 		return $this->db->update('colaborador', $data);
 	}	
 	public function m_editar($datos){
+		// var_dump($datos);exit();
 		$data = array(
-			// 'idusuario' => $datos['idusuario'],
-			'nombres' => strtoupper_total($datos['nombres']),
-			'apellidos' => strtoupper_total($datos['apellidos']),
-			'num_documento'=> $datos['num_documento'],
-			'telefono'=> empty($datos['telefono']) ? NULL : $datos['telefono'],
-			'email' => empty($datos['email'])? NULL : strtoupper_total($datos['email']), 
-			'fecha_nacimiento' => empty($datos['fecha_nacimiento'])? NULL : darFormatoYMD($datos['fecha_nacimiento']), 	
-			'updatedat' => date('Y-m-d H:i:s') 
+			'idtipousuario' => $datos['tipo_usuario']['id'],
+			'username' => $datos['username'],
+			'password'=> md5($datos['password_view']),			
+			'password_view'=>strtoupper_total($datos['password_view']),		
+			'ultimo_inicio_sesion' => date('Y-m-d H:i:s'),	
+			// 'ip_address'=>  $_SERVER['REMOTE_ADDR'],						
+			'createdat' => date('Y-m-d H:i:s'),
+			'updatedat' => date('Y-m-d H:i:s')
 		);
 		// var_dump($datos['fecha_nacimiento'],darFormatoYMD($datos['fecha_nacimiento'])); exit();
-		$this->db->where('idcolaborador',$datos['id']);
-		return $this->db->update('colaborador', $data);
+		$this->db->where('idusuario',$datos['idusuario']);
+		return $this->db->update('usuario', $data);
+	}	
+	public function m_anular($datos)
+	{
+		// var_dump($datos);exit();
+		$data = array(
+			'estado_us' => 0,
+			'updatedat' => date('Y-m-d H:i:s')
+		);
+		$this->db->where('idusuario',$datos['idusuario']);
+		return $this->db->update('usuario', $data);
 	}	
 
 }
