@@ -9,27 +9,27 @@
 		</div>
 		<div class="form-group col-md-6 mb-md">
 			<label class="control-label mb-n"> Nombre Comercial: <small class="text-danger">(*)</small> </label>
-			<input type="text" class="form-control input-sm" ng-model="fData.nombre_comercial" placeholder="Ingrese nombre comercial" required tabindex="70" />
+			<input type="text" class="form-control input-sm" ng-model="fData.nombre_comercial" placeholder="Ingrese nombre comercial" required tabindex="80" />
 		</div>	
 		<div class="form-group col-md-3 mb-md">
 			<label class="control-label mb-n"> R.U.C: <small class="text-danger">(*)</small> </label>
-			<input type="text" class="form-control input-sm" ng-model="fData.ruc" placeholder="Ingrese ruc" required tabindex="70" />
+			<input type="text" class="form-control input-sm" ng-model="fData.ruc" placeholder="Ingrese ruc" required tabindex="80" />
 		</div>	
 		<div class="form-group col-md-3 mb-md">
 			<label class="control-label mb-n"> Teléfono: <small class="text-danger">(*)</small> </label>
-			<input type="text" class="form-control input-sm" ng-model="fData.telefono" placeholder="Ingrese teléfono" required tabindex="70" />
+			<input type="text" class="form-control input-sm" ng-model="fData.telefono" placeholder="Ingrese teléfono" required tabindex="90" />
 		</div>	
 		<div class="form-group col-md-6 mb-md">
 			<label class="control-label mb-n"> Dirección Legal: <small class="text-danger">(*)</small> </label>
-			<input type="text" class="form-control input-sm" ng-model="fData.direccion_legal" placeholder="Ingrese dirección legal" required tabindex="70" />
+			<input type="text" class="form-control input-sm" ng-model="fData.direccion_legal" placeholder="Ingrese dirección legal" required tabindex="100" />
 		</div>	
 		<div class="form-group col-md-6 mb-md">
 			<label class="control-label mb-n"> Representante Legal: <small class="text-danger">(*)</small> </label>
-			<input type="text" class="form-control input-sm" ng-model="fData.representante_legal" placeholder="Ingrese representante legal" required tabindex="70" />
+			<input type="text" class="form-control input-sm" ng-model="fData.representante_legal" placeholder="Ingrese representante legal" required tabindex="110" />
 		</div>
 		<div class="form-group col-md-6 mb-md">
 			<label class="control-label mb-n"> Página Web: </label>
-			<input type="text" class="form-control input-sm" ng-model="fData.pagina_web" placeholder="Ingrese página web"  tabindex="70" />
+			<input type="text" class="form-control input-sm" ng-model="fData.pagina_web" placeholder="Ingrese página web"  tabindex="120" />
 		</div>	
 	</form>
 </div>

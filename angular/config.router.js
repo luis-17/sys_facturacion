@@ -162,7 +162,8 @@ angular.module('app')
             templateUrl: 'tpl/usuario.html',
             resolve: load([
               'angular/controllers/UsuarioCtrl.js',   
-              'angular/controllers/ColaboradorCtrl.js'      
+              'angular/controllers/ColaboradorCtrl.js',
+              'angular/controllers/UsuarioEmpresaAdminCtrl.js'          
             ]) 
           })    
           .state('app.contacto', {
@@ -173,7 +174,14 @@ angular.module('app')
               'angular/controllers/ClienteEmpresaCtrl.js',
               'angular/controllers/ClienteCtrl.js'   
             ]) 
-          })                                               
+          })    
+          .state('app.variable-car', {
+            url: '/variable-car',
+            templateUrl: 'tpl/variable-car.html',
+            resolve: load([
+              'angular/controllers/VariableCarCtrl.js'      
+            ]) 
+          })                                                       
           .state('lockme', {
               url: '/lockme',
               templateUrl: 'tpl/page_lockme.html'
