@@ -124,15 +124,15 @@ class Model_colaborador extends CI_Model {
 		return $this->db->update('colaborador', $data);
 	}	
 
-	public function m_cargar_cotizacion_colaborador($idcolaborador)
+	public function m_cargar_cotizacion_colaborador($colaborador)
 	{
 		$this->db->select('co.idcotizacion');
 		$this->db->from('cotizacion co');
-		$this->db->where('co.idcolaborador',$idcolaborador['id']);
+		$this->db->where('co.idcolaborador',$colaborador['id']); 
+		$this->db->where_in('co.estado_cot',array(1,2)); 
 		$this->db->limit(1);
 		return $this->db->get()->row_array();
 	}
-
 
 }
 ?>

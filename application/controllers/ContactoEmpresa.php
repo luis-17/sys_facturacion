@@ -74,6 +74,8 @@ class ContactoEmpresa extends CI_Controller {
 					'anexo' => $row['anexo'],
 					'area_encargada' => $row['area_encargada'],
 					'email' => $row['email'],
+					'razon_social' => strtoupper($row['razon_social']),
+					'ruc' => $row['ruc'],
 					'cliente_empresa' => array(
 						'id' => trim($row['idclienteempresa']),
 						'descripcion'=> strtoupper($row['nombre_comercial']),
@@ -93,7 +95,9 @@ class ContactoEmpresa extends CI_Controller {
 						'dni_representante_legal' => $row['dni_representante_legal'],
 						'direccion_legal' => $row['direccion_legal'],
 						'direccion_guia' => $row['direccion_guia'],
-						'telefono' => $row['telefono'] 
+						'telefono' => $row['telefono'],
+						'telefono_contacto'=> $row['telefono_fijo'], // contacto tel
+						'anexo_contacto'=> $row['anexo'] // contacto anexo 
 					),	
 					'contacto' => strtoupper($row['nombres'].' '.$row['apellidos']) 				
 				)
@@ -123,10 +127,12 @@ class ContactoEmpresa extends CI_Controller {
 				array(
 					'id' => $row['idcontacto'],
 					'contacto' => strtoupper($row['contacto']),
-					'ruc' => strtoupper($row['ruc']),
+					'ruc' => $row['ruc'],
 					'razon_social' => strtoupper($row['razon_social']),
 					'representante_legal' => strtoupper($row['representante_legal']),
-					'dni_representante_legal' => strtoupper($row['dni_representante_legal']),
+					'dni_representante_legal' => $row['dni_representante_legal'],
+					'telefono_fijo' => $row['telefono_fijo'],
+					'telefono_movil' => $row['telefono_movil'],
 					'anexo' => $row['anexo'],
 					'area_encargada' => $row['area_encargada'],
 					'idclienteempresa' => $row['idclienteempresa']

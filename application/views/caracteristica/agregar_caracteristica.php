@@ -22,5 +22,5 @@
 	</form>
 </div>
 <div class="modal-footer">
-    <button class="btn btn-warning" ng-click="cancel();">Cerrar</button>
+    <button class="btn btn-warning" ng-click="cancel();">Guardar</button>
 </div> 

@@ -265,7 +265,7 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
           useExternalPagination: true,
           useExternalSorting: true,
           enableGridMenu: true,
-          enableRowSelection: false,
+          enableRowSelection: true,
           enableSelectAll: false,
           enableFiltering: true,
           enableFullRowSelection: true,
@@ -530,9 +530,9 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
           useExternalPagination: true,
           useExternalSorting: true,
           enableGridMenu: true,
-          enableRowSelection: false,
           enableSelectAll: false,
           enableFiltering: true,
+          enableRowSelection: true,
           enableFullRowSelection: true,
           multiSelect: false,
           columnDefs: [],
@@ -541,7 +541,12 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
             gridApi.selection.on.rowSelectionChanged($scope,function(row){
               $scope.mySelectionGridBELE = gridApi.selection.getSelectedRows();
               $scope.fData.temporal.elemento = $scope.mySelectionGridBELE[0]; 
-              $uibModalInstance.dismiss('cancel');
+              $scope.fData.temporal.precio_unitario = $scope.mySelectionGridBELE[0].precio_referencial; 
+              $timeout(function() {
+                $scope.calcularImporte();
+                $uibModalInstance.dismiss('cancel');
+              },100);
+              
               // $timeout(function() {
               //   $('#temporalElemento').focus(); //console.log('focus me',$('#temporalElemento'));
               // }, 1000);
@@ -577,7 +582,6 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
           }
         }; 
         $scope.metodos.cambioColumnas = function() { 
-      
           $scope.gridOptionsBELE.columnDefs = [ 
             { field: 'id', name: 'el.idelemento', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
             { field: 'tipo_elemento', type: 'object', name: 'el.tipo_elemento', displayName: 'TIPO', minWidth: 70,
@@ -655,7 +659,10 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     $scope.fData.cliente.id = model.idclienteempresa;
     $scope.fData.cliente.razon_social = model.razon_social;
     $scope.fData.cliente.representante_legal = model.representante_legal;
-    $scope.fData.cliente.dni_representante_legal = model.dni_representante_legal;  
+    $scope.fData.cliente.dni_representante_legal = model.dni_representante_legal; 
+
+    $scope.fData.cliente.telefono_contacto = model.telefono_fijo; 
+    $scope.fData.cliente.anexo_contacto = model.anexo; 
   }
 
   $scope.validateContacto = function() { 
@@ -702,37 +709,24 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
           useExternalPagination: true,
           useExternalSorting: true,
           enableGridMenu: true,
-          enableRowSelection: false,
+          enableRowSelection: true,
           enableSelectAll: false,
           enableFiltering: true,
           enableFullRowSelection: true,
           multiSelect: false,
           columnDefs: [ 
             { field: 'id', name: 'idcontacto', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
-            { field: 'nombres', name: 'nombres', displayName: 'Nombre', minWidth: 160 },
-            { field: 'apellidos', name: 'apellidos', displayName: 'Apellidos', minWidth: 160 },
-            { field: 'fecha_nacimiento', name: 'fecha_nacimiento', displayName: 'Fecha Nacimiento', minWidth: 160 },
-            { field: 'telefono_fijo', name: 'telefono_fijo', displayName: 'Teléfono Fijo', minWidth: 160 },
-            { field: 'telefono_movil', name: 'telefono_movil', displayName: 'Teléfono Móvil', minWidth: 100 },
-            { field: 'nombre_comercial', name: 'nombre_comercial',  displayName: 'Cliente', minWidth: 160 },
-            { field: 'email', name: 'email', displayName: 'Teléfono Móvil', minWidth: 100 },
-            { field: 'contacto', name: 'contacto',visible: false, displayName: 'Contacto', minWidth: 100 },
-            { field: 'razon_social', name: 'razon_social',visible: false, displayName: 'Razón social', minWidth: 100 },
-            { field: 'representante_legal', name: 'representante_legal',visible: false, displayName: 'Representante Legal', minWidth: 100 },
-            { field: 'idclienteempresa', name: 'idclienteempresa',visible: false, displayName: 'Cliente', minWidth: 100 },
-            { field: 'ruc', name: 'ruc',visible: false, displayName: 'Ruc', minWidth: 100 },
-            { field: 'dni_representante_legal', name: 'dni_representante_legal',visible: false, displayName: 'Dni', minWidth: 100 }
+            { field: 'nombres', name: 'nombres', displayName: 'Nombre', minWidth: 120 },
+            { field: 'apellidos', name: 'apellidos', displayName: 'Apellidos', minWidth: 120 },
+            { field: 'razon_social', name: 'razon_social', displayName: 'Empresa', minWidth: 140 },
+            { field: 'ruc', name: 'ruc', displayName: 'RUC', minWidth: 80 } 
           ],
           onRegisterApi: function(gridApi) { // gridComboOptions
             $scope.gridApi = gridApi;
             gridApi.selection.on.rowSelectionChanged($scope,function(row){
               $scope.mySelectionGridCO = gridApi.selection.getSelectedRows();
               $scope.fData.contacto = $scope.mySelectionGridCO[0];
-              $scope.fData.cliente = $scope.mySelectionGridCO[0].cliente_empresa;
-              // $scope.fData.cliente.razon_social = $scope.mySelectionGridCO[0].razon_social;
-              // $scope.fData.cliente.representante_legal = $scope.mySelectionGridCO[0].representante_legal;
-              // $scope.fData.cliente.dni_representante_legal = $scope.mySelectionGridCO[0].dni_representante_legal; 
-              // $scope.fData.cliente.id = $scope.mySelectionGridCO[0].idclienteempresa; 
+              $scope.fData.cliente = $scope.mySelectionGridCO[0].cliente_empresa; 
               $scope.fData.num_documento = $scope.mySelectionGridCO[0].cliente_empresa.ruc; 
               $scope.fData.classEditCliente = '';
               $uibModalInstance.dismiss('cancel');
@@ -760,11 +754,8 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
                 'co.idcontacto' : grid.columns[1].filters[0].term,
                 'co.nombres' : grid.columns[2].filters[0].term,
                 'co.apellidos' : grid.columns[3].filters[0].term,
-                'co.fecha_nacimiento' : grid.columns[4].filters[0].term,
-                'co.telefono_fijo' : grid.columns[5].filters[0].term,
-                'co.telefono_movil' : grid.columns[6].filters[0].term,
-                'co.nombre_comercial' : grid.columns[7].filters[0].term,
-                'co.email' : grid.columns[8].filters[0].term
+                'ce.razon_social' : grid.columns[4].filters[0].term,
+                'ce.ruc' : grid.columns[5].filters[0].term
               }; 
               $scope.metodos.getPaginationServerSideCO();
             });
@@ -814,7 +805,7 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
           useExternalPagination: false,
           useExternalSorting: false,
           enableGridMenu: false,
-          enableRowSelection: false,
+          enableRowSelection: true,
           enableSelectAll: false,
           enableFiltering: true,
           enableFullRowSelection: false,
@@ -876,7 +867,7 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
   $scope.mySelectionGrid = [];
   $scope.gridOptions = { 
     paginationPageSize: 50,
-    enableRowSelection: false,
+    enableRowSelection: true,
     enableSelectAll: false,
     enableFiltering: false,
     enableFullRowSelection: false,
@@ -1095,7 +1086,7 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
           useExternalPagination: false,
           useExternalSorting: false,
           enableGridMenu: false,
-          enableRowSelection: false,
+          enableRowSelection: true,
           enableSelectAll: false,
           enableFiltering: true,
           enableFullRowSelection: false,
@@ -1176,7 +1167,7 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     $scope.fData.total = MathFactory.redondear(total).toFixed($scope.fConfigSys.num_decimal_total_key);
   }
   $scope.calcularImporte = function (){
-    if($scope.fData.temporal.precio_unitario != '' && $scope.fData.temporal.cantidad != '' && angular.isObject($scope.fData.temporal.elemento) ){ 
+    if(/*$scope.fData.temporal.precio_unitario != '' && $scope.fData.temporal.cantidad != '' &&*/ angular.isObject($scope.fData.temporal.elemento) ){ 
       if( $scope.fData.modo_igv == 2 ){ 
         console.log('Calculando modo NO INCLUYE IGV');
         $scope.fData.temporal.importe_sin_igv = (parseFloat($scope.fData.temporal.precio_unitario) * parseFloat($scope.fData.temporal.cantidad)).toFixed($scope.fConfigSys.num_decimal_precio_key);

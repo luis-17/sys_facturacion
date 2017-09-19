@@ -48,12 +48,12 @@ app.controller('ColaboradorCtrl', ['$scope', '$filter', '$uibModal', '$bootbox',
         { field: 'id', name: 'idcolaborador', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
         { field: 'nombres', name: 'nombres', displayName: 'Nombres', minWidth: 140 },
         { field: 'apellidos', name: 'apellidos', displayName: 'Apellidos', minWidth: 140 },
-        { field: 'num_documento', name: 'num_documento', displayName: 'N° Documento', minWidth: 100 },
-        { field: 'telefono', name: 'telefono', displayName: 'Telefono', minWidth: 120 },  
+        { field: 'num_documento', name: 'num_documento', displayName: 'N° Documento', minWidth: 100 }, 
+        { field: 'telefono', name: 'telefono', displayName: 'Telefono', minWidth: 120 }, 
         { field: 'email', name: 'email', displayName: 'Correo', minWidth: 180 },
-        { field: 'fecha_nacimiento', name: 'fecha_nacimiento', displayName: 'Fecha de Nacimiento', minWidth: 100},
-        // { field: 'username', name: 'username', displayName: 'Username', visible: false,minWidth: 100},
-        { field: 'tipo_usuario', type: 'object', name: 'tipo_usuario', displayName: 'Tipo usuario', minWidth: 100, enableColumnMenus: false, enableColumnMenu: false,cellTemplate:'<div class="ui-grid-cell-contents text-center ">'+'<label class="label bg-primary block">{{ COL_FIELD.descripcion }}</label></div>' 
+        { field: 'fecha_nacimiento', name: 'fecha_nacimiento', displayName: 'Fecha de Nacimiento', minWidth: 100}, 
+        { field: 'tipo_usuario', type: 'object', name: 'tipo_usuario', displayName: 'Tipo usuario', minWidth: 100, 
+          cellTemplate:'<div class="ui-grid-cell-contents text-center "><label class="label bg-primary block">{{ COL_FIELD.descripcion }}</label></div>' 
         }         
       ],
       onRegisterApi: function(gridApi) { 
@@ -90,7 +90,8 @@ app.controller('ColaboradorCtrl', ['$scope', '$filter', '$uibModal', '$bootbox',
             'co.num_documento' : grid.columns[4].filters[0].term,
             'co.telefono' : grid.columns[5].filters[0].term,
             'co.email' : grid.columns[6].filters[0].term,
-            'co.fecha_nacimiento' : grid.fecha_nacimiento[7].filters[0].term         
+            'co.fecha_nacimiento' : grid.columns[7].filters[0].term,
+            'tu.descripcion_tu' : grid.columns[8].filters[0].term 
           }
           $scope.metodos.getPaginationServerSide();
         });
@@ -234,8 +235,8 @@ app.factory("ColaboradorFactory", function($uibModal, pinesNotifications, blockU
               'metodos': $scope.metodos,
               'fArr': $scope.fArr, 
               callback: function(datos,rpta) {
-                $scope.fData.username=datos.username;
-                $scope.fData.idusuario=rpta.idusuario;
+                $scope.fData.username = datos.username;
+                $scope.fData.idusuario = rpta.idusuario;
               }
             }
             UsuarioFactory.regUsuarioModal(arrParams); 

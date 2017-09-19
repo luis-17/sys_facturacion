@@ -20,7 +20,7 @@
         	</legend>
 					<div class="form-group pull-in clearfix mb-n"> 
 						<div class="col-md-3">
-              <label class="control-label text-ellipsis"> Documento de Cliente </label>
+              <label class="control-label text-ellipsis"> Tipo de Documento </label>
               <select class="form-control input-sm" ng-model="fData.tipo_documento_cliente" ng-options="item as item.descripcion for item in fArr.listaTiposDocumentoCliente" 
               	tabindex="100" focus-me required > </select> 
           	</div>
@@ -41,6 +41,30 @@
           </div>
           <div class="form-group pull-in clearfix mb-n"> 
           	<div class="col-md-6" ng-show="fData.tipo_documento_cliente.destino == 1"> 
+							<label class="control-label text-ellipsis"> Contacto. </label> 
+							<div class="input-group"> 
+              	<input type="text" ng-model="fData.contacto" class="form-control input-sm "
+									placeholder="Busque Contacto" typeahead-loading="loadingCT" uib-typeahead="item as item.contacto for item in getContactoAutocomplete($viewValue)"
+	            		typeahead-on-select="getSelectedContacto($item, $model, $label)" typeahead-min-length="2" autocomplete ="off" ng-blur="validateContacto();" tabindex="140"/> 
+	            	<span class="input-group-btn">
+	                <button class="btn btn-default btn-sm" type="button" ng-click="btnBusquedaContacto();" tabindex="150"><i class="fa fa-search"></i> </button>
+	              </span>
+	            </div>
+	            <i ng-show="loadingCT" class="fa fa-refresh"></i>
+	            <div ng-show="noResultsCT" class="text-danger">
+	                <i class="fa fa-remove"></i> No se encontró resultados 
+	            </div>
+						</div> 
+						<div class="col-md-6" ng-show="fData.tipo_documento_cliente.destino == 1"> 
+          		<label class="control-label"> Teléfono/Anexo </label>
+							<div class="input-group-btn">
+								<input type="text" class="form-control input-sm" ng-model="fData.cliente.telefono_contacto" placeholder="Teléfono" readonly="readonly" 
+									tabindex="155" style="margin-right: 4%;width:66%;display: inline-block;" />
+								<input type="text" class="form-control input-sm" ng-model="fData.cliente.anexo_contacto" placeholder="Anexo" readonly="readonly" 
+									tabindex="157" style="width:30%;display: inline-block;" /> 
+							</div> 
+						</div> 
+          	<!-- <div class="col-md-6" ng-show="fData.tipo_documento_cliente.destino == 1"> 
           		<label class="control-label"> Representante Legal </label>
 							<div class="input-group-btn">
 								<input type="text" class="form-control input-sm" ng-model="fData.cliente.representante_legal" placeholder="Representante Legal" readonly="readonly" 
@@ -48,26 +72,12 @@
 								<input type="text" class="form-control input-sm" ng-model="fData.cliente.dni_representante_legal" placeholder="DNI" readonly="readonly" 
 									tabindex="150" style="width:30%;display: inline-block;" />
 							</div> 
-						</div> 
+						</div>  -->
 						<div class="col-md-6" ng-show="fData.tipo_documento_cliente.destino == 2">
           		<label class="control-label"> Correo Electrónico </label>
 							<input type="text" class="form-control input-sm" ng-model="fData.cliente.email" placeholder="Correo Electrónico" readonly="readonly" tabindex="160" /> 
 						</div> 
-						<div class="col-md-6" ng-show="fData.tipo_documento_cliente.destino == 1"> 
-							<label class="control-label text-ellipsis"> Contacto. </label> 
-							<div class="input-group"> 
-              	<input type="text" ng-model="fData.contacto" class="form-control input-sm "
-									placeholder="Busque Contacto" typeahead-loading="loadingCT" uib-typeahead="item as item.contacto for item in getContactoAutocomplete($viewValue)"
-	            		typeahead-on-select="getSelectedContacto($item, $model, $label)" typeahead-min-length="2" autocomplete ="off" ng-blur="validateContacto();" tabindex="240"/> 
-	            	<span class="input-group-btn">
-	                <button class="btn btn-default btn-sm" type="button" ng-click="btnBusquedaContacto();" tabindex="250"><i class="fa fa-search"></i> </button>
-	              </span>
-	            </div>
-	            <i ng-show="loadingCT" class="fa fa-refresh"></i>
-	            <div ng-show="noResultsCT" class="text-danger">
-	                <i class="fa fa-remove"></i> No se encontró resultados 
-	            </div>
-						</div> <!--  -->
+						
 						<div class="col-md-3" ng-show="fData.tipo_documento_cliente.destino == 2">
               <label class="control-label text-ellipsis"> Telefono Móvil</label>
               <input type="text" class="form-control input-sm" ng-model="fData.cliente.telefono_movil" placeholder="Telefono" readonly="readonly" tabindex="170" /> 

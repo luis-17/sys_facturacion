@@ -162,20 +162,23 @@ class Model_cotizacion extends CI_Model {
 		$fData = $this->db->get()->row_array();
 		return $fData; 
 	}
-	public function m_cargar_ultima_cotizacion_sede_dia($datos)
+	public function m_cargar_ultima_cotizacion_segun_config($datos)
 	{
 		$this->db->select('co.idcotizacion, co.num_cotizacion');
 		$this->db->from('cotizacion co');
 		$this->db->join('sede se', 'co.idsede = se.idsede');
 		$this->db->where_in('co.estado_cot',array(1,2)); // solo "por enviar" y "enviado" 
 		//$this->db->where('se.idsede',$datos['sede']['id']);
-		if($fConfig['incluye_mes_en_codigo_cot'] == 'no' && $fConfig['incluye_dia_en_codigo_cot'] == 'no'){
+		if($datos['config']['incluye_mes_en_codigo_cot'] == 'no' && $datos['config']['incluye_dia_en_codigo_cot'] == 'no'){
 			$this->db->where('YEAR(DATE(co.fecha_registro))', (int)date('Y')); // año 
 		}
-		
-		$this->db->where('YEAR(DATE(co.fecha_registro))',date('Y-m-d')); // año y mes 
-		$this->db->where('DATE(co.fecha_registro)',date('Y-m-d')); // año, mes y dia
-
+		if($datos['config']['incluye_mes_en_codigo_cot'] == 'si' && $datos['config']['incluye_dia_en_codigo_cot'] == 'no'){
+			$this->db->where('YEAR(DATE(co.fecha_registro))', (int)date('Y')); // año 
+			$this->db->where("DATE_FORMAT(DATE(co.fecha_registro),'%m')",date('m')); // mes 
+		}
+		if($datos['config']['incluye_mes_en_codigo_cot'] == 'si' && $datos['config']['incluye_dia_en_codigo_cot'] == 'si'){
+			$this->db->where('DATE(co.fecha_registro)',date('Y-m-d')); // año, mes y dia
+		}
 		$this->db->where('co.idempresaadmin', $this->sessionFactur['idempresaadmin']); // empresa session 
 		$this->db->order_by('co.fecha_registro','DESC');
 		$this->db->limit(1);

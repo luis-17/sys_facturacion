@@ -39,17 +39,17 @@ app.controller('UsuarioCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$l
       useExternalSorting: true,
       useExternalFiltering : true,
       enableGridMenu: true,
-      enableRowSelection: true,
       enableSelectAll: true,
       enableFiltering: false,
+      enableRowSelection: true,
       enableFullRowSelection: true,
       multiSelect: false,
       columnDefs: [ 
         { field: 'idusuario', name: 'idusuario', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
-        { field: 'tipo_usuario', name: 'descripcion_tu',cellTemplate:'<div class="ui-grid-cell-contents text-left ">'+ '{{ COL_FIELD.descripcion }}</div>',  displayName: 'Tipo Usuario', minWidth: 160 },
+        { field: 'tipo_usuario', name: 'tu.descripcion_tu', width: 160, 
+          cellTemplate:'<div class="ui-grid-cell-contents text-left ">'+ '{{ COL_FIELD.descripcion }}</div>',  displayName: 'Tipo Usuario' },
         { field: 'username', name: 'username', displayName: 'Username', minWidth: 100 },
-         { field: 'password', name: 'password',visible: false, displayName: 'Password', minWidth: 100 },
-        { field: 'password_view', name: 'password_view',visible: false, displayName: 'Contraseña', minWidth: 100 }
+        { field: 'ult_inicio_sesion', name: 'ultimo_inicio_sesion', displayName: 'Ult. Actividad', minWidth: 100 } 
       ],
       onRegisterApi: function(gridApi) { 
         $scope.gridApi = gridApi;
@@ -80,10 +80,9 @@ app.controller('UsuarioCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$l
           paginationOptions.search = true; 
           paginationOptions.searchColumn = {
             'u.idusuario' : grid.columns[1].filters[0].term,
-            'ut.descripcion_tu' : grid.columns[2].filters[0].term,
-            'u.username' : grid.columns[4].filters[0].term,
-            'u.password_view' : grid.columns[5].filters[0].term,
-            'u.password_view' : grid.columns[6].filters[0].term
+            'tu.descripcion_tu' : grid.columns[2].filters[0].term,
+            'u.username' : grid.columns[3].filters[0].term,
+            'u.ultimo_inicio_sesion' : grid.columns[4].filters[0].term
           }
           $scope.metodos.getPaginationServerSide();
         });
@@ -177,7 +176,7 @@ app.controller('UsuarioCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$l
             useExternalSorting: true,
             useExternalFiltering : true,
             enableGridMenu: true,
-            enableRowSelection: false,
+            enableRowSelection: true,
             enableSelectAll: false,
             enableFiltering: true,
             enableFullRowSelection: false,

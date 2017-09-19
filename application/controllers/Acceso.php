@@ -31,7 +31,7 @@ class Acceso extends CI_Controller {
 						$arrData['message'] = 'Hay problemas con su cuenta. <br>Las posibles causas son: <br> - No se le ha asignado ninguna empresa. <br> - No se le ha asignado empresa por defecto.';
 					}else{
 						// ACTUALIZAMOS EL ULTIMO LOGEO DEL USUARIO. 
-						$this->model_acceso->m_actualizar_fecha_ultima_sesion($arrPerfilUsuario);
+						$this->model_acceso->m_actualizar_datos_usuario_ultima_sesion($arrPerfilUsuario);
 						$arrData['message'] = 'Usuario inició sesión correctamente';
 						if( isset($arrPerfilUsuario['idusuario']) ){ 
 							$this->session->set_userdata('sess_fact_'.substr(base_url(),-20,7),$arrPerfilUsuario);

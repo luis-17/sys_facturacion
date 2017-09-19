@@ -12,15 +12,15 @@ class Model_variable_car extends CI_Model {
 		$this->db->limit(1);
 		return $this->db->get()->row_array();
 	}
-	public function m_registrar($datos)
-	{
-		$data = array(
-			'descripcion_vcar' => strtoupper($datos['valor']) 
-		);
-		return $this->db->insert('sede', $data); 
-	}
-		public function m_cargar_variable_car($paramPaginate){ 
-		$this->db->select("vc.idvariablecar, vc.descripcion_vcar");
+	// public function m_registrar($datos)
+	// {
+	// 	$data = array(
+	// 		'descripcion_vcar' => strtoupper($datos['valor']) 
+	// 	);
+	// 	return $this->db->insert('sede', $data); 
+	// }
+	public function m_cargar_variable_car($paramPaginate){ 
+		$this->db->select("vc.idvariablecar, vc.descripcion_vcar"); 
 		$this->db->from('variable_car vc');
 		$this->db->where('estado_vcar', 1);
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){

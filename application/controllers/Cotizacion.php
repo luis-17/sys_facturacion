@@ -6,7 +6,7 @@ class Cotizacion extends CI_Controller {
     {
         parent::__construct(); 
         $this->load->helper(array('fechas','otros','pdf','contable','config')); 
-        $this->load->model(array('model_cotizacion','model_categoria_cliente','model_cliente_persona','model_cliente_empresa','model_configuracion','Model_variable_car')); 
+        $this->load->model(array('model_cotizacion','model_categoria_cliente','model_cliente_persona','model_cliente_empresa','model_configuracion','model_variable_car')); 
         $this->load->library('excel');
     	$this->load->library('Fpdfext');
         //cache
@@ -99,7 +99,7 @@ class Cotizacion extends CI_Controller {
 		}
 		// Codigo para uso interno. 
 		// NOMENCLATURA: 
-		// C + ABV_SEDE(2) + AÑO(2) + MES(2) + DIA(2) + 5 CARACTERES (DINAMICO)
+		// C + ABV_SEDE(2) + AÑO(2) + MES(2) + DIA(2) + "X" CARACTERES (DINAMICO)
 		// Ejm: CUC170827001 
 		$sede = strtoupper($allInputs['sede']['abreviatura']); 
 		$numCaracteres = $fConfig['cant_caracteres_correlativo_cot']; 
@@ -110,8 +110,9 @@ class Cotizacion extends CI_Controller {
 		if($fConfig['incluye_dia_en_codigo_cot'] == 'si'){
 			$numCotizacion .= date('d'); 
 		}
-		// OBTENER ULTIMA COTIZACION DE LA SEDE, Y DEL DÍA. 
-		$fCotizacion = $this->model_cotizacion->m_cargar_ultima_cotizacion_sede_dia($allInputs);
+		// OBTENER ULTIMA COTIZACION SEGÚN LOGICA DE CONFIGURACIÓN. 
+		$allInputs['config'] = $fConfig; 
+		$fCotizacion = $this->model_cotizacion->m_cargar_ultima_cotizacion_segun_config($allInputs);
 		if( empty($fCotizacion) ){
 			$numCorrelativo = 1;
 		}else{
@@ -195,6 +196,14 @@ class Cotizacion extends CI_Controller {
 		    	->set_output(json_encode($arrData));
 		    return;
     	}
+    	if( empty($allInputs['contacto']['id']) ){ 
+    		$arrData['message'] = 'No se ha asociado un CONTACTO válido. Asocie el CONTACTO.';
+    		$arrData['flag'] = 0;
+    		$this->output
+		    	->set_content_type('application/json')
+		    	->set_output(json_encode($arrData));
+		    return;
+    	}
     	$fCotizacion = $this->model_cotizacion->m_cargar_esta_cotizacion_por_codigo($allInputs['num_cotizacion']);
     	if( !empty($fCotizacion) ){ 
     		$arrData['message'] = 'Ya se a registrado una cotización, usando el código <strong>'.$allInputs['num_cotizacion'].'</strong>'; 
@@ -233,7 +242,8 @@ class Cotizacion extends CI_Controller {
 									$fVariable = $this->model_variable_car->m_buscar_variable($caracteristica); 
 									if( empty($fVariable) ){ 
 										// GRABAR COMO UNA VARIABLE 
-										$this->model_variable_car->m_registrar_variable_car($caracteristica); 
+										$caracteristica['descripcion_vcar'] = $caracteristica['valor'];
+										$this->model_variable_car->m_registrar($caracteristica); 
 									}
 								} 
 							} 

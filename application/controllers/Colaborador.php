@@ -83,7 +83,7 @@ class Colaborador extends CI_Controller {
     	
     	$this->db->trans_start();
 		if($this->model_colaborador->m_editar($allInputs)) { // edicion de elemento
-			$arrData['message'] = 'Se registraron los datos correctamente';
+			$arrData['message'] = 'Se editaron los datos correctamente';
 			$arrData['flag'] = 1;
 		}
 		$this->db->trans_complete();

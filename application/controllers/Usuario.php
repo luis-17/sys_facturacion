@@ -26,8 +26,7 @@ class Usuario extends CI_Controller {
 						'descripcion'=> $row['descripcion_tu']
 					),					
 					'username' => strtoupper($row['username']),
-					'password_view' => strtoupper($row['password_view']),
-					'password' => strtoupper($row['password'])  
+					'ult_inicio_sesion' => formatoFechaReporte4($row['ultimo_inicio_sesion'])
 				)
 			);
 		}
@@ -55,16 +54,27 @@ class Usuario extends CI_Controller {
     	$arrData['flag'] = 0;
 
     	// VALIDACIONES  
-    	/* VALIDAR SI EL USUARIO YA EXISTE */	
-		if($allInputs['password'] != $allInputs['password_view']){
-		$arrData['message'] = 'Las contraseñas no coinciden, inténtelo nuevamente';
-    	$arrData['flag'] = 0;
-			$this->output
-			    ->set_content_type('application/json')
-			    ->set_output(json_encode($arrData));
-			return;
+
+    	/* VALIDAR QUE SE HAYA REGISTRADO CLAVE */
+		if( empty($allInputs['password']) || empty($allInputs['password_view']) ){ 
+			$arrData['message'] = 'Los campos de contraseña están vacios.';
+	    	$arrData['flag'] = 0;
+				$this->output
+				    ->set_content_type('application/json')
+				    ->set_output(json_encode($arrData));
+				return;
 		}
 
+    	/* VALIDAR QUE LAS CLAVES COINCIDAN */
+		if($allInputs['password'] != $allInputs['password_view']){
+			$arrData['message'] = 'Las contraseñas no coinciden, inténtelo nuevamente';
+	    	$arrData['flag'] = 0;
+				$this->output
+				    ->set_content_type('application/json')
+				    ->set_output(json_encode($arrData));
+				return;
+		}
+		/* VALIDAR SI EL USUARIO YA EXISTE */	
     	$fUsuario = $this->model_usuario->m_validar_usuario_username($allInputs['username']);
     	if( !empty($fUsuario) ) {
     		$arrData['message'] = 'El Usuario ingresado, ya existe.';
@@ -76,13 +86,13 @@ class Usuario extends CI_Controller {
    		}   	
 
 		$this->db->trans_start();
-			if($this->model_usuario->m_registrar($allInputs)) { // registro de elemento
-				$arrData['message'] = 'Se registraron los datos correctamente';
-				$arrData['flag'] = 1;
-				$arrData['idusuario'] = GetLastId('idusuario','usuario');
-			}
-	
+		if($this->model_usuario->m_registrar($allInputs)) { // registro de usuario 
+			$arrData['idusuario'] = GetLastId('idusuario','usuario');
+			$arrData['message'] = 'Se registraron los datos correctamente';
+			$arrData['flag'] = 1; 
+		} 
 		$this->db->trans_complete();
+
 		$this->output
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
@@ -105,8 +115,8 @@ class Usuario extends CI_Controller {
 			return;
    		}
     	$this->db->trans_start();
-		if($this->model_usuario->m_editar($allInputs)) { // edicion de elemento
-			$arrData['message'] = 'Se registraron los datos correctamente';
+		if($this->model_usuario->m_editar($allInputs)) { // edicion de usuario 
+			$arrData['message'] = 'Se editaron los datos correctamente'; 
 			$arrData['flag'] = 1;
 		}
 		$this->db->trans_complete();

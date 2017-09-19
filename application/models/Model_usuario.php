@@ -6,7 +6,7 @@ class Model_usuario extends CI_Model {
 	}
 
 	public function m_cargar_usuario($paramPaginate){ 
-		$this->db->select("u.idusuario,u.idtipousuario,u.username,u.password_view,tu.descripcion_tu,u.password");
+		$this->db->select("u.idusuario, u.idtipousuario, u.username, u.password_view, u.password, u.ultimo_inicio_sesion, tu.descripcion_tu");
 		$this->db->from('usuario u');
 		$this->db->join('tipo_usuario tu', 'u.idtipousuario = tu.idtipousuario');
 		$this->db->where('estado_us', 1);
@@ -75,8 +75,8 @@ class Model_usuario extends CI_Model {
 			'username' => $datos['username'],
 			'password'=> md5($datos['password_view']),			
 			'password_view'=>strtoupper_total($datos['password_view']),		
-			'ultimo_inicio_sesion' => date('Y-m-d H:i:s'),	
-			// 'ip_address'=>  $_SERVER['REMOTE_ADDR'],						
+			//'ultimo_inicio_sesion' => date('Y-m-d H:i:s'),	
+			//'ip_address'=>  $_SERVER['REMOTE_ADDR'],						
 			'createdat' => date('Y-m-d H:i:s'),
 			'updatedat' => date('Y-m-d H:i:s')
 		);
@@ -95,11 +95,10 @@ class Model_usuario extends CI_Model {
 		$data = array(
 			'idtipousuario' => $datos['tipo_usuario']['id'],
 			'username' => $datos['username'],
-			'password'=> md5($datos['password_view']),			
-			'password_view'=>strtoupper_total($datos['password_view']),		
-			'ultimo_inicio_sesion' => date('Y-m-d H:i:s'),	
-			// 'ip_address'=>  $_SERVER['REMOTE_ADDR'],						
-			'createdat' => date('Y-m-d H:i:s'),
+			// 'password'=> md5($datos['password_view']),			
+			// 'password_view'=>strtoupper_total($datos['password_view']),		
+			//'ultimo_inicio_sesion' => date('Y-m-d H:i:s'),	
+			//'ip_address'=>  $_SERVER['REMOTE_ADDR'], 
 			'updatedat' => date('Y-m-d H:i:s')
 		);
 		// var_dump($datos['fecha_nacimiento'],darFormatoYMD($datos['fecha_nacimiento'])); exit();
