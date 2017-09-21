@@ -50,7 +50,7 @@ class Model_usuario extends CI_Model {
 		return $fData;
 	}
 
-	public function m_cargar_usuario_cbo(){
+	public function m_cargar_tipo_usuario_cbo(){
 		$this->db->select("tu.idtipousuario, tu.descripcion_tu",FALSE);
 		$this->db->from('tipo_usuario tu');
 		$this->db->where('estado_tu', 1);

@@ -56,7 +56,8 @@ class Model_variable_car extends CI_Model {
 		$this->db->limit($datos['limite']);
 		return $this->db->get()->result_array();
 	}
-	public function m_registrar($datos)
+
+	public function m_registrar_variable_car($datos)
 	{
 		$data = array(
 			'descripcion_vcar' => strtoupper($datos['descripcion_vcar'])
@@ -81,5 +82,17 @@ class Model_variable_car extends CI_Model {
 		$this->db->where('idvariablecar',$datos['id']); 
 		return $this->db->update('variable_car', $data); 
 	}
+	public function m_cargar_esta_variable_car($datos)
+	{	
+	
+		$this->db->select('vc.idvariablecar');
+		$this->db->from('variable_car vc');
+		$this->db->where('vc.descripcion_vcar',$datos['descripcion_vcar']);
+		$this->db->where('vc.estado_vcar',1);
+		$this->db->limit(1);
+		return $this->db->get()->row_array();
+	}
+
+
 }
 ?>

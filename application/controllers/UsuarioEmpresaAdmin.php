@@ -29,13 +29,12 @@ class UsuarioEmpresaAdmin extends CI_Controller {
 				array(
 					'id' => $row['idusuarioempresaadmin'],	
 					'razon_social' => strtoupper($row['razon_social']),
-					'nombre_comercial' => strtoupper($row['nombre_comercial']),
 					'ruc' => strtoupper($row['ruc']),
-					'direccion_legal' => strtoupper($row['direccion_legal']),
-					'representante_legal' => strtoupper($row['representante_legal']),
-					'telefono' => strtoupper($row['telefono']),
-					'pagina_web' => strtoupper($row['pagina_web']),
-					'select_por_defecto' => $row['select_por_defecto']			
+					'select_por_defecto' => $row['select_por_defecto'],		
+					'empresa' => array(
+						'id'=> $row['idempresaadmin'],
+						'descripcion'=> strtoupper($row['razon_social'])				
+					),	
 				)
 			);
 		}
@@ -50,37 +49,49 @@ class UsuarioEmpresaAdmin extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
+
 	public function ver_popup_usuario_empresa()
 	{
 		$this->load->view('usuario/mant_usuarioEmpresaAdmin');
 	}
+
 	public function registrar()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
     	$arrData['flag'] = 0;
-	    
-    	$this->db->trans_start();
-		if( $this->model_empresa_admin->m_registrar($allInputs) ){ 
-			$arrData['idempresaadmin'] = GetLastId('idempresaadmin','empresa_admin');
-				$allInputs['idempresaadmin'] = $arrData['idempresaadmin'];
-				// var_dump($empresa['idempresaadmin']);exit();
-				if( $this->model_usuario_empresa_admin->m_registrar($allInputs) ){ 
-					$arrData['message'] = 'Se registraron los datos correctamente';
-					$arrData['flag'] = 1;
-					
-				} 			
-		} 
+    	if( $allInputs['empresa']['id']==0){ 
+    		$arrData['message'] = 'Seleccione una empresa'; 
+    		$arrData['flag'] = 0;
+    		$this->output
+		    	->set_content_type('application/json')
+		    	->set_output(json_encode($arrData));
+		    return;
+    	}     	 
+    	$fEmpresa = $this->model_usuario_empresa_admin->m_cargar_empresa($allInputs);
+    	if( !empty($fEmpresa) ){ 
+    		$arrData['message'] = 'Ya se a registrado esta empresa, no se puede registrar'; 
+    		$arrData['flag'] = 0;
+    		$this->output
+		    	->set_content_type('application/json')
+		    	->set_output(json_encode($arrData));
+		    return;
+    	} 
 
+    	$this->db->trans_start();	
+		if( $this->model_usuario_empresa_admin->m_registrar($allInputs) ){ 
+					$arrData['message'] = 'Se registraron los datos correctamente';
+					$arrData['flag'] = 1;				
+		} 			
 		$this->db->trans_complete();
 		$this->output
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
+
 	public function anular()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
-
 		$arrData['message'] = 'No se pudo anular los datos';
     	$arrData['flag'] = 0;
 		if( $this->model_usuario_empresa_admin->m_anular($allInputs) ){ 
@@ -91,6 +102,7 @@ class UsuarioEmpresaAdmin extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
+
 	public function editar_selectpordefecto()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);

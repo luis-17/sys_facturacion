@@ -140,9 +140,9 @@ class Usuario extends CI_Controller {
 		    ->set_output(json_encode($arrData));
 	} 	
 
-	 public function listar_usuario_cbo(){ 
+	 public function listar_tipo_usuario_cbo(){ 
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
-		$lista = $this->model_usuario->m_cargar_usuario_cbo();
+		$lista = $this->model_usuario->m_cargar_tipo_usuario_cbo();
 		$arrListado = array();
 		foreach ($lista as $row) {
 			array_push($arrListado,

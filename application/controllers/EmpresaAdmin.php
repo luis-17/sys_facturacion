@@ -103,4 +103,28 @@ class EmpresaAdmin extends CI_Controller {
 		    ->set_output(json_encode($arrData));
 	}	
 
+	public function listar_empresa_cbo(){
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$lista = $this->model_empresa_admin->m_cargar_empresa_cbo();
+		$arrListado = array();
+		foreach ($lista as $row) {
+			array_push($arrListado,
+				array(
+					'id' => $row['idempresaadmin'],
+					'descripcion' => strtoupper($row['razon_social']) 
+				)
+			);
+		}
+    	$arrData['datos'] = $arrListado;
+    	$arrData['message'] = '';
+    	$arrData['flag'] = 1;
+		if(empty($lista)){
+			$arrData['flag'] = 0;
+		}
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}	
+
+
 }
