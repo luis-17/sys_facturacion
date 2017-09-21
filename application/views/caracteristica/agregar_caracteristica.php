@@ -6,9 +6,9 @@
 		<div class="row">
 			<div class="col-xs-12">
 		        <div class="inline pull-right"> 
-		        	<button class="btn m-b-xs btn-success btn-xs" ng-click="btnNuevaCaracteristica();">
+		        	<button type="button" class="btn m-b-xs btn-success btn-xs" ng-click="btnNuevaCaracteristica();">
 	        			<i class="fa fa-file-text"></i> Nuevo </button> 
-	        		<button class="btn m-b-xs btn-info btn-xs" ng-click="metodos.getPaginationServerSideCR(true);">
+	        		<button type="button" class="btn m-b-xs btn-info btn-xs" ng-click="metodos.getPaginationServerSideCR(true);">
 	        			<i class="fa fa-file-text"></i> Reestablecer </button> 
 		        </div>
 			</div>

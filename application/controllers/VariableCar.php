@@ -36,7 +36,31 @@ class VariableCar extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
-
+	public function listar_variable_autocomplete()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);	
+		$allInputs['limite'] = 15;
+		$lista = $this->model_variable_car->m_cargar_variable_limite($allInputs);
+		$arrListado = array();
+		foreach ($lista as $row) { 
+			array_push($arrListado,
+				array(
+					'id' => $row['idvariablecar'],
+					'descripcion' => strtoupper($row['descripcion_vcar']) 
+				)
+			);
+		}
+		
+    	$arrData['datos'] = $arrListado;
+    	$arrData['message'] = '';
+    	$arrData['flag'] = 1;
+		if(empty($lista)){
+			$arrData['flag'] = 0;
+		}
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData)); 
+	}
 	public function ver_popup_formulario()
 	{
 		$this->load->view('variable-car/mant_variableCar');

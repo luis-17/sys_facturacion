@@ -136,9 +136,10 @@ app.controller('VariableCarCtrl', ['$scope', '$filter', '$uibModal', '$bootbox',
     }
 }]);
 
-app.service("VariableCarServices",function($http, $q, handleBehavior) {
+app.service("VariableCarServices",function($http, $q, handleBehavior) { 
     return({
         sListar: sListar,
+        sListarVariableAutoComplete: sListarVariableAutoComplete,
         sRegistrar: sRegistrar,
         sEditar: sEditar,
         sAnular: sAnular
@@ -148,6 +149,14 @@ app.service("VariableCarServices",function($http, $q, handleBehavior) {
             method : "post",
             url : angular.patchURLCI+"VariableCar/listar_variable_car",
             data : datos
+      });
+      return (request.then(handleBehavior.success,handleBehavior.error));
+    }
+    function sListarVariableAutoComplete(datos) {
+      var request = $http({
+            method : "post",
+            url : angular.patchURLCI+"VariableCar/listar_variable_autocomplete",
+            data : datos 
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
     }

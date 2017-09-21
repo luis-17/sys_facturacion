@@ -118,8 +118,7 @@ class ContactoEmpresa extends CI_Controller {
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);	
 		$allInputs['limite'] = 15;
-		$paramDatos = @$allInputs['datos'];
-		$lista = $this->model_contacto_empresa->m_cargar_contacto_empresa_limite($allInputs,$paramDatos);
+		$lista = $this->model_contacto_empresa->m_cargar_contacto_empresa_limite($allInputs);
 		$hayStock = true;
 		$arrListado = array();
 		foreach ($lista as $row) { 

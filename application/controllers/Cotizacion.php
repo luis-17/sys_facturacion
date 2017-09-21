@@ -196,14 +196,17 @@ class Cotizacion extends CI_Controller {
 		    	->set_output(json_encode($arrData));
 		    return;
     	}
-    	if( empty($allInputs['contacto']['id']) ){ 
-    		$arrData['message'] = 'No se ha asociado un CONTACTO válido. Asocie el CONTACTO.';
-    		$arrData['flag'] = 0;
-    		$this->output
-		    	->set_content_type('application/json')
-		    	->set_output(json_encode($arrData));
-		    return;
+    	if( $allInputs['tipo_documento_cliente']['destino_str'] == 'ce' ){ // si es cliente empresa 
+    		if( empty($allInputs['contacto']['id']) ){ 
+	    		$arrData['message'] = 'No se ha asociado un CONTACTO válido. Asocie el CONTACTO.';
+	    		$arrData['flag'] = 0;
+	    		$this->output
+			    	->set_content_type('application/json')
+			    	->set_output(json_encode($arrData));
+			    return;
+	    	}
     	}
+    	
     	$fCotizacion = $this->model_cotizacion->m_cargar_esta_cotizacion_por_codigo($allInputs['num_cotizacion']);
     	if( !empty($fCotizacion) ){ 
     		$arrData['message'] = 'Ya se a registrado una cotización, usando el código <strong>'.$allInputs['num_cotizacion'].'</strong>'; 

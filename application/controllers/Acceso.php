@@ -3,8 +3,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Acceso extends CI_Controller {
 	public function __construct(){
 		parent::__construct();
-		$this->load->helper(array('security'));
-		$this->load->model(array('model_acceso','model_colaborador'));
+		$this->load->helper(array('security','config'));
+		$this->load->model(array('model_acceso','model_colaborador','model_configuracion'));
 		//cache
 		$this->output->set_header("Cache-Control: no-store, no-cache, must-revalidate, no-transform, max-age=0, post-check=0, pre-check=0"); 
 		$this->output->set_header("Pragma: no-cache");
@@ -103,10 +103,11 @@ class Acceso extends CI_Controller {
 	public function getSessionCI(){
 		$arrData['flag'] = 0;
 		$arrData['datos'] = array();
-		if( $this->session->has_userdata( 'sess_fact_'.substr(base_url(),-20,7) ) && 
-			!empty($_SESSION['sess_fact_'.substr(base_url(),-20,7) ]['idusuario']) ){
+		if( $this->session->has_userdata( 'sess_fact_'.substr(base_url(),-20,7) ) && !empty($_SESSION['sess_fact_'.substr(base_url(),-20,7) ]['idusuario']) ){ 
 			$arrData['flag'] = 1;
-			$arrData['datos'] = $_SESSION['sess_fact_'.substr(base_url(),-20,7) ];
+			$arrData['datos'] = $_SESSION['sess_fact_'.substr(base_url(),-20,7) ]; 
+			$arrConfig = obtener_parametros_configuracion(); 
+			$arrData['datos']['config'] = $arrConfig;
 		} 
 		$this->output
 		    ->set_content_type('application/json')

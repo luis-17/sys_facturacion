@@ -103,7 +103,7 @@ class Model_contacto_empresa extends CI_Model {
 		$fData = $this->db->get()->row_array();
 		return $fData;
 	}
-	public function m_cargar_contacto_empresa_limite($datos,$paramDatos)
+	public function m_cargar_contacto_empresa_limite($datos)
 	{
 		$this->db->select('co.idcontacto,CONCAT(co.nombres, " ", co.apellidos) as contacto, co.area_encargada, co.idclienteempresa, co.telefono_fijo, co.telefono_movil, co.anexo, 
 			ce.ruc, ce.razon_social, ce.representante_legal, ce.dni_representante_legal');
