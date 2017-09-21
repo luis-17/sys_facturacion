@@ -125,7 +125,7 @@ app.controller('EmpresaAdminCtrl', ['$scope', '$filter', '$uibModal', '$bootbox'
       }
       EmpresaAdminFactory.editEmpresaAdminModal(arrParams); 
     }
-    $scope.btnBancos = function() { 
+    $scope.btnAsignarBancos = function() { 
       blockUI.start('Abriendo formulario...');
       $uibModal.open({ 
         templateUrl: angular.patchURLCI+'EmpresaAdmin/ver_popup_bancos',

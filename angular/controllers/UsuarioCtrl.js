@@ -20,7 +20,7 @@ app.controller('UsuarioCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$l
     };
     $scope.metodos.listaTipoUsuario = function(myCallback) {
       var myCallback = myCallback || function() { };
-      UsuarioServices.sListarCbo().then(function(rpta) {
+      UsuarioServices.sListarTipoUsuarioCbo().then(function(rpta) {
         $scope.fArr.listaTipoUsuario = rpta.datos; 
         myCallback();
       });
@@ -396,7 +396,7 @@ app.service("UsuarioServices",function($http, $q, handleBehavior) {
         sRegistrar: sRegistrar,
         sEditar: sEditar,
         sAnular: sAnular,
-        sListarCbo: sListarCbo
+        sListarTipoUsuarioCbo: sListarTipoUsuarioCbo
     });
     function sListar(datos) {
       var request = $http({
@@ -430,10 +430,10 @@ app.service("UsuarioServices",function($http, $q, handleBehavior) {
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
     }       
-    function sListarCbo(datos) {
+    function sListarTipoUsuarioCbo(datos) {
       var request = $http({
             method : "post",
-            url : angular.patchURLCI+"Usuario/listar_usuario_cbo",
+            url : angular.patchURLCI+"Usuario/listar_tipo_usuario_cbo",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));

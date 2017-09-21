@@ -85,8 +85,8 @@ class Model_variable_car extends CI_Model {
 	
 		$this->db->select('vc.idvariablecar');
 		$this->db->from('variable_car vc');
-		$this->db->where('ea.idempresaadmin',$datos['empresa']['id']);
-
+		$this->db->where('vc.descripcion_vcar',$datos['descripcion_vcar']);
+		$this->db->where('vc.estado_vcar',1);
 		$this->db->limit(1);
 		return $this->db->get()->row_array();
 	}
