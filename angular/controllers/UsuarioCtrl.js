@@ -2,11 +2,13 @@ app.controller('UsuarioCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$l
   'UsuarioFactory',
   'UsuarioServices',
   'UsuarioEmpresaAdminServices',
+  'EmpresaAdminServices',
   'ColaboradorFactory',
   function($scope, $filter, $uibModal, $bootbox, $log, $timeout, pinesNotifications, uiGridConstants, blockUI, 
   UsuarioFactory,
   UsuarioServices,
   UsuarioEmpresaAdminServices,
+  EmpresaAdminServices,
   ColaboradorFactory
   ) {
     $scope.metodos = {}; // contiene todas las funciones 
@@ -161,6 +163,14 @@ app.controller('UsuarioCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$l
             $scope.gridOptionsEmpresa.enableFiltering = !$scope.gridOptionsEmpresa.enableFiltering;
             $scope.gridApiEmpresa.core.notifyDataChange( uiGridConstants.dataChange.COLUMN );
           };
+          $scope.metodos.listaEmpresa = function(myCallback) {
+            var myCallback = myCallback || function() { };
+            EmpresaAdminServices.sListarCbo().then(function(rpta) {
+              $scope.fArr.listaEmpresa = rpta.datos; 
+              myCallback();
+            });
+          };          
+
           var paginationOptionEmpresa = {
             pageNumber: 1,
             firstRow: 0,
@@ -185,18 +195,14 @@ app.controller('UsuarioCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$l
             multiSelect: false,
             columnDefs: [ 
               { field: 'id', name: 'idusuarioempresaadmin', displayName: 'ID',visible: false,enableCellEdit: false , width: '75',  sort: { direction: uiGridConstants.DESC} },
-              { field: 'select_por_defecto', name: 'select_por_defecto', displayName: 'Seleccione', width: 90, enableCellEdit: true, enableSorting: false, cellClass:'ui-editCell',editableCellTemplate: 'ui-grid/dropdownEditor',              cellFilter: 'select_por_defecto', editDropdownValueLabel: 'select_por_defecto', editDropdownOptionsArray: [
+              { field: 'select_por_defecto', name: 'select_por_defecto', displayName: 'Por defecto', width: 90, enableCellEdit: true, enableSorting: false, cellClass:'ui-editCell',editableCellTemplate: 'ui-grid/dropdownEditor',              cellFilter: 'select_por_defecto', editDropdownValueLabel: 'select_por_defecto', editDropdownOptionsArray: [
                   { id: 1, select_por_defecto: 'SI' },
                   { id: 2, select_por_defecto: 'NO' }
                 ],cellTemplate: '<div class="text-center ui-grid-cell-contents" ng-if="COL_FIELD == 1"> SI </div><div class="text-center" ng-if="COL_FIELD == 2"> NO </div>'
               },
               { field: 'razon_social', name: 'razon_social', displayName: 'Razón Social', minWidth: 160 ,enableCellEdit: false },
-              { field: 'nombre_comercial', name: 'nombre_comercial', displayName: 'Nombre Comercial', minWidth: 160,enableCellEdit: false  },
-              { field: 'ruc', name: 'ruc', displayName: 'RUC', minWidth: 100,enableCellEdit: false  },
-              { field: 'direccion_legal', name: 'direccion_legal', displayName: 'Dirección Legal', minWidth: 160,enableCellEdit: false  },
-              { field: 'representante_legal', name: 'representante_legal', displayName: 'Representante Legal', minWidth: 160,enableCellEdit: false  },
-              { field: 'telefono', name: 'telefono', displayName: 'Teléfono', minWidth: 100 ,enableCellEdit: false },
-              { field: 'pagina_web', name: 'pagina_web', displayName: 'Página Web', minWidth: 100, enableColumnMenus: false, enableColumnMenu: false,enableCellEdit: false }
+              { field: 'ruc', name: 'ruc', displayName: 'RUC', minWidth: 100,enableCellEdit: false  }
+
             ],
             onRegisterApi: function(gridApiEmpresa) { 
               $scope.gridApiEmpresa = gridApiEmpresa;
@@ -207,8 +213,7 @@ app.controller('UsuarioCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$l
                    console.log(rpta,'aquiss');       
                     if(rpta.flag == 1){
                       var pTitle = 'OK!';
-                      var pType = 'success';
-                      $scope.metodos.getPaginationServerSideEmpresa();
+                      var pType = 'success';                      
                     }else if(rpta.flag == 0){
                       var pTitle = 'Error!';
                       var pType = 'danger';
@@ -216,6 +221,7 @@ app.controller('UsuarioCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$l
                     }else{
                       alert('Error inesperado');
                     }
+                    $scope.metodos.getPaginationServerSideEmpresa();
                     pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2500 });
                     blockUI.stop();                     
                 });
@@ -226,10 +232,18 @@ app.controller('UsuarioCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$l
                 // EMPRESA         
                 if( $scope.mySelectionGridEmpresa.length == 1 ){
                   $scope.editClassForm = ' edit-form'; 
-                  $scope.tituloBloque = 'Edición de Empresa';
+                  $scope.tituloBloque = 'Quitar Empresa';
                   $scope.contBotonesReg = false;
                   $scope.contBotonesEdit = true;
-                  $scope.fEmpresa = $scope.mySelectionGridEmpresa[0];                              
+                  $scope.fEmpresa = $scope.mySelectionGridEmpresa[0]; 
+                  var myCallBackEm = function() { 
+                    var objIndex = $scope.fArr.listaEmpresa.filter(function(obj) {         
+                      return obj.id == $scope.fEmpresa.empresa.id;
+                    }).shift(); 
+                    $scope.fEmpresa.empresa = objIndex; 
+                  }
+                  $scope.metodos.listaEmpresa(myCallBackEm); 
+
                 }else{     
                   $scope.editClassForm = null; 
                   $scope.tituloBloque = 'Agregar Empresa';
@@ -264,13 +278,7 @@ app.controller('UsuarioCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$l
                 paginationOptionEmpresa.searchColumn = {
                   'uea.idusuarioempresaadmin' : grid.columns[1].filters[0].term,
                   'ea.razon_social' : grid.columns[2].filters[0].term,      
-                  'ea.nombre_comercial' : grid.columns[3].filters[0].term,
-                  'ea.ruc' : grid.columns[4].filters[0].term,
-                  'ea.direccion_legal' : grid.columns[5].filters[0].term,
-                  'ea.representante_legal' : grid.columns[6].filters[0].term,
-                  'ea.telefono' : grid.columns[7].filters[0].term,
-                  'ea.pagina_web' : grid.columns[8].filters[0].term
-
+                  'ea.ruc' : grid.columns[3].filters[0].term,
                 }
                 $scope.metodos.getPaginationServerSideEmpresa();
               }); 
@@ -324,8 +332,15 @@ app.controller('UsuarioCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$l
               }
             });
             $scope.mySelectionGridEmpresa = [];
+            var myCallBackEm = function() { 
+              $scope.fArr.listaEmpresa.splice(0,0,{ id : '0', descripcion:'--Seleccione empresa--'}); 
+              $scope.fEmpresa.empresa = $scope.fArr.listaEmpresa[0]; 
+            }
+            $scope.metodos.listaEmpresa(myCallBackEm);             
           };
+
           $scope.metodos.getPaginationServerSideEmpresa(true); 
+          
           $scope.agregarUsuarioEmpresa = function () { 
             blockUI.start('Procesando información...');
             $scope.fEmpresa.idusuario = $scope.fData.idusuario; 

@@ -163,7 +163,8 @@ angular.module('app')
             resolve: load([
               'angular/controllers/UsuarioCtrl.js',   
               'angular/controllers/ColaboradorCtrl.js',
-              'angular/controllers/UsuarioEmpresaAdminCtrl.js'          
+              'angular/controllers/UsuarioEmpresaAdminCtrl.js',
+              'angular/controllers/EmpresaAdminCtrl.js'               
             ]) 
           })    
           .state('app.contacto', {

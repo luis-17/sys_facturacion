@@ -35,7 +35,8 @@ app.controller('CaracteristicaCtrl', ['$scope', '$filter', '$uibModal', '$bootbo
       multiSelect: false,
       columnDefs: [ 
         { field: 'id', name: 'ca.idcaracteristica', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
-        { field: 'descripcion_car', name: 'ca.descripcion_car', displayName: 'Descripción', minWidth: 160 } 
+        { field: 'descripcion_car', name: 'ca.descripcion_car', displayName: 'Descripción', minWidth: 160 },
+        { field: 'orden_car', name: 'ca.orden_car', displayName: 'Orden', minWidth: 160 }  
       ],
       onRegisterApi: function(gridApi) { 
         $scope.gridApi = gridApi;
@@ -98,7 +99,9 @@ app.controller('CaracteristicaCtrl', ['$scope', '$filter', '$uibModal', '$bootbo
     $scope.btnNuevo = function() { 
       var arrParams = {
         'metodos': $scope.metodos,
-        'fArr': $scope.fArr 
+        'fArr': $scope.fArr, 
+        callback: function() {      
+        }          
       }
       CaracteristicaFactory.regCaracteristicaModal(arrParams); 
     }
@@ -106,7 +109,9 @@ app.controller('CaracteristicaCtrl', ['$scope', '$filter', '$uibModal', '$bootbo
       var arrParams = {
         'metodos': $scope.metodos,
         'mySelectionGrid': $scope.mySelectionGrid,
-        'fArr': $scope.fArr 
+        'fArr': $scope.fArr, 
+        callback: function() {      
+        }  
       }
       CaracteristicaFactory.editCaracteristicaModal(arrParams); 
     }

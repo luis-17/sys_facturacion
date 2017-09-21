@@ -5,8 +5,13 @@
 	<form class="row" name="formCaracteristica">
 		<div class="form-group col-md-8 mb-md">
 			<label class="control-label mb-n"> Descripción: <small class="text-danger">(*)</small> </label>
-			<input type="text" class="form-control input-sm" ng-model="fData.descripcion_car" placeholder="Descripción caracteristica" required tabindex="60" />
+			<input type="text" class="form-control input-sm" ng-model="fData.descripcion_car" placeholder="Descripción característica" required tabindex="100" />
 		</div>
+		<div class="form-group col-md-4 mb-md">
+			<label class="control-label mb-n"> Orden: </label>
+			<input type="text" class="form-control input-sm" ng-model="fData.orden_car" placeholder="Digite orden" tabindex="110" />
+		</div>
+
 	</form>
 </div>
 <div class="modal-footer">

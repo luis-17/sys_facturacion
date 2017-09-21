@@ -48,9 +48,18 @@ class VariableCar extends CI_Controller {
 		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
     	$arrData['flag'] = 0;
     	// VALIDACIONES
-    	
+      	$fVariable = $this->model_variable_car->m_cargar_esta_variable_car($allInputs);
+    	if( !empty($fVariable) ){ 
+    		$arrData['message'] = 'Ya se encuentra registrado'; 
+    		$arrData['flag'] = 0;
+    		$this->output
+		    	->set_content_type('application/json')
+		    	->set_output(json_encode($arrData));
+		    return;
+    	} 	
+
     	$this->db->trans_start();
-		if($this->model_variable_car->m_registrar($allInputs)) { // registro de elemento
+		if($this->model_variable_car->m_registrar_variable_car($allInputs)) { // registro de elemento
 			$arrData['message'] = 'Se registraron los datos correctamente';
 			$arrData['flag'] = 1;
 		}

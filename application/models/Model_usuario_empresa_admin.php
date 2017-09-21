@@ -50,9 +50,9 @@ class Model_usuario_empresa_admin extends CI_Model {
 
 	// CRUD 
 	public function m_registrar($datos)
-	{
+	{		
 		$data = array(
-			'idempresaadmin' => $datos['idempresaadmin'],
+			'idempresaadmin' => $datos['empresa']['id'],
 			'idusuario'=> $datos['idusuario'],
 			'createdat' => date('Y-m-d H:i:s'),
 			'updatedat' => date('Y-m-d H:i:s')			
@@ -91,6 +91,17 @@ class Model_usuario_empresa_admin extends CI_Model {
 		return $this->db->get()->row_array();
 	}
 
+	public function m_cargar_empresa($datos)
+	{	
+		// var_dump($idempresaadmin);exit();
+		$this->db->select('ea.idempresaadmin');
+		$this->db->from('empresa_admin ea');
+		$this->db->join('usuario_empresa_admin uea', 'uea.idempresaadmin = ea.idempresaadmin');
+		$this->db->where('ea.idempresaadmin',$datos['empresa']['id']);
+		$this->db->where('uea.idusuario',$datos['idusuario']);
+		$this->db->limit(1);
+		return $this->db->get()->row_array();
+	}
 
 }
 ?>

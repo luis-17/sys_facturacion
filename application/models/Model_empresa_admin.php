@@ -78,5 +78,14 @@ class Model_empresa_admin extends CI_Model {
 		$this->db->where('idempresaadmin',$datos['id']); 
 		return $this->db->update('empresa_admin', $data); 
 	}
+
+	public function m_cargar_empresa_cbo($datos = FALSE){ 
+		$this->db->select("ea.idempresaadmin, ea.razon_social");
+		$this->db->from('empresa_admin ea');
+		$this->db->where('estado_ea', 1); //activo
+		$this->db->order_by('ea.razon_social','ASC');
+		return $this->db->get()->result_array();
+	}
+
 }
 ?>

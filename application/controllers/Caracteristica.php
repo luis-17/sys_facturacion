@@ -21,7 +21,8 @@ class Caracteristica extends CI_Controller {
 			array_push($arrListado,
 				array(
 					'id' => $row['idcaracteristica'],
-					'descripcion_car' => strtoupper($row['descripcion_car'])			
+					'descripcion_car' => strtoupper($row['descripcion_car']),
+					'orden_car' => strtoupper($row['orden_car'])			
 				)
 			);
 		}
@@ -74,9 +75,16 @@ class Caracteristica extends CI_Controller {
 		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
     	$arrData['flag'] = 0;
     	// VALIDACIONES
-    	
+    	if(!is_numeric($allInputs['orden_car'])){ 
+    		$arrData['message'] = 'Digite número , no letras'; 
+    		$arrData['flag'] = 0;
+    		$this->output
+		    	->set_content_type('application/json')
+		    	->set_output(json_encode($arrData));
+		    return;
+    	}     	
     	$this->db->trans_start();
-		if($this->model_caracteristica->m_registrar($allInputs)) { // registro de elemento
+		if($this->model_caracteristica->m_registrar($allInputs)) { 
 			$arrData['message'] = 'Se registraron los datos correctamente';
 			$arrData['flag'] = 1;
 		}
@@ -92,9 +100,16 @@ class Caracteristica extends CI_Controller {
 		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
     	$arrData['flag'] = 0;
     	// VALIDACIONES
-    	
+    	if(!is_numeric($allInputs['orden_car'])){ 
+    		$arrData['message'] = 'Digite número , no letras'; 
+    		$arrData['flag'] = 0;
+    		$this->output
+		    	->set_content_type('application/json')
+		    	->set_output(json_encode($arrData));
+		    return;
+    	}        	
     	$this->db->trans_start();
-		if($this->model_caracteristica->m_editar($allInputs)) { // edicion de elemento
+		if($this->model_caracteristica->m_editar($allInputs)) {
 			$arrData['message'] = 'Se registraron los datos correctamente';
 			$arrData['flag'] = 1;
 		}
