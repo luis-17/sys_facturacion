@@ -67,7 +67,7 @@ app.controller('CaracteristicaCtrl', ['$scope', '$filter', '$uibModal', '$bootbo
           paginationOptions.search = true; 
           paginationOptions.searchColumn = {
             'ca.idcaracteristica' : grid.columns[1].filters[0].term,
-            'ca.descripcion_car' : grid.columns[2].filters[0].term
+            'ca.descripcion_car' : grid.columns[2].filters[0].term,
             'ca.orden_car' : grid.columns[3].filters[0].term
           }
           $scope.metodos.getPaginationServerSide();
