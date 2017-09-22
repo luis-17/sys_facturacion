@@ -816,6 +816,7 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
           data: $scope.fData.temporal.caracteristicas || [],
           columnDefs: [ 
             { field: 'id', displayName: 'ID', width: '75', enableCellEdit: false, visible: false }, 
+            { field: 'orden', displayName: 'ORDEN', width: '100', enableCellEdit: false },
             { field: 'descripcion', displayName: 'Descripción', minWidth: 160, enableCellEdit: false }, 
             { field: 'valor', displayName: 'Valor', minWidth: 160, cellClass:'ui-editCell', enableCellEdit: true, sort: { direction: uiGridConstants.ASC }, 
               editableCellTemplate: '<input type="text" ui-grid-editor ng-model="MODEL_COL_FIELD" uib-typeahead="item.descripcion as item.descripcion for item in grid.appScope.getVariableAutocomplete($viewValue)" class="" >'
@@ -908,7 +909,7 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
       },
       { field: 'precio_unitario', displayName: 'P. UNIT', width: 80, enableCellEdit: true, enableSorting: false, cellClass:'ui-editCell text-right' },
       { field: 'importe_sin_igv', displayName: 'IMPORTE SIN IGV', width: 120, enableCellEdit: false, enableSorting: false, cellClass:'text-right', visible: true },
-      { field: 'igv', displayName: 'IGV', width: 100, enableCellEdit: false, enableSorting: false, cellClass:'text-right', visible:true },
+      { field: 'igv', displayName: 'IGV', width: 80, enableCellEdit: false, enableSorting: false, cellClass:'text-right', visible:true },
       { field: 'importe_con_igv', displayName: 'IMPORTE', width: 120, enableCellEdit: false, enableSorting: false, cellClass:'text-right', visible:true },
       { field: 'excluye_igv', displayName: 'INAFECTO', width: 90, enableCellEdit: true, enableSorting: false, cellClass:'ui-editCell',
         editableCellTemplate: 'ui-grid/dropdownEditor',cellFilter: 'mapInafecto', editDropdownValueLabel: 'inafecto', editDropdownOptionsArray: [
@@ -925,9 +926,10 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
           { id: 4, agrupacion: 'GRUPO 4' }
         ]//,cellTemplate: '<div class="ui-grid-cell-contents text-center ">'+ '{{ COL_FIELD }}</div>' 
       },
-      { field: 'accion', displayName: 'ACCIÓN', width: 120, enableCellEdit: false, enableSorting: false, 
+      { field: 'accion', displayName: 'ACCIÓN', width: 110, enableCellEdit: false, enableSorting: false, 
         cellTemplate:'<div class="m-xxs text-center">'+ 
-          '<button uib-tooltip="Ver Características" tooltip-placement="left" type="button" class="btn btn-xs btn-info mr-xs" ng-click="grid.appScope.btnGestionCaracteristicasDetalle(row)"> <i class="fa fa-eye"></i> </button>' + 
+          '<button uib-tooltip="Clonar" tooltip-placement="left" type="button" class="btn btn-xs btn-gray mr-xs" ng-click="grid.appScope.btnClonarFila(row)"> <i class="fa fa-plus"></i> </button>' + 
+          '<button uib-tooltip="Ver Características" tooltip-placement="left" type="button" class="btn btn-xs btn-info mr-xs" ng-click="grid.appScope.btnGestionCaracteristicasDetalle(row)"> <i class="fa fa-eye"></i> </button>' +
           '<button uib-tooltip="Quitar" tooltip-placement="left" type="button" class="btn btn-xs btn-danger" ng-click="grid.appScope.btnQuitarDeLaCesta(row)"> <i class="fa fa-trash"></i> </button>' + 
           '</div>' 
       } // uib-tooltip
@@ -989,6 +991,23 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
         height: (4 * rowHeight + headerHeight + 20) + "px"
      };
   };
+  $scope.btnClonarFila = function(row) { 
+    console.log(row,'row');
+    var arrFClon = { 
+      'id' : row.entity.id,
+      'descripcion' : row.entity.descripcion,
+      'cantidad' : row.entity.cantidad,
+      'precio_unitario' : row.entity.precio_unitario,
+      'importe_sin_igv' : row.entity.importe_sin_igv,
+      'igv' : row.entity.igv,
+      'importe_con_igv' : row.entity.importe_con_igv,
+      'excluye_igv' : row.entity.excluye_igv,
+      'unidad_medida' : angular.copy(row.entity.unidad_medida), 
+      'agrupacion': row.entity.agrupacion,
+      'caracteristicas': angular.copy(row.entity.caracteristicas)
+    }; 
+    $scope.gridOptions.data.push(arrFClon); 
+  }
   $scope.agregarItem = function () {
     $('#temporalElemento').focus();
     if( !angular.isObject($scope.fData.temporal.elemento) ){ 
@@ -1074,7 +1093,7 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     // console.log($scope.fData.classValid,'$scope.fData.classValid');
   }
   $scope.btnGestionCaracteristicasDetalle = function(row) { 
-    console.log(row,'row');
+    // console.log(row,'row');
     blockUI.start('Procesando información...'); 
     $uibModal.open({ 
       templateUrl: angular.patchURLCI+'Caracteristica/ver_popup_agregar_caracteristica',
@@ -1129,6 +1148,7 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
           //data: row.entity.caracteristicas,
           columnDefs: [ 
             { field: 'id', displayName: 'ID', width: '75', enableCellEdit: false, visible: false },
+            { field: 'orden', displayName: 'ORDEN', width: '100', enableCellEdit: false },
             { field: 'descripcion', displayName: 'Descripción', minWidth: 160, enableCellEdit: false }, 
             { field: 'valor', displayName: 'Valor', minWidth: 160, cellClass:'ui-editCell', enableCellEdit: true, sort: { direction: uiGridConstants.ASC }, 
               editableCellTemplate: '<input type="text" ui-grid-editor ng-model="MODEL_COL_FIELD" uib-typeahead="item.descripcion as item.descripcion for item in grid.appScope.getVariableAutocomplete($viewValue)" class="" >'
