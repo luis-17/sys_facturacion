@@ -72,13 +72,13 @@ class VariableCar extends CI_Controller {
 	public function editar()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
-		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
+		$arrData['message'] = 'Error al editar los datos, inténtelo nuevamente';
     	$arrData['flag'] = 0;
     	// VALIDACIONES
     	
     	$this->db->trans_start();
 		if($this->model_variable_car->m_editar($allInputs)) { // edicion de elemento
-			$arrData['message'] = 'Se registraron los datos correctamente';
+			$arrData['message'] = 'Se editaron los datos correctamente';
 			$arrData['flag'] = 1;
 		}
 		$this->db->trans_complete();

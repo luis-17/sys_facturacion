@@ -182,7 +182,15 @@ angular.module('app')
             resolve: load([
               'angular/controllers/VariableCarCtrl.js'      
             ]) 
-          })                                                       
+          })   
+          .state('app.formas-pago', {
+            url: '/formas-pago',
+            templateUrl: 'tpl/forma-pago.html',
+            resolve: load([
+              'angular/controllers/FormaPagoCtrl.js',
+              'angular/controllers/PlazoFormaPagoCtrl.js'        
+            ]) 
+          })                                                               
           .state('lockme', {
               url: '/lockme',
               templateUrl: 'tpl/page_lockme.html'
