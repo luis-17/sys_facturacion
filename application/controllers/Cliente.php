@@ -76,7 +76,9 @@ class Cliente extends CI_Controller {
 	public function buscar_cliente_para_lista()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		// var_dump($allInputs);
 		$paramDatos = $allInputs['datos'];
+		// $paramDatosCo = @$allInputs['datosCo']; // contacto 
 		$paramPaginate = $allInputs['paginate'];
 		if(empty($paramDatos['tipo_cliente'])){ 
 			$arrData['message'] = 'No hay datos.';

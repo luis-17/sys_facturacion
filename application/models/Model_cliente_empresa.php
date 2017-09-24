@@ -4,7 +4,8 @@ class Model_cliente_empresa extends CI_Model {
 	{
 		parent::__construct();
 	}
-	public function m_cargar_cliente_empresa($paramPaginate){
+	public function m_cargar_cliente_empresa($paramPaginate=FALSE){
+		// var_dump($paramDatosCo);
 		$this->db->select("co.idcolaborador, CONCAT(co.nombres, ' ', co.apellidos) As colaborador",FALSE);
 		$this->db->select('ce.idclienteempresa, ce.nombre_comercial, ce.nombre_corto, ce.razon_social, ce.ruc, ce.representante_legal, ce.dni_representante_legal, 
 			ce.direccion_legal, ce.direccion_guia, ce.telefono, 
@@ -13,15 +14,14 @@ class Model_cliente_empresa extends CI_Model {
 		$this->db->join('categoria_cliente cc', 'ce.idcategoriacliente = cc.idcategoriacliente');
 		$this->db->join('colaborador co', 'ce.idcolaborador = co.idcolaborador','left');
 		$this->db->where('estado_ce', 1);
-		$this->db->where('ce.idempresaadmin', $this->sessionFactur['idempresaadmin']);
+		$this->db->where('ce.idempresaadmin', $this->sessionFactur['idempresaadmin']); 			
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
 			foreach ($paramPaginate['searchColumn'] as $key => $value) {
 				if(! empty($value)){
 					$this->db->like($key ,strtoupper_total($value) ,FALSE);
 				}
 			}
-		}
-
+		} 
 		if( $paramPaginate['sortName'] ){
 			$this->db->order_by($paramPaginate['sortName'], $paramPaginate['sort']);
 		}
@@ -42,7 +42,7 @@ class Model_cliente_empresa extends CI_Model {
 					$this->db->like($key ,strtoupper_total($value) ,FALSE);
 				}
 			}
-		}
+		} 
 		$fData = $this->db->get()->row_array();
 		return $fData;
 	}

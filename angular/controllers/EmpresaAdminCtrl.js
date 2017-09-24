@@ -125,7 +125,7 @@ app.controller('EmpresaAdminCtrl', ['$scope', '$filter', '$uibModal', '$bootbox'
       }
       EmpresaAdminFactory.editEmpresaAdminModal(arrParams); 
     }
-    $scope.btnBancos = function() { 
+    $scope.btnAsignarBancos = function() { 
       blockUI.start('Abriendo formulario...');
       $uibModal.open({ 
         templateUrl: angular.patchURLCI+'EmpresaAdmin/ver_popup_bancos',
@@ -397,7 +397,8 @@ app.service("EmpresaAdminServices",function($http, $q, handleBehavior) {
         sListar: sListar,
         sRegistrar: sRegistrar,
         sEditar: sEditar,
-        sAnular: sAnular
+        sAnular: sAnular,
+        sListarCbo:sListarCbo
     });
     function sListar(datos) {
       var request = $http({
@@ -430,7 +431,17 @@ app.service("EmpresaAdminServices",function($http, $q, handleBehavior) {
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
-    }      
+    }   
+    function sListarCbo(datos) {
+      var request = $http({
+            method : "post",
+            url : angular.patchURLCI+"EmpresaAdmin/listar_empresa_cbo",
+            data : datos
+      });
+      return (request.then(handleBehavior.success,handleBehavior.error));
+    } 
+
+
 });
 
 app.factory("EmpresaAdminFactory", function($uibModal, pinesNotifications, blockUI, EmpresaAdminServices) { 

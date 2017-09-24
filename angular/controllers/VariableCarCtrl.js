@@ -1,13 +1,9 @@
-app.controller('ColaboradorCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$log', '$timeout', 'pinesNotifications', 'uiGridConstants', 'blockUI', 
-  'ColaboradorFactory',
-  'ColaboradorServices',
-  'UsuarioServices',
-  'UsuarioFactory',
+app.controller('VariableCarCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$log', '$timeout', 'pinesNotifications', 'uiGridConstants', 'blockUI', 
+  'VariableCarFactory',
+  'VariableCarServices',
   function($scope, $filter, $uibModal, $bootbox, $log, $timeout, pinesNotifications, uiGridConstants, blockUI, 
-  ColaboradorFactory,
-  ColaboradorServices,
-  UsuarioServices,
-  UsuarioFactory
+  VariableCarFactory,
+  VariableCarServices
   ) {
     $scope.metodos = {}; // contiene todas las funciones 
     $scope.fArr = {}; // contiene todos los arrays generados por las funciones 
@@ -15,13 +11,6 @@ app.controller('ColaboradorCtrl', ['$scope', '$filter', '$uibModal', '$bootbox',
     $scope.btnBuscar = function(){ 
       $scope.gridOptions.enableFiltering = !$scope.gridOptions.enableFiltering;
       $scope.gridApi.core.notifyDataChange( uiGridConstants.dataChange.COLUMN );
-    };
-    $scope.metodos.listaTipoUsuario = function(myCallback) {
-      var myCallback = myCallback || function() { };
-      UsuarioServices.sListarCbo().then(function(rpta) {
-        $scope.fArr.listaTipoUsuario = rpta.datos; 
-        myCallback();
-      });
     };
     var paginationOptions = {
       pageNumber: 1,
@@ -45,16 +34,8 @@ app.controller('ColaboradorCtrl', ['$scope', '$filter', '$uibModal', '$bootbox',
       enableFullRowSelection: true,
       multiSelect: false,
       columnDefs: [ 
-        { field: 'id', name: 'idcolaborador', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
-        { field: 'nombres', name: 'nombres', displayName: 'Nombres', minWidth: 140 },
-        { field: 'apellidos', name: 'apellidos', displayName: 'Apellidos', minWidth: 140 },
-        { field: 'num_documento', name: 'num_documento', displayName: 'N° Documento', minWidth: 100 }, 
-        { field: 'telefono', name: 'telefono', displayName: 'Telefono', minWidth: 120 }, 
-        { field: 'email', name: 'email', displayName: 'Correo', minWidth: 180 },
-        { field: 'fecha_nacimiento', name: 'fecha_nacimiento', displayName: 'Fecha de Nacimiento', minWidth: 100}, 
-        { field: 'tipo_usuario', type: 'object', name: 'tipo_usuario', displayName: 'Tipo usuario', minWidth: 100, 
-          cellTemplate:'<div class="ui-grid-cell-contents text-center "><label class="label bg-primary block">{{ COL_FIELD.descripcion }}</label></div>' 
-        }         
+        { field: 'id', name: 'vc.idvariablecar', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
+        { field: 'descripcion_vcar', name: 'vc.descripcion_vcar', displayName: 'Descripción', minWidth: 100 }
       ],
       onRegisterApi: function(gridApi) { 
         $scope.gridApi = gridApi;
@@ -84,14 +65,8 @@ app.controller('ColaboradorCtrl', ['$scope', '$filter', '$uibModal', '$bootbox',
           var grid = this.grid;
           paginationOptions.search = true; 
           paginationOptions.searchColumn = {
-            'co.idcolaborador' : grid.columns[1].filters[0].term,
-            'co.nombres' : grid.columns[2].filters[0].term,
-            'co.apellidos' : grid.columns[3].filters[0].term,
-            'co.num_documento' : grid.columns[4].filters[0].term,
-            'co.telefono' : grid.columns[5].filters[0].term,
-            'co.email' : grid.columns[6].filters[0].term,
-            'co.fecha_nacimiento' : grid.columns[7].filters[0].term,
-            'tu.descripcion_tu' : grid.columns[8].filters[0].term 
+            'vc.idvariablecar' : grid.columns[1].filters[0].term,
+            'vc.descripcion_vcar' : grid.columns[2].filters[0].term
           }
           $scope.metodos.getPaginationServerSide();
         });
@@ -105,7 +80,7 @@ app.controller('ColaboradorCtrl', ['$scope', '$filter', '$uibModal', '$bootbox',
       var arrParams = {
         paginate : paginationOptions
       };
-      ColaboradorServices.sListar(arrParams).then(function (rpta) { 
+      VariableCarServices.sListar(arrParams).then(function (rpta) { 
         if( rpta.datos.length == 0 ){
           rpta.paginate = { totalRows: 0 };
         }
@@ -124,7 +99,7 @@ app.controller('ColaboradorCtrl', ['$scope', '$filter', '$uibModal', '$bootbox',
         'metodos': $scope.metodos,
         'fArr': $scope.fArr 
       }
-      ColaboradorFactory.regColaboradorModal(arrParams); 
+      VariableCarFactory.regVariableCarModal(arrParams); 
     }
     $scope.btnEditar = function() { 
       var arrParams = {
@@ -132,18 +107,17 @@ app.controller('ColaboradorCtrl', ['$scope', '$filter', '$uibModal', '$bootbox',
         'mySelectionGrid': $scope.mySelectionGrid,
         'fArr': $scope.fArr 
       }
-      ColaboradorFactory.editColaboradorModal(arrParams); 
+      VariableCarFactory.editVariableCarModal(arrParams); 
     }
     $scope.btnAnular = function() { 
       var pMensaje = '¿Realmente desea anular el registro?';
       $bootbox.confirm(pMensaje, function(result) {
         if(result){
           var arrParams = {
-            id: $scope.mySelectionGrid[0].id,
-            idusuario: $scope.mySelectionGrid[0].idusuario  
+            id: $scope.mySelectionGrid[0].id 
           };
           blockUI.start('Procesando información...');
-          ColaboradorServices.sAnular(arrParams).then(function (rpta) {
+          VariableCarServices.sAnular(arrParams).then(function (rpta) {
             if(rpta.flag == 1){
               var pTitle = 'OK!';
               var pType = 'success';
@@ -162,10 +136,10 @@ app.controller('ColaboradorCtrl', ['$scope', '$filter', '$uibModal', '$bootbox',
     }
 }]);
 
-app.service("ColaboradorServices",function($http, $q, handleBehavior) {
+app.service("VariableCarServices",function($http, $q, handleBehavior) { 
     return({
         sListar: sListar,
-        sListarCbo: sListarCbo,
+        sListarVariableAutoComplete: sListarVariableAutoComplete,
         sRegistrar: sRegistrar,
         sEditar: sEditar,
         sAnular: sAnular
@@ -173,78 +147,66 @@ app.service("ColaboradorServices",function($http, $q, handleBehavior) {
     function sListar(datos) {
       var request = $http({
             method : "post",
-            url : angular.patchURLCI+"Colaborador/listar_colaboradores",
+            url : angular.patchURLCI+"VariableCar/listar_variable_car",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
     }
-    function sListarCbo(datos) {
+    function sListarVariableAutoComplete(datos) {
       var request = $http({
             method : "post",
-            url : angular.patchURLCI+"Colaborador/listar_colaboradores_cbo",
-            data : datos
+            url : angular.patchURLCI+"VariableCar/listar_variable_autocomplete",
+            data : datos 
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
     }
     function sRegistrar (datos) {
       var request = $http({
             method : "post",
-            url : angular.patchURLCI+"Colaborador/registrar",
+            url : angular.patchURLCI+"VariableCar/registrar",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
-    }
+    }  
     function sEditar (datos) {
       var request = $http({
             method : "post",
-            url : angular.patchURLCI+"Colaborador/editar",
+            url : angular.patchURLCI+"VariableCar/editar",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
-    }
+    }   
     function sAnular (datos) {
       var request = $http({
             method : "post",
-            url : angular.patchURLCI+"Colaborador/anular",
+            url : angular.patchURLCI+"VariableCar/anular",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
-    }
+    }      
 });
 
-app.factory("ColaboradorFactory", function($uibModal, pinesNotifications, blockUI, ColaboradorServices,UsuarioServices,UsuarioFactory) { 
+app.factory("VariableCarFactory", function($uibModal, pinesNotifications, blockUI, VariableCarServices) { 
   var interfaz = {
-    regColaboradorModal: function (arrParams) {
+    regVariableCarModal: function (arrParams) {
       blockUI.start('Abriendo formulario...');
       $uibModal.open({ 
-        templateUrl: angular.patchURLCI+'Colaborador/ver_popup_formulario',
+        templateUrl: angular.patchURLCI+'VariableCar/ver_popup_formulario',
         size: 'md',
         backdrop: 'static',
         keyboard:false,
-        controller: function ($scope, $uibModalInstance, arrParams,UsuarioFactory) { 
+        controller: function ($scope, $uibModalInstance, arrParams) { 
           blockUI.stop(); 
           $scope.fData = {};
           $scope.metodos = arrParams.metodos;
           $scope.fArr = arrParams.fArr;
-          $scope.titleForm = 'Registro de Colaborador';
+          $scope.titleForm = 'Registro de Variable';
           $scope.cancel = function () {
             $uibModalInstance.dismiss('cancel');
           }
-          $scope.btnNuevoUsuario = function() { 
-            var arrParams = {
-              'metodos': $scope.metodos,
-              'fArr': $scope.fArr, 
-              callback: function(datos,rpta) {
-                $scope.fData.username = datos.username;
-                $scope.fData.idusuario = rpta.idusuario;
-              }
-            }
-            UsuarioFactory.regUsuarioModal(arrParams); 
-          };
           $scope.aceptar = function () { 
             blockUI.start('Procesando información...');
-            console.log($scope.fData,'$scope.fData');
-            ColaboradorServices.sRegistrar($scope.fData).then(function (rpta) {
+            VariableCarServices.sRegistrar($scope.fData).then(function (rpta) {
               if(rpta.flag == 1){
                 var pTitle = 'OK!';
                 var pType = 'success';
@@ -270,10 +232,10 @@ app.factory("ColaboradorFactory", function($uibModal, pinesNotifications, blockU
         }
       });
     },
-    editColaboradorModal: function (arrParams) {
+    editVariableCarModal: function (arrParams) {
       blockUI.start('Abriendo formulario...');
       $uibModal.open({ 
-        templateUrl: angular.patchURLCI+'Colaborador/ver_popup_formulario',
+        templateUrl: angular.patchURLCI+'VariableCar/ver_popup_formulario',
         size: 'md',
         backdrop: 'static',
         keyboard:false,
@@ -287,25 +249,13 @@ app.factory("ColaboradorFactory", function($uibModal, pinesNotifications, blockU
           }else{
             alert('Seleccione una sola fila');
           }
-          $scope.titleForm = 'Edición de Colaborador';
+          $scope.titleForm = 'Edición de Variable';
           $scope.cancel = function () {
             $uibModalInstance.dismiss('cancel');
           }
-          $scope.btnNuevoUsuario = function() { 
-            var arrParamss = {
-              'metodos': $scope.metodos,
-              'mySelectionGrid': arrParams.mySelectionGrid,
-              'fArr': $scope.fArr,
-              callback: function(datos) {
-                console.log(datos,'datos');
-              } 
-            }
-            console.log(arrParams,'arrParams');
-            UsuarioFactory.editUsuarioModal(arrParamss); 
-          }
           $scope.aceptar = function () { 
             blockUI.start('Procesando información...');
-            ColaboradorServices.sEditar($scope.fData).then(function (rpta) {
+            VariableCarServices.sEditar($scope.fData).then(function (rpta) {
               if(rpta.flag == 1){
                 var pTitle = 'OK!';
                 var pType = 'success';
@@ -334,3 +284,4 @@ app.factory("ColaboradorFactory", function($uibModal, pinesNotifications, blockU
   }
   return interfaz;
 })
+

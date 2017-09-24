@@ -8,7 +8,7 @@ class Colaborador extends CI_Controller {
         // Se le asigna a la informacion a la variable $sessionVP.
         $this->sessionFactur = @$this->session->userdata('sess_fact_'.substr(base_url(),-20,7));
         $this->load->helper(array('fechas','otros')); 
-        $this->load->model(array('model_colaborador')); 
+        $this->load->model(array('model_colaborador','model_usuario')); 
 
     }
 
@@ -32,7 +32,10 @@ class Colaborador extends CI_Controller {
 							'id'=> $row['idtipousuario'],
 							'descripcion'=> $row['descripcion_tu']
 					),	
-					'username' => $row['username']
+					'username' => $row['username'],
+					'password' => $row['password'],
+					'password_view' => $row['password_view'],
+					'idusuario' => $row['idusuario']
 				)
 			);
 		}
@@ -80,7 +83,7 @@ class Colaborador extends CI_Controller {
     	
     	$this->db->trans_start();
 		if($this->model_colaborador->m_editar($allInputs)) { // edicion de elemento
-			$arrData['message'] = 'Se registraron los datos correctamente';
+			$arrData['message'] = 'Se editaron los datos correctamente';
 			$arrData['flag'] = 1;
 		}
 		$this->db->trans_complete();
@@ -94,9 +97,21 @@ class Colaborador extends CI_Controller {
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		$arrData['message'] = 'No se pudo anular los datos';
     	$arrData['flag'] = 0;
+    	// var_dump($allInputs);exit();
+    	$fCotizacion = $this->model_colaborador->m_cargar_cotizacion_colaborador($allInputs);
+    	if( !empty($fCotizacion) ){ 
+    		$arrData['message'] = 'Ya se a registrado una cotización, no se puede anular'; 
+    		$arrData['flag'] = 0;
+    		$this->output
+		    	->set_content_type('application/json')
+		    	->set_output(json_encode($arrData));
+		    return;
+    	} 
 		if( $this->model_colaborador->m_anular($allInputs) ){ 
 			$arrData['message'] = 'Se anularon los datos correctamente';
     		$arrData['flag'] = 1;
+		}
+		if( $this->model_usuario->m_anular($allInputs) ){ 
 		}
 		$this->output
 		    ->set_content_type('application/json')

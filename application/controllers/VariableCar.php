@@ -1,28 +1,27 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Caracteristica extends CI_Controller {
+class VariableCar extends CI_Controller {
 	public function __construct()
     {
         parent::__construct();
         // Se le asigna a la informacion a la variable $sessionVP.
         $this->sessionFactur = @$this->session->userdata('sess_fact_'.substr(base_url(),-20,7));
         $this->load->helper(array('fechas','otros')); 
-        $this->load->model(array('model_caracteristica')); 
+        $this->load->model(array('model_variable_car')); 
     }
 
-	public function listar_caracteristica(){ 
+	public function listar_variable_car(){ 
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		$paramPaginate = $allInputs['paginate'];
-		$lista = $this->model_caracteristica->m_cargar_caracteristica($paramPaginate);
-		$fCount = $this->model_caracteristica->m_count_caracteristica($paramPaginate);
+		$lista = $this->model_variable_car->m_cargar_variable_car($paramPaginate);
+		$fCount = $this->model_variable_car->m_count_variable_car($paramPaginate);
 		$arrListado = array();
 		foreach ($lista as $row) { 
 			array_push($arrListado,
 				array(
-					'id' => $row['idcaracteristica'],
-					'descripcion_car' => strtoupper($row['descripcion_car']),
-					'orden_car' => strtoupper($row['orden_car'])			
+					'id' => $row['idvariablecar'],
+					'descripcion_vcar' => strtoupper($row['descripcion_vcar'])
 				)
 			);
 		}
@@ -37,22 +36,22 @@ class Caracteristica extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
-	public function listar_caracteristicas_agregar()
+	public function listar_variable_autocomplete()
 	{
-		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
-		$lista = $this->model_caracteristica->m_cargar_caracteristica_agregar();
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);	
+		$allInputs['limite'] = 15;
+		$lista = $this->model_variable_car->m_cargar_variable_limite($allInputs);
 		$arrListado = array();
 		foreach ($lista as $row) { 
 			array_push($arrListado,
 				array(
-					'id' => $row['idcaracteristica'], 
-					'descripcion' => strtoupper($row['descripcion_car']), 
-					'orden'=> $row['orden_car'],
-					'valor'=> NULL 
+					'id' => $row['idvariablecar'],
+					'descripcion' => strtoupper($row['descripcion_vcar']) 
 				)
 			);
 		}
-    	$arrData['datos'] = $arrListado; 
+		
+    	$arrData['datos'] = $arrListado;
     	$arrData['message'] = '';
     	$arrData['flag'] = 1;
 		if(empty($lista)){
@@ -60,32 +59,31 @@ class Caracteristica extends CI_Controller {
 		}
 		$this->output
 		    ->set_content_type('application/json')
-		    ->set_output(json_encode($arrData));
+		    ->set_output(json_encode($arrData)); 
 	}
 	public function ver_popup_formulario()
 	{
-		$this->load->view('caracteristica/mant_caracteristica');
+		$this->load->view('variable-car/mant_variableCar');
 	}	
-	public function ver_popup_agregar_caracteristica()
-	{
-		$this->load->view('caracteristica/agregar_caracteristica');
-	}
+
 	public function registrar()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
     	$arrData['flag'] = 0;
     	// VALIDACIONES
-    	if(!is_numeric($allInputs['orden_car'])){ 
-    		$arrData['message'] = 'Digite número , no letras'; 
+      	$fVariable = $this->model_variable_car->m_cargar_esta_variable_car($allInputs);
+    	if( !empty($fVariable) ){ 
+    		$arrData['message'] = 'Ya se encuentra registrado'; 
     		$arrData['flag'] = 0;
     		$this->output
 		    	->set_content_type('application/json')
 		    	->set_output(json_encode($arrData));
 		    return;
-    	}     	
+    	} 	
+
     	$this->db->trans_start();
-		if($this->model_caracteristica->m_registrar($allInputs)) { 
+		if($this->model_variable_car->m_registrar_variable_car($allInputs)) { // registro de variable
 			$arrData['message'] = 'Se registraron los datos correctamente';
 			$arrData['flag'] = 1;
 		}
@@ -101,16 +99,9 @@ class Caracteristica extends CI_Controller {
 		$arrData['message'] = 'Error al editar los datos, inténtelo nuevamente';
     	$arrData['flag'] = 0;
     	// VALIDACIONES
-    	if(!is_numeric($allInputs['orden_car'])){ 
-    		$arrData['message'] = 'Digite número , no letras'; 
-    		$arrData['flag'] = 0;
-    		$this->output
-		    	->set_content_type('application/json')
-		    	->set_output(json_encode($arrData));
-		    return;
-    	}        	
+    	
     	$this->db->trans_start();
-		if($this->model_caracteristica->m_editar($allInputs)) {
+		if($this->model_variable_car->m_editar($allInputs)) { // edicion de variable
 			$arrData['message'] = 'Se editaron los datos correctamente';
 			$arrData['flag'] = 1;
 		}
@@ -125,13 +116,13 @@ class Caracteristica extends CI_Controller {
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		$arrData['message'] = 'No se pudo anular los datos';
     	$arrData['flag'] = 0;
-		if( $this->model_caracteristica->m_anular($allInputs) ){ 
+		if( $this->model_variable_car->m_anular($allInputs) ){ 
 			$arrData['message'] = 'Se anularon los datos correctamente';
     		$arrData['flag'] = 1;
 		}
 		$this->output
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
-	}	
-
+	}
+	
 }

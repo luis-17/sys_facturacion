@@ -75,7 +75,9 @@ angular.module('app')
               'angular/controllers/TipoDocumentoClienteCtrl.js',
               'angular/controllers/SedeCtrl.js',
               'angular/controllers/FormaPagoCtrl.js',
-              'angular/controllers/UnidadMedidaCtrl.js' 
+              'angular/controllers/UnidadMedidaCtrl.js',
+              'angular/controllers/ContactoEmpresaCtrl.js',
+              'angular/controllers/VariableCarCtrl.js' 
             ])
           })
           .state('app.historial-cotizacion', {
@@ -161,7 +163,9 @@ angular.module('app')
             templateUrl: 'tpl/usuario.html',
             resolve: load([
               'angular/controllers/UsuarioCtrl.js',   
-              'angular/controllers/ColaboradorCtrl.js'      
+              'angular/controllers/ColaboradorCtrl.js',
+              'angular/controllers/UsuarioEmpresaAdminCtrl.js',
+              'angular/controllers/EmpresaAdminCtrl.js'               
             ]) 
           })    
           .state('app.contacto', {
@@ -169,9 +173,17 @@ angular.module('app')
             templateUrl: 'tpl/contacto.html',
             resolve: load([      
               'angular/controllers/ContactoEmpresaCtrl.js', 
-              'angular/controllers/ClienteEmpresaCtrl.js'   
+              'angular/controllers/ClienteEmpresaCtrl.js',
+              'angular/controllers/ClienteCtrl.js'   
             ]) 
-          })                                               
+          })    
+          .state('app.variable-car', {
+            url: '/variable-car',
+            templateUrl: 'tpl/variable-car.html',
+            resolve: load([
+              'angular/controllers/VariableCarCtrl.js'      
+            ]) 
+          })                                                       
           .state('lockme', {
               url: '/lockme',
               templateUrl: 'tpl/page_lockme.html'

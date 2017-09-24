@@ -24,31 +24,45 @@
 			            <input type="text" class="form-control input-sm" ng-model="fContacto.nombres" placeholder="Ingrese nombres" required tabindex="20" /> 
 					</div>
 					<div class="form-group">
-						<label class="control-label"> Apellidos: <small class="text-danger">(*)</small> </label>
-			            <input type="text" class="form-control input-sm" ng-model="fContacto.apellidos" placeholder="Ingrese apellidos" required tabindex="30" /> 
+						<label class="control-label"> Apellidos: </label>
+			            <input type="text" class="form-control input-sm" ng-model="fContacto.apellidos" placeholder="Ingrese apellidos" tabindex="30" /> 
 					</div>
-					<div class="form-group col-md-6 pl-n">
-						<label class="control-label"> Teléfono Fijo: <small class="text-danger">(*)</small> </label>
-			            <input type="tel" class="form-control input-sm" ng-model="fContacto.telefono_fijo" placeholder="Ingrese tel. fijo" required tabindex="40" /> 
+					<div class="form-group">
+						<div class="inline mr-sm">
+							<label class="control-label text-ellipsis"> Fecha de Nac.: </label>
+			            	<input type="text" input-mask mask-options="{alias: 'dd-mm-yyyy'}" placeholder="dd-mm-yyyy" class="form-control input-sm" ng-model="fContacto.fecha_nacimiento" tabindex="40" /> 
+						</div>
+						<div class="inline"> 
+							<label class="control-label text-ellipsis"> Teléfono Movil: </label>
+			            	<input type="tel" class="form-control input-sm" ng-model="fContacto.telefono_movil" placeholder="Ingrese tel. movil" tabindex="50" /> 
+						</div>
+					</div> 
+					<div class="form-group">
+						<div class="inline mr-sm">
+							<label class="control-label"> Teléfono Fijo: </label>
+				            <input type="tel" class="form-control input-sm" ng-model="fContacto.telefono_fijo" placeholder="Ingrese tel. fijo" tabindex="60" /> 
+				        </div>
+				        <div class="inline">
+				        	<label class="control-label"> Anexo: </label>
+			           	 	<input type="text" class="form-control input-sm" ng-model="fContacto.anexo" placeholder="Anexo" tabindex="70" /> 
+				        </div>
 					</div>
-					<div class="form-group col-md-6 pr-n">
-						<label class="control-label"> Teléfono Movil: <small class="text-danger">(*)</small> </label>
-			            <input type="tel" class="form-control input-sm" ng-model="fContacto.telefono_movil" placeholder="Ingrese tel. movil" required tabindex="50" /> 
-					</div>
-					<div class="form-group col-md-6 pl-n">
-						<label class="control-label"> E-mail: </label>
-			            <input type="email" class="form-control input-sm" ng-model="fContacto.email" placeholder="Ingrese correo electrónico" tabindex="60" /> 
-					</div>
-					<div class="form-group col-md-6 pr-n">
-						<label class="control-label"> Fecha de Nac.: </label>
-			            <input type="text" input-mask mask-options="{alias: 'dd-mm-yyyy'}" placeholder="dd-mm-yyyy" class="form-control input-sm" ng-model="fContacto.fecha_nacimiento" tabindex="70" /> 
+					<div class="form-group">
+						<div class="inline mr-sm">
+							<label class="control-label"> E-mail: </label>
+			            	<input type="email" class="form-control input-sm" ng-model="fContacto.email" placeholder="Ingrese correo electrónico" tabindex="80" /> 
+			           	</div> 
+			           	<div class="inline">
+			           		<label class="control-label"> Area encargada: </label>
+			            	<input type="text" class="form-control input-sm" ng-model="fContacto.area_encargada" placeholder="Ingrese área" tabindex="90" /> 
+			            </div>
 					</div> 
 					<div class="form-group" ng-if="contBotonesReg">
-						<button type="button" ng-click="agregarContacto(); $event.preventDefault();" ng-disabled="formContactoEmpresa.$invalid" class="block btn btn-primary btn-sm btn-full"> <i class="fa fa-plus"></i> AGREGAR CONTACTO </button>
+						<button type="button" ng-click="agregarContacto(); $event.preventDefault();" ng-disabled="formContactoEmpresa.$invalid" tabindex="100" class="block btn btn-primary btn-sm btn-full"> <i class="fa fa-plus"></i> AGREGAR CONTACTO </button>
 					</div> 
 					<div class="form-group" ng-if="contBotonesEdit">
-						<button type="button" ng-click="actualizarContacto(); $event.preventDefault();" ng-disabled="formContactoEmpresa.$invalid" class="block btn btn-primary btn-sm btn-block"> <i class="fa fa-edit"></i> ACTUALIZAR CONTACTO </button>
-						<button type="button" ng-click="quitarContacto(); $event.preventDefault();" class="block btn btn-danger btn-sm btn-block"> <i class="fa fa-trash"></i> QUITAR CONTACTO </button>
+						<button type="button" ng-click="actualizarContacto(); $event.preventDefault();" tabindex="110" ng-disabled="formContactoEmpresa.$invalid" class="block btn btn-primary btn-sm btn-block"> <i class="fa fa-edit"></i> ACTUALIZAR CONTACTO </button>
+						<button type="button" ng-click="quitarContacto(); $event.preventDefault();" tabindex="120" class="block btn btn-danger btn-sm btn-block"> <i class="fa fa-trash"></i> QUITAR CONTACTO </button>
 					</div> 
 				</fieldset>	
 			</form>

@@ -6,7 +6,7 @@ class Model_caracteristica extends CI_Model {
 	}
 
 	public function m_cargar_caracteristica($paramPaginate){ 
-		$this->db->select("ca.idcaracteristica, ca.descripcion_car");
+		$this->db->select("ca.idcaracteristica, ca.descripcion_car, ca.orden_car");
 		$this->db->from('caracteristica ca');
 		$this->db->where('estado_car', 1);
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
@@ -42,16 +42,18 @@ class Model_caracteristica extends CI_Model {
 	}
 	public function m_cargar_caracteristica_agregar()
 	{
-		$this->db->select("ca.idcaracteristica, ca.descripcion_car");
+		$this->db->select("ca.idcaracteristica, ca.descripcion_car, ca.orden_car");
 		$this->db->from('caracteristica ca');
 		$this->db->where('estado_car', 1);
-		$this->db->order_by('ca.descripcion_car','ASC');
+		$this->db->order_by('ca.orden_car','DESC');
 		return $this->db->get()->result_array();
 	}
 	public function m_registrar($datos)
 	{
 		$data = array(
-			'descripcion_car' => strtoupper($datos['descripcion_car'])
+			'descripcion_car' => strtoupper($datos['descripcion_car']),
+			'orden_car'=> empty($datos['orden_car']) ? NULL : $datos['orden_car']
+			// 'orden_car' => $datos['orden_car']
 		);
 		return $this->db->insert('caracteristica', $data); 
 	}
@@ -59,7 +61,9 @@ class Model_caracteristica extends CI_Model {
 	public function m_editar($datos)
 	{
 		$data = array(
-			'descripcion_car' => strtoupper($datos['descripcion_car'])
+			'descripcion_car' => strtoupper($datos['descripcion_car']),
+			'orden_car'=> empty($datos['orden_car']) ? NULL : $datos['orden_car']
+			// 'orden_car' => $datos['orden_car']
 		);
 		$this->db->where('idcaracteristica',$datos['id']);
 		return $this->db->update('caracteristica', $data); 
