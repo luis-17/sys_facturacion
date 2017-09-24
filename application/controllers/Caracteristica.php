@@ -47,6 +47,7 @@ class Caracteristica extends CI_Controller {
 				array(
 					'id' => $row['idcaracteristica'], 
 					'descripcion' => strtoupper($row['descripcion_car']), 
+					'orden'=> $row['orden_car'],
 					'valor'=> NULL 
 				)
 			);
@@ -97,7 +98,7 @@ class Caracteristica extends CI_Controller {
 	public function editar()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
-		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
+		$arrData['message'] = 'Error al editar los datos, inténtelo nuevamente';
     	$arrData['flag'] = 0;
     	// VALIDACIONES
     	if(!is_numeric($allInputs['orden_car'])){ 
@@ -110,7 +111,7 @@ class Caracteristica extends CI_Controller {
     	}        	
     	$this->db->trans_start();
 		if($this->model_caracteristica->m_editar($allInputs)) {
-			$arrData['message'] = 'Se registraron los datos correctamente';
+			$arrData['message'] = 'Se editaron los datos correctamente';
 			$arrData['flag'] = 1;
 		}
 		$this->db->trans_complete();

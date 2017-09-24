@@ -194,14 +194,13 @@ app.controller('UsuarioCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$l
             multiSelect: false,
             columnDefs: [ 
               { field: 'id', name: 'idusuarioempresaadmin', displayName: 'ID',visible: false,enableCellEdit: false , width: '75',  sort: { direction: uiGridConstants.DESC} },
+              { field: 'razon_social', name: 'razon_social', displayName: 'Razón Social', minWidth: 160 ,enableCellEdit: false },
+              { field: 'ruc', name: 'ruc', displayName: 'RUC', minWidth: 100,enableCellEdit: false  }
               { field: 'select_por_defecto', name: 'select_por_defecto', displayName: 'Por defecto', width: 90, enableCellEdit: true, enableSorting: false, cellClass:'ui-editCell',editableCellTemplate: 'ui-grid/dropdownEditor',              cellFilter: 'select_por_defecto', editDropdownValueLabel: 'select_por_defecto', editDropdownOptionsArray: [
                   { id: 1, select_por_defecto: 'SI' },
                   { id: 2, select_por_defecto: 'NO' }
                 ],cellTemplate: '<div class="text-center ui-grid-cell-contents" ng-if="COL_FIELD == 1"> SI </div><div class="text-center" ng-if="COL_FIELD == 2"> NO </div>'
               },
-              { field: 'razon_social', name: 'razon_social', displayName: 'Razón Social', minWidth: 160 ,enableCellEdit: false },
-              { field: 'ruc', name: 'ruc', displayName: 'RUC', minWidth: 100,enableCellEdit: false  }
-
             ],
             onRegisterApi: function(gridApiEmpresa) { 
               $scope.gridApiEmpresa = gridApiEmpresa;
