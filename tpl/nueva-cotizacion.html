@@ -28,7 +28,7 @@
 							<label class="control-label text-ellipsis"> Num. Documento. <small class="text-danger">(*)</small></label> 
               <input id="numDocumento" type="text" class="form-control input-sm" ng-model="fData.num_documento" ng-enter="obtenerDatosCliente(); $event.preventDefault();" 
               	placeholder="Numero de Documento" ng-change="limpiarCampos();" tabindex="110" ng-pattern="pNumeroDocumento" required /> 
-              <span class="help-block m-b-none f-10 text-ellipsis">Presiones "Enter" para buscar.</span>
+              <span class="help-block m-b-none f-10 text-ellipsis">Presiona "Enter" para buscar.</span>
 						</div>	
 						<div class="col-md-6" ng-show="fData.tipo_documento_cliente.destino == 1"> <!-- EMPRESA -->
 							<label class="control-label"> Razón Social <small class="text-danger">(*)</small> </label> 
@@ -133,7 +133,6 @@
               <label class="control-label text-info text-bold text-ellipsis"> {{ fSessionCI.nombres + ' ' + fSessionCI.apellidos }} </label> 
           	</div>
           </div>
-
 	    	</fieldset>
 			</div>
 			<div class="col-xs-12" >
@@ -279,17 +278,14 @@
 	    <div class="col-xs-12 text-right" >
 	    	<button type="button" class="btn-info btn pull-left" ng-click="goToUrl('/app/historial-cotizacion'); $event.preventDefault();" tabindex="415"> 
 	    		<i class="fa fa-save"> </i> COTIZACIONES </button> 
-
 	    	<button type="button" class="btn-primary btn" ng-click="grabar(); $event.preventDefault();" ng-disabled="formCotizacion.$invalid && !fData.isRegisterSuccess" tabindex="420"> 
 	    		<i class="fa fa-save"> </i> [F2] GRABAR </button> 
-	    	<button type="button" class="btn-success btn mr-lg" ng-click="imprimir(); $event.preventDefault();" ng-disabled="!fData.isRegisterSuccess" tabindex="440"> 
+	    	<button type="button" class="btn-success btn mr-lg" ng-click="imprimir(); $event.preventDefault();" ng-disabled="!fData.isRegisterSuccess" tabindex="430"> 
 	        	<i class="fa fa-print"> </i> [F4] IMPRIMIR </button> 
-
-	      <button type="button" class="btn-default btn" ng-click="reloadPage(); $event.preventDefault();" tabindex="430"> 
+	      <button type="button" class="btn-default btn" ng-click="reloadPage(); $event.preventDefault();" tabindex="440"> 
 	        	<i class="fa fa-file"> </i> [F3] NUEVO </button>
 	      <button type="button" class="btn-warning btn" ng-click="mismoCliente(); $event.preventDefault();" tabindex="450" > 
-	        	<i class="fa fa-file"> </i> [F6] MISMO CLIENTE </button>
-
+	        	<i class="fa fa-file"> </i> [F6] MISMO CLIENTE </button> 
 	    </div>
 	  </div>
 	</form>
