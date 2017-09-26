@@ -38,12 +38,13 @@ app.controller('FormaPagoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '
       columnDefs: [ 
         { field: 'id', name: 'fp.idformapago', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
         { field: 'descripcion_fp', name: 'fp.descripcion_fp', displayName: 'Descripción', minWidth: 160 }
-
       ],
       onRegisterApi: function(gridApi) { 
         $scope.gridApi = gridApi;
         gridApi.selection.on.rowSelectionChanged($scope,function(row){
           $scope.mySelectionGrid = gridApi.selection.getSelectedRows();
+          $scope.mySelectionGrid.plazo = $scope.mySelectionGrid[0].modo_fp;
+
         });
         gridApi.selection.on.rowSelectionChangedBatch($scope,function(rows){
           $scope.mySelectionGrid = gridApi.selection.getSelectedRows();
