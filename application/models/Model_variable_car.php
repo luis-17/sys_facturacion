@@ -12,15 +12,8 @@ class Model_variable_car extends CI_Model {
 		$this->db->limit(1);
 		return $this->db->get()->row_array();
 	}
-	public function m_registrar($datos)
-	{
-		$data = array(
-			'descripcion_vcar' => strtoupper($datos['valor']) 
-		);
-		return $this->db->insert('sede', $data); 
-	}
-		public function m_cargar_variable_car($paramPaginate){ 
-		$this->db->select("vc.idvariablecar, vc.descripcion_vcar");
+	public function m_cargar_variable_car($paramPaginate){ 
+		$this->db->select("vc.idvariablecar, vc.descripcion_vcar"); 
 		$this->db->from('variable_car vc');
 		$this->db->where('estado_vcar', 1);
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
@@ -39,7 +32,6 @@ class Model_variable_car extends CI_Model {
 		}
 		return $this->db->get()->result_array();
 	}
-
 	public function m_count_variable_car($paramPaginate){
 		$this->db->select('COUNT(*) AS contador');
 		$this->db->from('variable_car vc');
@@ -53,6 +45,16 @@ class Model_variable_car extends CI_Model {
 		}
 		$fData = $this->db->get()->row_array();
 		return $fData;
+	}
+	public function m_cargar_variable_limite($datos)
+	{
+		$this->db->select('vc.idvariablecar, vc.descripcion_vcar');
+		$this->db->from('variable_car vc');
+		$this->db->where('vc.estado_vcar', 1);
+		$this->db->like('vc.descripcion_vcar', $datos['searchText']);
+		$this->db->order_by('vc.descripcion_vcar','ASC'); 
+		$this->db->limit($datos['limite']);
+		return $this->db->get()->result_array();
 	}
 
 	public function m_registrar_variable_car($datos)
@@ -85,8 +87,8 @@ class Model_variable_car extends CI_Model {
 	
 		$this->db->select('vc.idvariablecar');
 		$this->db->from('variable_car vc');
-		$this->db->where('ea.idempresaadmin',$datos['empresa']['id']);
-
+		$this->db->where('vc.descripcion_vcar',$datos['descripcion_vcar']);
+		$this->db->where('vc.estado_vcar',1);
 		$this->db->limit(1);
 		return $this->db->get()->row_array();
 	}

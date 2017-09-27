@@ -35,6 +35,9 @@ class Model_colaborador extends CI_Model {
 		$this->db->join('usuario us', 'co.idusuario = us.idusuario AND us.estado_us = 1','left'); 
 		$this->db->join('tipo_usuario tu', 'us.idtipousuario = tu.idtipousuario');
 		$this->db->where('co.estado_col', 1);
+		if( $this->sessionFactur['key_tu'] != 'key_root' ){ 
+			$this->db->where_not_in('tu.key_tu', array('key_root'));
+		}
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
 			foreach ($paramPaginate['searchColumn'] as $key => $value) {
 				if(! empty($value)){
@@ -56,6 +59,9 @@ class Model_colaborador extends CI_Model {
 		$this->db->join('usuario us', 'co.idusuario = us.idusuario AND us.estado_us = 1','left'); 
 		$this->db->join('tipo_usuario tu', 'us.idtipousuario = tu.idtipousuario');
 		$this->db->where('co.estado_col', 1);
+		if( $this->sessionFactur['key_tu'] != 'key_root' ){ 
+			$this->db->where_not_in('tu.key_tu', array('key_root'));
+		}
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
 			foreach ($paramPaginate['searchColumn'] as $key => $value) {
 				if(! empty($value)){
@@ -70,6 +76,9 @@ class Model_colaborador extends CI_Model {
 		$this->db->select("co.idcolaborador, CONCAT(co.nombres, ' ', co.apellidos) As colaborador",FALSE);
 		$this->db->from('colaborador co');
 		$this->db->where('estado_col', 1);
+		if( $this->sessionFactur['key_tu'] != 'key_root' ){ 
+			$this->db->where_not_in('tu.key_tu', array('key_root'));
+		}
 		return $this->db->get()->result_array();
 	}
 	public function m_registrar($datos)
@@ -124,15 +133,15 @@ class Model_colaborador extends CI_Model {
 		return $this->db->update('colaborador', $data);
 	}	
 
-	public function m_cargar_cotizacion_colaborador($idcolaborador)
+	public function m_cargar_cotizacion_colaborador($colaborador)
 	{
 		$this->db->select('co.idcotizacion');
 		$this->db->from('cotizacion co');
-		$this->db->where('co.idcolaborador',$idcolaborador['id']);
+		$this->db->where('co.idcolaborador',$colaborador['id']); 
+		$this->db->where_in('co.estado_cot',array(1,2)); 
 		$this->db->limit(1);
 		return $this->db->get()->row_array();
 	}
-
 
 }
 ?>

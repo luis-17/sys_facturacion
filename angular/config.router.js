@@ -76,7 +76,8 @@ angular.module('app')
               'angular/controllers/SedeCtrl.js',
               'angular/controllers/FormaPagoCtrl.js',
               'angular/controllers/UnidadMedidaCtrl.js',
-              'angular/controllers/ContactoEmpresaCtrl.js' 
+              'angular/controllers/ContactoEmpresaCtrl.js',
+              'angular/controllers/VariableCarCtrl.js' 
             ])
           })
           .state('app.historial-cotizacion', {

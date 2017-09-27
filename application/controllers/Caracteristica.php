@@ -47,6 +47,7 @@ class Caracteristica extends CI_Controller {
 				array(
 					'id' => $row['idcaracteristica'], 
 					'descripcion' => strtoupper($row['descripcion_car']), 
+					'orden'=> $row['orden_car'],
 					'valor'=> NULL 
 				)
 			);

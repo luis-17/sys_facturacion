@@ -13,7 +13,7 @@ class Model_contacto_empresa extends CI_Model {
 			cc.idcategoriacliente, cc.descripcion_cc');
 		$this->db->from('contacto co');
 		$this->db->join('cliente_empresa ce', 'co.idclienteempresa = ce.idclienteempresa');
-		$this->db->join('categoria_cliente cc', 'ce.idcategoriacliente = cc.idcategoriacliente');
+		$this->db->join('categoria_cliente cc', 'ce.idcategoriacliente = cc.idcategoriacliente','left');
 		$this->db->join('colaborador col', 'ce.idcolaborador = col.idcolaborador','left');
 		$this->db->where('co.estado_co', 1);
 		$this->db->where('ce.estado_ce', 1);
@@ -103,10 +103,10 @@ class Model_contacto_empresa extends CI_Model {
 		$fData = $this->db->get()->row_array();
 		return $fData;
 	}
-	public function m_cargar_contacto_empresa_limite($datos,$paramDatos)
+	public function m_cargar_contacto_empresa_limite($datos)
 	{
-		$this->db->select('co.idcontacto,CONCAT(co.nombres, " ", co.apellidos) as contacto, co.anexo, co.area_encargada,
-			ce.ruc,ce.razon_social,co.idclienteempresa,ce.representante_legal,ce.dni_representante_legal');
+		$this->db->select('co.idcontacto,CONCAT(co.nombres, " ", co.apellidos) as contacto, co.area_encargada, co.idclienteempresa, co.telefono_fijo, co.telefono_movil, co.anexo, 
+			ce.ruc, ce.razon_social, ce.representante_legal, ce.dni_representante_legal');
 		$this->db->from('contacto co');
 		$this->db->join('cliente_empresa ce', 'co.idclienteempresa = ce.idclienteempresa');
 		$this->db->where('co.estado_co', 1);

@@ -26,6 +26,17 @@
     background-color: #fcfbcd !important;
     font-style: oblique !important;
 }
+.ui-grid-disable-selection, .fs-mini-grid .ui-grid-cell{
+    -webkit-touch-callout:all !important;
+    -webkit-user-select:all !important;
+    -khtml-user-select:all !important;
+    -moz-user-select:all !important;
+    -ms-user-select:all !important;
+    user-select:all !important;
+    cursor:default;
+}
+
+
 .btn {
 	text-transform: uppercase;
 }

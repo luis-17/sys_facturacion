@@ -20,7 +20,7 @@ app.controller('UsuarioCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$l
     };
     $scope.metodos.listaTipoUsuario = function(myCallback) {
       var myCallback = myCallback || function() { };
-      UsuarioServices.sListarCbo().then(function(rpta) {
+      UsuarioServices.sListarTipoUsuarioCbo().then(function(rpta) {
         $scope.fArr.listaTipoUsuario = rpta.datos; 
         myCallback();
       });
@@ -41,17 +41,17 @@ app.controller('UsuarioCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$l
       useExternalSorting: true,
       useExternalFiltering : true,
       enableGridMenu: true,
-      enableRowSelection: true,
       enableSelectAll: true,
       enableFiltering: false,
+      enableRowSelection: true,
       enableFullRowSelection: true,
       multiSelect: false,
       columnDefs: [ 
         { field: 'idusuario', name: 'idusuario', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
-        { field: 'tipo_usuario', name: 'descripcion_tu',cellTemplate:'<div class="ui-grid-cell-contents text-left ">'+ '{{ COL_FIELD.descripcion }}</div>',  displayName: 'Tipo Usuario', minWidth: 160 },
+        { field: 'tipo_usuario', name: 'tu.descripcion_tu', width: 160, 
+          cellTemplate:'<div class="ui-grid-cell-contents text-left ">'+ '{{ COL_FIELD.descripcion }}</div>',  displayName: 'Tipo Usuario' },
         { field: 'username', name: 'username', displayName: 'Username', minWidth: 100 },
-         { field: 'password', name: 'password',visible: false, displayName: 'Password', minWidth: 100 },
-        { field: 'password_view', name: 'password_view',visible: false, displayName: 'Contraseña', minWidth: 100 }
+        { field: 'ult_inicio_sesion', name: 'ultimo_inicio_sesion', displayName: 'Ult. Actividad', minWidth: 100 } 
       ],
       onRegisterApi: function(gridApi) { 
         $scope.gridApi = gridApi;
@@ -82,10 +82,9 @@ app.controller('UsuarioCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$l
           paginationOptions.search = true; 
           paginationOptions.searchColumn = {
             'u.idusuario' : grid.columns[1].filters[0].term,
-            'ut.descripcion_tu' : grid.columns[2].filters[0].term,
-            'u.username' : grid.columns[4].filters[0].term,
-            'u.password_view' : grid.columns[5].filters[0].term,
-            'u.password_view' : grid.columns[6].filters[0].term
+            'tu.descripcion_tu' : grid.columns[2].filters[0].term,
+            'u.username' : grid.columns[3].filters[0].term,
+            'u.ultimo_inicio_sesion' : grid.columns[4].filters[0].term
           }
           $scope.metodos.getPaginationServerSide();
         });
@@ -187,7 +186,7 @@ app.controller('UsuarioCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$l
             useExternalSorting: true,
             useExternalFiltering : true,
             enableGridMenu: true,
-            enableRowSelection: false,
+            enableRowSelection: true,
             enableSelectAll: false,
             enableFiltering: true,
             enableFullRowSelection: false,
@@ -195,14 +194,13 @@ app.controller('UsuarioCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$l
             multiSelect: false,
             columnDefs: [ 
               { field: 'id', name: 'idusuarioempresaadmin', displayName: 'ID',visible: false,enableCellEdit: false , width: '75',  sort: { direction: uiGridConstants.DESC} },
+              { field: 'razon_social', name: 'razon_social', displayName: 'Razón Social', minWidth: 160 ,enableCellEdit: false },
+              { field: 'ruc', name: 'ruc', displayName: 'RUC', minWidth: 100,enableCellEdit: false },
               { field: 'select_por_defecto', name: 'select_por_defecto', displayName: 'Por defecto', width: 90, enableCellEdit: true, enableSorting: false, cellClass:'ui-editCell',editableCellTemplate: 'ui-grid/dropdownEditor',              cellFilter: 'select_por_defecto', editDropdownValueLabel: 'select_por_defecto', editDropdownOptionsArray: [
                   { id: 1, select_por_defecto: 'SI' },
                   { id: 2, select_por_defecto: 'NO' }
                 ],cellTemplate: '<div class="text-center ui-grid-cell-contents" ng-if="COL_FIELD == 1"> SI </div><div class="text-center" ng-if="COL_FIELD == 2"> NO </div>'
-              },
-              { field: 'razon_social', name: 'razon_social', displayName: 'Razón Social', minWidth: 160 ,enableCellEdit: false },
-              { field: 'ruc', name: 'ruc', displayName: 'RUC', minWidth: 100,enableCellEdit: false  }
-
+              }
             ],
             onRegisterApi: function(gridApiEmpresa) { 
               $scope.gridApiEmpresa = gridApiEmpresa;
@@ -396,7 +394,7 @@ app.service("UsuarioServices",function($http, $q, handleBehavior) {
         sRegistrar: sRegistrar,
         sEditar: sEditar,
         sAnular: sAnular,
-        sListarCbo: sListarCbo
+        sListarTipoUsuarioCbo: sListarTipoUsuarioCbo
     });
     function sListar(datos) {
       var request = $http({
@@ -430,10 +428,10 @@ app.service("UsuarioServices",function($http, $q, handleBehavior) {
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
     }       
-    function sListarCbo(datos) {
+    function sListarTipoUsuarioCbo(datos) {
       var request = $http({
             method : "post",
-            url : angular.patchURLCI+"Usuario/listar_usuario_cbo",
+            url : angular.patchURLCI+"Usuario/listar_tipo_usuario_cbo",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
