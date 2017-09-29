@@ -17,23 +17,22 @@ class PlazoFormaPago extends CI_Controller {
 		//$permisos = cargar_permisos_del_usuario($this->user->idusuario);
 	}
 	public function listar_plazo_forma_pago(){ 
-		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
-		$paramPaginate = $allInputs['paginate'];
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);	
 		$paramDatos = $allInputs['datos'];	
-		$lista = $this->model_plazo_forma_pago->m_cargar_plazo_forma_pago($paramPaginate,$paramDatos);
-		$fCount = $this->model_plazo_forma_pago->m_count_plazo_forma_pago($paramPaginate,$paramDatos);
+		$lista = $this->model_plazo_forma_pago->m_cargar_plazo_forma_pago($paramDatos);
+		$fCount = $this->model_plazo_forma_pago->m_count_plazo_forma_pago($paramDatos);
 		$arrListado = array();
 		foreach ($lista as $row) { 	
 			array_push($arrListado,
 				array(
 					'id' => $row['idplazoformapago'],	
 					'dias_transcurridos' => strtoupper($row['dias_transcurridos']),
-					'porcentaje_importe' => strtoupper($row['porcentaje_importe'])
+					'porcentaje_importe' => strtoupper($row['porcentaje_importe']),
+					'idformapago' => $row['idformapago']
 				)
 			);
 		}
     	$arrData['datos'] = $arrListado;
-    	$arrData['paginate']['totalRows'] = $fCount['contador'];
     	$arrData['message'] = '';
     	$arrData['flag'] = 1;
 		if(empty($lista)){
@@ -54,7 +53,15 @@ class PlazoFormaPago extends CI_Controller {
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
     	$arrData['flag'] = 0;
-
+    	$suma=$allInputs['porcentaje_importe']+$allInputs['totalimporte'];    
+    	if($suma>100){     
+    		$arrData['message'] = 'No se puede registrar, se ha pasado del 100%'; 
+    		$arrData['flag'] = 0;
+    		$this->output
+		    	->set_content_type('application/json')
+		    	->set_output(json_encode($arrData));
+		    return;
+    	}
     	$this->db->trans_start();	
 		if( $this->model_plazo_forma_pago->m_registrar($allInputs) ){ 
 					$arrData['message'] = 'Se registraron los datos correctamente';
@@ -68,7 +75,7 @@ class PlazoFormaPago extends CI_Controller {
 
 	public function anular()
 	{
-		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);		
 		$arrData['message'] = 'No se pudo anular los datos';
     	$arrData['flag'] = 0;
 		if( $this->model_plazo_forma_pago->m_anular($allInputs) ){ 
@@ -85,9 +92,17 @@ class PlazoFormaPago extends CI_Controller {
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		$arrData['message'] = 'Error al editar los datos, inténtelo nuevamente';
     	$arrData['flag'] = 0;
-
+    	$paramDatos = $allInputs['datos'];	
+    	if($allInputs['total']>100){     
+    		$arrData['message'] = 'No se puede editar, se ha pasado del 100%'; 
+    		$arrData['flag'] = 0;
+    		$this->output
+		    	->set_content_type('application/json')
+		    	->set_output(json_encode($arrData));
+		    return;
+    	} 
 		$this->db->trans_complete();
-		if($this->model_plazo_forma_pago->m_editar($allInputs)) {
+		if($this->model_plazo_forma_pago->m_editar($paramDatos)) {
 			$arrData['message'] = 'Se editaron los datos correctamente';
 			$arrData['flag'] = 1;
 		}		

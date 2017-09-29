@@ -18,11 +18,18 @@ class FormaPago extends CI_Controller {
 		$fCount = $this->model_forma_pago->m_count_forma_pago($paramPaginate);
 		$arrListado = array();
 		foreach ($lista as $row) { 
+			if( $row['modo_fp'] == 1){ 
+				$strModo = 'AL CONTADO'; 
+			}
+			if( $row['modo_fp'] == 2 ){ 
+				$strModo = 'AL CRÉDITO'; 
+			}
 			array_push($arrListado,
 				array(
 					'id' => $row['idformapago'],
 					'descripcion_fp' => strtoupper($row['descripcion_fp']),
-					'modo_fp' => strtoupper($row['modo_fp']) 
+					'modo_fp' => strtoupper($row['modo_fp']),
+					'descripcion_modo_fp' => $strModo
 				)
 			);
 		}

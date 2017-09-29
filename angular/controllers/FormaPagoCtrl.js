@@ -37,7 +37,8 @@ app.controller('FormaPagoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '
       multiSelect: false,
       columnDefs: [ 
         { field: 'id', name: 'fp.idformapago', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
-        { field: 'descripcion_fp', name: 'fp.descripcion_fp', displayName: 'Descripción', minWidth: 160 }
+        { field: 'descripcion_fp', name: 'fp.descripcion_fp', displayName: 'Descripción', minWidth: 160 },
+         { field: 'descripcion_modo_fp', name: 'descripcion_modo_fp', displayName: 'Modo', minWidth: 160 }
       ],
       onRegisterApi: function(gridApi) { 
         $scope.gridApi = gridApi;
@@ -70,7 +71,8 @@ app.controller('FormaPagoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '
           paginationOptions.search = true; 
           paginationOptions.searchColumn = {
             'fp.idformapago' : grid.columns[1].filters[0].term,
-            'fp.descripcion_fp' : grid.columns[2].filters[0].term  
+            'fp.descripcion_fp' : grid.columns[2].filters[0].term,
+            'fp.descripcion_modo_fp' : grid.columns[3].filters[0].term    
           }
           $scope.metodos.getPaginationServerSide();
         });
@@ -117,7 +119,7 @@ app.controller('FormaPagoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '
       blockUI.start('Abriendo formulario...');
       $uibModal.open({ 
         templateUrl: angular.patchURLCI+'PlazoFormaPago/ver_popup_plazo_forma_pago',
-        size: 'lg',
+        size: 'md',
         backdrop: 'static',
         keyboard:false,
         scope: $scope,
@@ -140,165 +142,92 @@ app.controller('FormaPagoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '
           $scope.cancel = function () {
             $uibModalInstance.dismiss('cancel');
           } 
-          $scope.btnBuscarPlazo = function(){
-            $scope.gridOptionsPlazo.enableFiltering = !$scope.gridOptionsPlazo.enableFiltering;
-            $scope.gridApiPlazo.core.notifyDataChange( uiGridConstants.dataChange.COLUMN );
-          };
-          var paginationOptionPlazo = {
-            pageNumber: 1,
-            firstRow: 0,
-            pageSize: 10,
-            sort: uiGridConstants.DESC,
-            sortName: null,
-            search: null
-          };
-          $scope.gridOptionsPlazo = { 
-            rowHeight: 30,
-            paginationPageSizes: [10, 50, 100, 500, 1000],
-            paginationPageSize: 10,
-            useExternalPagination: true,
-            useExternalSorting: true,
-            useExternalFiltering : true,
-            enableGridMenu: true,
-            enableRowSelection: true,
-            enableSelectAll: true,
-            enableFiltering: false,
-            enableFullRowSelection: true,
-            multiSelect: false,
-            columnDefs: [ 
-              { field: 'id', name: 'idplazoformapago', displayName: 'ID',visible: false,enableCellEdit: false , width: '75',  sort: { direction: uiGridConstants.DESC} },
-              { field: 'dias_transcurridos', name: 'dias_transcurridos', displayName: 'Días transcurridos', minWidth: 160 },
-              { field: 'porcentaje_importe', name: 'porcentaje_importe', displayName: 'Porcentaje Importe', minWidth: 160 }
-            ],
-
-            onRegisterApi: function(gridApiPlazo) { 
-              $scope.gridApiPlazo = gridApiPlazo;
-              gridApiPlazo.selection.on.rowSelectionChanged($scope,function(row){
-                $scope.mySelectionGridBanco = gridApiPlazo.selection.getSelectedRows(); 
-                // EDICIÓN DE BANCO
-                if( $scope.mySelectionGridBanco.length == 1 ){
-                  $scope.editClassForm = ' edit-form'; 
-                  $scope.tituloBloque = 'Edición de Plazo';
-                  $scope.contBotonesReg = false;
-                  $scope.contBotonesEdit = true;
-                  $scope.fPlazo = $scope.mySelectionGridBanco[0];                            
-                }else{
-                  console.log();
-                  $scope.editClassForm = null; 
-                  $scope.tituloBloque = 'Agregar Plazo';
-                  $scope.contBotonesReg = true;
-                  $scope.contBotonesEdit = false;
-                }
-                /* END */
-              });
-              gridApiPlazo.selection.on.rowSelectionChangedBatch($scope,function(rows){
-                $scope.mySelectionGridBanco = gridApiPlazo.selection.getSelectedRows();
-              });
-
-              $scope.gridApiPlazo.core.on.sortChanged($scope, function(grid, sortColumns) { 
-                if (sortColumns.length == 0) {
-                  paginationOptionPlazo.sort = null;
-                  paginationOptionPlazo.sortName = null;
-                } else {
-                  paginationOptionPlazo.sort = sortColumns[0].sort.direction;
-                  paginationOptionPlazo.sortName = sortColumns[0].name;
-                }
-                $scope.metodos.getPaginationServerSidePlazo(true);
-              });
-              gridApiPlazo.pagination.on.paginationChanged($scope, function (newPage, pageSize) {
-                paginationOptionPlazo.pageNumber = newPage;
-                paginationOptionPlazo.pageSize = pageSize;
-                paginationOptionPlazo.firstRow = (paginationOptionPlazo.pageNumber - 1) * paginationOptionPlazo.pageSize;
-                $scope.metodos.getPaginationServerSidePlazo(true);
-              });
-              $scope.gridApiPlazo.core.on.filterChanged( $scope, function(grid, searchColumns) {
-                var grid = this.grid;
-                paginationOptionPlazo.search = true; 
-                paginationOptionPlazo.searchColumn = {
-                  'pfp.idplazoformapago' : grid.columns[1].filters[0].term,
-                  'pfp.dias_transcurridos' : grid.columns[2].filters[0].term,      
-                  'pfp.porcentaje_importe' : grid.columns[3].filters[0].term      
-                }
-                $scope.metodos.getPaginationServerSidePlazo();
-              }); 
+          $scope.metodos.getPaginationServerSidePlazo = function(loader) {
+            if( loader ){
+              blockUI.start('Procesando información...');
             }
-          };
-
-          $scope.quitarPlazo = function() {
-            var pMensaje = '¿Realmente desea anular el registro?';
-              $bootbox.confirm(pMensaje, function(result) {
-                if(result){
-                  var arrParams = {
-                    id: $scope.fPlazo.id 
+            var arrParams = {       
+              datos: $scope.fData 
+            };
+            PlazoFormaPagoServices.sListarPlazoFormaPago(arrParams).then(function (rpta) { 
+               console.log(rpta.datos,'rpta');
+               $scope.fPlazo.plazolista=rpta.datos;
+                  var total = 0;
+                  angular.forEach($scope.fPlazo.plazolista,function (value, key) { 
+                     total += parseFloat($scope.fPlazo.plazolista[key].porcentaje_importe);                
+                  });
+                  $scope.fPlazo.totalimporte=total;
+                  if($scope.fPlazo.totalimporte==100){              
+                    $scope.completado=false;
+                  }else{
+                    $scope.completado=true;
                   }
-                  blockUI.start('Procesando información...');
-                  PlazoFormaPagoServices.sQuitarPlazoFormaPago(arrParams).then(function (rpta) {
+                  console.log($scope.fPlazo.totalimporte,'$scope.fPlazo.totalimporte');
+              if( loader ){
+                blockUI.stop(); 
+              }
+            });
+          };
+          $scope.metodos.getPaginationServerSidePlazo(true); 
+          $scope.quitarplazo = function(index){
+            angular.forEach($scope.fPlazo.plazolista, function(value, key){              
+                if(key==index){
+                  console.log(value);
+                  var pMensaje = '¿Realmente desea anular el registro?';
+                    $bootbox.confirm(pMensaje, function(result) {
+                      if(result){
+                        var arrParams = {
+                          id: value.id 
+                        }
+                        blockUI.start('Procesando información...');
+                        PlazoFormaPagoServices.sQuitarPlazoFormaPago(arrParams).then(function (rpta) {
+                          if(rpta.flag == 1){
+                            var pTitle = 'OK!';
+                            var pType = 'success';
+                           $scope.metodos.getPaginationServerSidePlazo(true); 
+                          }else if(rpta.flag == 0){
+                            var pTitle = 'Error!';
+                            var pType = 'danger';
+                          }else{
+                            alert('Error inesperado');
+                          }
+                          pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2500 });
+                          blockUI.stop(); 
+                        });
+                      }
+                    });        
+                }
+            });                        
+          }
+          $scope.editarplazo = function(index){
+            var total = 0;
+            angular.forEach($scope.fPlazo.plazolista,function (value, key) { 
+                     total += parseFloat($scope.fPlazo.plazolista[key].porcentaje_importe);                
+            });             
+            angular.forEach($scope.fPlazo.plazolista, function(value, key){             
+                if(key==index){     
+                  $scope.fPlazo.datos= value;   
+                  $scope.fPlazo.total= total;             
+                  PlazoFormaPagoServices.EditarPlazoFormaPago($scope.fPlazo).then(function (rpta) {
                     if(rpta.flag == 1){
                       var pTitle = 'OK!';
                       var pType = 'success';
-                      $scope.metodos.getPaginationServerSidePlazo();
-                      $scope.editClassForm = null; 
-                      $scope.tituloBloque = 'Agregar Plazo';
-                      $scope.contBotonesReg = true;
-                      $scope.contBotonesEdit = false;
+                      $scope.metodos.getPaginationServerSidePlazo(true); 
                     }else if(rpta.flag == 0){
                       var pTitle = 'Error!';
                       var pType = 'danger';
                     }else{
                       alert('Error inesperado');
                     }
-                    pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2500 });
                     blockUI.stop(); 
-                  });
+                    pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2500 });
+                  });        
                 }
-              });
+            });                        
           }
-
-          $scope.actualizarPlazo = function() { 
-            blockUI.start('Procesando información...'); 
-            PlazoFormaPagoServices.EditarPlazoFormaPago($scope.fPlazo).then(function (rpta) {
-              if(rpta.flag == 1){
-                var pTitle = 'OK!';
-                var pType = 'success';
-                $scope.fPlazo = {};
-                $scope.metodos.getPaginationServerSidePlazo(true); 
-                $scope.editClassForm = null; 
-                $scope.tituloBloque = 'Editar Plazo';
-                $scope.contBotonesReg = true;
-                $scope.contBotonesEdit = false;
-              }else if(rpta.flag == 0){
-                var pTitle = 'Error!';
-                var pType = 'danger';
-              }else{
-                alert('Error inesperado');
-              }
-              blockUI.stop(); 
-              pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2500 });
-            });
-          }
-          paginationOptionPlazo.sortName = $scope.gridOptionsPlazo.columnDefs[0].name;
-          $scope.metodos.getPaginationServerSidePlazo = function(loader) {
-            if( loader ){
-              blockUI.start('Procesando información...');
-            }
-            var arrParams = { 
-              paginate : paginationOptionPlazo,
-              datos: $scope.fData 
-            };
-            PlazoFormaPagoServices.sListarPlazoFormaPago(arrParams).then(function (rpta) { 
-              $scope.gridOptionsPlazo.totalItems = rpta.paginate.totalRows;
-              $scope.gridOptionsPlazo.data = rpta.datos; 
-              if( loader ){
-                blockUI.stop(); 
-              }
-            });
-            $scope.mySelectionGridBanco = [];
-
-          };
-          $scope.metodos.getPaginationServerSidePlazo(true); 
           $scope.agregarPlazo = function () { 
             blockUI.start('Procesando información...');
-            $scope.fPlazo.idformapago = $scope.fData.id;    
+            $scope.fPlazo.idformapago = $scope.fData.id;     
             PlazoFormaPagoServices.sAgregaPlazoFormaPago($scope.fPlazo).then(function (rpta) {
               if(rpta.flag == 1){
                 var pTitle = 'OK!';
@@ -318,6 +247,7 @@ app.controller('FormaPagoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '
         }
       });
     } 
+
     $scope.btnAnular = function() { 
       var pMensaje = '¿Realmente desea anular el registro?';
       $bootbox.confirm(pMensaje, function(result) {

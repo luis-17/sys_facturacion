@@ -394,7 +394,7 @@ app.service("UsuarioServices",function($http, $q, handleBehavior) {
         sRegistrar: sRegistrar,
         sEditar: sEditar,
         sAnular: sAnular,
-        sListarTipoUsuarioCbo: sListarTipoUsuarioCbo
+        sListarCbo: sListarCbo
     });
     function sListar(datos) {
       var request = $http({
@@ -428,7 +428,7 @@ app.service("UsuarioServices",function($http, $q, handleBehavior) {
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
     }       
-    function sListarTipoUsuarioCbo(datos) {
+    function sListarCbo(datos) {
       var request = $http({
             method : "post",
             url : angular.patchURLCI+"Usuario/listar_tipo_usuario_cbo",
