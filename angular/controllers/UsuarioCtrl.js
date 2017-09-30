@@ -387,14 +387,14 @@ app.controller('UsuarioCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$l
       });
     }
 }]);
-
+// UsuarioServices
 app.service("UsuarioServices",function($http, $q, handleBehavior) {
     return({
         sListar: sListar,
         sRegistrar: sRegistrar,
         sEditar: sEditar,
         sAnular: sAnular,
-        sListarCbo: sListarCbo
+        sListarTipoUsuarioCbo: sListarTipoUsuarioCbo
     });
     function sListar(datos) {
       var request = $http({
@@ -428,7 +428,7 @@ app.service("UsuarioServices",function($http, $q, handleBehavior) {
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
     }       
-    function sListarCbo(datos) {
+    function sListarTipoUsuarioCbo(datos) {
       var request = $http({
             method : "post",
             url : angular.patchURLCI+"Usuario/listar_tipo_usuario_cbo",

@@ -18,7 +18,7 @@ app.controller('ColaboradorCtrl', ['$scope', '$filter', '$uibModal', '$bootbox',
     };
     $scope.metodos.listaTipoUsuario = function(myCallback) {
       var myCallback = myCallback || function() { };
-      UsuarioServices.sListarCbo().then(function(rpta) {
+      UsuarioServices.sListarTipoUsuarioCbo().then(function(rpta) {
         $scope.fArr.listaTipoUsuario = rpta.datos; 
         myCallback();
       });

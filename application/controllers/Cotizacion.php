@@ -522,10 +522,12 @@ class Cotizacion extends CI_Controller {
 	      );
 	      $i++;
 	    }
-	    $this->pdf->Ln(1);
+	    $this->pdf->SetXY(8,-90); 
+	    //$this->pdf->Ln(1);
 	    $this->pdf->SetFont('Arial','B',9);
 	    $this->pdf->Cell(140,5,'Observaciones');
-	    $this->pdf->Ln(5);
+	    //$this->pdf->Ln(5);
+	    $this->pdf->SetXY(8,-88); 
 	    $this->pdf->SetFont('Arial','',8);
 
 	    $this->pdf->SetWidths(array(138));
@@ -547,7 +549,7 @@ class Cotizacion extends CI_Controller {
 	    $this->pdf->Cell(20,8,'TOTAL:','TLB',0,'R');
 	    $this->pdf->Cell(30,8,$simbolo . $fila['total'],'TRB',0,'R');
 	    // $this->pdf->Cell(30,8,$simbolo . substr($fila['total_a_pagar'], 4),'TRB',0,'R');
-	    $this->pdf->Ln(15);
+	    // $this->pdf->Ln(15);
 	    // $monto = new EnLetras();
 	    $en_letra = ValorEnLetras($fila['total'],$fila['moneda_str']);
 	    $this->pdf->Cell(0,8,'TOTAL SON: ' . $en_letra ,'',0);
