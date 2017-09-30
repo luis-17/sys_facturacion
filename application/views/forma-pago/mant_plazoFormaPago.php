@@ -33,12 +33,12 @@
                                         </div>
                                     </td>
                                 </tr>                 
-                                <tr class="bg-info" ng-show="completado">
-                                    <td><input type="text" class="form-control input-sm" ng-model="fPlazo.dias_transcurridos" placeholder="Ingrese días transcurridos" required tabindex="120" /></td>
-                                    <td><input type="text" class="form-control input-sm" ng-model="fPlazo.porcentaje_importe" placeholder="Ingrese porcentaje importe" required tabindex="120" /></td>
+                                <tr class="bg-info" ng-show="completado">                            
+                                    <td><input type="text" ng-focus="focusdt()" class="form-control input-sm" ng-model="fPlazo.dias_transcurridos" placeholder="Ingrese días transcurridos" required tabindex="120" /></td>
+                                    <td><input type="text" ng-focus="focuspi()" class="form-control input-sm" ng-model="fPlazo.porcentaje_importe" placeholder="Ingrese porcentaje importe" required tabindex="120" /></td>                                
                                     <td class="text-right">
                                         <div class="btn-group" >
-                                            <button class="btn btn-sm btn-primary" type="submit" ng-click="agregarPlazo()" title="Guardar">
+                                            <button class="btn btn-sm btn-primary" type="submit" ng-disabled="formPlazo.$invalid" ng-click="agregarPlazo()" title="Guardar">
                                                 <span class="glyphicon glyphicon-plus-sign"></span>
                                                 <span class="hidden-xs">&nbsp;Nuevo</span>
                                             </button>
@@ -49,7 +49,11 @@
                         </table>
                     </div>
                 </div>
-			</div>
+			</div>            
+            <form ng-hide="" name="formPlazo">         
+                    <input type="hidden" class="form-control input-sm"  ng-model="fPlazo.dias_transcurridos" placeholder="Ingrese días transcurridos" required tabindex="100" />       
+                    <input type="hidden" class="form-control input-sm" ng-model="fPlazo.porcentaje_importe" placeholder="Ingrese porcentaje importe" required tabindex="120" />                              
+            </form>
 		</div>
 	</div>
 </div>

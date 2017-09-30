@@ -143,18 +143,22 @@ app.controller('FormaPagoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '
             $uibModalInstance.dismiss('cancel');
           } 
           $scope.metodos.getPaginationServerSidePlazo = function(loader) {
+
             if( loader ){
               blockUI.start('Procesando información...');
             }
             var arrParams = {       
               datos: $scope.fData 
             };
+
             PlazoFormaPagoServices.sListarPlazoFormaPago(arrParams).then(function (rpta) { 
                console.log(rpta.datos,'rpta');
                $scope.fPlazo.plazolista=rpta.datos;
                   var total = 0;
+                  var totaldia = 0;
                   angular.forEach($scope.fPlazo.plazolista,function (value, key) { 
-                     total += parseFloat($scope.fPlazo.plazolista[key].porcentaje_importe);                
+                     total += parseFloat($scope.fPlazo.plazolista[key].porcentaje_importe); 
+                     totaldia += parseFloat($scope.fPlazo.plazolista[key].dias_transcurridos);                
                   });
                   $scope.fPlazo.totalimporte=total;
                   if($scope.fPlazo.totalimporte==100){              
@@ -162,7 +166,14 @@ app.controller('FormaPagoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '
                   }else{
                     $scope.completado=true;
                   }
-                  console.log($scope.fPlazo.totalimporte,'$scope.fPlazo.totalimporte');
+                  $scope.focusdt = function () {              
+                    $scope.focus = true;
+                    $scope.fPlazo.dias_transcurridos=totaldia;           
+                  }
+                  $scope.focuspi = function () {                
+                    $scope.focus = true;  
+                    $scope.fPlazo.porcentaje_importe=100-$scope.fPlazo.totalimporte;
+                  }
               if( loader ){
                 blockUI.stop(); 
               }
@@ -225,6 +236,7 @@ app.controller('FormaPagoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '
                 }
             });                        
           }
+
           $scope.agregarPlazo = function () { 
             blockUI.start('Procesando información...');
             $scope.fPlazo.idformapago = $scope.fData.id;     

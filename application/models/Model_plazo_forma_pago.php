@@ -9,6 +9,7 @@ class Model_plazo_forma_pago extends CI_Model {
 		$this->db->from('plazo_forma_pago pfp');
 		$this->db->where('estado_pfp', 1);
 		$this->db->where('pfp.idformapago', $paramDatos['id']);
+		$this->db->order_by('pfp.dias_transcurridos','ASC');
 		return $this->db->get()->result_array();
 	}
 
