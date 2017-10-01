@@ -57,7 +57,7 @@ class Model_variable_car extends CI_Model {
 		return $this->db->get()->result_array();
 	}
 
-	public function m_registrar_variable_car($datos)
+	public function m_registrar($datos)
 	{
 		$data = array(
 			'descripcion_vcar' => strtoupper($datos['descripcion_vcar'])

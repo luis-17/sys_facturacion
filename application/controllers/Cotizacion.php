@@ -356,7 +356,7 @@ class Cotizacion extends CI_Controller {
       	$this->pdf->Cell(24,6,'CLIENTE '); 
       	$this->pdf->Cell(3,6,':',0,0,'C'); 
       	$this->pdf->SetFont('Arial','',9); 
-      	$this->pdf->Cell(75,6,strtoupper($fila['cliente_persona_empresa']));
+      	$this->pdf->Cell(75,6,strtoupper(strtoupper_total($fila['cliente_persona_empresa'])));
 
       	$this->pdf->SetXY(8,56); 
       	$this->pdf->SetFont('Arial','B',9); 
@@ -370,7 +370,7 @@ class Cotizacion extends CI_Controller {
       	$this->pdf->Cell(24,6,'CONTACTO '); 
       	$this->pdf->Cell(3,6,':',0,0,'C'); 
       	$this->pdf->SetFont('Arial','',9); 
-      	$this->pdf->Cell(75,6,strtoupper($fila['contacto']));
+      	$this->pdf->Cell(75,6,strtoupper(strtoupper_total(utf8_decode($fila['contacto']))));
 
       	$this->pdf->SetXY(8,64); 
       	$this->pdf->SetFont('Arial','B',9); 
@@ -384,14 +384,14 @@ class Cotizacion extends CI_Controller {
       	$this->pdf->Cell(36,6,utf8_decode('DIRECCIÓN ')); 
       	$this->pdf->Cell(3,6,':',0,0,'C'); 
       	$this->pdf->SetFont('Arial','',9); 
-      	$this->pdf->Cell(75,6,strtoupper($fila['direccion_legal_ce']));
+      	$this->pdf->Cell(75,6,utf8_decode(strtoupper_total($fila['direccion_legal_ce'])));
 
       	$this->pdf->SetXY(96,56); 
       	$this->pdf->SetFont('Arial','B',9); 
       	$this->pdf->Cell(36,6,utf8_decode('DIR. DESPACHO')); 
       	$this->pdf->Cell(3,6,':',0,0,'C'); 
       	$this->pdf->SetFont('Arial','',9); 
-      	$this->pdf->Cell(75,6,strtoupper($fila['direccion_guia']));
+      	$this->pdf->Cell(75,6,strtoupper(strtoupper_total($fila['direccion_guia'])));
       	
       	$this->pdf->SetXY(96,60); 
       	$this->pdf->SetFont('Arial','B',9); 
@@ -425,7 +425,7 @@ class Cotizacion extends CI_Controller {
       	$this->pdf->Cell(38,6,'ASESOR DE VENTA '); 
       	$this->pdf->Cell(3,6,':',0,0,'C'); 
       	$this->pdf->SetFont('Arial','',9); 
-      	$this->pdf->Cell(75,6,strtoupper($fila['colaborador']));
+      	$this->pdf->Cell(75,6,strtoupper(strtoupper_total($fila['colaborador'])));
 
       	$this->pdf->SetXY(8,82); 
       	$this->pdf->SetFont('Arial','B',9); 
