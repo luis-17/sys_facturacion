@@ -266,7 +266,7 @@ class Cotizacion extends CI_Controller {
 	    // var_dump($allInputs); exit(); 
 	    // RECUPERACIÓN DE DATOS 
 	    $fConfig = obtener_parametros_configuracion();
-	    $fila = $this->model_cotizacion->m_cargar_cotizacion_por_id($allInputs['id']);
+	    $fila = $this->model_cotizacion->m_cargar_cotizacion_por_id($allInputs['id']);	 
 	    $fila['moneda_str'] = NULL; 
 	    $simbolo = NULL;
 	    if($fila['moneda'] == 'S'){
@@ -291,7 +291,7 @@ class Cotizacion extends CI_Controller {
 	    $this->pdf->setEstado($fila['estado_cot']);
 	    $this->pdf->AddPage('P','A4');//var_dump($allInputs['tituloAbv']); exit();
 	    $this->pdf->AliasNbPages();
-	    $this->pdf->SetAutoPageBreak(true,65);
+	    $this->pdf->SetAutoPageBreak(true,10);
 
 	    $this->pdf->SetTextColor(95,95,95);
 	    $this->pdf->SetFont('Arial','B',10);
@@ -496,19 +496,42 @@ class Cotizacion extends CI_Controller {
 	    $i = 1;
 	    $detalleEle = $this->model_cotizacion->m_cargar_detalle_cotizacion_por_id($allInputs['id']);
 	    //var_dump($detalleEle); exit(); 
-	    $this->pdf->SetTextColor(66,66,66);
+	    $arrGroupBy=array();
+	    foreach ($detalleEle as $key => $value) {
+	    	// var_dump($detalleEle);
+	    	$rowAux=array(
+	    		'iddetallecotizacion' =>$value['iddetallecotizacion'],
+	    		'descripcion_ele' =>$value['descripcion_ele'],
+	    		'cantidad' =>$value['cantidad'],
+	    		'abreviatura_um' =>$value['abreviatura_um'],
+	    		'precio_unitario' =>$value['precio_unitario'],
+	    		'importe_con_igv' =>$value['importe_con_igv'],
+	    		'detallecaracteristica' =>array()
+	    		);
+	    	$arrGroupBy[$value['iddetallecotizacion']]=$rowAux;
+	    }		
+		foreach ($detalleEle as $key => $value) {
+	    	$rowAux=array(
+	    		'iddetallecaracteristica' =>$value['iddetallecaracteristica'],
+	    		'descripcion_car' =>$value['descripcion_car'],
+	    		'valor' =>$value['valor'],
+	    		);
+	    	$arrGroupBy[$value['iddetallecotizacion']]['detallecaracteristica'][$value['iddetallecaracteristica']]=$rowAux;
+		}
+	  
 	    $exonerado = 0;
 	    $fill = TRUE;
 	    $this->pdf->SetDrawColor($r_sec,$g_sec,$b_sec); // gris fill 
 	    $this->pdf->SetLineWidth(.1);
-
-	    foreach ($detalleEle as $key => $value) { 
-	      $fill = !$fill;
+	    foreach ($arrGroupBy as $key => $value) { 
+		// var_dump($arrGroupBy);exit();
+	      $fill = !$fill;		
 	      $this->pdf->SetWidths(array(10, 100, 20, 18, 20, 26));
 	      $this->pdf->SetAligns(array('L', 'L', 'C', 'C', 'R', 'R'));
 	      //$this->pdf->fill(array(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE));
 	      $this->pdf->SetFillColor($r_sec,$g_sec,$b_sec);
-	      $this->pdf->SetFont('Arial','',6);
+	      $this->pdf->SetTextColor(0,3,6);
+	      $this->pdf->SetFont('Arial','B',6);
 	      $this->pdf->RowSmall(   
 	        array(
 	          $i,
@@ -518,41 +541,60 @@ class Cotizacion extends CI_Controller {
 	          $value['precio_unitario'],
 	          $value['importe_con_igv']
 	        ),
-	        $fill,0
+	        false, 0
 	      );
 	      $i++;
+	      $this->pdf->SetTextColor(66,66,66);
+	       $this->pdf->SetFont('Arial','',6);
+	      		foreach ($value['detallecaracteristica'] as $key => $row) {
+	      			$this->pdf->Cell(10,3,'',0,0,'C',0);  
+	      			$this->pdf->Cell(184,3,utf8_decode($row['descripcion_car']).': '.$row['valor'],0,1,'L',0);  
+
+	      		}
+	      		$this->pdf->Cell(194,0,'','B',1,'C',0);  
 	    }
-	    $this->pdf->SetXY(8,-90); 
+	    $this->pdf->SetXY(8,-34); 
 	    //$this->pdf->Ln(1);
 	    $this->pdf->SetFont('Arial','B',9);
-	    $this->pdf->Cell(140,5,'Observaciones');
-	    //$this->pdf->Ln(5);
-	    $this->pdf->SetXY(8,-88); 
+	    $en_letra = ValorEnLetras($fila['total'],$fila['moneda_str']);
+	    $this->pdf->Cell(140,5,'TOTAL SON: ' . $en_letra);
+
+	    $this->pdf->SetXY(8,-23); 
 	    $this->pdf->SetFont('Arial','',8);
-
+	    $bancoEmpresa = $this->model_cotizacion->m_cargar_banco_empresa_admin_por_id($fila['idempresaadmin']);
+ 		$this->pdf->SetTextColor(0,0,0);
+   		$this->pdf->SetFont('Arial','B',9);
+	    foreach ($bancoEmpresa as $key => $value) {
+	    	$this->pdf->Cell(40,5,'Cta. Cte. '.$value['abreviatura_ba'].' '. $fila['moneda_str'],0,0,'L',0); 	  
+	    }
+	    $this->pdf->SetXY(8,-19); 
+	    foreach ($bancoEmpresa as $key => $value) {
+	    	$this->pdf->Cell(40,5,$value['num_cuenta'],0,0,'L',0); 	  
+	    }
+	    $this->pdf->SetXY(8,-35); 
+	    $this->pdf->SetFont('Arial','',8);
 	    $this->pdf->SetWidths(array(138));
-	    $this->pdf->TextArea(array(empty($fila['motivo_movimiento'])? '':$fila['motivo_movimiento']),0,0,FALSE,5,20);
-
-	    $this->pdf->Cell(2,20,'');
+	    // $this->pdf->TextArea(array(empty($fila['motivo_movimiento'])? '':$fila['motivo_movimiento']),0,0,FALSE,5,20);
+	    $this->pdf->Cell(150,20,'');
 	    $this->pdf->Cell(20,6,'SUBTOTAL:','LT',0,'R');
 	    $this->pdf->SetFont('Arial','',8);
-	    $this->pdf->Cell(30,6,$fila['subtotal'],'TR',0,'R');
+	    $this->pdf->Cell(20,6,$fila['subtotal'],'TR',0,'R');
 	    $this->pdf->Ln(6);
 	    $this->pdf->SetFont('Arial','',8);
-	    $this->pdf->Cell(140,6,'');
+	    $this->pdf->Cell(150,6,'');
 	    $this->pdf->Cell(20,6,'IGV:','L',0,'R');
 	    $this->pdf->SetFont('Arial','',8);
-	    $this->pdf->Cell(30,6,$fila['igv'],'R',0,'R');
+	    $this->pdf->Cell(20,6,$fila['igv'],'R',0,'R');
 	    $this->pdf->Ln(6);
 	    $this->pdf->SetFont('Arial','B',9);
-	    $this->pdf->Cell(140,8,'');
+	    $this->pdf->Cell(150,8,'');
 	    $this->pdf->Cell(20,8,'TOTAL:','TLB',0,'R');
-	    $this->pdf->Cell(30,8,$simbolo . $fila['total'],'TRB',0,'R');
+	    $this->pdf->Cell(20,8,$simbolo . $fila['total'],'TRB',0,'R');
 	    // $this->pdf->Cell(30,8,$simbolo . substr($fila['total_a_pagar'], 4),'TRB',0,'R');
 	    // $this->pdf->Ln(15);
 	    // $monto = new EnLetras();
-	    $en_letra = ValorEnLetras($fila['total'],$fila['moneda_str']);
-	    $this->pdf->Cell(0,8,'TOTAL SON: ' . $en_letra ,'',0);
+	    // $en_letra = ValorEnLetras($fila['total'],$fila['moneda_str']);
+	    // $this->pdf->Cell(0,8,'TOTAL SON: ' . $en_letra ,'',0);
 
 	    $arrData['message'] = 'ERROR';
 	    $arrData['flag'] = 2;
