@@ -83,7 +83,7 @@ class VariableCar extends CI_Controller {
     	} 	
 
     	$this->db->trans_start();
-		if($this->model_variable_car->m_registrar_variable_car($allInputs)) { // registro de variable
+		if($this->model_variable_car->m_registrar($allInputs)) { // registro de variable
 			$arrData['message'] = 'Se registraron los datos correctamente';
 			$arrData['flag'] = 1;
 		}
