@@ -83,5 +83,17 @@ class Model_banco_empresa_admin extends CI_Model {
 		$this->db->where('idbancoempresaadmin',$datos['idbancoempresaadmin']); 
 		return $this->db->update('banco_empresa_admin', $data); 
 	} 
+	
+	public function m_cargar_banco_empresa_admin_por_id($idempresaadmin)
+	{ 
+		$this->db->select('bea.num_cuenta,bea.num_cuenta_inter,b.abreviatura_ba', FALSE); 
+		$this->db->from('banco_empresa_admin bea'); 
+		$this->db->join('banco b','bea.idbanco = b.idbanco'); 
+		$this->db->where('bea.idempresaadmin',$idempresaadmin); 
+		$this->db->where('estado_bea',1);
+		return $this->db->get()->result_array();
+	}
+
+
 }
 ?>

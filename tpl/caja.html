@@ -1,0 +1,22 @@
+<div class="bg-light lter b-b wrapper-md">
+  <h1 class="m-n font-thin h3"> Caja </h1>
+</div>
+<div class="wrapper-md" ng-controller="CajaCtrl"> 
+	<div class="row">
+		<div class="col-xs-12 text-right">
+			<button class="btn m-b-xs btn-info pull-left btn-xs" ng-click="btnBuscar();"> 
+				<i class="fa fa-search"> </i> Buscar </button>
+	        <button class="btn m-b-xs btn-success btn-xs" ng-click="btnNuevo();">
+	        	<i class="fa fa-file-text"></i> Nuevo </button>
+	        <button ng-if="mySelectionGrid.length == 1" ng-click="btnEditar();" class="btn m-b-xs btn-warning btn-xs"> 
+	        	<i class="fa fa-edit"></i> Editar </button>
+	        <button ng-if="mySelectionGrid.length == 1" ng-click="btnAnular();" class="btn m-b-xs btn-danger btn-xs">
+	        	<i class="fa fa-trash-o"></i> Anular </button>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-12">
+			<div  ui-grid="gridOptions" ui-grid-pagination ui-grid-selection ui-grid-resize-columns ui-grid-auto-resize class="grid table-responsive fs-mini-grid"></div>
+		</div>
+	</div>
+</div>

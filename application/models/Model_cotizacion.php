@@ -239,19 +239,10 @@ class Model_cotizacion extends CI_Model {
 		$this->db->join('detalle_cotizacion dcot','cot.idcotizacion = dcot.idcotizacion'); 
 		$this->db->join('elemento ele','dcot.idelemento = ele.idelemento'); 
 		$this->db->join('unidad_medida um','ele.idunidadmedida = um.idunidadmedida'); 
-		$this->db->join('detalle_caracteristica dc','dc.iddetalle = dcot.iddetallecotizacion'); 
-		$this->db->join('caracteristica c','dc.idcaracteristica = c.idcaracteristica'); 
+		$this->db->join('detalle_caracteristica dc','dc.iddetalle = dcot.iddetallecotizacion','left'); 
+		$this->db->join('caracteristica c','dc.idcaracteristica = c.idcaracteristica','left'); 
 		$this->db->where('cot.idcotizacion',$idcotizacion); 
 		$this->db->where('estado_dcot',1); // detalle cot. habilitado 
-		return $this->db->get()->result_array();
-	}
-	public function m_cargar_banco_empresa_admin_por_id($idempresaadmin)
-	{ 
-		$this->db->select('bea.num_cuenta,bea.num_cuenta_inter,b.abreviatura_ba', FALSE); 
-		$this->db->from('banco_empresa_admin bea'); 
-		$this->db->join('banco b','bea.idbanco = b.idbanco'); 
-		$this->db->where('bea.idempresaadmin',$idempresaadmin); 
-		$this->db->where('estado_bea',1);
 		return $this->db->get()->result_array();
 	}
 	public function m_registrar_cotizacion($datos)
