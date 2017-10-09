@@ -218,7 +218,22 @@ angular.module('app')
               'angular/controllers/FormaPagoCtrl.js',
               'angular/controllers/PlazoFormaPagoCtrl.js'        
             ]) 
-          })                                                               
+          }) 
+          .state('app.caja', {
+            url: '/caja',
+            templateUrl: 'tpl/caja.html',
+            resolve: load([
+              'angular/controllers/CajaCtrl.js',
+              'angular/controllers/SerieCtrl.js'
+            ]) 
+          })     
+          .state('app.documento-serie', {
+            url: '/documento-serie',
+            templateUrl: 'tpl/tipo-documento.html',
+            resolve: load([     
+              'angular/controllers/TipoDocumentoCtrl.js'
+            ]) 
+          })                                                                             
           .state('lockme', {
               url: '/lockme',
               templateUrl: 'tpl/page_lockme.html'

@@ -6,7 +6,7 @@ class Cotizacion extends CI_Controller {
     {
         parent::__construct(); 
         $this->load->helper(array('fechas','otros','pdf','contable','config')); 
-        $this->load->model(array('model_cotizacion','model_categoria_cliente','model_cliente_persona','model_cliente_empresa','model_configuracion','model_variable_car')); 
+        $this->load->model(array('model_cotizacion','model_categoria_cliente','model_cliente_persona','model_cliente_empresa','model_configuracion','model_variable_car','model_banco_empresa_admin')); 
         $this->load->library('excel');
     	$this->load->library('Fpdfext');
         //cache
@@ -578,6 +578,7 @@ class Cotizacion extends CI_Controller {
 	    $detalleEle = $this->model_cotizacion->m_cargar_detalle_cotizacion_por_id($allInputs['id']);
 	    //var_dump($detalleEle); exit(); 
 	    $arrGroupBy=array();
+
 	    foreach ($detalleEle as $key => $value) {
 	    	// var_dump($detalleEle);
 	    	$rowAux=array(
@@ -599,7 +600,7 @@ class Cotizacion extends CI_Controller {
 	    		);
 	    	$arrGroupBy[$value['iddetallecotizacion']]['detallecaracteristica'][$value['iddetallecaracteristica']]=$rowAux;
 		}
-	  
+	  	// var_dump($arrGroupBy);exit();
 	    $exonerado = 0;
 	    $fill = TRUE;
 	    $this->pdf->SetDrawColor($r_sec,$g_sec,$b_sec); // gris fill 
@@ -629,8 +630,7 @@ class Cotizacion extends CI_Controller {
 	       $this->pdf->SetFont('Arial','',6);
 	      		foreach ($value['detallecaracteristica'] as $key => $row) {
 	      			$this->pdf->Cell(10,3,'',0,0,'C',0);  
-	      			$this->pdf->Cell(184,3,utf8_decode($row['descripcion_car']).': '.$row['valor'],0,1,'L',0);  
-
+	      			$this->pdf->Cell(184,3,utf8_decode($row['descripcion_car']).': '.$row['valor'],0,1,'L',0); 
 	      		}
 	      		$this->pdf->Cell(194,0,'','B',1,'C',0);  
 	    }
@@ -639,10 +639,9 @@ class Cotizacion extends CI_Controller {
 	    $this->pdf->SetFont('Arial','B',9);
 	    $en_letra = ValorEnLetras($fila['total'],$fila['moneda_str']);
 	    $this->pdf->Cell(140,5,'TOTAL SON: ' . $en_letra);
-
 	    $this->pdf->SetXY(8,-23); 
 	    $this->pdf->SetFont('Arial','',8);
-	    $bancoEmpresa = $this->model_cotizacion->m_cargar_banco_empresa_admin_por_id($fila['idempresaadmin']);
+	    $bancoEmpresa = $this->model_banco_empresa_admin->m_cargar_banco_empresa_admin_por_id($fila['idempresaadmin']);
  		$this->pdf->SetTextColor(0,0,0);
    		$this->pdf->SetFont('Arial','B',9);
 	    foreach ($bancoEmpresa as $key => $value) {
@@ -676,7 +675,6 @@ class Cotizacion extends CI_Controller {
 	    // $monto = new EnLetras();
 	    // $en_letra = ValorEnLetras($fila['total'],$fila['moneda_str']);
 	    // $this->pdf->Cell(0,8,'TOTAL SON: ' . $en_letra ,'',0);
-
 	    $arrData['message'] = 'ERROR';
 	    $arrData['flag'] = 2;
 	    // $timestamp = date('YmdHis');
