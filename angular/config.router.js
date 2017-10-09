@@ -89,6 +89,33 @@ angular.module('app')
               'angular/controllers/SedeCtrl.js',
             ])
           })
+          .state('app.nueva-nota-pedido', {
+            url: '/nueva-nota-pedido',
+            templateUrl: 'tpl/nueva-nota-pedido.html',
+            resolve: load([
+              'angular/controllers/NotaPedidoCtrl.js',
+              'angular/controllers/NuevaCotizacionCtrl.js',
+              'angular/controllers/ClienteEmpresaCtrl.js',
+              'angular/controllers/ClientePersonaCtrl.js',
+              'angular/controllers/ColaboradorCtrl.js',
+              'angular/controllers/CategoriaClienteCtrl.js',
+              'angular/controllers/CaracteristicaCtrl.js',
+              'angular/controllers/TipoDocumentoClienteCtrl.js',
+              'angular/controllers/ClienteCtrl.js',
+              'angular/controllers/SedeCtrl.js',
+              'angular/controllers/FormaPagoCtrl.js',
+              'angular/controllers/UnidadMedidaCtrl.js',
+              'angular/controllers/ContactoEmpresaCtrl.js'
+            ])
+          })
+          .state('app.historial-nota-pedido', {
+            url: '/historial-nota-pedido',
+            templateUrl: 'tpl/historial-nota-pedido.html',
+            resolve: load([
+              'angular/controllers/HistorialNotaPedidoCtrl.js',
+              'angular/controllers/SedeCtrl.js'
+            ])
+          })
           .state('app.producto', {
             url: '/producto',
             templateUrl: 'tpl/producto.html',

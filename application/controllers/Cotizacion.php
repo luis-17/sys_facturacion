@@ -131,6 +131,87 @@ class Cotizacion extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
+	public function buscar_numero_cotizacion_autocomplete()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);	
+		$allInputs['limite'] = 15;
+		$lista = $this->model_cotizacion->m_cargar_numero_cotizacion_autocomplete($allInputs);
+		$hayStock = true;
+		$arrListado = array();
+		foreach ($lista as $row) { 
+			if($row['moneda'] == 'S'){
+				$strIdMoneda = 1; 
+				$strDescripcion = 'S/.';
+				$strMoneda = $row['moneda'];
+			}
+			if($row['moneda'] == 'D'){
+				$strIdMoneda = 2; 
+				$strDescripcion = 'US$'; 
+				$strMoneda = $row['moneda']; 
+			}
+			if( $row['tipo_cliente'] == 'E' ){ //cliente_empresa
+				$arrCliente = array( 
+					'idclienteempresa' => $row['idclienteempresa'], 
+					//'ruc' => $row['ruc'],
+					'razon_social' => strtoupper($row['razon_social_ce']),
+					// 'representante_legal' => strtoupper($row['representante_legal_ce']),
+					// 'dni_representante_legal' => $row['dni_representante_legal'],
+					'num_documento'=> $row['ruc_ce'] 
+				);
+			}
+			if( $row['tipo_cliente'] == 'P' ){ //cliente_persona
+				$arrCliente = array( 
+					'idclientepersona'=> $row['idclientepersona'],
+					'cliente'=> strtoupper($row['cliente_persona']),
+					'email'=> strtoupper($row['email_persona_empresa']),
+					'telefono_movil'=> $row['telefono_movil_cp'], 
+					'num_documento'=> $row['num_documento_cp']
+				);
+			}
+			array_push($arrListado, 
+				array(
+					//cotizacion 
+					'idcotizacion'=> $row['idcotizacion'], 
+					'num_cotizacion'=> $row['num_cotizacion'], 
+					'moneda'=> array( 
+						'id'=> $strIdMoneda,
+						'descripcion'=> $strDescripcion,
+						'str_moneda'=> $strMoneda
+					), 
+					'forma_pago'=> array(
+						'id'=> $row['idformapago'],
+						'descripcion'=> strtoupper($row['descripcion_fp']),
+						'modo'=> $row['modo_fp']
+					),
+					//contacto 
+					'idcontacto' => $row['idcontacto'],
+					'contacto' => strtoupper($row['contacto']),
+					'telefono_contacto' => $row['telefono_fijo'],
+					'anexo'=> $row['anexo'],
+					'area_encargada' => $row['area_encargada'], 
+					//configuración avanzada 
+					'incluye_entr_dom'=> $row['incluye_entrega_domicilio'],
+					'incluye_tras_prov'=> $row['incluye_traslado_prov'],
+					'plazo_entrega'=> $row['plazo_entrega'],
+					'validez_oferta'=> $row['validez_oferta'],
+					'modo_igv'=> $row['modo_igv'],
+					//cliente 
+					'cliente'=> $arrCliente, 
+				)
+			);
+			
+		}
+		
+    	$arrData['datos'] = $arrListado;
+    	$arrData['message'] = '';
+    	$arrData['flag'] = 1;
+		if(empty($lista)){
+			$arrData['flag'] = 0;
+		}
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData)); 
+	}
 	public function registrar()
 	{
 		ini_set('xdebug.var_display_max_depth', 5);
