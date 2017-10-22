@@ -20,25 +20,26 @@ app.controller('TipoDocumentoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox
       sortName: null,
       search: null
     };
+    $scope.columnDefs = [
+        { field: 'id', name: 'idtipodocumentomov', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
+        { field: 'descripcion_tdm', name: 'descripcion_tdm', displayName: 'Descripción', minWidth: 160 }
+    ];
     $scope.gridOptions = {
       rowHeight: 30,
-      paginationPageSizes: [100, 500, 1000],
-      paginationPageSize: 100,
-      useExternalPagination: true,
-      useExternalSorting: true,
-      useExternalFiltering : true,
-      enableGridMenu: true,
+      paginationPageSizes: [10, 50, 100, 500, 1000],
+      paginationPageSize: 10,
       enableRowSelection: true,
       enableSelectAll: true,
       enableFiltering: false,
       enableFullRowSelection: true,
-      multiSelect: false,
-      columnDefs: [ 
-        { field: 'id', name: 'idtipodocumentomov', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
-        { field: 'descripcion_tdm', name: 'descripcion_tdm', displayName: 'Descripción', minWidth: 160 },
-        { field: 'abreviatura_tdm', name: 'abreviatura_tdm', displayName: 'Abreviatura', minWidth: 100 },
-        { field: 'porcentaje_imp', name: 'porcentaje_imp', displayName: 'Porcentaje', minWidth: 100 }
-      ],
+      multiSelect: true,
+      columnDefs: $scope.columnDefs,
+      // columnDefs: [ 
+      //   { field: 'id', name: 'idtipodocumentomov', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
+      //   { field: 'descripcion_tdm', name: 'descripcion_tdm', displayName: 'Descripción', minWidth: 160 },
+      //   { field: 'abreviatura_tdm', name: 'abreviatura_tdm', displayName: 'Abreviatura', minWidth: 100 },
+      //   { field: 'porcentaje_imp', name: 'porcentaje_imp', displayName: 'Porcentaje', minWidth: 100 }
+      // ],
       onRegisterApi: function(gridApi) { 
         $scope.gridApi = gridApi;
         gridApi.selection.on.rowSelectionChanged($scope,function(row){
@@ -85,11 +86,35 @@ app.controller('TipoDocumentoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox
         paginate : paginationOptions
       };
       TipoDocumentoServices.sListar(arrParams).then(function (rpta) { 
+        console.log(rpta,'rpta');
         if( rpta.datos.length == 0 ){
           rpta.paginate = { totalRows: 0 };
         }
         $scope.gridOptions.totalItems = rpta.paginate.totalRows;
         $scope.gridOptions.data = rpta.datos; 
+        $scope.gridOptions.data2 = rpta.datos2; 
+        var arrColumns = $scope.gridOptions.data2[0];
+        console.log(arrColumns,'arrColumns');
+        var i = 0;    
+        angular.forEach(arrColumns,function (val,key) { 
+          i++;
+          if( i >2){ 
+            var arrObjectColumns = { 
+              field: key, 
+              displayName: key, 
+              cellTemplate: '<span>{{ COL_FIELD }}</span>',
+              type: 'number', 
+              cellClass:'text-center', 
+              enableColumnMenus: false, 
+              enableColumnMenu: false,
+              enableCellEdit: true, 
+              enableSorting: false
+            }
+            $scope.columnDefs.push(arrObjectColumns);
+          }
+        });
+
+
         if( loader ){
           blockUI.stop(); 
         }
@@ -97,6 +122,7 @@ app.controller('TipoDocumentoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox
       $scope.mySelectionGrid = [];
     };
     $scope.metodos.getPaginationServerSide(true); 
+
     // MAS ACCIONES
     $scope.btnNuevo = function() { 
       var arrParams = {
