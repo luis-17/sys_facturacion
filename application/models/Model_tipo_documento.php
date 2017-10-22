@@ -6,8 +6,10 @@ class Model_tipo_documento extends CI_Model {
 	}
 
 	public function m_cargar_tipo_documento($paramPaginate){ 
-		$this->db->select("tdm.idtipodocumentomov, tdm.descripcion_tdm, tdm.porcentaje_imp,tdm.abreviatura_tdm");
+		$this->db->select("tdm.idtipodocumentomov, tdm.descripcion_tdm, tdm.porcentaje_imp,tdm.abreviatura_tdm,se.numero_serie, se.descripcion_ser,se.idempresaadmin");
 		$this->db->from('tipo_documento_mov tdm');
+		$this->db->join("tipo_documento_serie tds","tds.idtipodocumentomov = tdm.idtipodocumentomov",'left'); 
+		$this->db->join("serie se","tds.idserie = se.idserie",'left'); 
 		$this->db->where('estado_tdm', 1);
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
 			foreach ($paramPaginate['searchColumn'] as $key => $value) {
@@ -29,6 +31,8 @@ class Model_tipo_documento extends CI_Model {
 	public function m_count_tipo_documento($paramPaginate){
 		$this->db->select('COUNT(*) AS contador');
 		$this->db->from('tipo_documento_mov tdm');
+		$this->db->join("tipo_documento_serie tds","tds.idtipodocumentomov = tdm.idtipodocumentomov",'left'); 
+		$this->db->join("serie se","tds.idserie = se.idserie",'left'); 
 		$this->db->where('estado_tdm', 1);
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
 			foreach ($paramPaginate['searchColumn'] as $key => $value) {
@@ -39,6 +43,13 @@ class Model_tipo_documento extends CI_Model {
 		}
 		$fData = $this->db->get()->row_array();
 		return $fData;
+	}
+
+	public function m_cargar_tipo_documento_serie(){ 
+		$this->db->select("se.idserie,se.numero_serie, se.descripcion_ser,se.idempresaadmin");
+		$this->db->from('serie se');	
+		$this->db->where('idempresaadmin', 1);
+		return $this->db->get()->result_array();
 	}
 
 	public function m_registrar($datos)
