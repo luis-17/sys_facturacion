@@ -10,6 +10,39 @@ class Serie extends CI_Controller {
         $this->load->helper(array('fechas','otros')); 
         $this->load->model(array('model_serie')); 
     }
+
+	public function registrar()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
+    	$arrData['flag'] = 0;
+    	// VALIDACIONES     
+    	$fSerie = $this->model_serie->m_validar_num_serie($allInputs['numero_serie']);
+    	if( !empty($fSerie) ) {
+    		$arrData['message'] = 'El número serie ingresado, ya existe.';
+			$arrData['flag'] = 0;
+			$this->output
+			    ->set_content_type('application/json')
+			    ->set_output(json_encode($arrData));
+			return;
+   		}  
+
+    	$this->db->trans_start();
+		if($this->model_serie->m_registrar($allInputs)) { // registro de elemento
+			$arrData['message'] = 'Se registraron los datos correctamente';
+			$arrData['flag'] = 1;
+		}
+		$this->db->trans_complete();
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
+
+	public function ver_popup_formulario()
+	{
+		$this->load->view('serie/mant_serie');
+	}
+	
 	public function listar_serie_cbo(){ 
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		$lista = $this->model_serie->m_cargar_serie_cbo();

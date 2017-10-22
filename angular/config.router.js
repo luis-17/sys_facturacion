@@ -264,7 +264,8 @@ angular.module('app')
             url: '/documento-serie',
             templateUrl: 'tpl/tipo-documento.html',
             resolve: load([     
-              'angular/controllers/TipoDocumentoCtrl.js'
+              'angular/controllers/TipoDocumentoCtrl.js',
+              'angular/controllers/SerieCtrl.js'
             ]) 
           })                                                                             
           .state('lockme', {

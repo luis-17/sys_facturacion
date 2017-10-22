@@ -52,8 +52,6 @@ class TipoDocumento extends CI_Controller {
 
 	// $arrListado = array_values($arrGroupBy);
 
-
-
 		$arrListado = array();
 		foreach ($lista as $row) { 
 			array_push($arrListado,

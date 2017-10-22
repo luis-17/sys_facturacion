@@ -1,9 +1,13 @@
 app.controller('TipoDocumentoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$log', '$timeout', 'pinesNotifications', 'uiGridConstants', 'blockUI', 
   'TipoDocumentoFactory',
+  'SerieFactory',
   'TipoDocumentoServices',
+  'SerieServices',
   function($scope, $filter, $uibModal, $bootbox, $log, $timeout, pinesNotifications, uiGridConstants, blockUI, 
   TipoDocumentoFactory,
-  TipoDocumentoServices
+  SerieFactory,
+  TipoDocumentoServices,
+  SerieServices
   ) {
     $scope.metodos = {}; // contiene todas las funciones 
     $scope.fArr = {}; // contiene todos los arrays generados por las funciones 
@@ -164,6 +168,15 @@ app.controller('TipoDocumentoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox
         }
       });
     }
+
+    $scope.btnNuevaSerie = function() { 
+      var arrParams = {
+        'metodos': $scope.metodos,
+        'fArr': $scope.fArr
+    }
+    SerieFactory.regSerieModal(arrParams); 
+    };
+
 }]);
 
 app.service("TipoDocumentoServices",function($http, $q, handleBehavior) {
