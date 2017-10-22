@@ -6,7 +6,7 @@ class NotaPedido extends CI_Controller {
     {
         parent::__construct(); 
         $this->load->helper(array('fechas','otros','pdf','contable','config')); 
-        $this->load->model(array('model_nota_pedido','model_cliente_persona','model_cliente_empresa','model_configuracion')); 
+        $this->load->model(array('model_nota_pedido','model_cliente_persona','model_cliente_empresa','model_configuracion', 'model_cotizacion')); 
         $this->load->library('excel');
     	$this->load->library('Fpdfext');
         //cache
@@ -15,6 +15,71 @@ class NotaPedido extends CI_Controller {
 		$this->sessionFactur = @$this->session->userdata('sess_fact_'.substr(base_url(),-20,7));
 		date_default_timezone_set("America/Lima");
     }
+    public function lista_notas_de_pedido_historial() // CONTINUAR DESDE AQUIIIIIIIIIIIIIIIIIIIIIII 
+    {
+    	$allInputs = json_decode(trim($this->input->raw_input_stream),true); // var_dump($allInputs); exit(); 
+		$paramPaginate = $allInputs['paginate'];
+		$paramDatos = @$allInputs['datos'];
+		$lista = $this->model_nota_pedido->m_cargar_nota_pedido($paramPaginate,$paramDatos); 
+		$totalRows = $this->model_nota_pedido->m_count_nota_pedido($paramPaginate,$paramDatos); 
+		$arrListado = array(); 
+		foreach ($lista as $row) { 
+			$objEstado = array();
+			if( $row['estado_movimiento'] == 1 ){ // REGISTRADO 
+				$objEstado['claseIcon'] = 'fa-file-archive-o';
+				$objEstado['claseLabel'] = 'label-info';
+				$objEstado['labelText'] = 'REGISTRADO';
+			}
+			if( $row['estado_movimiento'] == 2 ){ // FACTURADO 
+				$objEstado['claseIcon'] = 'fa-send';
+				$objEstado['claseLabel'] = 'label-success';
+				$objEstado['labelText'] = 'FACTURADO';
+			}
+			$strCliente = NULL; 
+			$strMoneda = NULL;
+			if( $row['moneda'] == 'S' ){ 
+				$strMoneda = 'SOLES'; 
+			}
+			if( $row['moneda'] == 'D' ){ 
+				$strMoneda = 'DÓLARES'; 
+			}
+			array_push($arrListado, 
+				array(
+					'idmovimiento' => $row['idmovimiento'],
+					'num_nota_pedido' => $row['num_nota_pedido'],
+					'fecha_registro' => darFormatoDMY($row['fecha_registro']),
+					'fecha_emision' => darFormatoDMY($row['fecha_emision']),
+					'cliente' => trim($row['cliente_persona_empresa']),
+					'colaborador' => strtoupper($row['colaborador']),
+					'moneda' => $strMoneda,
+					'plazo_entrega' => $row['plazo_entrega'].' días útiles', 
+					'validez_oferta' => $row['validez_oferta'].' días útiles', 
+					'idformapago' => $row['idformapago'],
+					'forma_pago' => strtoupper($row['descripcion_fp']),
+					'idsede' => $row['idsede'],
+					'sede' => strtoupper($row['descripcion_se']),
+					'idempresaadmin' => $row['idempresaadmin'],
+					'empresa_admin' => strtoupper($row['razon_social_ea']),
+					'idusuario' => $row['idusuario'], 
+					'usuario'=> $row['username'],
+					'subtotal' => $row['subtotal'], 
+					'igv' => $row['igv'], 
+					'total' => $row['total'], 
+					'estado' => $objEstado 
+				)
+			);
+		}
+		$arrData['datos'] = $arrListado; 
+    	$arrData['paginate']['totalRows'] = $totalRows['contador']; 
+    	$arrData['message'] = ''; 
+    	$arrData['flag'] = 1; 
+		if(empty($lista)){ 
+			$arrData['flag'] = 0; 
+		} 
+		$this->output 
+		    ->set_content_type('application/json') 
+		    ->set_output(json_encode($arrData)); 
+    } 
 	public function generar_numero_nota_pedido() 
 	{ 
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true); 
@@ -65,14 +130,16 @@ class NotaPedido extends CI_Controller {
 	{
 		ini_set('xdebug.var_display_max_depth', 5);
 	    ini_set('xdebug.var_display_max_children', 256);
-	    ini_set('xdebug.var_display_max_data', 1024);
+	    ini_set('xdebug.var_display_max_data', 1024); 
+
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true); 
+		// print_r($allInputs); exit(); 
 		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
     	$arrData['flag'] = 0;
 		/* VALIDACIONES */
 
 		if( $allInputs['isRegisterSuccess'] === TRUE ){ 
-    		$arrData['message'] = 'Ya se registró esta cotización.';
+    		$arrData['message'] = 'Ya se registró esta nota de pedido.';
     		$arrData['flag'] = 0;
     		$this->output
 			    ->set_content_type('application/json')
@@ -119,7 +186,7 @@ class NotaPedido extends CI_Controller {
 		    return;
     	}
     	if( empty($allInputs['num_nota_pedido']) ){ 
-    		$arrData['message'] = 'No se ha generado un COD. DE COTIZACIÓN. Genere la COTIZACIÓN.';
+    		$arrData['message'] = 'No se ha generado un COD. DE NOTA DE PEDIDO. Genere la NOTA DE PEDIDO.';
     		$arrData['flag'] = 0;
     		$this->output
 		    	->set_content_type('application/json')
@@ -127,7 +194,7 @@ class NotaPedido extends CI_Controller {
 		    return;
     	}
     	if( $allInputs['tipo_documento_cliente']['destino_str'] == 'ce' ){ // si es cliente empresa 
-    		if( empty($allInputs['contacto']['id']) ){ 
+    		if( empty($allInputs['contacto']) || empty($allInputs['idcontacto']) ){ 
 	    		$arrData['message'] = 'No se ha asociado un CONTACTO válido. Asocie el CONTACTO.';
 	    		$arrData['flag'] = 0;
 	    		$this->output
@@ -137,9 +204,9 @@ class NotaPedido extends CI_Controller {
 	    	}
     	}
     	
-    	$fCotizacion = $this->model_cotizacion->m_cargar_esta_cotizacion_por_codigo($allInputs['num_cotizacion']);
-    	if( !empty($fCotizacion) ){ 
-    		$arrData['message'] = 'Ya se a registrado una cotización, usando el código <strong>'.$allInputs['num_cotizacion'].'</strong>'; 
+    	$fNotaPedido = $this->model_nota_pedido->m_cargar_esta_nota_pedido_por_codigo($allInputs['num_nota_pedido']);
+    	if( !empty($fNotaPedido) ){ 
+    		$arrData['message'] = 'Ya se a registrado una nota de pedido, usando el código <strong>'.$allInputs['num_nota_pedido'].'</strong>'; 
     		$arrData['flag'] = 0;
     		$this->output
 		    	->set_content_type('application/json')
@@ -154,36 +221,38 @@ class NotaPedido extends CI_Controller {
     	if( $allInputs['tipo_documento_cliente']['destino'] == 2 ){ // cliente persona 
     		$allInputs['tipo_cliente'] = 'P'; // persona 
     	} 
-		if( $this->model_cotizacion->m_registrar_cotizacion($allInputs) ){ 
-			$arrData['idcotizacion'] = GetLastId('idcotizacion','cotizacion');
+    	$arrCotizaciones = array(); 
+		if( $this->model_nota_pedido->m_registrar_nota_pedido($allInputs) ){ 
+			$arrData['idnotapedido'] = GetLastId('idmovimiento','movimiento');
 			foreach ($allInputs['detalle'] as $key => $elemento) { 
-				$elemento['idcotizacion'] = $arrData['idcotizacion'];
+				$elemento['idnotapedido'] = $arrData['idnotapedido'];
 				if( empty($elemento['agrupacion']) ){ 
 					$elemento['agrupacion'] = 1; // por defecto 
 				} 
-				if( $this->model_cotizacion->m_registrar_detalle_cotizacion($elemento) ){ 
+				if( $this->model_nota_pedido->m_registrar_detalle_nota_pedido($elemento) ){ 
+					$arrCotizaciones[] = $elemento['idcotizacion']; 
 					$arrData['message'] = 'Los datos se registraron correctamente - (no caracteristicas)'; 
 					$arrData['flag'] = 1; 
-					$arrData['iddetallecotizacion'] = GetLastId('iddetallecotizacion','detalle_cotizacion');
+					$arrData['iddetallenotapedido'] = GetLastId('iddetallemovimiento','detalle_movimiento');
 					if( !empty($elemento['caracteristicas']) ){ 
 						foreach ($elemento['caracteristicas'] as $keyCa => $caracteristica) { 
 							if( !empty($caracteristica['valor']) ){ 
-								$caracteristica['iddetallecotizacion'] = $arrData['iddetallecotizacion']; 
-								if( $this->model_cotizacion->m_registrar_detalle_caracteristica_cotizacion($caracteristica) ){ 
+								$caracteristica['iddetallenotapedido'] = $arrData['iddetallenotapedido']; 
+								if( $this->model_nota_pedido->m_registrar_detalle_caracteristica_nota_pedido($caracteristica) ){ 
 									$arrData['message'] = 'Los datos se registraron correctamente'; 
 									$arrData['flag'] = 1; 
-									$fVariable = $this->model_variable_car->m_buscar_variable($caracteristica); 
-									if( empty($fVariable) ){ 
-										// GRABAR COMO UNA VARIABLE 
-										$caracteristica['descripcion_vcar'] = $caracteristica['valor'];
-										$this->model_variable_car->m_registrar($caracteristica); 
-									}
 								} 
 							} 
 						} 
 					}
 				} 
-			} 
+			}
+			// actualizar las cotizaciones a "ENVIADAS" 
+			$boolEstado = 2; 
+			$arrCotizaciones = array_unique($arrCotizaciones); 
+			if( $this->model_cotizacion->m_actualizar_estado_cotizaciones($arrCotizaciones,$boolEstado) ){ 
+				$arrData['message'] .= '<br/> - Se actualizó el estado de las cotizaciones seleccionadas.';  
+			}
 		} 
 		$this->db->trans_complete();
 		$this->output

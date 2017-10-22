@@ -1,10 +1,10 @@
-app.controller('HistorialCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$log', '$timeout', 'pinesNotifications', 'uiGridConstants', 'blockUI', 
+app.controller('HistorialNotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$log', '$timeout', 'pinesNotifications', 'uiGridConstants', 'blockUI', 
     'ModalReporteFactory',
-		'CotizacionServices',
+		'NotaPedidoServices',
     'SedeServices',
 	function($scope, $filter, $uibModal, $bootbox, $log, $timeout, pinesNotifications, uiGridConstants, blockUI, 
     ModalReporteFactory,
-		CotizacionServices,
+		NotaPedidoServices,
     SedeServices
 ) {
    
@@ -37,13 +37,13 @@ app.controller('HistorialCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$b
   }
   $scope.metodos.listaSedes(myCallback); 
 
-  // ESTADO DE COTIZACION 
-  $scope.fArr.listaEstadosCotizacion = [
+  // ESTADO DE NOTA DE PEDIDO  
+  $scope.fArr.listaEstadosNP = [
     {'id' : 'ALL', 'descripcion' : '--TODOS--'},
-    {'id' : 1, 'descripcion' : 'POR ENVIAR'},
-    {'id' : 2, 'descripcion' : 'ENVIADO'}
+    {'id' : 1, 'descripcion' : 'REGISTRADO'},
+    {'id' : 2, 'descripcion' : 'FACTURADO'}
   ]; 
-  $scope.fBusqueda.estado_cotizacion = $scope.fArr.listaEstadosCotizacion[0]; 
+  $scope.fBusqueda.estado_np = $scope.fArr.listaEstadosNP[0]; 
 
   $scope.tabs = [true, false];
   $scope.tab = function(index){
@@ -54,7 +54,7 @@ app.controller('HistorialCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$b
   }
 
   $scope.btnBuscar = function(){ 
-    $scope.gridOptionsCot.enableFiltering = !$scope.gridOptionsCot.enableFiltering;
+    $scope.gridOptionsNP.enableFiltering = !$scope.gridOptionsNP.enableFiltering;
     $scope.gridApi.core.notifyDataChange( uiGridConstants.dataChange.COLUMN );
   };
   var paginationOptions = { 
@@ -65,7 +65,7 @@ app.controller('HistorialCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$b
     sortName: null,
     search: null
   };
-  $scope.gridOptionsCot = {
+  $scope.gridOptionsNP = {
     rowHeight: 30,
     paginationPageSizes: [100, 500, 1000, 10000],
     paginationPageSize: 100,
@@ -79,20 +79,19 @@ app.controller('HistorialCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$b
     enableFullRowSelection: true,
     multiSelect: false,
     columnDefs: [ 
-      { field: 'idcotizacion', name: 'cot.idcotizacion', displayName: 'ID', width: '75', visible: false },
-      { field: 'num_cotizacion', name: 'cot.num_cotizacion', displayName: 'COD. COTIZACION', width: '120' },
-      { field: 'fecha_emision', name: 'cot.fecha_emision', displayName: 'F. Emisión', minWidth: 100, enableFiltering: false,  sort: { direction: uiGridConstants.DESC} },
-      { field: 'fecha_registro', name: 'cot.fecha_registro', displayName: 'F. Registro', minWidth: 100, enableFiltering: false, visible: false },
+      { field: 'idmovimiento', name: 'np.idmovimiento', displayName: 'ID', width: '75', visible: false },
+      { field: 'num_nota_pedido', name: 'np.num_nota_pedido', displayName: 'COD. NOTA PEDIDO', width: '120' },
+      { field: 'fecha_emision', name: 'np.fecha_emision', displayName: 'F. Emisión', minWidth: 100, enableFiltering: false,  sort: { direction: uiGridConstants.DESC} },
+      { field: 'fecha_registro', name: 'np.fecha_registro', displayName: 'F. Registro', minWidth: 100, enableFiltering: false, visible: false },
       { field: 'cliente', name: 'cliente_persona_empresa', displayName: 'Cliente', minWidth: 180 },
       { field: 'colaborador', name: 'colaborador', displayName: 'Colaborador', minWidth: 160 },
-      { field: 'plazo_entrega', name: 'cot.plazo_entrega', displayName: 'Plazo de Entrega', minWidth: 120 },
-      { field: 'validez_oferta', name: 'cot.validez_oferta', displayName: 'Validez Oferta', minWidth: 120, visible: false },
+      { field: 'usuario', name: 'us.username', displayName: 'Usuario', minWidth: 160, visible: false },
       { field: 'forma_pago', name: 'fp.descripcion_fp', displayName: 'Forma de Pago', minWidth: 120 },
       { field: 'sede', name: 'se.descripcion_se', displayName: 'Sede', minWidth: 105 },
-      { field: 'moneda', name: 'cot.moneda', displayName: 'Moneda', minWidth: 76, enableFiltering: false },
-      { field: 'subtotal', name: 'cot.subtotal', displayName: 'Subtotal', minWidth: 90 },
-      { field: 'igv', name: 'cot.igv', displayName: 'IGV', minWidth: 80 },
-      { field: 'total', name: 'cot.total', displayName: 'Total', minWidth: 80 },
+      { field: 'moneda', name: 'np.moneda', displayName: 'Moneda', minWidth: 76, enableFiltering: false },
+      { field: 'subtotal', name: 'np.subtotal', displayName: 'Subtotal', minWidth: 90 },
+      { field: 'igv', name: 'np.igv', displayName: 'IGV', minWidth: 80 },
+      { field: 'total', name: 'np.total', displayName: 'Total', minWidth: 80 },
       { field: 'estado', type: 'object', name: 'estado', displayName: 'ESTADO', width: '95', enableFiltering: false, enableSorting: false, enableColumnMenus: false, enableColumnMenu: false, 
           cellTemplate:'<div class="">' + 
             '<label tooltip-placement="left" tooltip="{{ COL_FIELD.labelText }}" class="label {{ COL_FIELD.claseLabel }} ml-xs">'+ 
@@ -128,23 +127,22 @@ app.controller('HistorialCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$b
         var grid = this.grid;
         paginationOptions.search = true; 
         paginationOptions.searchColumn = {
-          'cot.idcotizacion' : grid.columns[1].filters[0].term,
-          'cot.num_cotizacion' : grid.columns[2].filters[0].term,
+          'np.idmovimiento' : grid.columns[1].filters[0].term,
+          'np.num_nota_pedido' : grid.columns[2].filters[0].term,
           "CONCAT(COALESCE(cp.nombres,''), ' ', COALESCE(cp.apellidos,''), ' ', COALESCE(ce.razon_social,''))" : grid.columns[5].filters[0].term,
-          "CONCAT(col.nombres, ' ', col.apellidos)" : grid.columns[6].filters[0].term,
-          'cot.plazo_entrega' : grid.columns[7].filters[0].term, 
-          'cot.validez_oferta' : grid.columns[8].filters[0].term, 
-          'fp.descripcion_fp' : grid.columns[9].filters[0].term, 
-          'se.descripcion_se' : grid.columns[10].filters[0].term,
-          'cot.subtotal' : grid.columns[12].filters[0].term,
-          'cot.igv' : grid.columns[13].filters[0].term,
-          'cot.total' : grid.columns[14].filters[0].term
+          "us.username" : grid.columns[6].filters[0].term, 
+          'fp.descripcion_fp' : grid.columns[7].filters[0].term, 
+          'se.descripcion_se' : grid.columns[8].filters[0].term,
+          'np.moneda' : grid.columns[9].filters[0].term,
+          'np.subtotal' : grid.columns[10].filters[0].term,
+          'np.igv' : grid.columns[11].filters[0].term,
+          'np.total' : grid.columns[12].filters[0].term
         }
         $scope.metodos.getPaginationServerSide();
       });
     }
   };
-  paginationOptions.sortName = $scope.gridOptionsCot.columnDefs[2].name; 
+  paginationOptions.sortName = $scope.gridOptionsNP.columnDefs[2].name; 
   $scope.metodos.getPaginationServerSide = function(loader) { 
     if( loader ){
       blockUI.start('Procesando información...');
@@ -153,12 +151,12 @@ app.controller('HistorialCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$b
       paginate : paginationOptions,
       datos: $scope.fBusqueda 
     };
-    CotizacionServices.sListarHistorialCotizaciones(arrParams).then(function (rpta) { 
+    NotaPedidoServices.sListarHistorialNotaPedidos(arrParams).then(function (rpta) { 
       if( rpta.datos.length == 0 ){
         rpta.paginate = { totalRows: 0 };
       }
-      $scope.gridOptionsCot.totalItems = rpta.paginate.totalRows;
-      $scope.gridOptionsCot.data = rpta.datos; 
+      $scope.gridOptionsNP.totalItems = rpta.paginate.totalRows;
+      $scope.gridOptionsNP.data = rpta.datos; 
       if( loader ){
         blockUI.stop(); 
       }
@@ -166,18 +164,18 @@ app.controller('HistorialCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$b
     $scope.mySelectionGrid = [];
   };
   $scope.metodos.getPaginationServerSide(true); 
-  $scope.btnImprimir = function() { 
-    console.log($scope.mySelectionGrid[0],'$scope.mySelectionGrid[0]');
-    var arrParams = { 
-      titulo: 'VISTA PREVIA DE COTIZACIÓN',
-      datos:{
-        id: $scope.mySelectionGrid[0].idcotizacion,
-        codigo_reporte: 'COT-FCOT'
-      },
-      envio_correo: 'si',
-      salida: 'pdf',
-      url: angular.patchURLCI + "Cotizacion/imprimir_cotizacion" 
-    }
-    ModalReporteFactory.getPopupReporte(arrParams);
-  }
+  // $scope.btnImprimir = function() { 
+  //   console.log($scope.mySelectionGrid[0],'$scope.mySelectionGrid[0]');
+  //   var arrParams = { 
+  //     titulo: 'VISTA PREVIA DE COTIZACIÓN',
+  //     datos:{
+  //       id: $scope.mySelectionGrid[0].idcotizacion,
+  //       codigo_reporte: 'COT-FCOT'
+  //     },
+  //     envio_correo: 'si',
+  //     salida: 'pdf',
+  //     url: angular.patchURLCI + "NotaPedido/imprimir_cotizacion" 
+  //   }
+  //   ModalReporteFactory.getPopupReporte(arrParams);
+  // }
 }]); 

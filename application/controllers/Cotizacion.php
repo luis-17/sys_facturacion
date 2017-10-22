@@ -15,7 +15,7 @@ class Cotizacion extends CI_Controller {
 		$this->sessionFactur = @$this->session->userdata('sess_fact_'.substr(base_url(),-20,7));
 		date_default_timezone_set("America/Lima");
     }
-	public function lista_cotizaciones_historial()
+	public function listar_cotizaciones_historial()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true); // var_dump($allInputs); exit(); 
 		$paramPaginate = $allInputs['paginate'];
@@ -85,6 +85,128 @@ class Cotizacion extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
+	public function listar_detalle_esta_cotizacion()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true); // var_dump($allInputs); exit(); 
+		if(empty($allInputs['iddetallecotizacion'])){
+			$allInputs['iddetallecotizacion'] = NULL;
+		}
+		$lista = $this->model_cotizacion->m_cargar_detalle_cotizacion_por_id($allInputs['idcotizacion'],$allInputs['iddetallecotizacion']); 
+		$arrListado = array(); 
+		foreach ($lista as $key => $row) { 
+			$arrAux = array( 
+				'iddetallecotizacion' => $row['iddetallecotizacion'],
+				'idcotizacion' => $row['idcotizacion'],
+				'num_cotizacion' => $row['num_cotizacion'],
+				'idempresaadmin' => $row['idempresaadmin'],
+				'idelemento' => $row['idelemento'], 
+				'elemento' => $row['descripcion_ele'], 
+				'cantidad' => $row['cantidad'], 
+				'precio_unitario' => $row['precio_unitario'], 
+				'importe_con_igv' => $row['importe_con_igv'], 
+				'importe_sin_igv' => $row['importe_sin_igv'], 
+				'excluye_igv' => $row['excluye_igv'], 
+				'igv_detalle' => $row['igv_detalle'], 
+				'unidad_medida' => array( 
+					'id'=> $row['idunidadmedida'],
+					'descripcion'=> $row['descripcion_um'] 
+				),
+				'agrupador_totalizado' => $row['agrupador_totalizado'],
+				'caracteristicas' => array() 
+			);
+			$arrListado[$row['iddetallecotizacion']] = $arrAux; 
+		}
+		foreach ($lista as $key => $row) { 
+			$arrAux2 = array(
+				'id'=> $row['iddetallecaracteristica'],
+				'idcaracteristica'=> $row['idcaracteristica'],
+				'orden'=> $row['orden_car'],
+				'descripcion'=> $row['descripcion_car'],
+				'valor'=> $row['valor']
+			);
+			$arrListado[$row['iddetallecotizacion']]['caracteristicas'][$row['iddetallecaracteristica']] = $arrAux2; 
+		} 
+		$arrData['datos'] = $arrListado; 
+    	// $arrData['paginate']['totalRows'] = $totalRows['contador']; 
+    	$arrData['message'] = ''; 
+    	$arrData['flag'] = 1; 
+		if(empty($lista)){ 
+			$arrData['flag'] = 0; 
+		} 
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
+	public function listar_detalle_cotizaciones_historial()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true); // var_dump($allInputs); exit(); 
+		$paramPaginate = $allInputs['paginate'];
+		$paramDatos = @$allInputs['datos'];
+		$lista = $this->model_cotizacion->m_cargar_cotizaciones_detalle($paramPaginate,$paramDatos); 
+		$totalRows = $this->model_cotizacion->m_count_cotizaciones_detalle($paramPaginate,$paramDatos); 
+		$arrListado = array(); 
+		foreach ($lista as $key => $row) { 
+			$objEstado = array();
+			if( $row['estado_cot'] == 1 ){ // POR ENVIAR 
+				$objEstado['claseIcon'] = 'fa-file-archive-o';
+				$objEstado['claseLabel'] = 'label-info';
+				$objEstado['labelText'] = 'POR ENVIAR';
+			}
+			if( $row['estado_cot'] == 2 ){ // ENVIADO   
+				$objEstado['claseIcon'] = 'fa-send';
+				$objEstado['claseLabel'] = 'label-success';
+				$objEstado['labelText'] = 'ENVIADO';
+			}
+			$arrAux = array( 
+				'iddetallecotizacion' => $row['iddetallecotizacion'],
+				'num_cotizacion' => $row['num_cotizacion'],
+				'fecha_emision' => $row['fecha_emision'],
+				'idempresaadmin' => $row['idempresaadmin'],
+				'idelemento' => $row['idelemento'], 
+				'elemento' => $row['descripcion_ele'], 
+				'cantidad' => $row['cantidad'], 
+				'precio_unitario' => $row['precio_unitario'], 
+				'importe_con_igv' => $row['importe_con_igv'], 
+				'importe_sin_igv' => $row['importe_sin_igv'], 
+				'excluye_igv' => $row['excluye_igv'], 
+				'igv_detalle' => $row['igv_detalle'], 
+				'unidad_medida' => $row['descripcion_um'], 
+				'agrupador_totalizado' => $row['agrupador_totalizado'],
+				'estado' => $objEstado, 
+				'caracteristicas' => array() 
+
+			);
+
+			$arrListado[] = $arrAux; 
+		}
+		// foreach ($lista as $key => $row) {
+		// 	$arrAux2 = array(
+		// 		'id'=> $row['iddetallecaracteristica'],
+		// 		'orden'=> $row['orden_car'],
+		// 		'descripcion'=> $row['descripcion_car'],
+		// 		'valor'=> $row['valor']
+		// 	);
+		// 	$arrListado[$row['iddetallecotizacion']]['caracteristicas'][$row['iddetallecaracteristica']] = $arrAux2; 
+		// }
+		$arrData['datos'] = $arrListado; 
+    	$arrData['paginate']['totalRows'] = $totalRows['contador']; 
+    	$arrData['message'] = ''; 
+    	$arrData['flag'] = 1; 
+		if(empty($lista)){ 
+			$arrData['flag'] = 0; 
+		} 
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
+	public function ver_popup_busqueda_cotizacion()
+	{
+		$this->load->view('cotizacion/busq_cotizacion_popup'); 
+	}
+	public function ver_popup_busqueda_cotizacion_detalle()
+	{
+		$this->load->view('cotizacion/busq_cotizacion_detalle_popup'); 
+	}
 	public function generar_numero_cotizacion() 
 	{ 
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true); 
@@ -104,12 +226,14 @@ class Cotizacion extends CI_Controller {
 		$sede = strtoupper($allInputs['sede']['abreviatura']); 
 		$numCaracteres = $fConfig['cant_caracteres_correlativo_cot']; 
 		$numCotizacion = 'C'.$sede.date('y'); 
+		//print_r($fConfig); exit(); 
 		if($fConfig['incluye_mes_en_codigo_cot'] == 'si'){
 			$numCotizacion .= date('m'); 
 		}
 		if($fConfig['incluye_dia_en_codigo_cot'] == 'si'){
 			$numCotizacion .= date('d'); 
 		}
+		//var_dump($numCotizacion); exit();
 		// OBTENER ULTIMA COTIZACION SEGÚN LOGICA DE CONFIGURACIÓN. 
 		$allInputs['config'] = $fConfig; 
 		$fCotizacion = $this->model_cotizacion->m_cargar_ultima_cotizacion_segun_config($allInputs);
@@ -117,10 +241,14 @@ class Cotizacion extends CI_Controller {
 			$numCorrelativo = 1;
 		}else{
 			$numCorrelativo = substr($fCotizacion['num_cotizacion'], ($numCaracteres * -1), $numCaracteres); 
+			//var_dump($numCorrelativo); 
 			$numCorrelativo = (int)$numCorrelativo + 1;
+			//var_dump($numCorrelativo); exit();
 		}
+		//var_dump($numCotizacion); exit();
 		$numCotizacion .= str_pad($numCorrelativo, $numCaracteres, '0', STR_PAD_LEFT);
 	 	$arrDatos['num_cotizacion'] = $numCotizacion; 
+	 	//var_dump($numCotizacion); exit();
     	$arrData['datos'] = $arrDatos;
     	$arrData['message'] = '';
     	$arrData['flag'] = 1;
@@ -134,8 +262,7 @@ class Cotizacion extends CI_Controller {
 	public function buscar_numero_cotizacion_autocomplete()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);	
-		$allInputs['limite'] = 15;
-		$lista = $this->model_cotizacion->m_cargar_numero_cotizacion_autocomplete($allInputs);
+		$lista = $this->model_cotizacion->m_cargar_numero_cotizacion_autocomplete($allInputs,$allInputs['datos']);
 		$hayStock = true;
 		$arrListado = array();
 		foreach ($lista as $row) { 
@@ -151,21 +278,29 @@ class Cotizacion extends CI_Controller {
 			}
 			if( $row['tipo_cliente'] == 'E' ){ //cliente_empresa
 				$arrCliente = array( 
-					'idclienteempresa' => $row['idclienteempresa'], 
+					'idclienteempresa' => $row['idclienteempresa'],
+					'id'=> $row['idclienteempresa'], 
+					'idtipodocumentocliente'=> $row['ce_idtipodocumentocliente'],
+					'cliente'=> strtoupper($row['razon_social_ce']),
+					'tipo_cliente' => 'ce',
 					//'ruc' => $row['ruc'],
 					'razon_social' => strtoupper($row['razon_social_ce']),
-					// 'representante_legal' => strtoupper($row['representante_legal_ce']),
-					// 'dni_representante_legal' => $row['dni_representante_legal'],
-					'num_documento'=> $row['ruc_ce'] 
+					'num_documento'=> $row['ruc_ce'], 
+					// contacto 
+					'telefono_contacto' => $row['telefono_fijo'],
+					'anexo_contacto'=> $row['anexo'],
 				);
 			}
 			if( $row['tipo_cliente'] == 'P' ){ //cliente_persona
 				$arrCliente = array( 
 					'idclientepersona'=> $row['idclientepersona'],
+					'id'=> $row['idclientepersona'],
+					'idtipodocumentocliente'=> $row['cp_idtipodocumentocliente'],
 					'cliente'=> strtoupper($row['cliente_persona']),
+					'tipo_cliente' => 'cp',
 					'email'=> strtoupper($row['email_persona_empresa']),
 					'telefono_movil'=> $row['telefono_movil_cp'], 
-					'num_documento'=> $row['num_documento_cp']
+					'num_documento'=> $row['num_documento_cp'] 
 				);
 			}
 			array_push($arrListado, 
@@ -183,15 +318,16 @@ class Cotizacion extends CI_Controller {
 						'descripcion'=> strtoupper($row['descripcion_fp']),
 						'modo'=> $row['modo_fp']
 					),
+					'estado' => $row['estado_cot'],
 					//contacto 
 					'idcontacto' => $row['idcontacto'],
 					'contacto' => strtoupper($row['contacto']),
 					'telefono_contacto' => $row['telefono_fijo'],
-					'anexo'=> $row['anexo'],
+					'anexo_contacto'=> $row['anexo'],
 					'area_encargada' => $row['area_encargada'], 
 					//configuración avanzada 
-					'incluye_entr_dom'=> $row['incluye_entrega_domicilio'],
-					'incluye_tras_prov'=> $row['incluye_traslado_prov'],
+					'incluye_entr_dom'=> (int)$row['incluye_entrega_domicilio'],
+					'incluye_tras_prov'=> (int)$row['incluye_traslado_prov'],
 					'plazo_entrega'=> $row['plazo_entrega'],
 					'validez_oferta'=> $row['validez_oferta'],
 					'modo_igv'=> $row['modo_igv'],
@@ -199,7 +335,6 @@ class Cotizacion extends CI_Controller {
 					'cliente'=> $arrCliente, 
 				)
 			);
-			
 		}
 		
     	$arrData['datos'] = $arrListado;
@@ -207,7 +342,12 @@ class Cotizacion extends CI_Controller {
     	$arrData['flag'] = 1;
 		if(empty($lista)){
 			$arrData['flag'] = 0;
+		}else{
+			if( @$allInputs['limit'] == 1 && @$lista[0]['estado_cot'] == 2 /*enviado*/ ){ 
+				$arrData['flag'] = 2;
+			}
 		}
+		
 		$this->output
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData)); 
@@ -375,24 +515,24 @@ class Cotizacion extends CI_Controller {
 	    $this->pdf->SetAutoPageBreak(true,10);
 
 	    $this->pdf->SetTextColor(95,95,95);
-	    $this->pdf->SetFont('Arial','B',10);
-        $this->pdf->SetXY(8,25);
+	    $this->pdf->SetFont('Arial','B',9);
+        $this->pdf->SetXY(8,21);
         $this->pdf->MultiCell( 120,6,utf8_decode( $fila['razon_social_ea'] ) ); 
-        $this->pdf->SetFont('Arial','',9);
-        $this->pdf->SetXY(8,29);
+        $this->pdf->SetFont('Arial','',8);
+        $this->pdf->SetXY(8,25);
         $this->pdf->MultiCell( 120,6,utf8_decode( $fila['direccion_legal'] ),0,'L' );
-        $this->pdf->SetXY(8,33);
+        $this->pdf->SetXY(8,29);
         $this->pdf->MultiCell( 120,6,'Sitio Web: ',0,'L' ); 
-        	$this->pdf->SetXY(36,33);
-        	$this->pdf->MultiCell( 120,6,utf8_decode(strtolower($fila['pagina_web']) ),0,'L' );
-        $this->pdf->SetXY(8,37);
+        $this->pdf->SetXY(36,29);
+        $this->pdf->MultiCell( 120,6,utf8_decode(strtolower($fila['pagina_web']) ),0,'L' );
+        $this->pdf->SetXY(8,33);
         $this->pdf->MultiCell( 120,6,utf8_decode('Teléfono: '),0,'L' );
-	        $this->pdf->SetXY(36,37);
-	        $this->pdf->MultiCell( 120,6,utf8_decode( $fila['telefono_ea'] ),0,'L' );
+	    $this->pdf->SetXY(36,33);
+	    $this->pdf->MultiCell( 120,6,utf8_decode( $fila['telefono_ea'] ),0,'L' );
 
         $this->pdf->SetTextColor(0,0,0);
-        $this->pdf->SetFont('Arial','B',13);
-        $this->pdf->SetXY(100,10);
+        $this->pdf->SetFont('Arial','B',12);
+        $this->pdf->SetXY(100,8);
         $this->pdf->Cell(120,10,utf8_decode( 'COTIZACIÓN N° '.$fila['num_cotizacion'] ),0,0);
         $this->pdf->Ln(15);
         if( @$this->estado == 1 ){ 
@@ -401,7 +541,7 @@ class Cotizacion extends CI_Controller {
           $this->RotatedText(70,190,'A N U L A D O',45);  
         } 
       	
-      	$this->pdf->SetXY(8,46);
+      	$this->pdf->SetXY(8,40);
       	$r = $fConfig['color_plantilla_reporte_r'];
 		$g = $fConfig['color_plantilla_reporte_g'];
 		$b = $fConfig['color_plantilla_reporte_b'];
@@ -432,56 +572,56 @@ class Cotizacion extends CI_Controller {
 
 		$this->pdf->SetTextColor(66,66,66);
 		
-		$this->pdf->SetXY(8,52); 
-      	$this->pdf->SetFont('Arial','B',9); 
+		$this->pdf->SetXY(8,44); 
+      	$this->pdf->SetFont('Arial','B',8); 
       	$this->pdf->Cell(24,6,'CLIENTE '); 
       	$this->pdf->Cell(3,6,':',0,0,'C'); 
-      	$this->pdf->SetFont('Arial','',9); 
+      	$this->pdf->SetFont('Arial','',8); 
       	$this->pdf->Cell(75,6,strtoupper(strtoupper_total($fila['cliente_persona_empresa'])));
 
-      	$this->pdf->SetXY(8,56); 
-      	$this->pdf->SetFont('Arial','B',9); 
+      	$this->pdf->SetXY(8,48); 
+      	$this->pdf->SetFont('Arial','B',8); 
       	$this->pdf->Cell(24,6,strtoupper($fila['tipo_documento_abv'])); 
       	$this->pdf->Cell(3,6,':',0,0,'C'); 
-      	$this->pdf->SetFont('Arial','',9); 
+      	$this->pdf->SetFont('Arial','',8); 
       	$this->pdf->Cell(75,6,strtoupper($fila['num_documento_persona_empresa'])); 
 
-		$this->pdf->SetXY(8,60); 
-      	$this->pdf->SetFont('Arial','B',9); 
+		$this->pdf->SetXY(8,52); 
+      	$this->pdf->SetFont('Arial','B',8); 
       	$this->pdf->Cell(24,6,'CONTACTO '); 
       	$this->pdf->Cell(3,6,':',0,0,'C'); 
-      	$this->pdf->SetFont('Arial','',9); 
+      	$this->pdf->SetFont('Arial','',8); 
       	$this->pdf->Cell(75,6,strtoupper(strtoupper_total(utf8_decode($fila['contacto']))));
 
-      	$this->pdf->SetXY(8,64); 
-      	$this->pdf->SetFont('Arial','B',9); 
+      	$this->pdf->SetXY(8,56); 
+      	$this->pdf->SetFont('Arial','B',8); 
       	$this->pdf->Cell(24,6,'E-MAIL '); 
       	$this->pdf->Cell(3,6,':',0,0,'C'); 
-      	$this->pdf->SetFont('Arial','',9); 
+      	$this->pdf->SetFont('Arial','',8); 
       	$this->pdf->Cell(75,6,strtoupper($fila['email_persona_empresa']));
 
-      	$this->pdf->SetXY(96,52); 
-      	$this->pdf->SetFont('Arial','B',9); 
-      	$this->pdf->Cell(36,6,utf8_decode('DIRECCIÓN ')); 
+      	$this->pdf->SetXY(96,44); 
+      	$this->pdf->SetFont('Arial','B',8); 
+      	$this->pdf->Cell(26,6,utf8_decode('DIRECCIÓN ')); 
       	$this->pdf->Cell(3,6,':',0,0,'C'); 
-      	$this->pdf->SetFont('Arial','',9); 
+      	$this->pdf->SetFont('Arial','',7); 
       	$this->pdf->Cell(75,6,utf8_decode(strtoupper_total($fila['direccion_legal_ce'])));
 
-      	$this->pdf->SetXY(96,56); 
-      	$this->pdf->SetFont('Arial','B',9); 
-      	$this->pdf->Cell(36,6,utf8_decode('DIR. DESPACHO')); 
+      	$this->pdf->SetXY(96,48); 
+      	$this->pdf->SetFont('Arial','B',8); 
+      	$this->pdf->Cell(26,6,utf8_decode('DIR. DESPACHO')); 
       	$this->pdf->Cell(3,6,':',0,0,'C'); 
-      	$this->pdf->SetFont('Arial','',9); 
+      	$this->pdf->SetFont('Arial','',8); 
       	$this->pdf->Cell(75,6,strtoupper(strtoupper_total($fila['direccion_guia'])));
       	
-      	$this->pdf->SetXY(96,60); 
-      	$this->pdf->SetFont('Arial','B',9); 
-      	$this->pdf->Cell(36,6,utf8_decode('TELÉFONO ')); 
+      	$this->pdf->SetXY(96,52); 
+      	$this->pdf->SetFont('Arial','B',8); 
+      	$this->pdf->Cell(26,6,utf8_decode('TELÉFONO ')); 
       	$this->pdf->Cell(3,6,':',0,0,'C'); 
-      	$this->pdf->SetFont('Arial','',9); 
+      	$this->pdf->SetFont('Arial','',8); 
       	$this->pdf->Cell(75,6,strtoupper($fila['telefono_ce']));
 
-      	$this->pdf->SetXY(8,72); 
+      	$this->pdf->SetXY(8,62); 
       	$this->pdf->SetFillColor($r,$g,$b);
 		$this->pdf->SetWidths(array(60));
 		$arrBarra = array(
@@ -501,67 +641,67 @@ class Cotizacion extends CI_Controller {
 		$this->pdf->Row($arrBarra['data'],true,0,FALSE,5,$arrBarra['textColor'],$arrBarra['bgColor'],FALSE,FALSE,$arrBarra['fontSize']);
 		$this->pdf->SetTextColor(66,66,66);
 
-		$this->pdf->SetXY(8,78); 
-      	$this->pdf->SetFont('Arial','B',9); 
+		$this->pdf->SetXY(8,66); 
+      	$this->pdf->SetFont('Arial','B',8); 
       	$this->pdf->Cell(38,6,'ASESOR DE VENTA '); 
       	$this->pdf->Cell(3,6,':',0,0,'C'); 
-      	$this->pdf->SetFont('Arial','',9); 
+      	$this->pdf->SetFont('Arial','',8); 
       	$this->pdf->Cell(75,6,strtoupper(strtoupper_total($fila['colaborador'])));
 
-      	$this->pdf->SetXY(8,82); 
-      	$this->pdf->SetFont('Arial','B',9); 
+      	$this->pdf->SetXY(8,70); 
+      	$this->pdf->SetFont('Arial','B',8); 
       	$this->pdf->Cell(38,6,utf8_decode('FECHA EMISIÓN ')); 
       	$this->pdf->Cell(3,6,':',0,0,'C'); 
-      	$this->pdf->SetFont('Arial','',9); 
+      	$this->pdf->SetFont('Arial','',8); 
       	$this->pdf->Cell(75,6,darFormatoDMY($fila['fecha_emision'])); 
 
-      	$this->pdf->SetXY(8,86); 
-      	$this->pdf->SetFont('Arial','B',9); 
+      	$this->pdf->SetXY(8,74); 
+      	$this->pdf->SetFont('Arial','B',8); 
       	$this->pdf->Cell(38,6,'MONEDA '); 
       	$this->pdf->Cell(3,6,':',0,0,'C'); 
-      	$this->pdf->SetFont('Arial','',9); 
+      	$this->pdf->SetFont('Arial','',8); 
       	$this->pdf->Cell(75,6,utf8_decode($fila['moneda_str'])); 
 
-      	$this->pdf->SetXY(8,90); 
-      	$this->pdf->SetFont('Arial','B',9); 
+      	$this->pdf->SetXY(8,78); 
+      	$this->pdf->SetFont('Arial','B',8); 
       	$this->pdf->Cell(38,6,utf8_decode('PLAZO DE ENTREGA(*) ')); 
       	$this->pdf->Cell(3,6,':',0,0,'C'); 
-      	$this->pdf->SetFont('Arial','',9); 
+      	$this->pdf->SetFont('Arial','',8); 
       	$this->pdf->Cell(75,6,utf8_decode($fila['plazo_entrega']. ' días útiles')); 
 
-      	$this->pdf->SetXY(96,78); 
-      	$this->pdf->SetFont('Arial','B',9); 
-      	$this->pdf->Cell(36,6,utf8_decode('CONDICIÓN DE PAGO ')); 
+      	$this->pdf->SetXY(96,66); 
+      	$this->pdf->SetFont('Arial','B',8); 
+      	$this->pdf->Cell(26,6,utf8_decode('COND. DE PAGO ')); 
       	$this->pdf->Cell(3,6,':',0,0,'C'); 
-      	$this->pdf->SetFont('Arial','',9); 
+      	$this->pdf->SetFont('Arial','',8); 
       	$this->pdf->Cell(75,6,utf8_decode($fila['descripcion_fp'])); 
 
-      	$this->pdf->SetXY(96,82); 
-      	$this->pdf->SetFont('Arial','B',9); 
-      	$this->pdf->Cell(36,6,utf8_decode('VALIDEZ DE OFERTA ')); 
+      	$this->pdf->SetXY(96,70); 
+      	$this->pdf->SetFont('Arial','B',8); 
+      	$this->pdf->Cell(26,6,utf8_decode('VALIDEZ'));  // DE OFERTA
       	$this->pdf->Cell(3,6,':',0,0,'C'); 
-      	$this->pdf->SetFont('Arial','',9); 
+      	$this->pdf->SetFont('Arial','',8); 
       	$this->pdf->Cell(75,6,utf8_decode($fila['validez_oferta'].' días ')); 
 
-      	$this->pdf->SetXY(96,86); 
-      	$this->pdf->SetFont('Arial','B',9); 
-      	$this->pdf->Cell(36,6,utf8_decode('PRECIO INCLUYE IGV ')); 
+      	$this->pdf->SetXY(96,74); 
+      	$this->pdf->SetFont('Arial','B',8); 
+      	$this->pdf->Cell(26,6,utf8_decode('INCLUYE IGV ')); 
       	$this->pdf->Cell(3,6,':',0,0,'C'); 
-      	$this->pdf->SetFont('Arial','',9); 
+      	$this->pdf->SetFont('Arial','',8); 
       	$this->pdf->Cell(75,6,$strIncluyeIGV); 
 
-      	$this->pdf->SetXY(8,97); 
+      	$this->pdf->SetXY(8,85); 
       	$this->pdf->Cell(100,6,utf8_decode('Tenemos el agrado de presentar la siguiente cotización: ')); 
 
-      	$this->pdf->SetXY(8,100); 
-      	$this->pdf->Ln(4);
+      	$this->pdf->SetXY(8,92); 
+      	//$this->pdf->Ln(4);
       	$x_final_izquierda = $this->pdf->GetX();
       	$y_final_izquierda = $this->pdf->GetY();
 
       	// APARTADO: DATOS DEL DETALLE
 
       	// LOGICA POSICION 
-      	$this->pdf->SetFont('Arial','B',9);
+      	$this->pdf->SetFont('Arial','B',8);
       	$this->pdf->SetFillColor($r,$g,$b);
       	$this->pdf->SetTextColor(255,255,255);
       	$this->pdf->Cell(10,6,'ITEM',1,0,'L',TRUE);
@@ -570,18 +710,18 @@ class Cotizacion extends CI_Controller {
       	$this->pdf->Cell(18,6,'CANT.',1,0,'C',TRUE);
       	$this->pdf->Cell(20,6,'P.U.',1,0,'C',TRUE);
       	$this->pdf->Cell(26,6,'IMPORTE',1,0,'C',TRUE); 
-      	$this->pdf->Ln(8);
+      	$this->pdf->Ln(7);
 
-      	$this->pdf->SetFont('Arial','',8);
+      	$this->pdf->SetFont('Arial','',7);
 	    
 	    $i = 1;
 	    $detalleEle = $this->model_cotizacion->m_cargar_detalle_cotizacion_por_id($allInputs['id']);
 	    //var_dump($detalleEle); exit(); 
-	    $arrGroupBy=array();
+	    $arrGroupBy = array(); 
 
 	    foreach ($detalleEle as $key => $value) {
 	    	// var_dump($detalleEle);
-	    	$rowAux=array(
+	    	$rowAux = array(
 	    		'iddetallecotizacion' =>$value['iddetallecotizacion'],
 	    		'descripcion_ele' =>$value['descripcion_ele'],
 	    		'cantidad' =>$value['cantidad'],
@@ -589,50 +729,80 @@ class Cotizacion extends CI_Controller {
 	    		'precio_unitario' =>$value['precio_unitario'],
 	    		'importe_con_igv' =>$value['importe_con_igv'],
 	    		'detallecaracteristica' =>array()
-	    		);
-	    	$arrGroupBy[$value['iddetallecotizacion']]=$rowAux;
-	    }		
+	    	);
+	    	$arrGroupBy[$value['iddetallecotizacion']] = $rowAux;
+	    }
+	    
 		foreach ($detalleEle as $key => $value) {
-	    	$rowAux=array(
-	    		'iddetallecaracteristica' =>$value['iddetallecaracteristica'],
-	    		'descripcion_car' =>$value['descripcion_car'],
-	    		'valor' =>$value['valor'],
-	    		);
-	    	$arrGroupBy[$value['iddetallecotizacion']]['detallecaracteristica'][$value['iddetallecaracteristica']]=$rowAux;
+			if( !empty($value['iddetallecaracteristica']) ){ 
+				$rowAux=array(
+		    		'iddetallecaracteristica' => $value['iddetallecaracteristica'],
+		    		'descripcion_car' => $value['descripcion_car'],
+		    		'valor' => $value['valor'] 
+		    	);
+		    	$arrGroupBy[$value['iddetallecotizacion']]['detallecaracteristica'][$value['iddetallecaracteristica']] = $rowAux; 
+	    	} 
 		}
-	  	// var_dump($arrGroupBy);exit();
+	  	// print_r($arrGroupBy); exit();
 	    $exonerado = 0;
 	    $fill = TRUE;
 	    $this->pdf->SetDrawColor($r_sec,$g_sec,$b_sec); // gris fill 
 	    $this->pdf->SetLineWidth(.1);
 	    foreach ($arrGroupBy as $key => $value) { 
-		// var_dump($arrGroupBy);exit();
-	      $fill = !$fill;		
-	      $this->pdf->SetWidths(array(10, 100, 20, 18, 20, 26));
-	      $this->pdf->SetAligns(array('L', 'L', 'C', 'C', 'R', 'R'));
-	      //$this->pdf->fill(array(TRUE, TRUE, TRUE, TRUE, TRUE, TRUE));
-	      $this->pdf->SetFillColor($r_sec,$g_sec,$b_sec);
-	      $this->pdf->SetTextColor(0,3,6);
-	      $this->pdf->SetFont('Arial','B',6);
-	      $this->pdf->RowSmall(   
-	        array(
-	          $i,
-	          utf8_decode($value['descripcion_ele']),
-	          strtoupper($value['abreviatura_um']),
-	          $value['cantidad'],
-	          $value['precio_unitario'],
-	          $value['importe_con_igv']
-	        ),
-	        false, 0
-	      );
-	      $i++;
-	      $this->pdf->SetTextColor(66,66,66);
-	       $this->pdf->SetFont('Arial','',6);
-	      		foreach ($value['detallecaracteristica'] as $key => $row) {
-	      			$this->pdf->Cell(10,3,'',0,0,'C',0);  
-	      			$this->pdf->Cell(184,3,utf8_decode($row['descripcion_car']).': '.$row['valor'],0,1,'L',0); 
-	      		}
-	      		$this->pdf->Cell(194,0,'','B',1,'C',0);  
+		    $fill = !$fill;		
+		    $this->pdf->SetWidths(array(10, 100, 20, 18, 20, 26));
+		    $this->pdf->SetAligns(array('L', 'L', 'C', 'C', 'R', 'R'));
+		    $this->pdf->SetFillColor($r_sec,$g_sec,$b_sec);
+		    $this->pdf->SetTextColor(0,3,6);
+		    $this->pdf->SetFont('Arial','B',6); 
+		    $arrItemDetalle = array(
+				'fontSize'=> array(
+					array('family'=> NULL, 'weight'=> NULL, 'size'=> 8 ),
+					array('family'=> NULL, 'weight'=> NULL, 'size'=> 8 ),
+					array('family'=> NULL, 'weight'=> NULL, 'size'=> 8 ),
+					array('family'=> NULL, 'weight'=> NULL, 'size'=> 8 ),
+					array('family'=> NULL, 'weight'=> NULL, 'size'=> 8 ),
+					array('family'=> NULL, 'weight'=> NULL, 'size'=> 8 )
+				)
+			);
+		    $this->pdf->Row( 
+		      array(
+		        $i,
+		        utf8_decode($value['descripcion_ele']),
+		        strtoupper($value['abreviatura_um']),
+		        $value['cantidad'],
+		        $value['precio_unitario'],
+		        $value['importe_con_igv']
+		      ),
+		      FALSE, 0, FALSE, 4, FALSE, FALSE, FALSE, FALSE, $arrItemDetalle['fontSize'] 
+		    );
+		    $i++;
+		  	$this->pdf->SetTextColor(66,66,66);
+		   	$this->pdf->SetFont('Arial','',6);
+		   	// $this->pdf->Cell(194,0.8,'','B',1,'C',0); 
+			foreach ($value['detallecaracteristica'] as $key => $row) { 
+				$this->pdf->SetWidths(array(10, 50, 5, 100));
+		    	$this->pdf->SetAligns(array('L', 'L', 'L', 'L'));
+				$arrCaracts = array( 
+					'data'=> array(
+						'',
+						utf8_decode($row['descripcion_car']),
+						':',
+						utf8_decode($row['valor']) 
+					),
+					'fontSize'=> array(
+						array('family'=> NULL, 'weight'=> NULL, 'size'=> 6 ),
+						array('family'=> NULL, 'weight'=> NULL, 'size'=> 6 ),
+						array('family'=> NULL, 'weight'=> NULL, 'size'=> 6 ),
+						array('family'=> NULL, 'weight'=> NULL, 'size'=> 6 )
+					)
+				);
+				$this->pdf->Row( $arrCaracts['data'],FALSE,0,FALSE,3,FALSE,FALSE,FALSE,FALSE,$arrCaracts['fontSize'] );
+				// $this->pdf->Cell(10,3,'',0,0,'C',0);  
+				// $this->pdf->Cell(184,3,utf8_decode($row['descripcion_car']).': ',0,1,'L',0); 
+				// $this->pdf->Cell(184,3,utf8_decode(': '.$row['valor']),0,1,'L',0); 
+			}
+			$this->pdf->Cell(194,0.8,'','B',1,'C',0); 
 	    }
 	    $this->pdf->SetXY(8,-34); 
 	    //$this->pdf->Ln(1);
@@ -641,9 +811,9 @@ class Cotizacion extends CI_Controller {
 	    $this->pdf->Cell(140,5,'TOTAL SON: ' . $en_letra);
 	    $this->pdf->SetXY(8,-23); 
 	    $this->pdf->SetFont('Arial','',8);
-	    $bancoEmpresa = $this->model_banco_empresa_admin->m_cargar_banco_empresa_admin_por_id($fila['idempresaadmin']);
- 		$this->pdf->SetTextColor(0,0,0);
-   		$this->pdf->SetFont('Arial','B',9);
+	    $bancoEmpresa = $this->model_banco_empresa_admin->m_cargar_cuentas_banco_por_filtros($fila['idempresaadmin'],$fila['moneda']);
+ 		//$this->pdf->SetTextColor(0,0,0);
+   		$this->pdf->SetFont('Arial','',9);
 	    foreach ($bancoEmpresa as $key => $value) {
 	    	$this->pdf->Cell(40,5,'Cta. Cte. '.$value['abreviatura_ba'].' '. $fila['moneda_str'],0,0,'L',0); 	  
 	    }
@@ -658,18 +828,18 @@ class Cotizacion extends CI_Controller {
 	    $this->pdf->Cell(150,20,'');
 	    $this->pdf->Cell(20,6,'SUBTOTAL:','LT',0,'R');
 	    $this->pdf->SetFont('Arial','',8);
-	    $this->pdf->Cell(20,6,$fila['subtotal'],'TR',0,'R');
+	    $this->pdf->Cell(20,6,$simbolo . number_format($fila['subtotal'],2),'TR',0,'R');
 	    $this->pdf->Ln(6);
 	    $this->pdf->SetFont('Arial','',8);
 	    $this->pdf->Cell(150,6,'');
 	    $this->pdf->Cell(20,6,'IGV:','L',0,'R');
 	    $this->pdf->SetFont('Arial','',8);
-	    $this->pdf->Cell(20,6,$fila['igv'],'R',0,'R');
+	    $this->pdf->Cell(20,6,$simbolo . number_format($fila['igv'],2),'R',0,'R');
 	    $this->pdf->Ln(6);
 	    $this->pdf->SetFont('Arial','B',9);
 	    $this->pdf->Cell(150,8,'');
 	    $this->pdf->Cell(20,8,'TOTAL:','TLB',0,'R');
-	    $this->pdf->Cell(20,8,$simbolo . $fila['total'],'TRB',0,'R');
+	    $this->pdf->Cell(20,8,$simbolo . number_format($fila['total'],2),'TRB',0,'R');
 	    // $this->pdf->Cell(30,8,$simbolo . substr($fila['total_a_pagar'], 4),'TRB',0,'R');
 	    // $this->pdf->Ln(15);
 	    // $monto = new EnLetras();
