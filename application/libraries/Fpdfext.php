@@ -346,7 +346,7 @@
         $this->SetFont('Arial','',6);
         $this->SetXY(-70,0);
         $this->MultiCell(120,6,'USUARIO: '.strtoupper($ci2->sessionFactur['username']).utf8_decode('    /   FECHA DE IMPRESIÓN: ').date('Y-m-d H:i:s')); 
-        $this->Image($this->getImagenCab(),8,8,50); 
+        $this->Image($this->getImagenCab(),4,4,50); 
         
       }
        // El pie del pdf

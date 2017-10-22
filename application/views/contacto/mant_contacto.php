@@ -21,7 +21,7 @@
 		</div>
 		<div class="form-group col-md-3 mb-md">
 			<label class="control-label mb-n"> Teléfono fijo </label>
-			 <input type="tel" class="form-control input-sm" ng-model="fData.telefono_fijo" placeholder="Ingrese tel. movil" tabindex="60" /> 
+			 <input type="tel" class="form-control input-sm" ng-model="fData.telefono_fijo" placeholder="Ingrese tel. fijo" tabindex="60" /> 
 		</div>
 		<div class="form-group col-md-3 mb-md">
 			<label class="control-label mb-n"> Anexo </label>

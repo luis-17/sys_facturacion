@@ -84,12 +84,13 @@ class Model_banco_empresa_admin extends CI_Model {
 		return $this->db->update('banco_empresa_admin', $data); 
 	} 
 	
-	public function m_cargar_banco_empresa_admin_por_id($idempresaadmin)
+	public function m_cargar_cuentas_banco_por_filtros($idempresaadmin,$idmoneda)
 	{ 
-		$this->db->select('bea.num_cuenta,bea.num_cuenta_inter,b.abreviatura_ba', FALSE); 
+		$this->db->select('bea.num_cuenta, bea.num_cuenta_inter, b.abreviatura_ba, bea.moneda', FALSE); 
 		$this->db->from('banco_empresa_admin bea'); 
 		$this->db->join('banco b','bea.idbanco = b.idbanco'); 
 		$this->db->where('bea.idempresaadmin',$idempresaadmin); 
+		$this->db->where('bea.moneda',$idmoneda); 
 		$this->db->where('estado_bea',1);
 		return $this->db->get()->result_array();
 	}

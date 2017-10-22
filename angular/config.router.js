@@ -112,8 +112,41 @@ angular.module('app')
             url: '/historial-nota-pedido',
             templateUrl: 'tpl/historial-nota-pedido.html',
             resolve: load([
-              'angular/controllers/HistorialNotaPedidoCtrl.js',
-              'angular/controllers/SedeCtrl.js'
+              'angular/controllers/HistorialNotaPedidoCtrl.js', 
+              'angular/controllers/NotaPedidoCtrl.js', 
+              'angular/controllers/SedeCtrl.js' 
+            ])
+          })
+          .state('app.nueva-venta', {
+            url: '/nueva-venta',
+            templateUrl: 'tpl/nueva-venta.html',
+            resolve: load([
+              'angular/controllers/NuevaCotizacionCtrl.js',
+              'angular/controllers/ClienteEmpresaCtrl.js',
+              'angular/controllers/ClientePersonaCtrl.js',
+              'angular/controllers/ElementoCtrl.js',
+              'angular/controllers/ProductoCtrl.js',
+              'angular/controllers/ServicioCtrl.js',
+              'angular/controllers/ClienteCtrl.js',
+              'angular/controllers/ColaboradorCtrl.js',
+              'angular/controllers/CategoriaClienteCtrl.js',
+              'angular/controllers/CategoriaElementoCtrl.js',
+              'angular/controllers/CaracteristicaCtrl.js',
+              'angular/controllers/TipoDocumentoClienteCtrl.js',
+              'angular/controllers/SedeCtrl.js',
+              'angular/controllers/FormaPagoCtrl.js',
+              'angular/controllers/UnidadMedidaCtrl.js',
+              'angular/controllers/ContactoEmpresaCtrl.js',
+              'angular/controllers/VariableCarCtrl.js' 
+            ])
+          })
+          .state('app.historial-ventas', {
+            url: '/historial-ventas',
+            templateUrl: 'tpl/historial-ventas.html',
+            resolve: load([
+              'angular/controllers/HistorialNotaPedidoCtrl.js', 
+              'angular/controllers/NotaPedidoCtrl.js', 
+              'angular/controllers/SedeCtrl.js' 
             ])
           })
           .state('app.producto', {
@@ -203,7 +236,7 @@ angular.module('app')
               'angular/controllers/ClienteEmpresaCtrl.js',
               'angular/controllers/ClienteCtrl.js'   
             ]) 
-          })    
+          }) 
           .state('app.variable-car', {
             url: '/variable-car',
             templateUrl: 'tpl/variable-car.html',

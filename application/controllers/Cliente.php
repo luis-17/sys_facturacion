@@ -98,6 +98,8 @@ class Cliente extends CI_Controller {
 					array(
 						'id' => $row['idclienteempresa'],
 						'idclienteempresa' => $row['idclienteempresa'],
+						'cliente' => strtoupper($row['razon_social']),
+						'tipo_cliente' => 'ce',
 						'nombre_comercial' => strtoupper($row['nombre_comercial']),
 						'nombre_corto' => strtoupper($row['nombre_corto']),
 						'razon_social' => strtoupper($row['razon_social']),
@@ -136,6 +138,7 @@ class Cliente extends CI_Controller {
 						'nombres' => strtoupper($row['nombres']),
 						'apellidos' => strtoupper($row['apellidos']),
 						'cliente' => strtoupper($row['nombres'].' '.$row['apellidos']),
+						'tipo_cliente' => 'cp',
 						'num_documento' => $row['num_documento'],
 						'categoria_cliente' => array(
 							'id'=> $row['idcategoriacliente'],

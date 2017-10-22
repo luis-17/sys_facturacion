@@ -1,19 +1,19 @@
 <div class="bg-light lter b-b wrapper-sm">
-  <h1 class="m-n font-thin h3">Nueva Nota de Pedido</h1>
+  <h1 class="m-n font-thin h3">Nueva Venta</h1>
 </div>
-<div class="wrapper-sm" ng-controller="NotaPedidoCtrl">
-	<form name="formNotaPedido">
+<div class="wrapper-sm" ng-controller="NuevaCotizacionCtrl">
+	<form name="formVenta">
 		<div class="row">
 			<div class="col-md-6 col-sm-12" >
-				<fieldset>
+				<fieldset >
 					<legend class="lead lead-sm"> Datos del Cliente
             <div class="btn-group pull-right">
               <button type="button" class="btn btn-success dropdown-toggle btn-xs" data-toggle="dropdown">
-                  <i class="fa fa-tasks"> </i> ACCIONES <span class="caret"></span>
+                  <i class="fa fa-tasks"> </i>  ACCIONES <span class="caret"></span>
               </button>
               <ul class="dropdown-menu" role="menu">
-                  <!-- <li><a href="" ng-click='btnNuevoCliente();'><i class="fa fa-file"></i> Nuevo Cliente </a></li>
-                  <li ng-class="fData.classEditCliente"><a href="" ng-click="btnEditarCliente();"><i class="fa fa-pencil"></i> Editar Cliente </a></li> -->
+                  <li><a href="" ng-click='btnNuevoCliente();'><i class="fa fa-file"></i> Nuevo Cliente </a></li>
+                  <li ng-class="fData.classEditCliente"><a href="" ng-click="btnEditarCliente();"><i class="fa fa-pencil"></i> Editar Cliente </a></li>
                   <li><a href="" ng-click="btnBusquedaCliente();"><i class="fa fa-search"></i> Buscar Cliente</a></li>
               </ul>
             </div>
@@ -31,11 +31,11 @@
               <span class="help-block m-b-none f-10 text-ellipsis">Presiona "Enter" para buscar.</span>
 						</div>	
 						<div class="col-md-6" ng-show="fData.tipo_documento_cliente.destino == 1"> <!-- EMPRESA -->
-							<label class="control-label"> Razón Social <small class="text-danger">(*)</small> </label> 
+							<label class="control-label text-ellipsis"> Razón Social <small class="text-danger">(*)</small> </label> 
               <input type="text" class="form-control input-sm" ng-model="fData.cliente.razon_social" placeholder="Razón Social" readonly="readonly" tabindex="120" /> 
 						</div> 
 						<div class="col-md-6" ng-show="fData.tipo_documento_cliente.destino == 2"> <!-- PERSONA -->
-							<label class="control-label"> Nombres y Apellidos </label> 
+							<label class="control-label text-ellipsis"> Nombres y Apellidos </label> 
               <input type="text" class="form-control input-sm" ng-model="fData.cliente.cliente" placeholder="Nombres y Apellidos" readonly="readonly" tabindex="130" /> 
 						</div>
           </div>
@@ -43,18 +43,17 @@
           	<div class="col-md-6" ng-show="fData.tipo_documento_cliente.destino == 1"> 
 							<label class="control-label text-ellipsis"> Contacto. </label> 
 							<div class="input-group"> 
-								<input type="text" class="form-control input-sm" ng-model="fData.contacto" placeholder="Contacto" readonly="readonly" tabindex="140" /> 
-              	<!-- <input type="text" ng-model="fData.contacto" class="form-control input-sm "
+              	<input type="text" ng-model="fData.contacto" class="form-control input-sm "
 									placeholder="Busque Contacto" typeahead-loading="loadingCT" uib-typeahead="item as item.contacto for item in getContactoAutocomplete($viewValue)"
-	            		typeahead-on-select="getSelectedContacto($item, $model, $label)" typeahead-min-length="2" autocomplete ="off" ng-blur="validateContacto();" tabindex="140"/>  -->
+	            		typeahead-on-select="getSelectedContacto($item, $model, $label)" typeahead-min-length="2" autocomplete ="off" ng-blur="validateContacto();" tabindex="140"/> 
 	            	<span class="input-group-btn">
 	                <button class="btn btn-default btn-sm" type="button" ng-click="btnBusquedaContacto();" tabindex="150"><i class="fa fa-search"></i> </button>
 	              </span>
 	            </div>
-	            <!-- <i ng-show="loadingCT" class="fa fa-refresh"></i>
+	            <i ng-show="loadingCT" class="fa fa-refresh"></i>
 	            <div ng-show="noResultsCT" class="text-danger">
 	                <i class="fa fa-remove"></i> No se encontró resultados 
-	            </div> -->
+	            </div>
 						</div> 
 						<div class="col-md-6" ng-show="fData.tipo_documento_cliente.destino == 1"> 
           		<label class="control-label"> Teléfono/Anexo </label>
@@ -66,7 +65,7 @@
 							</div> 
 						</div> 
 						<div class="col-md-6" ng-show="fData.tipo_documento_cliente.destino == 2">
-          		<label class="control-label"> Correo Electrónico </label>
+          		<label class="control-label text-ellipsis"> Correo Electrónico </label>
 							<input type="text" class="form-control input-sm" ng-model="fData.cliente.email" placeholder="Correo Electrónico" readonly="readonly" tabindex="160" /> 
 						</div> 
 						
@@ -79,46 +78,50 @@
 			</div> 
 			<div class="col-md-6 col-sm-12" >
 				<fieldset >
-					<legend class="lead lead-sm"> Datos de la Nota de Pedido 
+					<legend class="lead lead-sm"> Datos de la Venta 
 						<div class="pull-right text-right">
-              <small class="text-default block" style="font-size: 18px;" > Nota de Ped. N° <strong>{{ fData.num_nota_pedido }}</strong>
+              <small class="text-default block" style="font-size: 18px;" > Venta. N° <strong>{{ fData.num_venta }}</strong>
                   <button tooltip-placement="bottom" tooltip="Actualizar" title="" type="button" class="btn btn-xs btn-warning" uib-tooltip="Actualizar" 
-                  	ng-click="metodos.generarNumeroNP(true); $event.preventDefault();" > <i class="icon-reload"></i> </button>
+                  	ng-click="metodos.generarNumeroVenta(true); $event.preventDefault();" > <i class="icon-reload"></i> </button>
               </small>  
             </div>
 					</legend>
 					<div class="form-group-sm pull-in clearfix " > 
-						<div class="col-md-4 col-sm-6 col-xs-12">
-							<label class="control-label"> Sede </label>
+						<div class="col-md-3 col-sm-12">
+							<label class="control-label text-ellipsis"> Sede </label>
               <select class="form-control input-sm" ng-model="fData.sede" ng-options="item as item.descripcion for item in fArr.listaSedes" 
-              	tabindex="190" ng-change="metodos.generarNumeroNP(true);"> </select> 
+              	tabindex="190" ng-change="metodos.generarNumeroVenta(true);"> </select> 
           	</div>
-          	<div class="col-md-4 col-sm-6 col-xs-12">
-              <label class="control-label"> Fecha de Creación </label> 
+          	<div class="col-md-3 col-sm-12">
+              <label class="control-label text-ellipsis"> Comprobante </label> 
+              <select class="form-control input-sm" ng-model="fData.tipo_documento_mov" ng-options="item as item.descripcion for item in fArr.listaTipoDocumentoMov" 
+              	tabindex="230" > </select> 
+          	</div>
+          	<div class="col-md-3 col-sm-12">
+              <label class="control-label text-ellipsis"> Fecha de Creación </label> 
               <input disabled type="text" class="form-control input-sm" ng-model="fData.fecha_registro" tabindex="200" input-mask mask-options="{alias: 'dd-mm-yyyy'}" />
           	</div>
-          	<div class="col-md-4 col-sm-6 col-xs-12">
-              <label class="control-label"> Fecha de Emisión </label> 
+          	<div class="col-md-3 col-sm-12">
+              <label class="control-label text-ellipsis"> Fecha de Emisión </label> 
               <input type="text" class="form-control input-sm" ng-model="fData.fecha_emision" tabindex="210" input-mask mask-options="{alias: 'dd-mm-yyyy'}" />
           	</div>
+          	
           </div>
           <div class="form-group pull-in clearfix mb-n"> 
-						<div class="col-md-3 col-sm-6 col-xs-12">
-              <label class="control-label"> Moneda </label>
-              <select class="form-control input-sm" ng-model="fData.moneda" ng-options="item as item.descripcion for item in fArr.listaMoneda" tabindex="220" ng-change="cambiarSimbolo();"></select> 
+						<div class="col-md-3">
+              <label class="control-label text-ellipsis"> Moneda </label>
+              <select class="form-control input-sm" ng-model="fData.moneda" ng-options="item as item.descripcion for item in fArr.listaMoneda" tabindex="180" ng-change="cambiarSimbolo();"> </select> 
           	</div>
-          	<div class="col-md-3 col-sm-6 col-xs-12">
-              <label class="control-label"> Tipo de cambio </label> 
-              <input type="text" class="form-control input-sm" ng-model="fData.tipo_cambio" tabindex="230" placeholder="Tipo de Cambio" />
-          	</div>
-          	<div class="col-md-3 col-sm-6 col-xs-12">
-							<label class="control-label"> Forma de Pago </label> 
+          	<div class="col-md-3 col-sm-12">
+							<label class="control-label text-ellipsis"> Forma de Pago </label> 
               <select class="form-control input-sm" ng-model="fData.forma_pago" ng-options="item as item.descripcion for item in fArr.listaFormaPago" 
-              	tabindex="240" > </select> 
+              	tabindex="220" > </select> 
               <span class="help-block m-b-none f-10"> <a href="" class="text-info pull-right" ng-click="metodos.verPlazosPago"> VER PLAZOS DE PAGO. </a> </span> 
           	</div>
-          	<div class="col-md-3 col-sm-6 col-xs-12">
-              <label class="control-label"> Colaborador </label> 
+          	
+          	
+          	<div class="col-md-3 col-sm-12">
+              <label class="control-label text-ellipsis"> Colaborador </label> 
               <label class="control-label text-info text-bold text-ellipsis"> {{ fSessionCI.nombres + ' ' + fSessionCI.apellidos }} </label> 
           	</div>
           </div>
@@ -126,8 +129,8 @@
 			</div>
 			<div class="col-xs-12" >
 				<fieldset >
-					<legend class="lead lead-sm"> Detalle de Pedido 
-						<!-- <div class="btn-group pull-right">
+					<legend class="lead lead-sm"> Detalle de Venta 
+						<div class="btn-group pull-right">
               <button type="button" class="btn btn-success dropdown-toggle btn-xs" data-toggle="dropdown">
                   <i class="fa fa-tasks"> </i>  ACCIONES <span class="caret"></span>
               </button>
@@ -136,39 +139,61 @@
                   <li><a href="" ng-click='btnNuevoServicio();'><i class="fa fa-file"></i> Nuevo Servicio </a></li>
                   <li><a href="" ng-click="btnBusquedaElemento();"><i class="fa fa-search"></i> Buscar </a></li>
               </ul>
-            </div> -->
+            </div>
 					</legend> 
-					<div class="form-group-sm pull-in clearfix"> 
-						<div class="col-md-3 col-sm-6">
-              <label class="control-label"> Buscar por N° de Cotización </label>
-              <div class="input-group"> 
-              	<input id="temporalNumCot" type="text" class="form-control input-sm" ng-model="fData.temporal.num_cotizacion" 
-              		typeahead-select-on-blur="true" typeahead-loading="loadingNCOT" 
-              		uib-typeahead="item as item.num_cotizacion for item in getNumCotizacionAutocomplete($viewValue)" typeahead-on-select="getSelectedNumCotizacion($item, $model, $label)" 
-              		typeahead-min-length="2" autocomplete ="off" placeholder="Digite N° Cotización" tabindex="240" ng-change="calcularImporte();" ng-blur="validateNumCot();" /> 
+					<div class="form-group-sm pull-in clearfix">
+						<div class="col-md-5 col-xs-12"> 
+				      <label class="control-label"> Elemento </label> 
+				      <div class="input-group"> 
+								<input id="temporalElemento" type="text" ng-model="fData.temporal.elemento" class="form-control input-sm {{ fData.classValid }}"
+									placeholder="Busque Elemento" typeahead-loading="loadingElemento" uib-typeahead="item as item.elemento for item in getElementoAutocomplete($viewValue)"
+	            		typeahead-on-select="getSelectedElemento($item, $model, $label)" typeahead-min-length="2" autocomplete ="off" ng-blur="validateElemento();" tabindex="240"/> 
 	            	<span class="input-group-btn">
-	                <button class="btn btn-default btn-sm" type="button" ng-click="btnBusquedaCotizacion();" tabindex="250"><i class="fa fa-search"></i> </button>
+	                <button class="btn btn-default btn-sm" type="button" ng-click="btnBusquedaElemento();" tabindex="250"><i class="fa fa-search"></i> </button>
+	                <button class="btn btn-default btn-sm" type="button" ng-click="btnGestionCaracteristicas();" ng-disabled="!fData.temporal.elemento.id" tabindex="260"> 
+	                	CARACTERÍSTICAS [F7] </button> 
 	              </span>
-	            </div>
-	            <i ng-show="loadingNCOT" class="fa fa-refresh"></i>
-	            <div ng-show="noResultsNCOT" class="text-danger">
+				    	</div>
+	            <i ng-show="loadingElemento" class="fa fa-refresh"></i>
+	            <div ng-show="noResultsELE" class="text-danger">
 	                <i class="fa fa-remove"></i> No se encontró resultados 
 	            </div>
+				    </div>
+				    <div class="col-md-2 col-sm-6">
+	            <label class="control-label"> U. Med. </label>
+	            <select class="form-control input-sm" ng-model="fData.temporal.unidad_medida" ng-options="item as item.descripcion for item in fArr.listaUnidadMedida" 
+	            	tabindex="270" > </select> 
+		        </div>
+		        <div class="col-md-1 col-sm-6">
+              <label class="control-label"> Cantidad </label>
+              <input id="temporalCantidad" type="text" class="form-control input-sm" ng-model="fData.temporal.cantidad" tabindex="280" 
+              	placeholder="Cantidad" ng-change="calcularImporte();"/> 
+          	</div>  
+          	<div class="col-md-1 col-sm-6">
+              <label class="control-label"> P. Unit.</label>
+              <input id="temporalPrecioUnit" type="text" class="form-control input-sm" ng-model="fData.temporal.precio_unitario" 
+              	placeholder="Precio" tabindex="290" ng-change="calcularImporte();"/> 
           	</div>
-          	<!-- -->
-          	<div class="col-md-3 col-sm-6 col-xs-12"> 
-	            <a style="margin-top: 24px;" ng-disabled="!(fData.cliente.id)" class="btn btn-default btn-sm" ng-click="buscarCotizacionMultiple(); $event.preventDefault();" 
-	            	tabindex="320"> BÚSQUEDA MÚLTIPLE... </a> 
-	          </div> 
-	          <!-- <div class="col-md-6 col-sm-6 col-xs-12 "> 
-          		<a style="margin-top: 22px;" href="" class="btn btn-info btn-sm pull-right" ng-click="btnBusquedaCotizacionAvanzado(); $event.preventDefault();" tabindex="310"> BÚSQUEDA AVANZADA </a> 
-	          </div> -->
+          	<div class="col-md-1 col-sm-6">
+              <label class="control-label"> Importe </label>
+              <!-- NO INCLUYE IGV -->
+              <div style="position:relative;">
+	              <input id="temporalImporte" disabled type="text" class="form-control input-sm" ng-model="fData.temporal.importe_sin_igv" 
+	              	placeholder="Importe" ng-show="fData.modo_igv == 2" style="position:absolute;" tabindex="300"/> 
+	              <!-- INCLUYE IGV -->
+	              <input id="temporalImporte" disabled type="text" class="form-control input-sm" ng-model="fData.temporal.importe_con_igv" 
+	              	placeholder="Importe" ng-show="fData.modo_igv == 1" style="position:absolute;" tabindex="310"/> 
+	            </div>
+          	</div>
+          	<div class="col-md-2 col-sm-6 col-xs-12"> 
+	            <a style="margin-top: 22px;" href="" class="btn btn-info btn-sm btn-block" ng-click="agregarItem(); $event.preventDefault();" tabindex="320">Agregar</a> 
+	          </div>
 					</div>
 					<div class="form-group-sm pull-in clearfix">
 						<div class="col-xs-12"> 
-	            <!-- <label class="control-label hidden"> Agregar al detalle: </label> -->
-	            <div ui-if="gridOptions.data.length>0" ui-grid="gridOptions" ui-grid-edit ui-grid-resize-columns ui-grid-auto-resize class="grid table-responsive fs-mini-grid" 
-	            	style="overflow: hidden;" ng-style="getTableHeight();"></div>
+	            <label class="control-label hidden"> Agregar al detalle: </label>
+	            <div ui-if="gridOptions.data.length>0" ui-grid="gridOptions" ui-grid-edit ui-grid-resize-columns ui-grid-auto-resize 
+	            	class="grid table-responsive fs-mini-grid" style="overflow: hidden;" ng-style="getTableHeight();"></div>
 	          </div>
           </div>
 				</fieldset> 
@@ -243,12 +268,12 @@
 	    </div>
 	    <div class="line line-dashed b-b line-lg pull-in"></div>
 	    <div class="col-xs-12 text-right" >
-	    	<button type="button" class="btn-info btn pull-left" ng-click="goToUrl('/app/historial-nota-pedido'); $event.preventDefault();" tabindex="415"> 
-	    		<i class="fa fa-save"> </i> NOTAS DE PEDIDO </button> 
-	    	<button type="button" class="btn-primary btn" ng-click="grabar(); $event.preventDefault();" ng-disabled="formNotaPedido.$invalid && !fData.isRegisterSuccess" tabindex="420"> 
+	    	<button type="button" class="btn-info btn pull-left" ng-click="goToUrl('/app/historial-ventas'); $event.preventDefault();" tabindex="415"> 
+	    		<i class="fa fa-save"> </i> VENTAS </button> 
+	    	<button type="button" class="btn-primary btn" ng-click="grabar(); $event.preventDefault();" ng-disabled="formVenta.$invalid && !fData.isRegisterSuccess" tabindex="420"> 
 	    		<i class="fa fa-save"> </i> [F2] GRABAR </button> 
-	    	<!-- <button type="button" class="btn-success btn mr-lg" ng-click="imprimir(); $event.preventDefault();" ng-disabled="!fData.isRegisterSuccess" tabindex="430"> 
-	        	<i class="fa fa-print"> </i> [F4] IMPRIMIR </button>  -->
+	    	<button type="button" class="btn-success btn mr-lg" ng-click="imprimir(); $event.preventDefault();" ng-disabled="!fData.isRegisterSuccess" tabindex="430"> 
+	        	<i class="fa fa-print"> </i> [F4] IMPRIMIR </button> 
 	      <button type="button" class="btn-default btn" ng-click="reloadPage(); $event.preventDefault();" tabindex="440"> 
 	        	<i class="fa fa-file"> </i> [F3] NUEVO </button>
 	      <button type="button" class="btn-warning btn" ng-click="mismoCliente(); $event.preventDefault();" tabindex="450" > 

@@ -55,6 +55,7 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
   $scope.fData.fecha_emision = $filter('date')(moment().toDate(),'dd-MM-yyyy'); 
   $scope.fData.num_cotizacion = '[ ............... ]';
   $scope.fData.modo_igv = parseInt($scope.fSessionCI.config.precio_incluye_igv_cot); // INCLUYE IGV dinamico 
+
   $scope.fData.plazo_entrega = 5;
   $scope.fData.validez_oferta = 10;
   $scope.fData.incluye_tras_prov = 2; // no 
@@ -959,23 +960,23 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
         }
         if( $scope.fData.modo_igv == 2 ){ 
           console.log('Calculando modo NO INCLUYE IGV');
-          rowEntity.importe_sin_igv = (parseFloat(rowEntity.precio_unitario) * parseFloat(rowEntity.cantidad)).toFixed($scope.fConfigSys.num_decimal_total_key);
+          rowEntity.importe_sin_igv = (parseFloat(rowEntity.precio_unitario) * parseFloat(rowEntity.cantidad)).toFixed($scope.fConfigSys.num_decimal_precio_key);
           if(rowEntity.excluye_igv == 1){
            rowEntity.igv = 0.00;
           }else{
-           rowEntity.igv = (0.18 * rowEntity.importe_sin_igv).toFixed($scope.fConfigSys.num_decimal_total_key);
+           rowEntity.igv = (0.18 * rowEntity.importe_sin_igv).toFixed($scope.fConfigSys.num_decimal_precio_key);
           }
-          rowEntity.importe_con_igv = (parseFloat(rowEntity.importe_sin_igv) + parseFloat(rowEntity.igv)).toFixed($scope.fConfigSys.num_decimal_total_key);
+          rowEntity.importe_con_igv = (parseFloat(rowEntity.importe_sin_igv) + parseFloat(rowEntity.igv)).toFixed($scope.fConfigSys.num_decimal_precio_key);
         }
         if( $scope.fData.modo_igv == 1 ){ 
           console.log('Calculando modo INCLUYE IGV');
-          rowEntity.importe_con_igv = (parseFloat(rowEntity.precio_unitario) * parseFloat(rowEntity.cantidad)).toFixed($scope.fConfigSys.num_decimal_total_key);
+          rowEntity.importe_con_igv = (parseFloat(rowEntity.precio_unitario) * parseFloat(rowEntity.cantidad)).toFixed($scope.fConfigSys.num_decimal_precio_key);
           if(rowEntity.excluye_igv == 1){
             rowEntity.importe_sin_igv = rowEntity.importe_con_igv;
             rowEntity.igv = 0.00;
           }else{
-            rowEntity.importe_sin_igv = (rowEntity.importe_con_igv / 1.18).toFixed($scope.fConfigSys.num_decimal_total_key);
-            rowEntity.igv = (0.18 * rowEntity.importe_sin_igv).toFixed($scope.fConfigSys.num_decimal_total_key);
+            rowEntity.importe_sin_igv = (rowEntity.importe_con_igv / 1.18).toFixed($scope.fConfigSys.num_decimal_precio_key);
+            rowEntity.igv = (0.18 * rowEntity.importe_sin_igv).toFixed($scope.fConfigSys.num_decimal_precio_key);
           }
         }
         $scope.calcularTotales();
@@ -1325,7 +1326,9 @@ app.service("CotizacionServices",function($http, $q, handleBehavior) {
     return({
         sGenerarNumeroCotizacion: sGenerarNumeroCotizacion,
         sBuscarNumCotizacionAutocomplete: sBuscarNumCotizacionAutocomplete,
+        sListarDetalleEstaCotizacion: sListarDetalleEstaCotizacion, 
         sListarHistorialCotizaciones: sListarHistorialCotizaciones,
+        sListarHistorialDetalleCotizaciones: sListarHistorialDetalleCotizaciones,
         sRegistrar: sRegistrar,
         sEditar: sEditar,
         sAnular: sAnular
@@ -1346,10 +1349,26 @@ app.service("CotizacionServices",function($http, $q, handleBehavior) {
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
     }
+    function sListarDetalleEstaCotizacion(datos) { 
+      var request = $http({
+            method : "post",
+            url : angular.patchURLCI+"Cotizacion/listar_detalle_esta_cotizacion",
+            data : datos
+      });
+      return (request.then(handleBehavior.success,handleBehavior.error));
+    }
     function sListarHistorialCotizaciones(datos) {
       var request = $http({
             method : "post",
-            url : angular.patchURLCI+"Cotizacion/lista_cotizaciones_historial",
+            url : angular.patchURLCI+"Cotizacion/listar_cotizaciones_historial",
+            data : datos
+      });
+      return (request.then(handleBehavior.success,handleBehavior.error));
+    }
+    function sListarHistorialDetalleCotizaciones(datos) {
+      var request = $http({
+            method : "post",
+            url : angular.patchURLCI+"Cotizacion/listar_detalle_cotizaciones_historial",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
