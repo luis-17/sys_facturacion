@@ -1,11 +1,11 @@
 <?php
-class Model_tipo_documento extends CI_Model {
+class Model_tipo_documento_mov extends CI_Model {
 	public function __construct()
 	{
 		parent::__construct();
 	}
 
-	public function m_cargar_tipo_documento($paramPaginate){ 
+	public function m_cargar_tipo_documento_mov($paramPaginate){ 
 		$this->db->select("tdm.idtipodocumentomov, tdm.descripcion_tdm, tdm.porcentaje_imp,tdm.abreviatura_tdm,se.numero_serie, se.descripcion_ser,se.idempresaadmin");
 		$this->db->from('tipo_documento_mov tdm');
 		$this->db->join("tipo_documento_serie tds","tds.idtipodocumentomov = tdm.idtipodocumentomov",'left'); 
@@ -28,8 +28,8 @@ class Model_tipo_documento extends CI_Model {
 		return $this->db->get()->result_array();
 	}
 
-	public function m_count_tipo_documento($paramPaginate){
-		$this->db->select('COUNT(*) AS contador');
+	public function m_count_tipo_documento_mov($paramPaginate){
+		$this->db->select('OUNT(*) AS contador');
 		$this->db->from('tipo_documento_mov tdm');
 		$this->db->join("tipo_documento_serie tds","tds.idtipodocumentomov = tdm.idtipodocumentomov",'left'); 
 		$this->db->join("serie se","tds.idserie = se.idserie",'left'); 
@@ -51,7 +51,14 @@ class Model_tipo_documento extends CI_Model {
 		$this->db->where('idempresaadmin', 1);
 		return $this->db->get()->result_array();
 	}
-
+	public function m_cargar_tipo_documento_mov_para_venta_cbo()
+	{
+		$this->db->select("tdm.idtipodocumentomov, tdm.descripcion_tdm, tdm.porcentaje_imp, tdm.abreviatura_tdm, tdm.key_tdm");
+		$this->db->from('tipo_documento_mov tdm');
+		$this->db->where('tdm.estado_tdm', 1); // activo 
+		$this->db->where('tdm.para_venta', 1); // form venta  
+		return $this->db->get()->result_array();
+	}
 	public function m_registrar($datos)
 	{
 		$data = array(

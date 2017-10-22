@@ -121,7 +121,7 @@ angular.module('app')
             url: '/nueva-venta',
             templateUrl: 'tpl/nueva-venta.html',
             resolve: load([
-              'angular/controllers/NuevaCotizacionCtrl.js',
+              'angular/controllers/NuevaVentaCtrl.js',
               'angular/controllers/ClienteEmpresaCtrl.js',
               'angular/controllers/ClientePersonaCtrl.js',
               'angular/controllers/ElementoCtrl.js',
@@ -133,6 +133,7 @@ angular.module('app')
               'angular/controllers/CategoriaElementoCtrl.js',
               'angular/controllers/CaracteristicaCtrl.js',
               'angular/controllers/TipoDocumentoClienteCtrl.js',
+              'angular/controllers/TipoDocumentoMovCtrl.js',
               'angular/controllers/SedeCtrl.js',
               'angular/controllers/FormaPagoCtrl.js',
               'angular/controllers/UnidadMedidaCtrl.js',
