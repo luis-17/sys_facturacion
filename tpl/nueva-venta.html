@@ -94,20 +94,24 @@
           	</div>
           	<div class="col-md-3 col-sm-12">
               <label class="control-label text-ellipsis"> Comprobante </label> 
-              <select class="form-control input-sm" ng-model="fData.tipo_documento_mov" ng-options="item as item.descripcion for item in fArr.listaTipoDocumentoMov" 
+              <select class="form-control input-sm" ng-model="fData.tipo_documento_mov" ng-options="item as item.descripcion for item in fArr.listaTiposDocumentoMov" 
+              	tabindex="230" > </select> 
+          	</div>
+          	<div class="col-md-3 col-sm-12">
+              <label class="control-label text-ellipsis"> Serie Doc. </label> 
+              <select class="form-control input-sm" ng-model="fData.serie" ng-options="item as item.descripcion for item in fArr.listaSeries" 
               	tabindex="230" > </select> 
           	</div>
           	<div class="col-md-3 col-sm-12">
               <label class="control-label text-ellipsis"> Fecha de Creación </label> 
               <input disabled type="text" class="form-control input-sm" ng-model="fData.fecha_registro" tabindex="200" input-mask mask-options="{alias: 'dd-mm-yyyy'}" />
           	</div>
+          </div>
+          <div class="form-group pull-in clearfix mb-n"> 
           	<div class="col-md-3 col-sm-12">
               <label class="control-label text-ellipsis"> Fecha de Emisión </label> 
               <input type="text" class="form-control input-sm" ng-model="fData.fecha_emision" tabindex="210" input-mask mask-options="{alias: 'dd-mm-yyyy'}" />
-          	</div>
-          	
-          </div>
-          <div class="form-group pull-in clearfix mb-n"> 
+          	</div> 
 						<div class="col-md-3">
               <label class="control-label text-ellipsis"> Moneda </label>
               <select class="form-control input-sm" ng-model="fData.moneda" ng-options="item as item.descripcion for item in fArr.listaMoneda" tabindex="180" ng-change="cambiarSimbolo();"> </select> 
@@ -118,12 +122,14 @@
               	tabindex="220" > </select> 
               <span class="help-block m-b-none f-10"> <a href="" class="text-info pull-right" ng-click="metodos.verPlazosPago"> VER PLAZOS DE PAGO. </a> </span> 
           	</div>
-          	
-          	
           	<div class="col-md-3 col-sm-12">
+              <label class="control-label text-ellipsis"> Orden de Compra </label> 
+              <input type="text" class="form-control input-sm" ng-model="fData.orden_compra" tabindex="230" />
+          	</div>
+          	<!-- <div class="col-md-3 col-sm-12">
               <label class="control-label text-ellipsis"> Colaborador </label> 
               <label class="control-label text-info text-bold text-ellipsis"> {{ fSessionCI.nombres + ' ' + fSessionCI.apellidos }} </label> 
-          	</div>
+          	</div> -->
           </div>
 	    	</fieldset>
 			</div>

@@ -1,9 +1,9 @@
-app.controller('TipoDocumentoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$log', '$timeout', 'pinesNotifications', 'uiGridConstants', 'blockUI', 
-  'TipoDocumentoFactory',
-  'TipoDocumentoServices',
+app.controller('TipoDocumentoMovCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$log', '$timeout', 'pinesNotifications', 'uiGridConstants', 'blockUI', 
+  'TipoDocumentoMovFactory',
+  'TipoDocumentoMovServices',
   function($scope, $filter, $uibModal, $bootbox, $log, $timeout, pinesNotifications, uiGridConstants, blockUI, 
-  TipoDocumentoFactory,
-  TipoDocumentoServices
+  TipoDocumentoMovFactory,
+  TipoDocumentoMovServices
   ) {
     $scope.metodos = {}; // contiene todas las funciones 
     $scope.fArr = {}; // contiene todos los arrays generados por las funciones 
@@ -85,7 +85,7 @@ app.controller('TipoDocumentoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox
       var arrParams = {
         paginate : paginationOptions
       };
-      TipoDocumentoServices.sListar(arrParams).then(function (rpta) { 
+      TipoDocumentoMovServices.sListar(arrParams).then(function (rpta) { 
         console.log(rpta,'rpta');
         if( rpta.datos.length == 0 ){
           rpta.paginate = { totalRows: 0 };
@@ -129,7 +129,7 @@ app.controller('TipoDocumentoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox
         'metodos': $scope.metodos,
         'fArr': $scope.fArr 
       }
-      TipoDocumentoFactory.regTipoDocumentoModal(arrParams); 
+      TipoDocumentoMovFactory.regTipoDocumentoMovModal(arrParams); 
     }
     $scope.btnEditar = function() { 
       var arrParams = {
@@ -137,7 +137,7 @@ app.controller('TipoDocumentoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox
         'mySelectionGrid': $scope.mySelectionGrid,
         'fArr': $scope.fArr 
       }
-      TipoDocumentoFactory.editTipoDocumentoModal(arrParams); 
+      TipoDocumentoMovFactory.editTipoDocumentoModal(arrParams); 
     }
     $scope.btnAnular = function() { 
       var pMensaje = '¿Realmente desea anular el registro?';
@@ -147,7 +147,7 @@ app.controller('TipoDocumentoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox
             id: $scope.mySelectionGrid[0].id 
           };
           blockUI.start('Procesando información...');
-          TipoDocumentoServices.sAnular(arrParams).then(function (rpta) {
+          TipoDocumentoMovServices.sAnular(arrParams).then(function (rpta) {
             if(rpta.flag == 1){
               var pTitle = 'OK!';
               var pType = 'success';
@@ -166,9 +166,10 @@ app.controller('TipoDocumentoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox
     }
 }]);
 
-app.service("TipoDocumentoServices",function($http, $q, handleBehavior) {
+app.service("TipoDocumentoMovServices",function($http, $q, handleBehavior) {
     return({
         sListar: sListar,
+        sListarTipoDocParaVenta: sListarTipoDocParaVenta,
         sRegistrar: sRegistrar,
         sEditar: sEditar,
         sAnular: sAnular
@@ -176,7 +177,15 @@ app.service("TipoDocumentoServices",function($http, $q, handleBehavior) {
     function sListar(datos) {
       var request = $http({
             method : "post",
-            url : angular.patchURLCI+"TipoDocumento/listar_tipo_documento",
+            url : angular.patchURLCI+"TipoDocumentoMov/listar_tipo_documento",
+            data : datos
+      });
+      return (request.then(handleBehavior.success,handleBehavior.error));
+    }
+    function sListarTipoDocParaVenta(datos) {
+      var request = $http({
+            method : "post",
+            url : angular.patchURLCI+"TipoDocumentoMov/listar_tipo_documento_mov_para_venta_cbo",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
@@ -184,7 +193,7 @@ app.service("TipoDocumentoServices",function($http, $q, handleBehavior) {
     function sRegistrar (datos) {
       var request = $http({
             method : "post",
-            url : angular.patchURLCI+"TipoDocumento/registrar",
+            url : angular.patchURLCI+"TipoDocumentoMov/registrar",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
@@ -192,7 +201,7 @@ app.service("TipoDocumentoServices",function($http, $q, handleBehavior) {
     function sEditar (datos) {
       var request = $http({
             method : "post",
-            url : angular.patchURLCI+"TipoDocumento/editar",
+            url : angular.patchURLCI+"TipoDocumentoMov/editar",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
@@ -200,19 +209,19 @@ app.service("TipoDocumentoServices",function($http, $q, handleBehavior) {
     function sAnular (datos) {
       var request = $http({
             method : "post",
-            url : angular.patchURLCI+"TipoDocumento/anular",
+            url : angular.patchURLCI+"TipoDocumentoMov/anular",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
     }      
 });
 
-app.factory("TipoDocumentoFactory", function($uibModal, pinesNotifications, blockUI, TipoDocumentoServices) { 
+app.factory("TipoDocumentoMovFactory", function($uibModal, pinesNotifications, blockUI, TipoDocumentoMovServices) { 
   var interfaz = {
-    regTipoDocumentoModal: function (arrParams) {
+    regTipoDocumentoMovModal: function (arrParams) {
       blockUI.start('Abriendo formulario...');
       $uibModal.open({ 
-        templateUrl: angular.patchURLCI+'TipoDocumento/ver_popup_formulario',
+        templateUrl: angular.patchURLCI+'TipoDocumentoMov/ver_popup_formulario',
         size: 'md',
         backdrop: 'static',
         keyboard:false,
@@ -227,7 +236,7 @@ app.factory("TipoDocumentoFactory", function($uibModal, pinesNotifications, bloc
           }
           $scope.aceptar = function () { 
             blockUI.start('Procesando información...');
-            TipoDocumentoServices.sRegistrar($scope.fData).then(function (rpta) {
+            TipoDocumentoMovServices.sRegistrar($scope.fData).then(function (rpta) {
               if(rpta.flag == 1){
                 var pTitle = 'OK!';
                 var pType = 'success';
@@ -256,7 +265,7 @@ app.factory("TipoDocumentoFactory", function($uibModal, pinesNotifications, bloc
     editTipoDocumentoModal: function (arrParams) {
       blockUI.start('Abriendo formulario...');
       $uibModal.open({ 
-        templateUrl: angular.patchURLCI+'TipoDocumento/ver_popup_formulario',
+        templateUrl: angular.patchURLCI+'TipoDocumentoMov/ver_popup_formulario',
         size: 'md',
         backdrop: 'static',
         keyboard:false,
@@ -276,7 +285,7 @@ app.factory("TipoDocumentoFactory", function($uibModal, pinesNotifications, bloc
           }
           $scope.aceptar = function () { 
             blockUI.start('Procesando información...');
-            TipoDocumentoServices.sEditar($scope.fData).then(function (rpta) {
+            TipoDocumentoMovServices.sEditar($scope.fData).then(function (rpta) {
               if(rpta.flag == 1){
                 var pTitle = 'OK!';
                 var pType = 'success';
