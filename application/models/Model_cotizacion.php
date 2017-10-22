@@ -184,6 +184,45 @@ class Model_cotizacion extends CI_Model {
 		$this->db->limit(1);
 		return $this->db->get()->row_array();
 	}
+	public function m_cargar_numero_cotizacion_autocomplete($datos)
+	{ 
+		$this->db->select("TRIM(CONCAT(COALESCE(cp.nombres,''), ' ', COALESCE(cp.apellidos,''), ' ', COALESCE(ce.razon_social,''))) AS cliente_persona_empresa",FALSE);
+		$this->db->select("TRIM(CONCAT(COALESCE(cp.email,''), ' ', COALESCE(ct.email,''))) AS email_persona_empresa",FALSE);
+		$this->db->select("TRIM(CONCAT(COALESCE(tdc_ce.abreviatura_tdc,''), ' ', COALESCE(tdc_cp.abreviatura_tdc,''))) AS tipo_documento_abv",FALSE);
+		$this->db->select("TRIM(CONCAT(COALESCE(ce.ruc,''), ' ', COALESCE(cp.num_documento,''))) AS num_documento_persona_empresa",FALSE);
+		$this->db->select("CONCAT(cp.nombres, ' ', cp.apellidos) AS cliente_persona",FALSE);
+		$this->db->select('cot.idcotizacion, cot.num_cotizacion, cot.fecha_registro, cot.fecha_emision, cot.tipo_cliente, cot.plazo_entrega, cot.incluye_entrega_domicilio,
+			cot.incluye_traslado_prov, cot.validez_oferta, cot.moneda, cot.modo_igv, cot.subtotal, cot.igv, cot.total, cot.estado_cot, 
+			ea.idempresaadmin, ce.idclienteempresa, (ce.razon_social) AS razon_social_ce, 
+			(ce.representante_legal) AS representante_legal_ce, ce.dni_representante_legal, (ce.nombre_comercial) AS nombre_comercial_ce, 
+			(ce.ruc) AS ruc_ce, (ce.telefono) AS telefono_ce, 
+			ce.direccion_guia, (ce.direccion_legal) AS direccion_legal_ce, 
+			cp.idclientepersona, (cp.num_documento) AS num_documento_cp, (cp.telefono_movil) AS telefono_movil_cp, (cp.telefono_fijo) AS telefono_fijo_cp, 
+			se.idsede, se.descripcion_se, se.abreviatura_se, 
+			fp.idformapago, fp.descripcion_fp, fp.modo_fp, ct.idcontacto, ct.telefono_fijo, ct.anexo, ct.area_encargada', FALSE); 
+		$this->db->select("CONCAT(COALESCE(ct.nombres,''), ' ', COALESCE(ct.apellidos,'')) AS contacto",FALSE);
+		$this->db->from('cotizacion cot'); 
+		$this->db->join('usuario us','cot.idusuarioregistro = us.idusuario'); 
+		$this->db->join('empresa_admin ea','cot.idempresaadmin = ea.idempresaadmin'); 
+		$this->db->join("cliente_empresa ce","cot.idcliente = ce.idclienteempresa AND cot.tipo_cliente = 'E'",'left'); 
+		$this->db->join("tipo_documento_cliente tdc_ce","ce.idtipodocumentocliente = tdc_ce.idtipodocumentocliente",'left'); 
+		$this->db->join("cliente_persona cp","cot.idcliente = cp.idclientepersona AND cot.tipo_cliente = 'P'",'left'); 
+		$this->db->join("tipo_documento_cliente tdc_cp","cp.idtipodocumentocliente = tdc_cp.idtipodocumentocliente",'left'); 
+		$this->db->join('sede se','cot.idsede = se.idsede'); 
+		$this->db->join('forma_pago fp','cot.idformapago = fp.idformapago'); 
+		$this->db->join('contacto ct','cot.idcontacto = ct.idcontacto','left'); 
+		$this->db->like('cot.num_cotizacion', $datos['searchText']); 
+		$this->db->where_in('cot.estado_cot',array(1)); // por enviar 
+		if( !empty($datos['cliente']) ){ 
+			if( !empty($datos['num_documento']) && !empty($datos['cliente']['idclienteempresa']) ){ 
+				$this->db->where('ce.idclienteempresa',$datos['cliente']['idclienteempresa']);
+			}
+			if( !empty($datos['num_documento']) && ( !empty($datos['cliente']['idclientepersona']) ) ){ 
+				$this->db->where('cp.idclientepersona',$datos['cliente']['idclientepersona']);
+			}
+		} 
+		return $this->db->get()->result_array(); 
+	}
 	public function m_cargar_esta_cotizacion_por_codigo($numCoti)
 	{
 		$this->db->select('co.idcotizacion, co.num_cotizacion');
@@ -196,13 +235,13 @@ class Model_cotizacion extends CI_Model {
 	}
 	public function m_cargar_cotizacion_por_id($idcotizacion)
 	{
-		$this->db->select("CONCAT(COALESCE(ct.nombres,''), ' ', COALESCE(ct.apellidos,'')) As contacto",FALSE);
-		$this->db->select("CONCAT(COALESCE(col.nombres,''), ' ', COALESCE(col.apellidos,'')) As colaborador",FALSE);
+		$this->db->select("CONCAT(COALESCE(ct.nombres,''), ' ', COALESCE(ct.apellidos,'')) AS contacto",FALSE);
+		$this->db->select("CONCAT(COALESCE(col.nombres,''), ' ', COALESCE(col.apellidos,'')) AS colaborador",FALSE);
 		$this->db->select("TRIM(CONCAT(COALESCE(cp.nombres,''), ' ', COALESCE(cp.apellidos,''), ' ', COALESCE(ce.razon_social,''))) AS cliente_persona_empresa",FALSE);
 		$this->db->select("TRIM(CONCAT(COALESCE(cp.email,''), ' ', COALESCE(ct.email,''))) AS email_persona_empresa",FALSE);
 		$this->db->select("TRIM(CONCAT(COALESCE(tdc_ce.abreviatura_tdc,''), ' ', COALESCE(tdc_cp.abreviatura_tdc,''))) AS tipo_documento_abv",FALSE);
 		$this->db->select("TRIM(CONCAT(COALESCE(ce.ruc,''), ' ', COALESCE(cp.num_documento,''))) AS num_documento_persona_empresa",FALSE);
-		$this->db->select("CONCAT(cp.nombres, ' ', cp.apellidos) As cliente_persona",FALSE);
+		$this->db->select("CONCAT(cp.nombres, ' ', cp.apellidos) AS cliente_persona",FALSE);
 		$this->db->select('cot.idcotizacion, cot.num_cotizacion, cot.fecha_registro, cot.fecha_emision, cot.tipo_cliente, cot.plazo_entrega, 
 			cot.validez_oferta, cot.moneda, cot.modo_igv, cot.subtotal, cot.igv, cot.total, cot.estado_cot, 
 			col.idcolaborador, (col.num_documento) AS num_documento_col, col.email, col.cargo, col.telefono ,us.idusuario, us.username, 
