@@ -1,6 +1,7 @@
 app.service("PlazoFormaPagoServices",function($http, $q, handleBehavior) {
     return({
-        sListarPlazoFormaPago: sListarPlazoFormaPago, 
+        sListarPlazoFormaPago: sListarPlazoFormaPago,
+        sListarPlazoFormaPagoDetalle: sListarPlazoFormaPagoDetalle, 
         sAgregaPlazoFormaPago: sAgregaPlazoFormaPago,
         sQuitarPlazoFormaPago: sQuitarPlazoFormaPago,
         EditarPlazoFormaPago:EditarPlazoFormaPago
@@ -13,6 +14,14 @@ app.service("PlazoFormaPagoServices",function($http, $q, handleBehavior) {
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
     }
+    function sListarPlazoFormaPagoDetalle(datos) {
+      var request = $http({
+            method : "post",
+            url : angular.patchURLCI+"PlazoFormaPago/listar_plazo_forma_pago_detalle",
+            data : datos
+      });
+      return (request.then(handleBehavior.success,handleBehavior.error));
+    }    
     function sAgregaPlazoFormaPago (datos) {
       var request = $http({
             method : "post",

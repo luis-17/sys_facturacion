@@ -22,6 +22,15 @@ class Model_plazo_forma_pago extends CI_Model {
 		return $fData;
 	}
 
+	public function m_cargar_plazo_forma_pago_detalle($paramDatos){ 
+		$this->db->select("pfp.idplazoformapago,pfp.dias_transcurridos,pfp.porcentaje_importe,pfp.idformapago");
+		$this->db->from('plazo_forma_pago pfp');
+		$this->db->where('estado_pfp', 1);
+		$this->db->where('pfp.idformapago', $paramDatos);
+		$this->db->order_by('pfp.dias_transcurridos','ASC');
+		return $this->db->get()->result_array();
+	}
+
 	// VALIDACIONES 
 
 	// CRUD 

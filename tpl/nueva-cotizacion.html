@@ -124,7 +124,7 @@
 							<label class="control-label text-ellipsis"> Forma de Pago </label> 
               <select class="form-control input-sm" ng-model="fData.forma_pago" ng-options="item as item.descripcion for item in fArr.listaFormaPago" 
               	tabindex="220" > </select> 
-              <span class="help-block m-b-none f-10"> <a href="" class="text-info pull-right" ng-click="metodos.verPlazosPago"> VER PLAZOS DE PAGO. </a> </span> 
+              <span class="help-block m-b-none f-10"> <a ng-show="fData.forma_pago.modo == 2" href="" class="text-info pull-right" ng-click='metodos.verPlazosPago();'> VER PLAZOS DE PAGO. </a> </span> 
           	</div>
           	
           	

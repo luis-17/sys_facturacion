@@ -43,11 +43,51 @@ class PlazoFormaPago extends CI_Controller {
 		    ->set_output(json_encode($arrData));
 	}
 
+	public function listar_plazo_forma_pago_detalle(){ 
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$paramDatos = $allInputs['datos'];
+		$paramDatosFecha = $allInputs['fechaemision'];	
+		$monto = @$allInputs['monto'];
+		$lista = $this->model_plazo_forma_pago->m_cargar_plazo_forma_pago_detalle($paramDatos);
+		$arrListado = array();
+		foreach ($lista as $row) {
+			if(isset($monto)){
+				$totalmonto =  ($row['porcentaje_importe']*@$monto)/100;
+			}else{
+				$totalmonto='-';
+			}
+			array_push($arrListado,
+				array(
+					'id' => $row['idplazoformapago'],	
+					'dias_transcurridos' => strtoupper($row['dias_transcurridos']),
+					'porcentaje_importe' => strtoupper($row['porcentaje_importe']),
+					'idformapago' => $row['idformapago'],
+					'fechaemision' => agregardiasfecha($paramDatosFecha,$row['dias_transcurridos']),
+					'montototales' => $totalmonto,
+				)
+			);
+		}
+    	$arrData['datos'] = $arrListado;
+    	$arrData['message'] = '';
+    	$arrData['flag'] = 1;
+		if(empty($lista)){
+			$arrData['flag'] = 0;
+		}
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
+
+
 	public function ver_popup_plazo_forma_pago()
 	{
 		$this->load->view('forma-pago/mant_plazoFormaPago');
 	}
 
+	public function ver_popup_plazo_pago()
+	{
+		$this->load->view('forma-pago/mant_plazoPago');
+	}
 	public function registrar()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);

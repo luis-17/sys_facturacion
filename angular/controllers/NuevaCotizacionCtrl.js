@@ -21,6 +21,7 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     'CaracteristicaServices',
     'ContactoEmpresaServices',
     'VariableCarServices',
+    'PlazoFormaPagoServices',
 	function($scope, $filter, $uibModal, $bootbox, $log, $timeout, pinesNotifications, uiGridConstants, blockUI, 
     ClientePersonaFactory,
     ClienteEmpresaFactory,
@@ -43,7 +44,8 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     ElementoServices,
     CaracteristicaServices,
     ContactoEmpresaServices,
-    VariableCarServices 
+    VariableCarServices,
+    PlazoFormaPagoServices 
 ) {
    
   $scope.metodos = {}; // contiene todas las funciones 
@@ -1320,6 +1322,49 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
       pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 3000 });
     });
   }
+
+  $scope.metodos.verPlazosPago = function() {
+    console.log($scope.fData.total,'$scope.fData.total');
+      // console.log($scope.fData.fecha_emision,'$scope.fData.fecha_emision');
+      blockUI.start('Abriendo formulario...');
+      $uibModal.open({ 
+        templateUrl: angular.patchURLCI+'PlazoFormaPago/ver_popup_plazo_pago',
+        size: 'md',
+        backdrop: 'static',
+        keyboard:false,
+        scope: $scope,
+        controller: function ($scope, $uibModalInstance) { 
+          blockUI.stop();      
+          $scope.fPlazo = {};
+          $scope.fArr = {}; 
+          $scope.metodos = {};
+          $scope.titleForm = 'Plazos';
+          $scope.cancel = function () {
+            $uibModalInstance.dismiss('cancel');
+          } 
+          $scope.metodos.getPaginationServerSidePlazo = function(loader) {
+
+            if( loader ){
+              blockUI.start('Procesando información...');
+            }
+            var arrParams = {       
+              datos: $scope.fData.forma_pago.id,
+              fechaemision:$scope.fData.fecha_emision,
+              monto:$scope.fData.total
+            };
+            console.log(arrParams,'arrParams');
+            PlazoFormaPagoServices.sListarPlazoFormaPagoDetalle(arrParams).then(function (rpta) {         
+               $scope.fPlazo.plazolista=rpta.datos;             
+              if( loader ){
+                blockUI.stop(); 
+              }
+            });
+          };
+          $scope.metodos.getPaginationServerSidePlazo(true); 
+        }
+      });  
+  }
+
 }]);
 
 app.service("CotizacionServices",function($http, $q, handleBehavior) {
