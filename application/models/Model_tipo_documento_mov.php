@@ -18,7 +18,6 @@ class Model_tipo_documento_mov extends CI_Model {
 				}
 			}
 		}
-
 		if( $paramPaginate['sortName'] ){
 			$this->db->order_by($paramPaginate['sortName'], $paramPaginate['sort']);
 		}
@@ -27,9 +26,8 @@ class Model_tipo_documento_mov extends CI_Model {
 		}
 		return $this->db->get()->result_array();
 	}
-
 	public function m_count_tipo_documento_mov($paramPaginate){
-		$this->db->select('OUNT(*) AS contador');
+		$this->db->select('COUNT(*) AS contador');
 		$this->db->from('tipo_documento_mov tdm');
 		$this->db->join("tipo_documento_serie tds","tds.idtipodocumentomov = tdm.idtipodocumentomov",'left'); 
 		$this->db->join("serie se","tds.idserie = se.idserie",'left'); 
@@ -44,7 +42,19 @@ class Model_tipo_documento_mov extends CI_Model {
 		$fData = $this->db->get()->row_array();
 		return $fData;
 	}
-
+	public function m_cargar_tipo_documento_grilla()
+	{
+		$this->db->select("tdm.idtipodocumentomov, tdm.descripcion_tdm, tdm.porcentaje_imp,tdm.abreviatura_tdm, 
+			se.idserie ,se.numero_serie, se.descripcion_ser, se.idempresaadmin, 
+			tds.idtipodocumentoserie, tds.correlativo_actual"); 
+		$this->db->from('tipo_documento_mov tdm'); 
+		$this->db->join("tipo_documento_serie tds","tds.idtipodocumentomov = tdm.idtipodocumentomov",'left'); 
+		$this->db->join("serie se","tds.idserie = se.idserie AND se.idempresaadmin = ".$this->sessionFactur['idempresaadmin'],'left'); 
+		$this->db->where('tdm.estado_tdm', 1); 
+		// $this->db->where('se.idempresaadmin', ); // empresa session 
+		$this->db->order_by('tdm.idtipodocumentomov','ASC'); 
+		return $this->db->get()->result_array(); 
+	}
 	public function m_cargar_tipo_documento_serie(){ 
 		$this->db->select("se.idserie,se.numero_serie, se.descripcion_ser,se.idempresaadmin");
 		$this->db->from('serie se');	
@@ -62,9 +72,9 @@ class Model_tipo_documento_mov extends CI_Model {
 	public function m_registrar($datos)
 	{
 		$data = array(
-			'descripcion_tdm' => strtoupper($datos['descripcion_tdm']),	
-			'abreviatura_tdm' => strtoupper($datos['abreviatura_tdm']),
-			'porcentaje_imp' => strtoupper($datos['porcentaje_imp'])
+			'descripcion_tdm' => strtoupper($datos['tipo_documento']),	
+			'abreviatura_tdm' => strtoupper($datos['abreviatura']),
+			'porcentaje_imp' => $datos['porcentaje']
 
 		);
 		return $this->db->insert('tipo_documento_mov', $data); 
@@ -73,11 +83,11 @@ class Model_tipo_documento_mov extends CI_Model {
 	public function m_editar($datos)
 	{
 		$data = array(
-			'descripcion_tdm' => strtoupper($datos['descripcion_tdm']),	
-			'abreviatura_tdm' => strtoupper($datos['abreviatura_tdm']),
-			'porcentaje_imp' => strtoupper($datos['porcentaje_imp'])
+			'descripcion_tdm' => strtoupper($datos['tipo_documento']),	
+			'abreviatura_tdm' => strtoupper($datos['abreviatura']),
+			'porcentaje_imp' => $datos['porcentaje']
 		);
-		$this->db->where('idtipodocumentomov',$datos['id']);
+		$this->db->where('idtipodocumentomov',$datos['idtipodocumentomov']);
 		return $this->db->update('tipo_documento_mov', $data); 
 	}
 
@@ -86,7 +96,7 @@ class Model_tipo_documento_mov extends CI_Model {
 		$data = array( 
 			'estado_tdm' => 0
 		);
-		$this->db->where('idtipodocumentomov',$datos['id']); 
+		$this->db->where('idtipodocumentomov',$datos['idtipodocumentomov']); 
 		return $this->db->update('tipo_documento_mov', $data); 
 	}
 

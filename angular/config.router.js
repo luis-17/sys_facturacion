@@ -122,6 +122,7 @@ angular.module('app')
             templateUrl: 'tpl/nueva-venta.html',
             resolve: load([
               'angular/controllers/NuevaVentaCtrl.js',
+              'angular/controllers/NotaPedidoCtrl.js',
               'angular/controllers/ClienteEmpresaCtrl.js',
               'angular/controllers/ClientePersonaCtrl.js',
               'angular/controllers/ElementoCtrl.js',
@@ -135,6 +136,7 @@ angular.module('app')
               'angular/controllers/TipoDocumentoClienteCtrl.js',
               'angular/controllers/TipoDocumentoMovCtrl.js',
               'angular/controllers/SedeCtrl.js',
+              'angular/controllers/SerieCtrl.js',
               'angular/controllers/FormaPagoCtrl.js',
               'angular/controllers/UnidadMedidaCtrl.js',
               'angular/controllers/ContactoEmpresaCtrl.js',
@@ -263,9 +265,9 @@ angular.module('app')
           })     
           .state('app.documento-serie', {
             url: '/documento-serie',
-            templateUrl: 'tpl/tipo-documento.html',
+            templateUrl: 'tpl/documento-serie.html',
             resolve: load([     
-              'angular/controllers/TipoDocumentoCtrl.js',
+              'angular/controllers/TipoDocumentoMovCtrl.js',
               'angular/controllers/SerieCtrl.js'
             ]) 
           })                                                                             

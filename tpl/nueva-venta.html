@@ -1,7 +1,7 @@
 <div class="bg-light lter b-b wrapper-sm">
   <h1 class="m-n font-thin h3">Nueva Venta</h1>
 </div>
-<div class="wrapper-sm" ng-controller="NuevaCotizacionCtrl">
+<div class="wrapper-sm" ng-controller="NuevaVentaCtrl">
 	<form name="formVenta">
 		<div class="row">
 			<div class="col-md-6 col-sm-12" >
@@ -80,7 +80,7 @@
 				<fieldset >
 					<legend class="lead lead-sm"> Datos de la Venta 
 						<div class="pull-right text-right">
-              <small class="text-default block" style="font-size: 18px;" > Venta. N° <strong>{{ fData.num_venta }}</strong>
+              <small class="text-default block" style="font-size: 18px;" > <strong>{{ fData.num_serie_correlativo }}</strong>
                   <button tooltip-placement="bottom" tooltip="Actualizar" title="" type="button" class="btn btn-xs btn-warning" uib-tooltip="Actualizar" 
                   	ng-click="metodos.generarNumeroVenta(true); $event.preventDefault();" > <i class="icon-reload"></i> </button>
               </small>  

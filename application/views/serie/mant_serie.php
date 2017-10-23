@@ -2,14 +2,14 @@
 	<h4 class="modal-title"> {{ titleForm }} </h4>
 </div> 
 <div class="modal-body">  
-	<form class="row" name="formSerie">
-		<div class="form-group col-md-6 mb-md">
-			<label class="control-label mb-n"> Descripción: <small class="text-danger">(*)</small> </label>
-			<input type="text" class="form-control input-sm" ng-model="fData.descripcion_ser" placeholder="Descripción serie" required tabindex="60" />
+	<form class="row" name="formSerie"> 
+		<div class="form-group col-md-12 mb-md">
+			<label class="control-label mb-n"> Número serie: <small class="text-danger">(*)</small> </label> 
+			<input type="text" class="form-control input-sm" ng-model="fData.numero_serie" placeholder="Ingrese número serie" required tabindex="10" />
 		</div>
-		<div class="form-group col-md-6 mb-md">
-			<label class="control-label mb-n"> Número serie: <small class="text-danger">(*)</small> </label>
-			<input type="text" class="form-control input-sm" ng-model="fData.numero_serie" placeholder="Ingrese número serie" required tabindex="70" />
+		<div class="form-group col-md-12 mb-md">
+			<label class="control-label mb-n"> Descripción: <small class="text-danger">(*)</small> </label> 
+			<textarea class="form-control input-sm" placeholder="Descripción serie" ng-model="fData.descripcion_ser" tabindex="20" required> </textarea> 
 		</div>
 	</form>
 </div>
