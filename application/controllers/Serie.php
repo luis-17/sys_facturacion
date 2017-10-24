@@ -8,7 +8,7 @@ class Serie extends CI_Controller {
         // Se le asigna a la informacion a la variable $sessionVP.
         $this->sessionFactur = @$this->session->userdata('sess_fact_'.substr(base_url(),-20,7));
         $this->load->helper(array('fechas','otros')); 
-        $this->load->model(array('model_serie')); 
+        $this->load->model(array('model_serie','model_tipo_documento_mov','model_tipo_documento_serie')); 
     }
 
     public function listar_serie_cbo(){ 
@@ -77,10 +77,16 @@ class Serie extends CI_Controller {
 			    ->set_content_type('application/json')
 			    ->set_output(json_encode($arrData));
 			return;
-   		}  
-
+   		} 
     	$this->db->trans_start();
-		if($this->model_serie->m_registrar($allInputs)) { // registro de elemento
+		if($this->model_serie->m_registrar($allInputs)) { // registro de serie
+			$arrData['idserie'] = GetLastId('idserie','serie');
+			$lista = $this->model_tipo_documento_mov->m_cargar_tipo_documento_grilla();
+			foreach ($lista as $key => $value) {
+				$arrData['idtipodocumentomov'] = $value['idtipodocumentomov'];
+				if( $this->model_tipo_documento_serie->m_registrar_tipo_documento_serie($arrData) ){ 
+				} 
+			}
 			$arrData['message'] = 'Se registraron los datos correctamente';
 			$arrData['flag'] = 1;
 		}
