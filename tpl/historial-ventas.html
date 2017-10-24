@@ -1,0 +1,90 @@
+<div class="" ng-controller="HistorialVentasCtrl">
+  <div class="bg-light lter b-b wrapper-md">
+    <div class="m-n font-thin h3"> Historial de Ventas </div>
+  </div>
+  <div class="nav-tabs-alt" >
+    <ul class="nav nav-tabs nav-justified">
+      <li class="active">
+        <a data-target="#venta" role="tab" data-toggle="tab"> VENTAS </a>
+      </li>
+      <li >
+        <a data-target="#det-venta" role="tab" data-toggle="tab"> DETALLE DE VENTAS </a>
+      </li>
+    </ul>
+  </div>
+  <div class="row-row">
+    <div class="cell scrollable hover">
+      <div class="cell-inner">
+        <div class="tab-content">
+          <div class="tab-pane active" id="venta">
+            <div class="wrapper-md">
+              <div class="row">
+                <div class="col-xs-12"> 
+                  <div class="form-group mb-n"> 
+                    <div class="inline w-sm mr" > 
+                      <label class="control-label text-ellipsis"> Sede </label> 
+                      <div class="input-group block clearfix"> 
+                        <select class="form-control input-sm" ng-model="fBusqueda.sede" ng-options="item as item.descripcion for item in fArr.listaSedes" 
+                          ng-change="metodos.getPaginationServerSide(true);" > </select> 
+                      </div>
+                    </div>
+                    <div class="inline w-md mr-xs"> 
+                      <label class="control-label text-ellipsis"> Desde </label> 
+                      <div class="input-group block clearfix"> 
+                        <input tabindex="110" type="text" class="form-control input-sm mask" ng-model="fBusqueda.desde" style="width: 50%;" input-mask mask-options="{alias: 'dd-mm-yyyy'}" />
+                        <input tabindex="115" type="text" class="form-control input-sm" ng-model="fBusqueda.desdeHora" style="width: 22%; margin-left: 4px;" />
+                        <input tabindex="116" type="text" class="form-control input-sm" ng-model="fBusqueda.desdeMinuto" style="width: 22%; margin-left: 4px;" />
+                      </div>
+                    </div>
+                    <div class="inline w-md mr-xs"> 
+                      <label class="control-label text-ellipsis"> Hasta </label> 
+                      <div class="input-group block clearfix"> 
+                        <input tabindex="120" type="text" class="form-control input-sm mask" ng-model="fBusqueda.hasta" style="width: 50%;" input-mask mask-options="{alias: 'dd-mm-yyyy'}" />
+                        <input tabindex="122" type="text" class="form-control input-sm" ng-model="fBusqueda.hastaHora" style="width: 22%; margin-left: 4px;" />
+                        <input tabindex="123" type="text" class="form-control input-sm" ng-model="fBusqueda.hastaMinuto" style="width: 22%; margin-left: 4px;" />
+                      </div> 
+                    </div>
+                    <div class="inline w-sm mr" > 
+                      <label class="control-label text-ellipsis"> Estados </label> 
+                      <div class="input-group block clearfix"> 
+                        <select class="form-control input-sm" ng-model="fBusqueda.estado_ve" ng-options="item as item.descripcion for item in fArr.listaEstadosVenta" 
+                          ng-change="metodos.getPaginationServerSide(true);" > </select> 
+                      </div>
+                    </div>
+                    <div class="inline w-xs mr" > 
+                      <label class="control-label text-ellipsis">  </label> 
+                      <div class="input-group block clearfix"> 
+                        <button type="button" class="btn btn-info btn-sm" style="position:absolute;" ng-click="metodos.getPaginationServerSide(true);"> PROCESAR </button> 
+                      </div>
+                    </div>
+                  </div>
+                  <div class="line line-dashed b-b line-sm"></div>
+                  <div class="form-group mb-n text-right">
+                    <button type="button" class="btn m-b-xs btn-info pull-left btn-xs" ng-click="btnBuscar();"> 
+                      <i class="fa fa-search"> </i> Buscar </button>
+                    <button type="button" class="btn m-b-xs btn-success btn-xs" ng-click="goToUrl('/app/nueva-nota-pedido'); $event.preventDefault();"> 
+                      <i class="fa fa-file-text"></i> Nuevo </button>
+                    <!-- <button type="button" ng-if="mySelectionGrid.length == 1" ng-click="btnImprimir();" class="btn m-b-xs btn-info btn-xs"> 
+                      <i class="fa fa-print"></i> Imprimir </button> -->
+                    <!-- <button type="button" ng-if="mySelectionGrid.length == 1" ng-click="btnEditar();" class="btn m-b-xs btn-warning btn-xs"> 
+                      <i class="fa fa-edit"></i> Editar </button> -->
+                    <button type="button" ng-if="mySelectionGrid.length == 1" ng-click="btnAnular();" class="btn m-b-xs btn-danger btn-xs"> 
+                      <i class="fa fa-trash-o"></i> Anular </button>
+                  </div>
+                </div>
+                <div class="col-xs-12">
+                  <div ui-grid="gridOptionsVE" ui-grid-pagination ui-grid-selection ui-grid-resize-columns ui-grid-auto-resize class="grid table-responsive fs-mini-grid"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="tab-pane" id="det-venta">
+            <div class="wrapper-md">
+                Month report 
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> 
+</div> 

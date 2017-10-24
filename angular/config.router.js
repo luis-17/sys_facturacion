@@ -143,12 +143,12 @@ angular.module('app')
               'angular/controllers/VariableCarCtrl.js' 
             ])
           })
-          .state('app.historial-ventas', {
+          .state('app.historial-ventas', { 
             url: '/historial-ventas',
             templateUrl: 'tpl/historial-ventas.html',
             resolve: load([
-              'angular/controllers/HistorialNotaPedidoCtrl.js', 
-              'angular/controllers/NotaPedidoCtrl.js', 
+              'angular/controllers/HistorialVentasCtrl.js', 
+              'angular/controllers/NuevaVentaCtrl.js', 
               'angular/controllers/SedeCtrl.js' 
             ])
           })
@@ -161,11 +161,11 @@ angular.module('app')
               'angular/controllers/UnidadMedidaCtrl.js'
             ]) 
           })
-          .state('app.servicio', {
-            url: '/servicio',
-            templateUrl: 'tpl/servicio.html',
+          .state('app.servicio', { 
+            url: '/servicio', 
+            templateUrl: 'tpl/servicio.html', 
             resolve: load([
-              'angular/controllers/ServicioCtrl.js',
+              'angular/controllers/ServicioCtrl.js', 
               'angular/controllers/CategoriaElementoCtrl.js' 
             ]) 
           })

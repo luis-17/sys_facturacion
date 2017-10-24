@@ -6,7 +6,7 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
     'CaracteristicaFactory',
     'ContactoEmpresaFactory',
     'MathFactory',
-		'CotizacionServices',
+		'VentaServices',
 		'ClienteEmpresaServices',
 		'ClientePersonaServices', 
 		'ColaboradorServices',
@@ -31,7 +31,7 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
     CaracteristicaFactory,
     ContactoEmpresaFactory,
     MathFactory,
-		CotizacionServices,
+		VentaServices,
 		ClienteEmpresaServices,
 		ClientePersonaServices,
 		ColaboradorServices,
@@ -57,13 +57,13 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
   $scope.fData.classEditCliente = 'disabled';
   $scope.fData.fecha_registro = $filter('date')(moment().toDate(),'dd-MM-yyyy'); 
   $scope.fData.fecha_emision = $filter('date')(moment().toDate(),'dd-MM-yyyy'); 
-  $scope.fData.num_cotizacion = '[ ............... ]';
-  $scope.fData.modo_igv = parseInt($scope.fSessionCI.config.precio_incluye_igv_cot); // INCLUYE IGV dinamico 
+  $scope.fData.num_serie_correlativo = '[ ............... ]';
+  $scope.fData.modo_igv = parseInt($scope.fSessionCI.config.precio_incluye_igv_ve); // INCLUYE IGV dinamico 
 
   $scope.fData.plazo_entrega = 5;
   $scope.fData.validez_oferta = 10;
   $scope.fData.incluye_tras_prov = 2; // no 
-  $scope.fData.incluye_entr_dom = parseInt($scope.fSessionCI.config.incluye_entrega_dom_cot);  // dinamico 
+  $scope.fData.incluye_entr_dom = parseInt($scope.fSessionCI.config.incluye_entrega_dom_ve);  // dinamico 
   $scope.fData.idventaanterior = null;
   $scope.fData.isRegisterSuccess = false;
   $scope.fData.temporal = {};
@@ -98,12 +98,12 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
   ];
   $scope.fData.moneda = $scope.fArr.listaMoneda[0];
 
-  // ESTADO DE COTIZACION 
-  $scope.fArr.listaEstadosCotizacion = [
-    {'id' : 1, 'descripcion' : 'POR ENVIAR'},
-    {'id' : 2, 'descripcion' : 'ENVIADO'}
+  // ESTADO DE VENTA 
+  $scope.fArr.listaEstadosVenta = [
+    {'id' : 1, 'descripcion' : 'REGISTRADO'},
+    {'id' : 0, 'descripcion' : 'ANULADO'}
   ]; 
-  $scope.fData.estado_cotizacion = $scope.fArr.listaEstadosCotizacion[0];
+  $scope.fData.estado_venta = $scope.fArr.listaEstadosVenta[0];
 
   // TIPOS DE DOCUMENTO CLIENTE
   $scope.metodos.listaTiposDocumentoCliente = function(myCallback) { 
@@ -222,22 +222,24 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
     }
   }, true);
 
-  // GENERACION DE NUMERO DE COTIZACION 
+  // GENERACION DE SERIE + CORRELATIVO 
   $scope.metodos.generarSerieCorrelativo = function(loader) { 
-    if(loader){
-      blockUI.start('Generando numero de serie / correlativo...'); 
-    }
+    if(loader){ 
+      blockUI.start('Generando numero de serie/correlativo...'); 
+    }; 
     var arrParams = { 
       'serie': $scope.fData.serie,
       'tipo_documento_mov': $scope.fData.tipo_documento_mov 
     }; 
-    ventaServices.sGenerarNumeroSerieCorrelativo(arrParams).then(function(rpta) { 
+    VentaServices.sGenerarNumeroSerieCorrelativo(arrParams).then(function(rpta) { 
       $scope.fData.num_serie_correlativo = '[ ............... ]'; 
       if( rpta.flag == 1){ 
         $scope.fData.num_serie_correlativo = rpta.datos.num_serie_correlativo; 
         $scope.fData.num_serie = rpta.datos.num_serie; 
         $scope.fData.num_correlativo = rpta.datos.num_correlativo; 
-      } 
+      }else{
+        pinesNotifications.notify({ title: 'Advertencia', text: rpta.message, type: 'warning', delay: 3000 });
+      }
       if(loader){ 
         blockUI.stop(); 
       } 
@@ -1100,7 +1102,7 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
     // } 
     // empieza el juego... 
     $scope.arrTemporal = { 
-      'id' : $scope.fData.temporal.elemento.id,
+      'idelemento' : $scope.fData.temporal.elemento.id,
       'descripcion' : $scope.fData.temporal.elemento.elemento,
       'cantidad' : $scope.fData.temporal.cantidad,
       'precio_unitario' : $scope.fData.temporal.precio_unitario,
@@ -1341,7 +1343,7 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
       return false; 
     }
     blockUI.start('Ejecutando proceso...');
-    CotizacionServices.sRegistrar($scope.fData).then(function (rpta) { 
+    VentaServices.sRegistrar($scope.fData).then(function (rpta) { 
       blockUI.stop();
       if(rpta.flag == 1){
         pTitle = 'OK!';

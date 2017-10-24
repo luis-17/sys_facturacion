@@ -14,7 +14,7 @@ app.controller('TipoDocumentoMovCtrl', ['$scope', '$filter', '$uibModal', '$boot
     $scope.mySelectionGrid = [];
     $scope.fArr.columnDefs = [ 
         { field: 'idtipodocumentomov', name: 'tdm.idtipodocumentomov', displayName: 'ID', width: 75, 
-          sort: { direction: uiGridConstants.DESC}, enableCellEdit: false 
+          sort: { direction: uiGridConstants.ASC}, enableCellEdit: false 
         },
         { field: 'tipo_documento', name: 'descripcion_tdm', displayName: 'Descripción', width: 250, enableCellEdit: false }, 
         { field: 'abreviatura', name: 'abreviatura_tdm', displayName: 'Abreviatura', width: 140, enableCellEdit: false }

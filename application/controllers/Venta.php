@@ -6,7 +6,7 @@ class Venta extends CI_Controller {
     {
         parent::__construct(); 
         $this->load->helper(array('fechas','otros','pdf','contable','config')); 
-        $this->load->model(array('model_venta','model_categoria_cliente','model_cliente_persona','model_cliente_empresa','model_configuracion','model_variable_car','model_banco_empresa_admin')); 
+        $this->load->model(array('model_venta','model_categoria_cliente','model_cliente_persona','model_cliente_empresa','model_configuracion','model_variable_car','model_banco_empresa_admin','model_serie')); 
         $this->load->library('excel');
     	$this->load->library('Fpdfext');
         //cache
@@ -20,8 +20,8 @@ class Venta extends CI_Controller {
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true); // var_dump($allInputs); exit(); 
 		$paramPaginate = $allInputs['paginate'];
 		$paramDatos = @$allInputs['datos'];
-		$lista = $this->model_cotizacion->m_cargar_cotizaciones($paramPaginate,$paramDatos); 
-		$totalRows = $this->model_cotizacion->m_count_cotizaciones($paramPaginate,$paramDatos); 
+		$lista = $this->model_venta->m_cargar_ventas($paramPaginate,$paramDatos); 
+		$totalRows = $this->model_venta->m_count_ventas($paramPaginate,$paramDatos); 
 		$arrListado = array(); 
 		foreach ($lista as $row) { 
 			$objEstado = array();
@@ -91,7 +91,7 @@ class Venta extends CI_Controller {
 		if(empty($allInputs['iddetallecotizacion'])){
 			$allInputs['iddetallecotizacion'] = NULL;
 		}
-		$lista = $this->model_cotizacion->m_cargar_detalle_cotizacion_por_id($allInputs['idcotizacion'],$allInputs['iddetallecotizacion']); 
+		$lista = $this->model_venta->m_cargar_detalle_cotizacion_por_id($allInputs['idcotizacion'],$allInputs['iddetallecotizacion']); 
 		$arrListado = array(); 
 		foreach ($lista as $key => $row) { 
 			$arrAux = array( 
@@ -142,20 +142,20 @@ class Venta extends CI_Controller {
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true); // var_dump($allInputs); exit(); 
 		$paramPaginate = $allInputs['paginate'];
 		$paramDatos = @$allInputs['datos'];
-		$lista = $this->model_cotizacion->m_cargar_cotizaciones_detalle($paramPaginate,$paramDatos); 
-		$totalRows = $this->model_cotizacion->m_count_cotizaciones_detalle($paramPaginate,$paramDatos); 
+		$lista = $this->model_venta->m_cargar_ventas_detalle($paramPaginate,$paramDatos); 
+		$totalRows = $this->model_venta->m_count_ventas_detalle($paramPaginate,$paramDatos); 
 		$arrListado = array(); 
 		foreach ($lista as $key => $row) { 
 			$objEstado = array();
-			if( $row['estado_cot'] == 1 ){ // POR ENVIAR 
+			if( $row['estado_movimiento'] == 1 ){ // REGISTRADO  
 				$objEstado['claseIcon'] = 'fa-file-archive-o';
-				$objEstado['claseLabel'] = 'label-info';
-				$objEstado['labelText'] = 'POR ENVIAR';
-			}
-			if( $row['estado_cot'] == 2 ){ // ENVIADO   
-				$objEstado['claseIcon'] = 'fa-send';
 				$objEstado['claseLabel'] = 'label-success';
-				$objEstado['labelText'] = 'ENVIADO';
+				$objEstado['labelText'] = 'REGISTRADO';
+			}
+			if( $row['estado_movimiento'] == 0 ){ // ANULADO   
+				$objEstado['claseIcon'] = 'fa-send';
+				$objEstado['claseLabel'] = 'label-danger';
+				$objEstado['labelText'] = 'ANULADO';
 			}
 			$arrAux = array( 
 				'iddetallecotizacion' => $row['iddetallecotizacion'],
@@ -202,8 +202,9 @@ class Venta extends CI_Controller {
 	{ 
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true); 
 		$fConfig = obtener_parametros_configuracion(); 
+
 		if( empty($allInputs['serie']) ){ 
-			$arrData['message'] = ''; 
+			$arrData['message'] = 'No ha seleccionado serie'; 
     		$arrData['flag'] = 0; 
 			$this->output 
 			    ->set_content_type('application/json')
@@ -211,7 +212,15 @@ class Venta extends CI_Controller {
 			return; 
 		}
 		if( empty($allInputs['tipo_documento_mov']) ){ 
-			$arrData['message'] = ''; 
+			$arrData['message'] = 'No ha seleccionado comprobante'; 
+    		$arrData['flag'] = 0; 
+			$this->output 
+			    ->set_content_type('application/json')
+			    ->set_output(json_encode($arrData));
+			return; 
+		}
+		if( empty($allInputs['tipo_documento_mov']['id']) ){
+			$arrData['message'] = 'Seleccione un comprobante.'; 
     		$arrData['flag'] = 0; 
 			$this->output 
 			    ->set_content_type('application/json')
@@ -222,28 +231,30 @@ class Venta extends CI_Controller {
 		// SERIE + "-" + X CARACTERES (DINAMICO) + CORRELATIVO 
 		// Ejm: 001- 00002
 		
-		//var_dump($numCotizacion); exit();
+		$numCaracteres = $fConfig['cant_caracteres_correlativo_compr']; 
+		$numSerie = $allInputs['serie']['descripcion']; 
 		// OBTENER CORRELATIVO ACTUAL. 
-		$allInputs['config'] = $fConfig; 
-		$fCotizacion = $this->model_cotizacion->m_cargar_ultima_cotizacion_segun_config($allInputs);
-		if( empty($fCotizacion) ){
-			$numCorrelativo = 1;
-		}else{
-			$numCorrelativo = substr($fCotizacion['num_cotizacion'], ($numCaracteres * -1), $numCaracteres); 
-			//var_dump($numCorrelativo); 
-			$numCorrelativo = (int)$numCorrelativo + 1;
-			//var_dump($numCorrelativo); exit();
-		}
-		//var_dump($numCotizacion); exit();
-		$numCotizacion .= str_pad($numCorrelativo, $numCaracteres, '0', STR_PAD_LEFT);
-	 	$arrDatos['num_cotizacion'] = $numCotizacion; 
+		$fCorrelativo = $this->model_serie->m_validar_serie_correlativo_existe($allInputs['serie']['id'],$allInputs['tipo_documento_mov']['id']); 
+		if( empty($fCorrelativo) ){ 
+			$arrData['message'] = 'No se ha configurado los números de serie para el comprobante elegido'; 
+    		$arrData['flag'] = 0; 
+			$this->output 
+			    ->set_content_type('application/json')
+			    ->set_output(json_encode($arrData));
+			return; 
+		} 
+
+		$numCorrelativo = str_pad(($fCorrelativo['correlativo_actual'] + 1), $numCaracteres, '0', STR_PAD_LEFT); 
+		$numSerieCorrelativo = $allInputs['serie']['descripcion'].'-'.$numCorrelativo; 
+
+	 	$arrDatos['num_serie_correlativo'] = $numSerieCorrelativo; 
+	 	$arrDatos['num_serie'] = $numSerie; 
+	 	$arrDatos['num_correlativo'] = $numCorrelativo; 
 	 	//var_dump($numCotizacion); exit();
     	$arrData['datos'] = $arrDatos;
     	$arrData['message'] = '';
     	$arrData['flag'] = 1;
-		if(empty($numCotizacion)){ 
-			$arrData['flag'] = 0;
-		}
+		
 		$this->output
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
@@ -253,20 +264,19 @@ class Venta extends CI_Controller {
 		ini_set('xdebug.var_display_max_depth', 5);
 	    ini_set('xdebug.var_display_max_children', 256);
 	    ini_set('xdebug.var_display_max_data', 1024);
-		$allInputs = json_decode(trim($this->input->raw_input_stream),true); 
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);  
 		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
     	$arrData['flag'] = 0;
-		/* VALIDACIONES */
-
+		/* VALIDACIONES */ 
 		if( $allInputs['isRegisterSuccess'] === TRUE ){ 
-    		$arrData['message'] = 'Ya se registró esta cotización.';
-    		$arrData['flag'] = 0;
+    		$arrData['message'] = 'Ya se registró esta venta.'; 
+    		$arrData['flag'] = 0; 
     		$this->output
 			    ->set_content_type('application/json')
 			    ->set_output(json_encode($arrData));
 		    return;
     	}
-		if( count($allInputs['detalle']) < 1){
+		if( count($allInputs['detalle']) < 1 ){
     		$arrData['message'] = 'No se ha agregado ningún elemento';
     		$arrData['flag'] = 0;
     		$this->output
@@ -305,35 +315,53 @@ class Venta extends CI_Controller {
 			    ->set_output(json_encode($arrData));
 		    return;
     	}
-    	if( empty($allInputs['num_cotizacion']) ){ 
-    		$arrData['message'] = 'No se ha generado un COD. DE COTIZACIÓN. Genere la COTIZACIÓN.';
+    	if( empty($allInputs['num_serie_correlativo']) ){ 
+    		$arrData['message'] = 'No se ha generado un CORRELATIVO.';
     		$arrData['flag'] = 0;
     		$this->output
 		    	->set_content_type('application/json')
 		    	->set_output(json_encode($arrData));
 		    return;
     	}
-    	if( $allInputs['tipo_documento_cliente']['destino_str'] == 'ce' ){ // si es cliente empresa 
-    		if( empty($allInputs['contacto']['id']) ){ 
-	    		$arrData['message'] = 'No se ha asociado un CONTACTO válido. Asocie el CONTACTO.';
-	    		$arrData['flag'] = 0;
-	    		$this->output
-			    	->set_content_type('application/json')
-			    	->set_output(json_encode($arrData));
-			    return;
-	    	}
+    	// if( $allInputs['tipo_documento_cliente']['destino_str'] == 'ce' ){ // si es cliente empresa 
+    	// 	if( empty($allInputs['contacto']['id']) ){ 
+	    // 		$arrData['message'] = 'No se ha asociado un CONTACTO válido. Asocie el CONTACTO.';
+	    // 		$arrData['flag'] = 0;
+	    // 		$this->output
+			  //   	->set_content_type('application/json') 
+			  //   	->set_output(json_encode($arrData));
+			  //   return;
+	    // 	}
+    	// }
+    	/* Validar el numero de serie + numero de correlativo tienen que ser correlativo */ 
+    	$fConfig = obtener_parametros_configuracion(); 
+    	$numCaracteres = $fConfig['cant_caracteres_correlativo_compr']; 
+    	$numeroDeSerieValido = FALSE; 
+    	$numSerie = $allInputs['serie']['descripcion']; 
+		// OBTENER CORRELATIVO ACTUAL. 
+		$fCorrelativo = $this->model_serie->m_validar_serie_correlativo_existe($allInputs['serie']['id'],$allInputs['tipo_documento_mov']['id']); 
+    	$numCorrelativo = str_pad(($fCorrelativo['correlativo_actual'] + 1), $numCaracteres, '0', STR_PAD_LEFT);
+    	$numSerieCorrelativoBD = $numSerie.'-'.$numCorrelativo; 
+    	if( $numSerieCorrelativoBD === $allInputs['num_serie_correlativo'] ){ 
+    		$numeroDeSerieValido = TRUE; 
     	}
-    	
-    	$fCotizacion = $this->model_cotizacion->m_cargar_esta_cotizacion_por_codigo($allInputs['num_cotizacion']);
-    	if( !empty($fCotizacion) ){ 
-    		$arrData['message'] = 'Ya se a registrado una cotización, usando el código <strong>'.$allInputs['num_cotizacion'].'</strong>'; 
+    	if( !$numeroDeSerieValido ){ 
+    		$arrData['message'] = 'El número de serie/correlativo es erróneo, por favor refresque el formulario <span class="icon-bg"><i class="ti ti-reload"></i></span>';
+    		$arrData['flag'] = 0;
+    		$this->output
+		    	->set_content_type('application/json')
+		    	->set_output(json_encode($arrData));
+		    return;
+    	}
+    	$fVenta = $this->model_venta->m_cargar_esta_venta_por_correlativo($allInputs['num_serie'],$allInputs['num_correlativo']);
+    	if( !empty($fVenta) ){ 
+    		$arrData['message'] = 'Ya se a registrado una venta, usando el correlativo <strong>'.$allInputs['num_serie'].'-'.$allInputs['num_correlativo'].'</strong>'; 
     		$arrData['flag'] = 0;
     		$this->output
 		    	->set_content_type('application/json')
 		    	->set_output(json_encode($arrData));
 		    return;
     	} 
-    	// var_dump($allInputs); exit(); 
     	$this->db->trans_start();
     	if( $allInputs['tipo_documento_cliente']['destino'] == 1 ){ // cliente empresa 
     		$allInputs['tipo_cliente'] = 'E'; // empresa 
@@ -341,23 +369,23 @@ class Venta extends CI_Controller {
     	if( $allInputs['tipo_documento_cliente']['destino'] == 2 ){ // cliente persona 
     		$allInputs['tipo_cliente'] = 'P'; // persona 
     	} 
-		if( $this->model_cotizacion->m_registrar_cotizacion($allInputs) ){ 
-			$arrData['idcotizacion'] = GetLastId('idcotizacion','cotizacion');
+		if( $this->model_venta->m_registrar_venta($allInputs) ){ 
+			$arrData['idmovimiento'] = GetLastId('idmovimiento','movimiento');
 			foreach ($allInputs['detalle'] as $key => $elemento) { 
-				$elemento['idcotizacion'] = $arrData['idcotizacion'];
+				$elemento['idmovimiento'] = $arrData['idmovimiento'];
 				if( empty($elemento['agrupacion']) ){ 
 					$elemento['agrupacion'] = 1; // por defecto 
 				} 
-				if( $this->model_cotizacion->m_registrar_detalle_cotizacion($elemento) ){ 
+				if( $this->model_venta->m_registrar_detalle_venta($elemento) ){ 
 					$arrData['message'] = 'Los datos se registraron correctamente - (no caracteristicas)'; 
 					$arrData['flag'] = 1; 
-					$arrData['iddetallecotizacion'] = GetLastId('iddetallecotizacion','detalle_cotizacion');
+					$arrData['iddetalleventa'] = GetLastId('iddetallemovimiento','detalle_movimiento');
 					if( !empty($elemento['caracteristicas']) ){ 
 						foreach ($elemento['caracteristicas'] as $keyCa => $caracteristica) { 
 							if( !empty($caracteristica['valor']) ){ 
-								$caracteristica['iddetallecotizacion'] = $arrData['iddetallecotizacion']; 
-								if( $this->model_cotizacion->m_registrar_detalle_caracteristica_cotizacion($caracteristica) ){ 
-									$arrData['message'] = 'Los datos se registraron correctamente'; 
+								$caracteristica['iddetalleventa'] = $arrData['iddetalleventa']; 
+								if( $this->model_venta->m_registrar_detalle_caracteristica_venta($caracteristica) ){ 
+									$arrData['message'] = '- Los datos se registraron correctamente'; 
 									$arrData['flag'] = 1; 
 									$fVariable = $this->model_variable_car->m_buscar_variable($caracteristica); 
 									if( empty($fVariable) ){ 
@@ -370,7 +398,16 @@ class Venta extends CI_Controller {
 						} 
 					}
 				} 
-			} 
+			}
+			// ACTUALIZAR NUMERO DE SERIE 
+			$arrDataSC = array( 
+				'tipo_documento_mov'=> $allInputs['tipo_documento_mov'], 
+				'serie'=> $allInputs['serie'] 
+			);
+			if( $this->model_serie->actualizar_serie_correlativo_por_movimiento($arrDataSC) ){ 
+				$arrData['message'] .= '<br /> - Se actualizó el correlativo correctamente'; 
+				$arrData['flag'] = 1; 
+			}
 		} 
 		$this->db->trans_complete();
 		$this->output

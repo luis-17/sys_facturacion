@@ -4,7 +4,7 @@ class Model_venta extends CI_Model {
 	{
 		parent::__construct();
 	}
-	public function m_cargar_ventas$paramPaginate,$paramDatos)
+	public function m_cargar_ventas($paramPaginate,$paramDatos)
 	{
 		$this->db->select("CONCAT(COALESCE(col.nombres,''), ' ', COALESCE(col.apellidos,'')) As colaborador",FALSE);
 		$this->db->select("CONCAT(COALESCE(cp.nombres,''), ' ', COALESCE(cp.apellidos,''), ' ', COALESCE(ce.razon_social,'')) As cliente_persona_empresa",FALSE);
@@ -219,6 +219,17 @@ class Model_venta extends CI_Model {
 		$this->db->limit(1);
 		return $this->db->get()->row_array();
 	}
+	public function m_cargar_esta_venta_por_correlativo($numSerie,$numCorrelativo)
+	{
+		$this->db->select('ve.idmovimiento, ve.numero_serie, ve.numero_correlativo', FALSE); 
+		$this->db->from('movimiento ve'); 
+		$this->db->where('ve.numero_serie', $numSerie ); 
+		$this->db->where('ve.numero_correlativo', $numCorrelativo ); 
+		$this->db->where('tipo_movimiento',2); // facturacion 
+		$this->db->limit(1);
+		$fData = $this->db->get()->row_array();
+		return $fData; 
+	}
 	public function m_cargar_venta_por_id($idcotizacion)
 	{
 		$this->db->select("CONCAT(COALESCE(ct.nombres,''), ' ', COALESCE(ct.apellidos,'')) AS contacto",FALSE);
@@ -278,45 +289,51 @@ class Model_venta extends CI_Model {
 	public function m_registrar_venta($datos)
 	{
 		$data = array( 
-			'num_cotizacion' => $datos['num_cotizacion'], 
-			'idcolaborador' => $this->sessionFactur['idcolaborador'], 
-			'fecha_registro' => date('Y-m-d H:i:s'),
-			'fecha_emision' => darFormatoYMD($datos['fecha_emision']),
+
 			'tipo_cliente' => $datos['tipo_cliente'],
 			'idcliente' => $datos['cliente']['id'],
-			'idusuarioregistro' => $this->sessionFactur['idusuario'],
+			'idaperturacaja' => empty($datos['idaperturacaja']) ? NULL : $datos['idaperturacaja'],
+			'idusuarioventa' => $this->sessionFactur['idusuario'],
+			'dir_movimiento' => 'E',
+			'tipo_movimiento' => 2,
+			'idtipodocumentomov' => $datos['tipo_documento_mov']['id'],
+			'numero_orden_compra' => empty($datos['orden_compra']) ? NULL : $datos['orden_compra'],
 			'idempresaadmin' => $this->sessionFactur['idempresaadmin'],
 			'idsede' => $datos['sede']['id'],
-			'plazo_entrega' => $datos['plazo_entrega'],
-			'validez_oferta' => $datos['validez_oferta'],
-			'incluye_traslado_prov' => $datos['incluye_tras_prov'],
-			'incluye_entrega_domicilio' => $datos['incluye_entr_dom'],
+			'idcontacto' => empty($datos['idcontacto']) ? NULL : $datos['idcontacto'], 
+			'fecha_registro' => date('Y-m-d H:i:s'),
+			'fecha_emision' => darFormatoYMD($datos['fecha_emision']),
+			'numero_serie' => $datos['num_serie'],
+			'numero_correlativo' => $datos['num_correlativo'],
 			'idformapago' => $datos['forma_pago']['id'],
 			'moneda' => $datos['moneda']['str_moneda'],
 			'modo_igv' => $datos['modo_igv'],
 			'subtotal' => $datos['subtotal'],
 			'igv' => $datos['igv'],
 			'total' => $datos['total'],
-			'estado_cot' => $datos['estado_cotizacion']['id'],
-			'idcontacto' => empty($datos['contacto']['id']) ? NULL : $datos['contacto']['id']
+			'incluye_traslado_prov' => $datos['incluye_tras_prov'],
+			'incluye_entrega_domicilio' => $datos['incluye_entr_dom'], 
+			'plazo_entrega' => $datos['plazo_entrega'],
+			'validez_oferta' => $datos['validez_oferta']
 		); 
-		return $this->db->insert('cotizacion', $data); 
+		return $this->db->insert('movimiento', $data); 
 	}
 	public function m_registrar_detalle_venta($datos)
 	{
 		$data = array(
-			'idcotizacion' => $datos['idcotizacion'],	
-			'idelemento' => $datos['id'],
-			'idunidadmedida' => $datos['unidad_medida']['id'],
+			'idmovimiento' => $datos['idmovimiento'],	
+			'idelemento' => $datos['idelemento'],
+			'idunidadmedida' => $datos['unidad_medida']['id'], 
 			'cantidad' => $datos['cantidad'],
 			'precio_unitario' => $datos['precio_unitario'],
 			'importe_con_igv' => $datos['importe_con_igv'],
 			'importe_sin_igv' => $datos['importe_sin_igv'],
 			'excluye_igv' => $datos['excluye_igv'],
 			'igv_detalle' => $datos['igv'],
-			'agrupador_totalizado' => $datos['agrupacion']
+			'idcotizacion' => empty($datos['idcotizacion']) ? NULL : $datos['idcotizacion'], 
+			'iddetallecotizacion' => empty($datos['iddetallecotizacion']) ? NULL : $datos['iddetallecotizacion'] 
 		);
-		return $this->db->insert('detalle_cotizacion', $data); 
+		return $this->db->insert('detalle_movimiento', $data); 
 	}
 	public function m_registrar_detalle_caracteristica_venta($datos) 
 	{ 
@@ -328,11 +345,11 @@ class Model_venta extends CI_Model {
 		);
 		return $this->db->insert('detalle_caracteristica', $data); 
 	} 
-	public function m_actualizar_estado_venta($arrIdVentas, $boolEstado)
+	public function m_actualizar_venta_anulado($arrIdVentas)
 	{
 		$data = array(
-			'estado_cot' => $boolEstado,
-			'fecha_envio' => date('Y-m-d H:i:s')
+			'estado_movimiento' => 0, //anulado 
+			'fecha_anulacion' => date('Y-m-d H:i:s')
 		);
 		$this->db->where_in('idmovimiento',$arrIdVentas); 
 		return $this->db->update('movimiento', $data); 

@@ -29,7 +29,7 @@ class Model_serie extends CI_Model {
 	}
 	public function m_validar_serie_correlativo_existe($idserie,$idtipodocumento)
 	{
-		$this->db->select("tds.idtipodocumentoserie, tds.idserie, tds.idtipodocumentomov"); 
+		$this->db->select("tds.idtipodocumentoserie, tds.idserie, tds.idtipodocumentomov, tds.correlativo_actual"); 
 		$this->db->from('tipo_documento_serie tds');
 		$this->db->where('tds.idserie',$idserie);
 		$this->db->where('tds.idtipodocumentomov',$idtipodocumento);
@@ -74,6 +74,13 @@ class Model_serie extends CI_Model {
 		$this->db->where('idserie',$datos['idserie']);
 		$this->db->where('idtipodocumentomov',$datos['idtipodocumentomov']);
 		return $this->db->update('tipo_documento_serie', $data);
+	}
+	public function actualizar_serie_correlativo_por_movimiento($datos)
+	{
+		$this->db->set('correlativo_actual', 'correlativo_actual + 1', FALSE);
+		$this->db->where('idserie',$datos['serie']['id']);
+		$this->db->where('idtipodocumentomov',$datos['tipo_documento_mov']['id']);
+		return $this->db->update('tipo_documento_serie');
 	}
 }
 ?>
