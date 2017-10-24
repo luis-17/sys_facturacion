@@ -1,7 +1,7 @@
 <div class="bg-light lter b-b wrapper-sm">
   <h1 class="m-n font-thin h3">Nueva Venta</h1>
 </div>
-<div class="wrapper-sm" ng-controller="NuevaCotizacionCtrl">
+<div class="wrapper-sm" ng-controller="NuevaVentaCtrl">
 	<form name="formVenta">
 		<div class="row">
 			<div class="col-md-6 col-sm-12" >
@@ -80,9 +80,9 @@
 				<fieldset >
 					<legend class="lead lead-sm"> Datos de la Venta 
 						<div class="pull-right text-right">
-              <small class="text-default block" style="font-size: 18px;" > Venta. N° <strong>{{ fData.num_venta }}</strong>
+              <small class="text-default block" style="font-size: 18px;" > <strong>{{ fData.num_serie_correlativo }}</strong>
                   <button tooltip-placement="bottom" tooltip="Actualizar" title="" type="button" class="btn btn-xs btn-warning" uib-tooltip="Actualizar" 
-                  	ng-click="metodos.generarNumeroVenta(true); $event.preventDefault();" > <i class="icon-reload"></i> </button>
+                  	ng-click="metodos.generarSerieCorrelativo(true); $event.preventDefault();" > <i class="icon-reload"></i> </button>
               </small>  
             </div>
 					</legend>
@@ -90,17 +90,17 @@
 						<div class="col-md-3 col-sm-12">
 							<label class="control-label text-ellipsis"> Sede </label>
               <select class="form-control input-sm" ng-model="fData.sede" ng-options="item as item.descripcion for item in fArr.listaSedes" 
-              	tabindex="190" ng-change="metodos.generarNumeroVenta(true);"> </select> 
+              	tabindex="190"> </select> 
           	</div>
           	<div class="col-md-3 col-sm-12">
               <label class="control-label text-ellipsis"> Comprobante </label> 
               <select class="form-control input-sm" ng-model="fData.tipo_documento_mov" ng-options="item as item.descripcion for item in fArr.listaTiposDocumentoMov" 
-              	tabindex="230" > </select> 
+              	tabindex="230" ng-change="metodos.generarSerieCorrelativo(true);" > </select> 
           	</div>
           	<div class="col-md-3 col-sm-12">
               <label class="control-label text-ellipsis"> Serie Doc. </label> 
               <select class="form-control input-sm" ng-model="fData.serie" ng-options="item as item.descripcion for item in fArr.listaSeries" 
-              	tabindex="230" > </select> 
+              	tabindex="230" ng-change="metodos.generarSerieCorrelativo(true);" > </select> 
           	</div>
           	<div class="col-md-3 col-sm-12">
               <label class="control-label text-ellipsis"> Fecha de Creación </label> 

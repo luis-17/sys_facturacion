@@ -20,8 +20,9 @@ app.controller('SerieCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$log
 
 app.service("SerieServices",function($http, $q, handleBehavior) {
     return({
-        sListarCbo: sListarCbo,
-        sRegistrar: sRegistrar
+        sListarCbo: sListarCbo, 
+        sRegistrar: sRegistrar, 
+        sEditarCorrelativoActual: sEditarCorrelativoActual 
     });
     function sListarCbo(datos) {
       var request = $http({
@@ -39,16 +40,23 @@ app.service("SerieServices",function($http, $q, handleBehavior) {
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
     }  
-
+    function sEditarCorrelativoActual(datos) {
+      var request = $http({
+            method : "post",
+            url : angular.patchURLCI+"Serie/editar_correlativo_actual",
+            data : datos
+      });
+      return (request.then(handleBehavior.success,handleBehavior.error));
+    }
 });
 
 app.factory("SerieFactory", function($uibModal, pinesNotifications, blockUI, SerieServices) { 
   var interfaz = {
-    regSerieModal: function (arrParams) {
+    regSerieModal: function (arrParams, myCallback) {
       blockUI.start('Abriendo formulario...');
       $uibModal.open({ 
         templateUrl: angular.patchURLCI+'Serie/ver_popup_formulario',
-        size: 'md',
+        size: 'sm',
         backdrop: 'static',
         keyboard:false,
         controller: function ($scope, $uibModalInstance, arrParams) { 
@@ -70,6 +78,7 @@ app.factory("SerieFactory", function($uibModal, pinesNotifications, blockUI, Ser
                 if(typeof $scope.metodos.getPaginationServerSide == 'function'){ 
                   $scope.metodos.getPaginationServerSide(true);
                 }
+                arrParams.myCallbackSerie();
               }else if(rpta.flag == 0){
                 var pTitle = 'Error!';
                 var pType = 'danger';

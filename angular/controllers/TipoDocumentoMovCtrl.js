@@ -1,47 +1,34 @@
 app.controller('TipoDocumentoMovCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$log', '$timeout', 'pinesNotifications', 'uiGridConstants', 'blockUI', 
   'TipoDocumentoMovFactory',
+  'SerieFactory',
   'TipoDocumentoMovServices',
   'SerieServices',
   function($scope, $filter, $uibModal, $bootbox, $log, $timeout, pinesNotifications, uiGridConstants, blockUI, 
   TipoDocumentoMovFactory,
+  SerieFactory,
   TipoDocumentoMovServices,
   SerieServices
   ) {
     $scope.metodos = {}; // contiene todas las funciones 
     $scope.fArr = {}; // contiene todos los arrays generados por las funciones 
     $scope.mySelectionGrid = [];
-    $scope.btnBuscar = function(){ 
-      $scope.gridOptions.enableFiltering = !$scope.gridOptions.enableFiltering;
-      $scope.gridApi.core.notifyDataChange( uiGridConstants.dataChange.COLUMN );
-    };
-    var paginationOptions = {
-      pageNumber: 1,
-      firstRow: 0,
-      pageSize: 100,
-      sort: uiGridConstants.DESC,
-      sortName: null,
-      search: null
-    };
-    $scope.columnDefs = [
-        { field: 'id', name: 'idtipodocumentomov', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
-        { field: 'descripcion_tdm', name: 'descripcion_tdm', displayName: 'Descripción', minWidth: 160 }
+    $scope.fArr.columnDefs = [ 
+        { field: 'idtipodocumentomov', name: 'tdm.idtipodocumentomov', displayName: 'ID', width: 75, 
+          sort: { direction: uiGridConstants.ASC}, enableCellEdit: false 
+        },
+        { field: 'tipo_documento', name: 'descripcion_tdm', displayName: 'Descripción', width: 250, enableCellEdit: false }, 
+        { field: 'abreviatura', name: 'abreviatura_tdm', displayName: 'Abreviatura', width: 140, enableCellEdit: false }
     ];
     $scope.gridOptions = {
       rowHeight: 30,
-      paginationPageSizes: [10, 50, 100, 500, 1000],
-      paginationPageSize: 10,
+      paginationPageSizes: [100, 500, 1000],
+      paginationPageSize: 100,
       enableRowSelection: true,
-      enableSelectAll: true,
+      //enableSelectAll: true,
       enableFiltering: false,
       enableFullRowSelection: true,
-      multiSelect: true,
-      columnDefs: $scope.columnDefs,
-      // columnDefs: [ 
-      //   { field: 'id', name: 'idtipodocumentomov', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
-      //   { field: 'descripcion_tdm', name: 'descripcion_tdm', displayName: 'Descripción', minWidth: 160 },
-      //   { field: 'abreviatura_tdm', name: 'abreviatura_tdm', displayName: 'Abreviatura', minWidth: 100 },
-      //   { field: 'porcentaje_imp', name: 'porcentaje_imp', displayName: 'Porcentaje', minWidth: 100 }
-      // ],
+      multiSelect: false,
+      columnDefs: $scope.fArr.columnDefs,
       onRegisterApi: function(gridApi) { 
         $scope.gridApi = gridApi;
         gridApi.selection.on.rowSelectionChanged($scope,function(row){
@@ -49,88 +36,74 @@ app.controller('TipoDocumentoMovCtrl', ['$scope', '$filter', '$uibModal', '$boot
         });
         gridApi.selection.on.rowSelectionChangedBatch($scope,function(rows){
           $scope.mySelectionGrid = gridApi.selection.getSelectedRows();
-        });
-        $scope.gridApi.core.on.sortChanged($scope, function(grid, sortColumns) { 
-          if (sortColumns.length == 0) {
-            paginationOptions.sort = null;
-            paginationOptions.sortName = null;
-          } else {
-            paginationOptions.sort = sortColumns[0].sort.direction;
-            paginationOptions.sortName = sortColumns[0].name;
+        }); 
+        gridApi.edit.on.afterCellEdit($scope,function(rowEntity, colDef, newValue, oldValue){ 
+          var arrEditCell = {
+            'serie' : colDef.field,
+            'correlativo' : newValue,
+            'idtipodocumentomov' : rowEntity.idtipodocumentomov
           }
-          $scope.metodos.getPaginationServerSide(true);
-        });
-        gridApi.pagination.on.paginationChanged($scope, function (newPage, pageSize) {
-          paginationOptions.pageNumber = newPage;
-          paginationOptions.pageSize = pageSize;
-          paginationOptions.firstRow = (paginationOptions.pageNumber - 1) * paginationOptions.pageSize;
-          $scope.metodos.getPaginationServerSide(true);
-        });
-        $scope.gridApi.core.on.filterChanged( $scope, function(grid, searchColumns) {
-          var grid = this.grid;
-          paginationOptions.search = true; 
-          paginationOptions.searchColumn = {
-            'tdm.idtipodocumentomov' : grid.columns[1].filters[0].term,
-            'tdm.descripcion_tdm' : grid.columns[2].filters[0].term,
-            'tdm.abreviatura_tdm' : grid.columns[3].filters[0].term,
-            'tdm.porcentaje_imp' : grid.columns[4].filters[0].term
-          }
-          $scope.metodos.getPaginationServerSide();
+          SerieServices.sEditarCorrelativoActual(arrEditCell).then(function (rpta) { 
+            if(rpta.flag == 1){
+              pTitle = 'OK!';
+              pType = 'success'; 
+            }else if(rpta.flag == 0){
+              var pTitle = 'Error!';
+              var pType = 'danger';
+            }else{
+              alert('Error inesperado');
+            }
+            $scope.metodos.listaTipoDocumentoMovFormat();
+            $scope.fData = {};
+            pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 1000 });
+          });
+          $scope.$apply();
         });
       }
     };
-    paginationOptions.sortName = $scope.gridOptions.columnDefs[0].name; 
-    $scope.metodos.getPaginationServerSide = function(loader) {
-      if( loader ){
-        blockUI.start('Procesando información...');
-      }
-      var arrParams = {
-        paginate : paginationOptions
-      };
-      TipoDocumentoMovServices.sListar(arrParams).then(function (rpta) { 
-        console.log(rpta,'rpta');
-        if( rpta.datos.length == 0 ){
-          rpta.paginate = { totalRows: 0 };
-        }
-        $scope.gridOptions.totalItems = rpta.paginate.totalRows;
+    // $scope.metodos.listaTipoDocumentoMov = function() { 
+    //   TipoDocumentoMovServices.sListarParaGrilla().then(function (rpta) { 
+    //     $scope.gridOptions.data = rpta.datos;
+    //   });
+    // }
+    $scope.metodos.listaTipoDocumentoMovFormat = function () { 
+      TipoDocumentoMovServices.sListarParaGrilla().then(function (rpta) { 
         $scope.gridOptions.data = rpta.datos; 
-        $scope.gridOptions.data2 = rpta.datos2; 
-        var arrColumns = $scope.gridOptions.data2[0];
-        console.log(arrColumns,'arrColumns');
-        var i = 0;    
+        var arrColumns = $scope.gridOptions.data[0]; 
+        var i = 0; 
+        console.log('datos cajas', $scope.gridOptions.data); 
         angular.forEach(arrColumns,function (val,key) { 
           i++;
-          if( i >2){ 
+          if( i > 5 ){ 
             var arrObjectColumns = { 
               field: key, 
-              displayName: key, 
+              name: 'campo_' + key,
+              displayName: 'SERIE N° ' + key, 
               cellTemplate: '<span>{{ COL_FIELD }}</span>',
               type: 'number', 
-              cellClass:'text-center', 
+              cellClass:'ui-editCell text-center', 
               enableColumnMenus: false, 
               enableColumnMenu: false,
               enableCellEdit: true, 
-              enableSorting: false
+              enableSorting: false,
+              enableCellEditOnFocus: false 
             }
-            $scope.columnDefs.push(arrObjectColumns);
+            $scope.fArr.columnDefs.push(arrObjectColumns);
           }
         });
-
-
-        if( loader ){
-          blockUI.stop(); 
-        }
+        // $scope.$apply();
       });
-      $scope.mySelectionGrid = [];
-    };
-    $scope.metodos.getPaginationServerSide(true); 
-
+    }
+    $scope.metodos.listaTipoDocumentoMovFormat(); 
     // MAS ACCIONES
     $scope.btnNuevo = function() { 
       var arrParams = {
         'metodos': $scope.metodos,
         'fArr': $scope.fArr 
-      }
+      };
+      arrParams.myCallbackSerie = function() { 
+        $scope.$parent.reloadPage(); 
+      };
       TipoDocumentoMovFactory.regTipoDocumentoMovModal(arrParams); 
     }
     $scope.btnEditar = function() { 
@@ -138,7 +111,10 @@ app.controller('TipoDocumentoMovCtrl', ['$scope', '$filter', '$uibModal', '$boot
         'metodos': $scope.metodos,
         'mySelectionGrid': $scope.mySelectionGrid,
         'fArr': $scope.fArr 
-      }
+      };
+      arrParams.myCallbackSerie = function() { 
+        $scope.$parent.reloadPage(); 
+      };
       TipoDocumentoMovFactory.editTipoDocumentoModal(arrParams); 
     }
     $scope.btnAnular = function() { 
@@ -146,14 +122,14 @@ app.controller('TipoDocumentoMovCtrl', ['$scope', '$filter', '$uibModal', '$boot
       $bootbox.confirm(pMensaje, function(result) {
         if(result){
           var arrParams = {
-            id: $scope.mySelectionGrid[0].id 
+            idtipodocumentomov: $scope.mySelectionGrid[0].idtipodocumentomov 
           };
           blockUI.start('Procesando información...');
           TipoDocumentoMovServices.sAnular(arrParams).then(function (rpta) {
             if(rpta.flag == 1){
               var pTitle = 'OK!';
               var pType = 'success';
-              $scope.metodos.getPaginationServerSide();
+              $scope.$parent.reloadPage(); 
             }else if(rpta.flag == 0){
               var pTitle = 'Error!';
               var pType = 'danger';
@@ -168,32 +144,34 @@ app.controller('TipoDocumentoMovCtrl', ['$scope', '$filter', '$uibModal', '$boot
     }
 
     $scope.btnNuevaSerie = function() { 
-      var arrParams = {
+      var arrParams = { 
         'metodos': $scope.metodos,
         'fArr': $scope.fArr
-    }
-    SerieFactory.regSerieModal(arrParams); 
+      }; 
+      arrParams.myCallbackSerie = function() { 
+        $scope.$parent.reloadPage(); 
+      }
+      SerieFactory.regSerieModal(arrParams); 
     };
-
 }]);
 
 app.service("TipoDocumentoMovServices",function($http, $q, handleBehavior) {
     return({
-        sListar: sListar,
-        sListarTipoDocParaVenta: sListarTipoDocParaVenta,
+        sListarParaGrilla: sListarParaGrilla,
+        sListarTipoDocParaVentaCbo: sListarTipoDocParaVentaCbo,
         sRegistrar: sRegistrar,
         sEditar: sEditar,
         sAnular: sAnular
     });
-    function sListar(datos) {
+    function sListarParaGrilla(datos) {
       var request = $http({
             method : "post",
-            url : angular.patchURLCI+"TipoDocumentoMov/listar_tipo_documento",
+            url : angular.patchURLCI+"TipoDocumentoMov/listar_tipo_documento_mov",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
     }
-    function sListarTipoDocParaVenta(datos) {
+    function sListarTipoDocParaVentaCbo(datos) {
       var request = $http({
             method : "post",
             url : angular.patchURLCI+"TipoDocumentoMov/listar_tipo_documento_mov_para_venta_cbo",
@@ -255,6 +233,7 @@ app.factory("TipoDocumentoMovFactory", function($uibModal, pinesNotifications, b
                 if(typeof $scope.metodos.getPaginationServerSide == 'function'){ 
                   $scope.metodos.getPaginationServerSide(true);
                 }
+                arrParams.myCallbackSerie();
               }else if(rpta.flag == 0){
                 var pTitle = 'Error!';
                 var pType = 'danger';
@@ -304,6 +283,7 @@ app.factory("TipoDocumentoMovFactory", function($uibModal, pinesNotifications, b
                 if(typeof $scope.metodos.getPaginationServerSide == 'function'){
                   $scope.metodos.getPaginationServerSide(true);
                 }
+                arrParams.myCallbackSerie();
               }else if(rpta.flag == 0){
                 var pTitle = 'Error!';
                 var pType = 'danger';

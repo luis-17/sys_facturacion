@@ -8,66 +8,41 @@ class TipoDocumentoMov extends CI_Controller {
         // Se le asigna a la informacion a la variable $sessionVP.
         $this->sessionFactur = @$this->session->userdata('sess_fact_'.substr(base_url(),-20,7));
         $this->load->helper(array('fechas','otros')); 
-        $this->load->model(array('model_tipo_documento_mov')); 
+        $this->load->model(array('model_tipo_documento_mov','model_serie')); 
     }
 
 	public function listar_tipo_documento_mov(){ 
-		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
-		$paramPaginate = $allInputs['paginate'];
-		$lista = $this->model_tipo_documento->m_cargar_tipo_documento($paramPaginate);
-		$listaSe = $this->model_tipo_documento->m_cargar_tipo_documento_serie();
-		// var_dump($listaSe);exit();
-		$fCount = $this->model_tipo_documento->m_count_tipo_documento($paramPaginate);
-
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true); 
+		$lista = $this->model_tipo_documento_mov->m_cargar_tipo_documento_grilla();
+		$listaSeries = $this->model_serie->m_cargar_series();
 		$arrListado = array();
-		foreach ($lista as $row) { 
-			array_push($arrListado,
-				array(
-					'id' => $row['idtipodocumentomov'],
-					'descripcion_tdm' => strtoupper($row['descripcion_tdm']),
-					'porcentaje_imp' => strtoupper($row['porcentaje_imp']) ,
-					'abreviatura_tdm' => strtoupper($row['abreviatura_tdm']) 
-				)
+		$arrGroupBy = array(); 
+		foreach ($lista as $key => $row) { 
+			$arrAux = array(
+				'idtipodocumentomov' => $row['idtipodocumentomov'],
+				'idempresa' => $row['idempresaadmin'],
+				'tipo_documento' => $row['descripcion_tdm'],
+				'abreviatura' => $row['abreviatura_tdm'],
+				'porcentaje' => $row['porcentaje_imp']
 			);
-		}
-
-		$arrListado2 = array();
-		$arrListadoSe = array();
-		foreach ($listaSe as $row) {
-			array_push($arrListadoSe, 
-				array(
-					'id' => $row['idempresaadmin'],
-					'descripcion_ser' => $row['descripcion_ser']
-				)
-			);
-		}
-		
-		$arrGroupBy = array();
-		foreach ($arrListadoSe as $key => $row) { 
-			$otherRow = array(
-				'id' => $row['id'],
-				'descripcion_ser' => $row['descripcion_ser']
-				//'detalle' => array()
-			);
-			$arrGroupBy[$row['id']] = $otherRow;
-		}
-		//var_dump($arrGroupBy); exit();
+			$arrGroupBy[$row['idtipodocumentomov']] = $arrAux; 
+		} 
 		foreach ($arrGroupBy as $key => $row) { 
-			foreach ($arrListadoSe as $keyDet => $rowDet) { 
-				if( $rowDet['id'] == $row['id'] ){ 
-					$arrGroupBy[$key][$rowDet['descripcion_ser']] = (int)$rowDet['descripcion_ser'];
+			foreach ($listaSeries as $keySe => $rowSe) {
+				$arrGroupBy[$key][$rowSe['numero_serie']] = 0;
+			}
+		}
+		foreach ($arrGroupBy as $key => $row) { 
+			foreach ($lista as $keyDet => $rowDet) { 
+				if( $rowDet['idtipodocumentomov'] == $row['idtipodocumentomov'] ){ 
+					if( !empty($rowDet['numero_serie']) ){
+						$arrGroupBy[$key][$rowDet['numero_serie']] = (int)$rowDet['correlativo_actual'];
+					} 
 				}
 			}
 		}
-		//var_dump("<pre>",$arrGroupBy); exit();
-		$arrListado2 = array_values($arrGroupBy);
-
-		// var_dump("<pre>",$arrListado); exit();
-
-
+		$arrListado = array_values($arrGroupBy);
     	$arrData['datos'] = $arrListado;
-    	$arrData['datos2'] = $arrListado2;
-    	$arrData['paginate']['totalRows'] = $fCount['contador'];
     	$arrData['message'] = '';
     	$arrData['flag'] = 1;
 		if(empty($lista)){
@@ -117,7 +92,7 @@ class TipoDocumentoMov extends CI_Controller {
     	// VALIDACIONES
     	
     	$this->db->trans_start();
-		if($this->model_tipo_documento->m_registrar($allInputs)) { // registro de elemento
+		if($this->model_tipo_documento_mov->m_registrar($allInputs)) { // registro de elemento
 			$arrData['message'] = 'Se registraron los datos correctamente';
 			$arrData['flag'] = 1;
 		}
@@ -126,7 +101,6 @@ class TipoDocumentoMov extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
-
 	public function editar()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
@@ -135,7 +109,7 @@ class TipoDocumentoMov extends CI_Controller {
     	// VALIDACIONES
     	
     	$this->db->trans_start();
-		if($this->model_tipo_documento->m_editar($allInputs)) { // edicion de elemento
+		if($this->model_tipo_documento_mov->m_editar($allInputs)) { // edicion de elemento
 			$arrData['message'] = 'Se editaron los datos correctamente';
 			$arrData['flag'] = 1;
 		}
@@ -144,13 +118,12 @@ class TipoDocumentoMov extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
-
 	public function anular()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		$arrData['message'] = 'No se pudo anular los datos';
     	$arrData['flag'] = 0;
-		if( $this->model_tipo_documento->m_anular($allInputs) ){ 
+		if( $this->model_tipo_documento_mov->m_anular($allInputs) ){ 
 			$arrData['message'] = 'Se anularon los datos correctamente';
     		$arrData['flag'] = 1;
 		}

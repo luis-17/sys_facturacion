@@ -6,16 +6,17 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
     'CaracteristicaFactory',
     'ContactoEmpresaFactory',
     'MathFactory',
-		'CotizacionServices',
+		'VentaServices',
 		'ClienteEmpresaServices',
 		'ClientePersonaServices', 
 		'ColaboradorServices',
     'TipoDocumentoClienteServices',
-    'TipoDocumentoMovServices',
+    'TipoDocumentoMovServices', 
     'ClienteServices', 
     'CategoriaClienteServices',
     'CategoriaElementoServices',
     'SedeServices',
+    'SerieServices',
     'FormaPagoServices',
     'UnidadMedidaServices',
     'ElementoServices',
@@ -30,7 +31,7 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
     CaracteristicaFactory,
     ContactoEmpresaFactory,
     MathFactory,
-		CotizacionServices,
+		VentaServices,
 		ClienteEmpresaServices,
 		ClientePersonaServices,
 		ColaboradorServices,
@@ -40,6 +41,7 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
     CategoriaClienteServices,
     CategoriaElementoServices,
     SedeServices,
+    SerieServices,
     FormaPagoServices,
     UnidadMedidaServices,
     ElementoServices,
@@ -55,13 +57,13 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
   $scope.fData.classEditCliente = 'disabled';
   $scope.fData.fecha_registro = $filter('date')(moment().toDate(),'dd-MM-yyyy'); 
   $scope.fData.fecha_emision = $filter('date')(moment().toDate(),'dd-MM-yyyy'); 
-  $scope.fData.num_cotizacion = '[ ............... ]';
-  $scope.fData.modo_igv = parseInt($scope.fSessionCI.config.precio_incluye_igv_cot); // INCLUYE IGV dinamico 
+  $scope.fData.num_serie_correlativo = '[ ............... ]';
+  $scope.fData.modo_igv = parseInt($scope.fSessionCI.config.precio_incluye_igv_ve); // INCLUYE IGV dinamico 
 
   $scope.fData.plazo_entrega = 5;
   $scope.fData.validez_oferta = 10;
   $scope.fData.incluye_tras_prov = 2; // no 
-  $scope.fData.incluye_entr_dom = parseInt($scope.fSessionCI.config.incluye_entrega_dom_cot);  // dinamico 
+  $scope.fData.incluye_entr_dom = parseInt($scope.fSessionCI.config.incluye_entrega_dom_ve);  // dinamico 
   $scope.fData.idventaanterior = null;
   $scope.fData.isRegisterSuccess = false;
   $scope.fData.temporal = {};
@@ -96,12 +98,12 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
   ];
   $scope.fData.moneda = $scope.fArr.listaMoneda[0];
 
-  // ESTADO DE COTIZACION 
-  $scope.fArr.listaEstadosCotizacion = [
-    {'id' : 1, 'descripcion' : 'POR ENVIAR'},
-    {'id' : 2, 'descripcion' : 'ENVIADO'}
+  // ESTADO DE VENTA 
+  $scope.fArr.listaEstadosVenta = [
+    {'id' : 1, 'descripcion' : 'REGISTRADO'},
+    {'id' : 0, 'descripcion' : 'ANULADO'}
   ]; 
-  $scope.fData.estado_cotizacion = $scope.fArr.listaEstadosCotizacion[0];
+  $scope.fData.estado_venta = $scope.fArr.listaEstadosVenta[0];
 
   // TIPOS DE DOCUMENTO CLIENTE
   $scope.metodos.listaTiposDocumentoCliente = function(myCallback) { 
@@ -121,7 +123,7 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
   // TIPO DE DOCUMENTO MOV 
   $scope.metodos.listaTiposDocumentoMov = function(myCallback) { 
     var myCallback = myCallback || function() { };
-    TipoDocumentoMovServices.sListarCbo().then(function(rpta) { 
+    TipoDocumentoMovServices.sListarTipoDocParaVentaCbo().then(function(rpta) { 
       if( rpta.flag == 1){
         $scope.fArr.listaTiposDocumentoMov = rpta.datos; 
         myCallback();
@@ -129,6 +131,7 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
     });
   }
   var myCallback = function() { 
+    $scope.fArr.listaTiposDocumentoMov.splice(0,0,{ id : '0', descripcion:'--Seleccione comprobante--'}); 
     $scope.fData.tipo_documento_mov = $scope.fArr.listaTiposDocumentoMov[0]; 
   }
   $scope.metodos.listaTiposDocumentoMov(myCallback); 
@@ -145,16 +148,24 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
   }
   var myCallback = function() { 
     $scope.fData.sede = $scope.fArr.listaSedes[0]; 
-    $scope.metodos.generarNumeroCotizacion();
   }
   $scope.metodos.listaSedes(myCallback); 
 
-  
-  var myCallback = function() { 
-    $scope.fData.sede = $scope.fArr.listaSedes[0]; 
-    $scope.metodos.generarNumeroCotizacion();
+  // SERIE 
+  $scope.metodos.listaSeries = function(myCallback) { 
+    var myCallback = myCallback || function() { };
+    SerieServices.sListarCbo().then(function(rpta) { 
+      if( rpta.flag == 1){
+        $scope.fArr.listaSeries = rpta.datos; 
+        myCallback();
+      } 
+    });
   }
-  $scope.metodos.listaSedes(myCallback); 
+  var myCallback = function() { 
+    $scope.fData.serie = $scope.fArr.listaSeries[0]; 
+    $scope.metodos.generarSerieCorrelativo();
+  }
+  $scope.metodos.listaSeries(myCallback); 
 
   // FORMAS DE PAGO 
   $scope.metodos.listaFormaPago = function(myCallback) { 
@@ -211,22 +222,27 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
     }
   }, true);
 
-  // GENERACION DE NUMERO DE COTIZACION 
-  $scope.metodos.generarNumeroCotizacion = function(loader) { 
-    if(loader){
-      blockUI.start('Generando numero de cotización...'); 
-    }
-    var arrParams = {
-      'sede': $scope.fData.sede 
+  // GENERACION DE SERIE + CORRELATIVO 
+  $scope.metodos.generarSerieCorrelativo = function(loader) { 
+    if(loader){ 
+      blockUI.start('Generando numero de serie/correlativo...'); 
     }; 
-    CotizacionServices.sGenerarNumeroCotizacion(arrParams).then(function(rpta) { 
-      $scope.fData.num_cotizacion = '[ ............... ]';
+    var arrParams = { 
+      'serie': $scope.fData.serie,
+      'tipo_documento_mov': $scope.fData.tipo_documento_mov 
+    }; 
+    VentaServices.sGenerarNumeroSerieCorrelativo(arrParams).then(function(rpta) { 
+      $scope.fData.num_serie_correlativo = '[ ............... ]'; 
       if( rpta.flag == 1){ 
-        $scope.fData.num_cotizacion = rpta.datos.num_cotizacion; 
+        $scope.fData.num_serie_correlativo = rpta.datos.num_serie_correlativo; 
+        $scope.fData.num_serie = rpta.datos.num_serie; 
+        $scope.fData.num_correlativo = rpta.datos.num_correlativo; 
+      }else{
+        pinesNotifications.notify({ title: 'Advertencia', text: rpta.message, type: 'warning', delay: 3000 });
       }
-      if(loader){
+      if(loader){ 
         blockUI.stop(); 
-      }
+      } 
     });
   }
   
@@ -706,7 +722,7 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
     }
   }  
 
-  // BUSCAR Contactos  
+  // BUSCAR CONTACTOS 
   $scope.btnBusquedaContacto = function() { 
     blockUI.start('Procesando información...'); 
     $uibModal.open({ 
@@ -1086,7 +1102,7 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
     // } 
     // empieza el juego... 
     $scope.arrTemporal = { 
-      'id' : $scope.fData.temporal.elemento.id,
+      'idelemento' : $scope.fData.temporal.elemento.id,
       'descripcion' : $scope.fData.temporal.elemento.elemento,
       'cantidad' : $scope.fData.temporal.cantidad,
       'precio_unitario' : $scope.fData.temporal.precio_unitario,
@@ -1296,7 +1312,7 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
     $scope.fData.igv = null;
     $scope.fData.total = null;
     $scope.fData.isRegisterSuccess = false;
-    $scope.metodos.generarNumeroCotizacion();
+    $scope.metodos.generarSerieCorrelativo();
     $('#temporalElemento').focus();
   }
   $scope.grabar = function() { 
@@ -1327,7 +1343,7 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
       return false; 
     }
     blockUI.start('Ejecutando proceso...');
-    CotizacionServices.sRegistrar($scope.fData).then(function (rpta) { 
+    VentaServices.sRegistrar($scope.fData).then(function (rpta) { 
       blockUI.stop();
       if(rpta.flag == 1){
         pTitle = 'OK!';
@@ -1345,53 +1361,44 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
   }
 }]);
 
-app.service("CotizacionServices",function($http, $q, handleBehavior) {
+app.service("VentaServices",function($http, $q, handleBehavior) {
     return({
-        sGenerarNumeroCotizacion: sGenerarNumeroCotizacion,
-        sBuscarNumCotizacionAutocomplete: sBuscarNumCotizacionAutocomplete,
-        sListarDetalleEstaCotizacion: sListarDetalleEstaCotizacion, 
-        sListarHistorialCotizaciones: sListarHistorialCotizaciones,
-        sListarHistorialDetalleCotizaciones: sListarHistorialDetalleCotizaciones,
+        sGenerarNumeroSerieCorrelativo: sGenerarNumeroSerieCorrelativo,
+        sListarDetalleEstaVenta: sListarDetalleEstaVenta, 
+        sListarHistorialVentas: sListarHistorialVentas,
+        sListarHistorialDetalleVenta: sListarHistorialDetalleVenta,
         sRegistrar: sRegistrar,
         sEditar: sEditar,
         sAnular: sAnular
     });
-    function sGenerarNumeroCotizacion(datos) {
+    function sGenerarNumeroSerieCorrelativo(datos) {
       var request = $http({
             method : "post",
-            url : angular.patchURLCI+"Cotizacion/generar_numero_cotizacion",
+            url : angular.patchURLCI+"Venta/generar_numero_serie_correlativo",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
     }
-    function sBuscarNumCotizacionAutocomplete(datos) {
+    function sListarDetalleEstaVenta(datos) { 
       var request = $http({
             method : "post",
-            url : angular.patchURLCI+"Cotizacion/buscar_numero_cotizacion_autocomplete",
+            url : angular.patchURLCI+"Venta/listar_detalle_esta_venta",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
     }
-    function sListarDetalleEstaCotizacion(datos) { 
+    function sListarHistorialVentas(datos) {
       var request = $http({
             method : "post",
-            url : angular.patchURLCI+"Cotizacion/listar_detalle_esta_cotizacion",
+            url : angular.patchURLCI+"Venta/listar_ventas_historial",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
     }
-    function sListarHistorialCotizaciones(datos) {
+    function sListarHistorialDetalleVenta(datos) {
       var request = $http({
             method : "post",
-            url : angular.patchURLCI+"Cotizacion/listar_cotizaciones_historial",
-            data : datos
-      });
-      return (request.then(handleBehavior.success,handleBehavior.error));
-    }
-    function sListarHistorialDetalleCotizaciones(datos) {
-      var request = $http({
-            method : "post",
-            url : angular.patchURLCI+"Cotizacion/listar_detalle_cotizaciones_historial",
+            url : angular.patchURLCI+"Venta/listar_detalle_ventas_historial",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
@@ -1399,7 +1406,7 @@ app.service("CotizacionServices",function($http, $q, handleBehavior) {
     function sRegistrar (datos) {
       var request = $http({
             method : "post",
-            url : angular.patchURLCI+"Cotizacion/registrar",
+            url : angular.patchURLCI+"Venta/registrar",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
@@ -1407,7 +1414,7 @@ app.service("CotizacionServices",function($http, $q, handleBehavior) {
     function sEditar (datos) {
       var request = $http({
             method : "post",
-            url : angular.patchURLCI+"Cotizacion/editar",
+            url : angular.patchURLCI+"Venta/editar",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
@@ -1415,7 +1422,7 @@ app.service("CotizacionServices",function($http, $q, handleBehavior) {
     function sAnular (datos) {
       var request = $http({
             method : "post",
-            url : angular.patchURLCI+"Cotizacion/anular",
+            url : angular.patchURLCI+"Venta/anular",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
