@@ -183,7 +183,7 @@
           	<div class="col-md-1 col-sm-6">
               <label class="control-label"> Importe </label>
               <!-- NO INCLUYE IGV -->
-              <div style="position:relative;">
+              <div style="position:relative;"> 
 	              <input id="temporalImporte" disabled type="text" class="form-control input-sm" ng-model="fData.temporal.importe_sin_igv" 
 	              	placeholder="Importe" ng-show="fData.modo_igv == 2" style="position:absolute;" tabindex="300"/> 
 	              <!-- INCLUYE IGV -->
@@ -192,7 +192,13 @@
 	            </div>
           	</div>
           	<div class="col-md-2 col-sm-6 col-xs-12"> 
-	            <a style="margin-top: 22px;" href="" class="btn btn-info btn-sm btn-block" ng-click="agregarItem(); $event.preventDefault();" tabindex="320">Agregar</a> 
+          		<div style="margin-top: 22px;" class="btn-group" style="min-width: 100%">
+		            <a href="" class="btn btn-info btn-sm" ng-click="agregarItem(); $event.preventDefault();" tabindex="320">AGREGAR</a> 
+		            <a href="" class="btn btn-info btn-sm dropdown-toggle" tabindex="113" data-toggle="dropdown"><span class="caret"></span></a>
+	              <ul class="dropdown-menu sm" role="menu" style="padding:0;">
+	                  <li><a ng-click="btnMostrarNotaPedido(); $event.preventDefault();" class="btn btn-info-alt" href="" tabindex="114">NOTAS DE PEDIDO</a></li>
+	              </ul>
+	            </div>
 	          </div>
 					</div>
 					<div class="form-group-sm pull-in clearfix">
