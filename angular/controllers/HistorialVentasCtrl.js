@@ -79,19 +79,21 @@ app.controller('HistorialVentasCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     enableFullRowSelection: true,
     multiSelect: false,
     columnDefs: [ 
-      { field: 'idmovimiento', name: 'np.idmovimiento', displayName: 'ID', width: '75', visible: false },
-      { field: 'num_nota_pedido', name: 'np.num_nota_pedido', displayName: 'COD. NOTA PEDIDO', width: '120' },
-      { field: 'fecha_emision', name: 'np.fecha_emision', displayName: 'F. Emisión', minWidth: 100, enableFiltering: false,  sort: { direction: uiGridConstants.DESC} },
-      { field: 'fecha_registro', name: 'np.fecha_registro', displayName: 'F. Registro', minWidth: 100, enableFiltering: false, visible: false },
+      { field: 'idmovimiento', name: 've.idmovimiento', displayName: 'ID', width: '75', visible: false },
+      { field: 'descripcion_tdm', name: 'tdm.descripcion_tdm', displayName: 'COMPROBANTE', width: 100 },
+      { field: 'serie', name: 've.numero_serie', displayName: 'SERIE', width: 60 },
+      { field: 'correlativo', name: 've.numero_correlativo', displayName: 'CORRELATIVO', width: 100 },
+      { field: 'fecha_emision', name: 've.fecha_emision', displayName: 'F. Emisión', minWidth: 100, enableFiltering: false,  sort: { direction: uiGridConstants.DESC} },
+      { field: 'fecha_registro', name: 've.fecha_registro', displayName: 'F. Registro', minWidth: 100, enableFiltering: false, visible: false },
       { field: 'cliente', name: 'cliente_persona_empresa', displayName: 'Cliente', minWidth: 180 },
       { field: 'colaborador', name: 'colaborador', displayName: 'Colaborador', minWidth: 160 },
       { field: 'usuario', name: 'us.username', displayName: 'Usuario', minWidth: 160, visible: false },
-      { field: 'forma_pago', name: 'fp.descripcion_fp', displayName: 'Forma de Pago', minWidth: 120 },
-      { field: 'sede', name: 'se.descripcion_se', displayName: 'Sede', minWidth: 105 },
-      { field: 'moneda', name: 'np.moneda', displayName: 'Moneda', minWidth: 76, enableFiltering: false },
-      { field: 'subtotal', name: 'np.subtotal', displayName: 'Subtotal', minWidth: 90 },
-      { field: 'igv', name: 'np.igv', displayName: 'IGV', minWidth: 80 },
-      { field: 'total', name: 'np.total', displayName: 'Total', minWidth: 80 },
+      { field: 'forma_pago', name: 'fp.descripcion_fp', displayName: 'Forma de Pago', minWidth: 100 },
+      { field: 'sede', name: 'se.descripcion_se', displayName: 'Sede', minWidth: 100 },
+      { field: 'moneda', name: 've.moneda', displayName: 'Moneda', minWidth: 76, enableFiltering: false },
+      { field: 'subtotal', name: 've.subtotal', displayName: 'Subtotal', minWidth: 90 },
+      { field: 'igv', name: 've.igv', displayName: 'IGV', minWidth: 70 },
+      { field: 'total', name: 've.total', displayName: 'Total', minWidth: 80 },
       { field: 'estado', type: 'object', name: 'estado', displayName: 'ESTADO', width: '95', enableFiltering: false, enableSorting: false, enableColumnMenus: false, enableColumnMenu: false, 
           cellTemplate:'<div class="">' + 
             '<label tooltip-placement="left" tooltip="{{ COL_FIELD.labelText }}" class="label {{ COL_FIELD.claseLabel }} ml-xs">'+ 
@@ -123,23 +125,25 @@ app.controller('HistorialVentasCtrl', ['$scope', '$filter', '$uibModal', '$bootb
         paginationOptions.firstRow = (paginationOptions.pageNumber - 1) * paginationOptions.pageSize;
         $scope.metodos.getPaginationServerSide(true);
       });
-      $scope.gridApi.core.on.filterChanged( $scope, function(grid, searchColumns) {
+      $scope.gridApi.core.on.filterChanged($scope, function(grid, searchColumns) {
         var grid = this.grid;
         paginationOptions.search = true; 
-        paginationOptions.searchColumn = {
-          'np.idmovimiento' : grid.columns[1].filters[0].term,
-          "CONCAT(COALESCE(cp.nombres,''), ' ', COALESCE(cp.apellidos,''), ' ', COALESCE(ce.razon_social,''))" : grid.columns[5].filters[0].term,
-          'np.num_serie' : grid.columns[2].filters[0].term,
-          'np.num_correlativo' : grid.columns[2].filters[0].term,
-          "us.username" : grid.columns[6].filters[0].term, 
-          'fp.descripcion_fp' : grid.columns[7].filters[0].term, 
-          'se.descripcion_se' : grid.columns[8].filters[0].term,
-          'np.moneda' : grid.columns[9].filters[0].term,
-          'np.subtotal' : grid.columns[10].filters[0].term,
-          'np.igv' : grid.columns[11].filters[0].term,
-          'np.total' : grid.columns[12].filters[0].term
-        }
-        $scope.metodos.getPaginationServerSide();
+        paginationOptions.searchColumn = { 
+          've.idmovimiento' : grid.columns[1].filters[0].term,
+          'tdm.descripcion_tdm' : grid.columns[2].filters[0].term,
+          've.numero_serie' : grid.columns[3].filters[0].term,
+          've.numero_correlativo' : grid.columns[4].filters[0].term,
+          "CONCAT(COALESCE(cp.nombres,''), ' ', COALESCE(cp.apellidos,''), ' ', COALESCE(ce.razon_social,''))" : grid.columns[7].filters[0].term,
+          "CONCAT(col.nombres, ' ', col.apellidos)" : grid.columns[8].filters[0].term,
+          "us.username" : grid.columns[9].filters[0].term, 
+          'fp.descripcion_fp' : grid.columns[10].filters[0].term, 
+          'se.descripcion_se' : grid.columns[11].filters[0].term, 
+          've.moneda' : grid.columns[12].filters[0].term, 
+          've.subtotal' : grid.columns[13].filters[0].term, 
+          've.igv' : grid.columns[14].filters[0].term, 
+          've.total' : grid.columns[15].filters[0].term 
+        } 
+        $scope.metodos.getPaginationServerSide(); 
       });
     }
   };

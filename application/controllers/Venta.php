@@ -25,23 +25,16 @@ class Venta extends CI_Controller {
 		$arrListado = array(); 
 		foreach ($lista as $row) { 
 			$objEstado = array();
-			if( $row['estado_cot'] == 1 ){ // REGISTRADO  
-				$objEstado['claseIcon'] = 'fa-file-archive-o';
-				$objEstado['claseLabel'] = 'label-info';
-				$objEstado['labelText'] = 'POR ENVIAR';
-			}
-			if( $row['estado_cot'] == 2 ){ // FACTURADO   
-				$objEstado['claseIcon'] = 'fa-send';
+			if( $row['estado_movimiento'] == 1 ){ // REGISTRADO 
+				$objEstado['claseIcon'] = 'fa-check';
 				$objEstado['claseLabel'] = 'label-success';
-				$objEstado['labelText'] = 'ENVIADO';
+				$objEstado['labelText'] = 'REGISTRADO';
 			}
-			$strCliente = NULL;
-			// if( $row['tipo_cliente'] == 'E' ){ 
-			// 	$strCliente = $row['razon_social_ce']; 
-			// }
-			// if( $row['tipo_cliente'] == 'P' ){ 
-			// 	$strCliente = $row['cliente_persona']; 
-			// }
+			if( $row['estado_movimiento'] == 0 ){ // ANULADO 
+				$objEstado['claseIcon'] = 'fa-ban';
+				$objEstado['claseLabel'] = 'label-danger';
+				$objEstado['labelText'] = 'ANULADO';
+			}
 			$strMoneda = NULL;
 			if( $row['moneda'] == 'S' ){ 
 				$strMoneda = 'SOLES'; 
@@ -51,10 +44,14 @@ class Venta extends CI_Controller {
 			}
 			array_push($arrListado, 
 				array(
-					'idcotizacion' => $row['idcotizacion'],
-					'num_cotizacion' => $row['num_cotizacion'],
+					'idmovimiento' => $row['idmovimiento'],
+					'tipo_cliente' => $row['tipo_cliente'],
 					'fecha_registro' => darFormatoDMY($row['fecha_registro']),
 					'fecha_emision' => darFormatoDMY($row['fecha_emision']),
+					'idtipodocumentomov'=> $row['idtipodocumentomov'],
+					'descripcion_tdm'=> $row['descripcion_tdm'],
+					'serie'=> $row['numero_serie'],
+					'correlativo'=> $row['numero_correlativo'],
 					'cliente' => trim($row['cliente_persona_empresa']),
 					'colaborador' => strtoupper($row['colaborador']),
 					'moneda' => $strMoneda,
@@ -353,9 +350,9 @@ class Venta extends CI_Controller {
 		    	->set_output(json_encode($arrData));
 		    return;
     	}
-    	$fVenta = $this->model_venta->m_cargar_esta_venta_por_correlativo($allInputs['num_serie'],$allInputs['num_correlativo']);
+    	$fVenta = $this->model_venta->m_validar_venta_por_correlativo($allInputs['num_serie'],$allInputs['num_correlativo'],$allInputs['tipo_documento_mov']['id']); 
     	if( !empty($fVenta) ){ 
-    		$arrData['message'] = 'Ya se a registrado una venta, usando el correlativo <strong>'.$allInputs['num_serie'].'-'.$allInputs['num_correlativo'].'</strong>'; 
+    		$arrData['message'] = 'Ya se a registrado una venta usando el correlativo <strong>'.$allInputs['num_serie'].'-'.$allInputs['num_correlativo'].'</strong>'; 
     		$arrData['flag'] = 0;
     		$this->output
 		    	->set_content_type('application/json')
