@@ -8,7 +8,7 @@ class TipoDocumentoMov extends CI_Controller {
         // Se le asigna a la informacion a la variable $sessionVP.
         $this->sessionFactur = @$this->session->userdata('sess_fact_'.substr(base_url(),-20,7));
         $this->load->helper(array('fechas','otros')); 
-        $this->load->model(array('model_tipo_documento_mov','model_serie')); 
+        $this->load->model(array('model_tipo_documento_mov','model_serie','model_tipo_documento_serie')); 
     }
 
 	public function listar_tipo_documento_mov(){ 
@@ -89,10 +89,16 @@ class TipoDocumentoMov extends CI_Controller {
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
     	$arrData['flag'] = 0;
-    	// VALIDACIONES
-    	
+    	// VALIDACIONES    	
     	$this->db->trans_start();
-		if($this->model_tipo_documento_mov->m_registrar($allInputs)) { // registro de elemento
+		if($this->model_tipo_documento_mov->m_registrar($allInputs)) { // registro
+			$arrData['idtipodocumentomov'] = GetLastId('idtipodocumentomov','tipo_documento_mov');
+			$listaSeries = $this->model_serie->m_cargar_series();
+			foreach ($listaSeries as $key => $value) {
+				$arrData['idserie'] = $value['idserie'];
+				if( $this->model_tipo_documento_serie->m_registrar_tipo_documento_serie($arrData) ){ 
+				} 
+			}
 			$arrData['message'] = 'Se registraron los datos correctamente';
 			$arrData['flag'] = 1;
 		}
