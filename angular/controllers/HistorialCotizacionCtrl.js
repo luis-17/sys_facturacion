@@ -2,10 +2,12 @@ app.controller('HistorialCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$b
     'ModalReporteFactory',
 		'CotizacionServices',
     'SedeServices',
+    'CategoriaElementoServices',
 	function($scope, $filter, $uibModal, $bootbox, $log, $timeout, pinesNotifications, uiGridConstants, blockUI, 
     ModalReporteFactory,
 		CotizacionServices,
-    SedeServices
+    SedeServices,
+    CategoriaElementoServices
 ) {
    
   $scope.metodos = {}; // contiene todas las funciones 
@@ -37,6 +39,21 @@ app.controller('HistorialCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$b
   }
   $scope.metodos.listaSedes(myCallback); 
 
+  // CATEGORIA ELEMENTO
+  $scope.metodos.listaCategoriasElemento = function(myCallback) {
+    var myCallback = myCallback || function() { };
+    CategoriaElementoServices.sListarCbo().then(function(rpta) {
+      $scope.fArr.listaCategoriasElemento = rpta.datos;
+      myCallbackElemento();
+    });
+  };
+
+  var myCallbackElemento = function() { 
+    $scope.fArr.listaCategoriasElemento.splice(0,0,{ id : 'ALL', descripcion:'--TODOS--'}); 
+    $scope.fBusqueda.categoria_elemento = $scope.fArr.listaCategoriasElemento[0]; 
+  }
+  $scope.metodos.listaCategoriasElemento(myCallbackElemento); 
+  
   // ESTADO DE COTIZACION 
   $scope.fArr.listaEstadosCotizacion = [
     {'id' : 'ALL', 'descripcion' : '--TODOS--'},
@@ -57,6 +74,12 @@ app.controller('HistorialCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$b
     $scope.gridOptionsCot.enableFiltering = !$scope.gridOptionsCot.enableFiltering;
     $scope.gridApi.core.notifyDataChange( uiGridConstants.dataChange.COLUMN );
   };
+
+  $scope.btnBuscarCotDet = function(){ 
+    $scope.gridOptionsCotDet.enableFiltering = !$scope.gridOptionsCotDet.enableFiltering;
+    $scope.gridApiCotDet.core.notifyDataChange( uiGridConstants.dataChange.COLUMN );
+  };
+
   var paginationOptions = { 
     pageNumber: 1,
     firstRow: 0,
@@ -180,4 +203,112 @@ app.controller('HistorialCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$b
     }
     ModalReporteFactory.getPopupReporte(arrParams);
   }
+
+  //***grid detalle cotizacion
+  var paginationOptionsDet = { 
+    pageNumber: 1,
+    firstRow: 0,
+    pageSize: 100,
+    sort: uiGridConstants.DESC,
+    sortName: null,
+    search: null
+  };
+  $scope.gridOptionsCotDet = {
+    rowHeight: 30,
+    paginationPageSizes: [100, 500, 1000, 10000],
+    paginationPageSize: 100,
+    useExternalPagination: true,
+    useExternalSorting: true,
+    useExternalFiltering : true,
+    enableGridMenu: true,
+    enableRowSelection: true,
+    enableSelectAll: true,
+    enableFiltering: false,
+    enableFullRowSelection: true,
+    multiSelect: false,
+    columnDefs: [ 
+      { field: 'iddetallecotizacion', name: 'dcot.iddetallecotizacion', displayName: 'ID', width: '75', visible: false },
+      { field: 'num_cotizacion', name: 'cot.num_cotizacion', displayName: 'COD. COTIZACION', width: '120' },
+      { field: 'fecha_emision', name: 'cot.fecha_emision', displayName: 'F. Emisión', minWidth: 100, enableFiltering: false,  sort: { direction: uiGridConstants.DESC} },
+      { field: 'fecha_registro', name: 'cot.fecha_registro', displayName: 'F. Registro', minWidth: 100, enableFiltering: false, visible: false },
+      { field: 'sede', name: 'se.descripcion_se', displayName: 'Sede', minWidth: 105 },
+      { field: 'cliente', name: 'cliente_persona_empresa', displayName: 'Cliente', minWidth: 180 },
+      { field: 'categoria_elemento', type: 'object', name: 'cael.descripcion_cael', displayName: 'Categoria', minWidth: 160, enableColumnMenus: false, enableColumnMenu: false,cellTemplate:'<div class="ui-grid-cell-contents text-center ">'+'<label class="label bg-primary block" style="background-color:{{COL_FIELD.color}}">{{ COL_FIELD.descripcion }}</label></div>' 
+      },    
+      { field: 'elemento', name: 'ele.descripcion_ele', displayName: 'Elemento', minWidth: 160 }, 
+      { field: 'precio_unitario', name: 'dcot.precio_unitario', displayName: 'Precio Unitario', minWidth: 90 }, 
+      { field: 'cantidad', name: 'dcot.cantidad', displayName: 'Cantidad', minWidth: 90 },
+      { field: 'importe_sin_igv', name: 'dcot.importe_sin_igv', displayName: 'Importe', minWidth: 90 }, 
+      { field: 'estado', type: 'object', name: 'estado', displayName: 'ESTADO', width: '95', enableFiltering: false, enableSorting: false, enableColumnMenus: false, enableColumnMenu: false, 
+          cellTemplate:'<div class="">' + 
+            '<label tooltip-placement="left" tooltip="{{ COL_FIELD.labelText }}" class="label {{ COL_FIELD.claseLabel }} ml-xs">'+ 
+            '<i class="fa {{ COL_FIELD.claseIcon }}"></i> {{COL_FIELD.labelText}} </label>'+ 
+            '</div>' 
+      }
+    ],
+    onRegisterApi: function(gridApi) { 
+      $scope.gridApiCotDet = gridApi;
+      gridApi.selection.on.rowSelectionChanged($scope,function(row){
+        $scope.mySelectionGrid = gridApi.selection.getSelectedRows();
+      });
+      gridApi.selection.on.rowSelectionChangedBatch($scope,function(rows){
+        $scope.mySelectionGrid = gridApi.selection.getSelectedRows();
+      });
+      $scope.gridApiCotDet.core.on.sortChanged($scope, function(grid, sortColumns) { 
+        if (sortColumns.length == 0) {
+          paginationOptionsDet.sort = null;
+          paginationOptionsDet.sortName = null;
+        } else {
+          paginationOptionsDet.sort = sortColumns[0].sort.direction;
+          paginationOptionsDet.sortName = sortColumns[0].name;
+        }
+        $scope.metodos.getPaginationServerSideCotDet(true);
+      });
+      gridApi.pagination.on.paginationChanged($scope, function (newPage, pageSize) {
+        paginationOptionsDet.pageNumber = newPage;
+        paginationOptionsDet.pageSize = pageSize;
+        paginationOptionsDet.firstRow = (paginationOptionsDet.pageNumber - 1) * paginationOptionsDet.pageSize;
+        $scope.metodos.getPaginationServerSideCotDet(true);
+      });
+      $scope.gridApiCotDet.core.on.filterChanged( $scope, function(grid, searchColumns) {
+        var grid = this.grid;
+        paginationOptionsDet.search = true; 
+        paginationOptionsDet.searchColumn = {
+          'dcot.iddetallecotizacion' : grid.columns[1].filters[0].term,
+          'cot.num_cotizacion' : grid.columns[2].filters[0].term,
+          "CONCAT(COALESCE(cp.nombres,''), ' ', COALESCE(cp.apellidos,''), ' ', COALESCE(ce.razon_social,''))" : grid.columns[5].filters[0].term,
+          "CONCAT(col.nombres, ' ', col.apellidos)" : grid.columns[6].filters[0].term,
+          'cael.descripcion_cael' : grid.columns[7].filters[0].term, 
+          'ele.descripcion_ele' : grid.columns[8].filters[0].term, 
+          'dcot.precio_unitario' : grid.columns[9].filters[0].term, 
+          'dcot.cantidad' : grid.columns[10].filters[0].term,
+          'dcot.importe_sin_igv' : grid.columns[11].filters[0].term
+        }
+        $scope.metodos.getPaginationServerSideCotDet();
+      });
+    }
+  };
+  paginationOptionsDet.sortName = $scope.gridOptionsCotDet.columnDefs[2].name; 
+  $scope.metodos.getPaginationServerSideCotDet = function(loader) { 
+    if( loader ){
+      blockUI.start('Procesando información...');
+    }
+    var arrParams = {
+      paginate : paginationOptionsDet,
+      datos: $scope.fBusqueda  
+    };
+    CotizacionServices.sListarHistorialDetalleCotizaciones(arrParams).then(function (rpta) { 
+      if( rpta.datos.length == 0 ){
+        rpta.paginate = { totalRows: 0 };
+      }
+      $scope.gridOptionsCotDet.totalItems = rpta.paginate.totalRows;
+      $scope.gridOptionsCotDet.data = rpta.datos; 
+      if( loader ){
+        blockUI.stop(); 
+      }
+    });
+    $scope.mySelectionGrid = [];
+  };
+  $scope.metodos.getPaginationServerSideCotDet(true); 
+
 }]); 

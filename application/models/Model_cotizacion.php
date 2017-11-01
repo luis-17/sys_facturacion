@@ -98,8 +98,9 @@ class Model_cotizacion extends CI_Model {
 	}
 	public function m_cargar_cotizaciones_detalle($paramPaginate,$paramDatos)
 	{
-		$this->db->select("CONCAT(col.nombres, ' ', col.apellidos) AS colaborador",FALSE);
-		$this->db->select("CONCAT(cp.nombres, ' ', cp.apellidos) AS cliente_persona",FALSE);
+		$this->db->select("CONCAT(COALESCE(col.nombres,''), ' ', COALESCE(col.apellidos,'')) As colaborador",FALSE);
+		$this->db->select("CONCAT(COALESCE(cp.nombres,''), ' ', COALESCE(cp.apellidos,''), ' ', COALESCE(ce.razon_social,'')) As cliente_persona_empresa",FALSE);
+		$this->db->select("CONCAT(cp.nombres, ' ', cp.apellidos) As cliente_persona",FALSE);
 		$this->db->select('cot.idcotizacion, cot.fecha_registro, cot.fecha_emision, cot.tipo_cliente, cot.plazo_entrega, cot.validez_oferta, 
 			cot.moneda, cot.modo_igv, cot.subtotal, cot.igv, cot.total, cot.estado_cot, cot.num_cotizacion, 
 			col.idcolaborador, (col.num_documento) AS num_documento_col, us.idusuario, us.username, 
@@ -108,18 +109,20 @@ class Model_cotizacion extends CI_Model {
 			cp.idclientepersona, (cp.num_documento) AS num_documento_cp, 
 			dcot.iddetallecotizacion, dcot.cantidad, dcot.precio_unitario, dcot.importe_con_igv, dcot.importe_sin_igv, 
 			dcot.excluye_igv, dcot.igv_detalle, dcot.agrupador_totalizado, um.idunidadmedida, um.descripcion_um, um.abreviatura_um, 
-			ele.idelemento, ele.descripcion_ele, ele.tipo_elemento', FALSE); 
+			ele.idelemento, ele.descripcion_ele, ele.tipo_elemento,se.idsede, se.descripcion_se, se.abreviatura_se, 
+			fp.idformapago, fp.descripcion_fp,cael.idcategoriaelemento,cael.descripcion_cael', FALSE); 
 		$this->db->from('cotizacion cot'); 
 		$this->db->join('colaborador col','cot.idcolaborador = col.idcolaborador'); 
 		$this->db->join('usuario us','cot.idusuarioregistro = us.idusuario'); 
 		$this->db->join('empresa_admin ea','cot.idempresaadmin = ea.idempresaadmin'); 
 		$this->db->join("cliente_empresa ce","cot.idcliente = ce.idclienteempresa AND cot.tipo_cliente = 'E'",'left'); 
 		$this->db->join("cliente_persona cp","cot.idcliente = cp.idclientepersona AND cot.tipo_cliente = 'p'",'left'); 
-		// $this->db->join('sede se','cot.idsede = se.idsede'); 
-		// $this->db->join('forma_pago fp','cot.idformapago = fp.idformapago'); 
+		$this->db->join('sede se','cot.idsede = se.idsede'); 
+		$this->db->join('forma_pago fp','cot.idformapago = fp.idformapago'); 
 		$this->db->join('detalle_cotizacion dcot','cot.idcotizacion = dcot.idcotizacion'); 
 		$this->db->join('elemento ele','dcot.idelemento = ele.idelemento'); 
 		$this->db->join('unidad_medida um','ele.idunidadmedida = um.idunidadmedida'); 
+		$this->db->join('categoria_elemento cael','ele.idcategoriaelemento = cael.idcategoriaelemento'); 
 		if( !empty($paramDatos['cliente']) ){
 			if( $paramDatos['cliente']['tipo_cliente'] == 'ce' ){
 				$this->db->where('ce.idclienteempresa',$paramDatos['cliente']['id']);
@@ -129,12 +132,18 @@ class Model_cotizacion extends CI_Model {
 			}
 		}
 		if( !empty($paramDatos['desde']) || !empty($paramDatos['hasta'])){
-			$this->db->where('cot.fecha_emision BETWEEN '. $this->db->escape($paramDatos['desde'].' '.$paramDatos['desdeHora'].':'.$paramDatos['desdeMinuto']) .' AND ' 
-				. $this->db->escape($paramDatos['hasta'].' '.$paramDatos['hastaHora'].':'.$paramDatos['hastaMinuto']));
+			$this->db->where('cot.fecha_emision BETWEEN '. $this->db->escape( darFormatoYMD($paramDatos['desde']).' '.$paramDatos['desdeHora'].':'.$paramDatos['desdeMinuto']) .' AND ' 
+			. $this->db->escape( darFormatoYMD($paramDatos['hasta']).' '.$paramDatos['hastaHora'].':'.$paramDatos['hastaMinuto']));
 		}
-		if(!empty($paramDatos['estado_cot']) && $paramDatos['estado_cot']['id'] !== 'ALL' ){ 
-			$this->db->where('cot.estado_cot', $paramDatos['estado_cot']['id']);
+		if(!empty($paramDatos['estado_cotizacion']) && $paramDatos['estado_cotizacion']['id'] !== 'ALL' ){ 
+			$this->db->where('cot.estado_cot', $paramDatos['estado_cotizacion']['id']);
 		} 
+		if(!empty($paramDatos['sede']) && $paramDatos['sede']['id'] !== 'ALL' ){ 
+			$this->db->where('se.idsede', $paramDatos['sede']['id']);
+		}
+		if(!empty($paramDatos['categoria_elemento']) && $paramDatos['categoria_elemento']['id'] !== 'ALL' ){ 
+			$this->db->where('cael.idcategoriaelemento', $paramDatos['categoria_elemento']['id']);
+		}
 		$this->db->where_in('cot.estado_cot', array(1,2)); // por enviar y enviado 
 		$this->db->where_in('dcot.estado_dcot', array(1)); // habilitado 
 		$this->db->where_in('ele.estado_ele', array(1)); // habilitado 
@@ -163,11 +172,12 @@ class Model_cotizacion extends CI_Model {
 		$this->db->join('empresa_admin ea','cot.idempresaadmin = ea.idempresaadmin'); 
 		$this->db->join("cliente_empresa ce","cot.idcliente = ce.idclienteempresa AND cot.tipo_cliente = 'E'",'left'); 
 		$this->db->join("cliente_persona cp","cot.idcliente = cp.idclientepersona AND cot.tipo_cliente = 'p'",'left'); 
-		// $this->db->join('sede se','cot.idsede = se.idsede'); 
-		// $this->db->join('forma_pago fp','cot.idformapago = fp.idformapago'); 
+		$this->db->join('sede se','cot.idsede = se.idsede'); 
+		$this->db->join('forma_pago fp','cot.idformapago = fp.idformapago'); 
 		$this->db->join('detalle_cotizacion dcot','cot.idcotizacion = dcot.idcotizacion'); 
 		$this->db->join('elemento ele','dcot.idelemento = ele.idelemento'); 
 		$this->db->join('unidad_medida um','ele.idunidadmedida = um.idunidadmedida'); 
+		$this->db->join('categoria_elemento cael','ele.idcategoriaelemento = cael.idcategoriaelemento'); 
 		if( !empty($paramDatos['cliente']) ){
 			if( $paramDatos['cliente']['tipo_cliente'] == 'ce' ){
 				$this->db->where('ce.idclienteempresa',$paramDatos['cliente']['id']);
@@ -180,9 +190,12 @@ class Model_cotizacion extends CI_Model {
 			$this->db->where('cot.fecha_emision BETWEEN '. $this->db->escape($paramDatos['desde'].' '.$paramDatos['desdeHora'].':'.$paramDatos['desdeMinuto']) .' AND ' 
 				. $this->db->escape($paramDatos['hasta'].' '.$paramDatos['hastaHora'].':'.$paramDatos['hastaMinuto']));
 		}
-		if(!empty($paramDatos['estado_cot']) && $paramDatos['estado_cot']['id'] !== 'ALL' ){ 
-			$this->db->where('cot.estado_cot', $paramDatos['estado_cot']['id']);
+		if(!empty($paramDatos['estado_cotizacion']) && $paramDatos['estado_cotizacion']['id'] !== 'ALL' ){ 
+			$this->db->where('cot.estado_cot', $paramDatos['estado_cotizacion']['id']);
 		} 
+		if(!empty($paramDatos['sede']) && $paramDatos['sede']['id'] !== 'ALL' ){ 
+			$this->db->where('se.idsede', $paramDatos['sede']['id']);
+		}
 		$this->db->where_in('cot.estado_cot', array(1,2)); // por enviar y enviado 
 		$this->db->where_in('dcot.estado_dcot', array(1)); // habilitado 
 		$this->db->where_in('ele.estado_ele', array(1)); // habilitado 

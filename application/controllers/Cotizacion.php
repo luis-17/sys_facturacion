@@ -164,7 +164,14 @@ class Cotizacion extends CI_Controller {
 				'idempresaadmin' => $row['idempresaadmin'],
 				'idelemento' => $row['idelemento'], 
 				'elemento' => $row['descripcion_ele'], 
+				'cliente' => trim($row['cliente_persona_empresa']),
+				'categoria_elemento' => array(
+						'id'=> $row['idcategoriaelemento'],
+						'descripcion'=> strtoupper($row['descripcion_cael'])				
+				),					
 				'cantidad' => $row['cantidad'], 
+				'idsede' => $row['idsede'],
+				'sede' => strtoupper($row['descripcion_se']),
 				'precio_unitario' => $row['precio_unitario'], 
 				'importe_con_igv' => $row['importe_con_igv'], 
 				'importe_sin_igv' => $row['importe_sin_igv'], 

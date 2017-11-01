@@ -88,6 +88,7 @@ angular.module('app')
               'angular/controllers/HistorialCotizacionCtrl.js',
               'angular/controllers/NuevaCotizacionCtrl.js',
               'angular/controllers/SedeCtrl.js',
+              'angular/controllers/CategoriaElementoCtrl.js',
             ])
           })
           .state('app.nueva-nota-pedido', {

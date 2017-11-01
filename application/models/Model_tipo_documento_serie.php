@@ -11,7 +11,6 @@ class Model_tipo_documento_serie extends CI_Model {
 			'idtipodocumentomov' => $datos['idtipodocumentomov'],	
 			'correlativo_actual' => 0,
 			'idserie' => $datos['idserie']
-
 		);
 		return $this->db->insert('tipo_documento_serie', $data); 
 	}
