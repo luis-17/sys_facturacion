@@ -1350,6 +1350,7 @@ app.service("NotaPedidoServices",function($http, $q, handleBehavior) {
     return({
         sGenerarNumeroNotaPedido: sGenerarNumeroNotaPedido,
         sListarHistorialNotaPedidos: sListarHistorialNotaPedidos,
+        sListarHistorialDetalleNotaPedidos: sListarHistorialDetalleNotaPedidos,
         sRegistrar: sRegistrar,
         sEditar: sEditar,
         sAnular: sAnular
@@ -1370,6 +1371,14 @@ app.service("NotaPedidoServices",function($http, $q, handleBehavior) {
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
     }
+    function sListarHistorialDetalleNotaPedidos(datos) {
+      var request = $http({
+            method : "post",
+            url : angular.patchURLCI+"NotaPedido/lista_notas_de_pedido_historial_detalle",
+            data : datos
+      });
+      return (request.then(handleBehavior.success,handleBehavior.error));
+    }    
     function sRegistrar (datos) {
       var request = $http({
             method : "post",
