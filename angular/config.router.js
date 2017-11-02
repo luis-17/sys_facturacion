@@ -152,7 +152,8 @@ angular.module('app')
             resolve: load([
               'angular/controllers/HistorialVentasCtrl.js', 
               'angular/controllers/NuevaVentaCtrl.js', 
-              'angular/controllers/SedeCtrl.js' 
+              'angular/controllers/SedeCtrl.js',
+              'angular/controllers/CategoriaElementoCtrl.js'
             ])
           })
           .state('app.producto', {
