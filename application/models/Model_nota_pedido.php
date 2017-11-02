@@ -6,7 +6,7 @@ class Model_nota_pedido extends CI_Model {
 	}
 	public function m_cargar_nota_pedido($paramPaginate,$paramDatos)
 	{
-		$this->db->select("CONCAT(COALESCE(col.nombres,''), ' ', COALESCE(col.apellidos,'')) As colaborador",FALSE);
+		$this->db->select("CONCAT(COALESCE(col.nombres,''), ' ', COALESCE(col.apellidos,'')) As colaborador",FALSE); 
 		$this->db->select("CONCAT(COALESCE(cp.nombres,''), ' ', COALESCE(cp.apellidos,''), ' ', COALESCE(ce.razon_social,'')) As cliente_persona_empresa",FALSE);
 		$this->db->select("CONCAT(cp.nombres, ' ', cp.apellidos) As cliente_persona",FALSE);
 		$this->db->select('np.idmovimiento, np.num_nota_pedido, np.fecha_registro, np.dir_movimiento, np.tipo_movimiento, np.fecha_emision, np.tipo_cliente, , incluye_traslado_prov, incluye_entrega_domicilio, np.moneda, np.modo_igv, np.subtotal, np.igv, np.total, np.estado_movimiento, np.plazo_entrega, np.validez_oferta, 
@@ -202,6 +202,27 @@ class Model_nota_pedido extends CI_Model {
 		}
 		$fData = $this->db->get()->row_array();
 		return $fData; 
+	}
+	public function m_cargar_detalle_esta_nota_pedido($datos)
+	{
+		$this->db->select('np.idmovimiento, np.num_nota_pedido, np.fecha_registro, dm.iddetallemovimiento, dm.cantidad, dm.precio_unitario, dm.importe_con_igv, 
+			dm.importe_sin_igv, dm.excluye_igv, dm.igv_detalle, 
+			ele.idelemento, ele.descripcion_ele, ele.tipo_elemento, 
+			um.idunidadmedida, um.descripcion_um, um.abreviatura_um', FALSE); 
+		$this->db->from('movimiento np'); // nota de pedido 
+		$this->db->join('detalle_movimiento dm','np.idmovimiento = dm.idmovimiento');
+		$this->db->join('elemento ele','dm.idelemento = ele.idelemento');
+		$this->db->join('unidad_medida um','ele.idunidadmedida = um.idunidadmedida'); 
+
+		$this->db->join('usuario us','np.idusuarionp = us.idusuario'); 
+		$this->db->join('colaborador col','us.idusuario = col.idusuario'); 
+		$this->db->join('sede se','np.idsede = se.idsede'); 
+		$this->db->where('np.idmovimiento', $datos['idmovimiento']); 
+		// $this->db->where('ea.idempresaadmin', $this->sessionFactur['idempresaadmin']); // empresa session 
+		$this->db->where('np.tipo_movimiento', 1); // nota de pedido 
+		$this->db->order_by('dm.iddetallemovimiento','ASC');
+		//$this->db->where_in('np.estado_movimiento', array(1,2)); // 1: registrado 2:enviado 
+		return $this->db->get()->result_array();
 	}
 	public function m_cargar_ultima_nota_pedido_segun_config($datos)
 	{

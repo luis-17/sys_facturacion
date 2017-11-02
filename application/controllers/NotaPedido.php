@@ -15,7 +15,7 @@ class NotaPedido extends CI_Controller {
 		$this->sessionFactur = @$this->session->userdata('sess_fact_'.substr(base_url(),-20,7));
 		date_default_timezone_set("America/Lima");
     }
-    public function lista_notas_de_pedido_historial() // CONTINUAR DESDE AQUIIIIIIIIIIIIIIIIIIIIIII 
+    public function lista_notas_de_pedido_historial() 
     {
     	$allInputs = json_decode(trim($this->input->raw_input_stream),true); // var_dump($allInputs); exit(); 
 		$paramPaginate = $allInputs['paginate'];
@@ -148,6 +148,41 @@ class NotaPedido extends CI_Controller {
 		$this->output 
 		    ->set_content_type('application/json') 
 		    ->set_output(json_encode($arrData)); 
+	}
+    public function lista_detalle_esta_nota_pedido()
+    {
+    	$allInputs = json_decode(trim($this->input->raw_input_stream),true); // var_dump($allInputs); exit(); 
+		$lista = $this->model_nota_pedido->m_cargar_detalle_esta_nota_pedido($allInputs); 
+		$arrListado = array(); 
+		foreach ($lista as $row) { 
+			array_push($arrListado, 
+				array(
+					'idmovimiento' => $row['idmovimiento'],
+					'num_nota_pedido' => $row['num_nota_pedido'],
+					'iddetallemovimiento' => $row['iddetallemovimiento'],
+					'cantidad' => $row['cantidad'],
+					'precio_unitario' => $row['precio_unitario'],
+					'importe_con_igv' => $row['importe_con_igv'],
+					'importe_sin_igv' => $row['importe_sin_igv'],
+					'excluye_igv' => $row['excluye_igv'],
+					'igv_detalle' => $row['igv_detalle'],
+					'idunidadmedida' => $row['idunidadmedida'],
+					'unidadmedida' => $row['descripcion_um'],
+					'idelemento' => $row['idelemento'],
+					'elemento' => $row['descripcion_ele']
+				)
+			);
+		}		
+		$arrData['datos'] = $arrListado; 
+    	$arrData['message'] = ''; 
+    	$arrData['flag'] = 1; 
+		if(empty($lista)){ 
+			$arrData['flag'] = 0; 
+		} 
+		$this->output 
+		    ->set_content_type('application/json') 
+		    ->set_output(json_encode($arrData)); 
+
     } 
 	public function generar_numero_nota_pedido() 
 	{ 
