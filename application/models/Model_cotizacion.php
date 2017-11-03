@@ -329,7 +329,7 @@ class Model_cotizacion extends CI_Model {
 		$this->db->from('cotizacion cot'); 
 		$this->db->join('detalle_cotizacion dcot','cot.idcotizacion = dcot.idcotizacion'); 
 		$this->db->join('elemento ele','dcot.idelemento = ele.idelemento'); 
-		$this->db->join('unidad_medida um','ele.idunidadmedida = um.idunidadmedida'); 
+		$this->db->join('unidad_medida um','ele.idunidadmedida = um.idunidadmedida','left'); 
 		$this->db->join("detalle_caracteristica dc","dc.iddetalle = dcot.iddetallecotizacion AND dc.tipo_detalle = 'C'",'left'); 
 		$this->db->join('caracteristica c','dc.idcaracteristica = c.idcaracteristica','left'); 
 		$this->db->where('cot.idcotizacion',$idcotizacion); 

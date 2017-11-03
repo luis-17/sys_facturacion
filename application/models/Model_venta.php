@@ -116,8 +116,8 @@ class Model_venta extends CI_Model {
 		$this->db->join('empresa_admin ea','ve.idempresaadmin = ea.idempresaadmin'); 
 		$this->db->join("cliente_empresa ce","ve.idcliente = ce.idclienteempresa AND ve.tipo_cliente = 'E'",'left'); 
 		$this->db->join("cliente_persona cp","ve.idcliente = cp.idclientepersona AND ve.tipo_cliente = 'p'",'left'); 
-		// $this->db->join('sede se','ve.idsede = se.idsede'); 
-		// $this->db->join('forma_pago fp','ve.idformapago = fp.idformapago'); 
+		$this->db->join('sede se','ve.idsede = se.idsede'); 
+		$this->db->join('forma_pago fp','ve.idformapago = fp.idformapago'); 
 		$this->db->join('detalle_cotizacion dcot','ve.idmovimiento = dve.idmovimiento'); 
 		$this->db->join('elemento ele','dve.idelemento = ele.idelemento'); 
 		$this->db->join('unidad_medida um','ele.idunidadmedida = um.idunidadmedida'); 
@@ -136,6 +136,10 @@ class Model_venta extends CI_Model {
 		if(!empty($paramDatos['estado_movimiento']) && $paramDatos['estado_movimiento']['id'] !== 'ALL' ){ 
 			$this->db->where('ve.estado_movimiento', $paramDatos['estado_movimiento']['id']);
 		} 
+		if(!empty($paramDatos['categoria_elemento']) && $paramDatos['categoria_elemento']['id'] !== 'ALL' ){ 
+			$this->db->where('cael.idcategoriaelemento', $paramDatos['categoria_elemento']['id']);
+		}
+
 		$this->db->where_in('ve.estado_movimiento', array(1,2)); // por enviar y enviado 
 		$this->db->where_in('dve.estado_dcot', array(1)); // habilitado 
 		$this->db->where_in('ele.estado_ele', array(1)); // habilitado 
@@ -184,6 +188,9 @@ class Model_venta extends CI_Model {
 		if(!empty($paramDatos['estado_movimiento']) && $paramDatos['estado_movimiento']['id'] !== 'ALL' ){ 
 			$this->db->where('ve.estado_movimiento', $paramDatos['estado_movimiento']['id']);
 		} 
+		if(!empty($paramDatos['categoria_elemento']) && $paramDatos['categoria_elemento']['id'] !== 'ALL' ){ 
+			$this->db->where('cael.idcategoriaelemento', $paramDatos['categoria_elemento']['id']);
+		}		
 		$this->db->where_in('ve.estado_movimiento', array(1,2)); // por enviar y enviado 
 		$this->db->where_in('dve.estado_dcot', array(1)); // habilitado 
 		$this->db->where_in('ele.estado_ele', array(1)); // habilitado 

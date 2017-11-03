@@ -233,12 +233,13 @@ app.controller('HistorialCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$b
       { field: 'fecha_registro', name: 'cot.fecha_registro', displayName: 'F. Registro', minWidth: 100, enableFiltering: false, visible: false },
       { field: 'sede', name: 'se.descripcion_se', displayName: 'Sede', minWidth: 105 },
       { field: 'cliente', name: 'cliente_persona_empresa', displayName: 'Cliente', minWidth: 220 },
-      { field: 'categoria_elemento', type: 'object', name: 'cael.descripcion_cael', displayName: 'Categoria', minWidth: 160, visible: false, enableColumnMenus: false, enableColumnMenu: false,cellTemplate:'<div class="ui-grid-cell-contents text-center ">'+'<label class="label bg-primary block" style="background-color:{{COL_FIELD.color}}">{{ COL_FIELD.descripcion }}</label></div>' 
-      },    
+      { field: 'categoria_elemento', type: 'object', name: 'cael.descripcion_cael', displayName: 'Categoria Elemento', minWidth: 160, visible: false, enableColumnMenus: false, enableColumnMenu: false, 
+        cellTemplate:'<div class="ui-grid-cell-contents text-center ">'+'<label class="label bg-primary block" style="background-color:{{COL_FIELD.color}}">{{ COL_FIELD.descripcion }}</label></div>' 
+      }, 
       { field: 'elemento', name: 'ele.descripcion_ele', displayName: 'Elemento', minWidth: 280 }, 
       { field: 'precio_unitario', name: 'dcot.precio_unitario', displayName: 'Precio Unitario', minWidth: 90 }, 
       { field: 'cantidad', name: 'dcot.cantidad', displayName: 'Cantidad', minWidth: 90 },
-      { field: 'importe_sin_igv', name: 'dcot.importe_sin_igv', displayName: 'Importe', minWidth: 90 }, 
+      { field: 'importe_con_igv', name: 'dcot.importe_con_igv', displayName: 'Importe', minWidth: 90 }, 
       { field: 'estado', type: 'object', name: 'estado', displayName: 'ESTADO', width: '95', enableFiltering: false, enableSorting: false, enableColumnMenus: false, enableColumnMenu: false, 
           cellTemplate:'<div class="">' + 
             '<label tooltip-placement="left" tooltip="{{ COL_FIELD.labelText }}" class="label {{ COL_FIELD.claseLabel }} ml-xs">'+ 
@@ -282,7 +283,7 @@ app.controller('HistorialCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$b
           'ele.descripcion_ele' : grid.columns[8].filters[0].term, 
           'dcot.precio_unitario' : grid.columns[9].filters[0].term, 
           'dcot.cantidad' : grid.columns[10].filters[0].term,
-          'dcot.importe_sin_igv' : grid.columns[11].filters[0].term
+          'dcot.importe_con_igv' : grid.columns[11].filters[0].term
         }
         $scope.metodos.getPaginationServerSideCotDet();
       });

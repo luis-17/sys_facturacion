@@ -80,6 +80,75 @@ class NotaPedido extends CI_Controller {
 		    ->set_content_type('application/json') 
 		    ->set_output(json_encode($arrData)); 
     } 
+    public function lista_notas_de_pedido_historial_detalle()
+    {
+    	$allInputs = json_decode(trim($this->input->raw_input_stream),true); // var_dump($allInputs); exit(); 
+		$paramPaginate = $allInputs['paginate'];
+		$paramDatos = @$allInputs['datos'];
+		$lista = $this->model_nota_pedido->m_cargar_nota_pedido_detalle($paramPaginate,$paramDatos); 
+		$totalRows = $this->model_nota_pedido->m_count_nota_pedido_detalle($paramPaginate,$paramDatos); 
+		$arrListado = array(); 
+		foreach ($lista as $row) { 
+			$objEstado = array();
+			if( $row['estado_movimiento'] == 1 ){ // REGISTRADO 
+				$objEstado['claseIcon'] = 'fa-file-archive-o';
+				$objEstado['claseLabel'] = 'label-info';
+				$objEstado['labelText'] = 'REGISTRADO';
+			}
+			if( $row['estado_movimiento'] == 2 ){ // FACTURADO 
+				$objEstado['claseIcon'] = 'fa-send';
+				$objEstado['claseLabel'] = 'label-success';
+				$objEstado['labelText'] = 'FACTURADO';
+			}
+			$strCliente = NULL; 
+			$strMoneda = NULL;
+			if( $row['moneda'] == 'S' ){ 
+				$strMoneda = 'SOLES'; 
+			}
+			if( $row['moneda'] == 'D' ){ 
+				$strMoneda = 'DÓLARES'; 
+			}
+			array_push($arrListado, 
+				array(			
+					'iddetallemovimiento' => $row['iddetallemovimiento'],
+					'num_nota_pedido' => $row['num_nota_pedido'],
+					'fecha_registro' => darFormatoDMY($row['fecha_registro']),
+					'fecha_emision' => darFormatoDMY($row['fecha_emision']),
+					'cliente' => trim($row['cliente_persona_empresa']),
+					'elemento' => $row['descripcion_ele'], 
+					'categoria_elemento' => array(
+							'id'=> $row['idcategoriaelemento'],
+							'descripcion'=> strtoupper($row['descripcion_cael'])				
+					),	
+					'moneda' => $strMoneda,
+					'plazo_entrega' => $row['plazo_entrega'].' días útiles', 
+					'validez_oferta' => $row['validez_oferta'].' días útiles', 
+					'idformapago' => $row['idformapago'],
+					'forma_pago' => strtoupper($row['descripcion_fp']),
+					'idsede' => $row['idsede'],
+					'sede' => strtoupper($row['descripcion_se']),
+					'idempresaadmin' => $row['idempresaadmin'],
+					'empresa_admin' => strtoupper($row['razon_social_ea']),
+					'idusuario' => $row['idusuario'], 
+					'usuario'=> $row['username'],
+					'cantidad' => $row['cantidad'], 
+					'precio_unitario' => $row['precio_unitario'], 
+					'importe_con_igv' => $row['importe_con_igv'],				
+					'estado' => $objEstado 
+				)
+			);
+		}
+		$arrData['datos'] = $arrListado; 
+    	$arrData['paginate']['totalRows'] = $totalRows['contador']; 
+    	$arrData['message'] = ''; 
+    	$arrData['flag'] = 1; 
+		if(empty($lista)){ 
+			$arrData['flag'] = 0; 
+		} 
+		$this->output 
+		    ->set_content_type('application/json') 
+		    ->set_output(json_encode($arrData)); 
+	}
     public function lista_detalle_esta_nota_pedido()
     {
     	$allInputs = json_decode(trim($this->input->raw_input_stream),true); // var_dump($allInputs); exit(); 
@@ -103,8 +172,7 @@ class NotaPedido extends CI_Controller {
 					'elemento' => $row['descripcion_ele']
 				)
 			);
-		}
-		
+		}		
 		$arrData['datos'] = $arrListado; 
     	$arrData['message'] = ''; 
     	$arrData['flag'] = 1; 
@@ -114,7 +182,8 @@ class NotaPedido extends CI_Controller {
 		$this->output 
 		    ->set_content_type('application/json') 
 		    ->set_output(json_encode($arrData)); 
-    }
+
+    } 
 	public function generar_numero_nota_pedido() 
 	{ 
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true); 
