@@ -618,14 +618,14 @@ class Cotizacion extends CI_Controller {
       	$this->pdf->SetFont('Arial','B',8); 
       	$this->pdf->Cell(26,6,utf8_decode('DIR. DESPACHO')); 
       	$this->pdf->Cell(3,6,':',0,0,'C'); 
-      	$this->pdf->SetFont('Arial','',8); 
+      	$this->pdf->SetFont('Arial','',7); 
       	$this->pdf->Cell(75,6,strtoupper(strtoupper_total($fila['direccion_guia'])));
       	
       	$this->pdf->SetXY(96,52); 
       	$this->pdf->SetFont('Arial','B',8); 
       	$this->pdf->Cell(26,6,utf8_decode('TELÉFONO ')); 
       	$this->pdf->Cell(3,6,':',0,0,'C'); 
-      	$this->pdf->SetFont('Arial','',8); 
+      	$this->pdf->SetFont('Arial','',7); 
       	$this->pdf->Cell(75,6,strtoupper($fila['telefono_ce']));
 
       	$this->pdf->SetXY(8,62); 
