@@ -786,8 +786,8 @@ class Cotizacion extends CI_Controller {
 		        utf8_decode($value['descripcion_ele']),
 		        strtoupper($value['abreviatura_um']),
 		        $value['cantidad'],
-		        $value['precio_unitario'],
-		        $value['importe_con_igv']
+		        number_format($value['precio_unitario'],$fConfig['num_decimal_precio_key']),
+		        number_format($value['importe_con_igv'],$fConfig['num_decimal_precio_key'])
 		      ),
 		      FALSE, 0, FALSE, 4, FALSE, FALSE, FALSE, FALSE, $arrItemDetalle['fontSize'] 
 		    );
@@ -843,18 +843,18 @@ class Cotizacion extends CI_Controller {
 	    $this->pdf->Cell(150,20,'');
 	    $this->pdf->Cell(20,6,'SUBTOTAL:','LT',0,'R');
 	    $this->pdf->SetFont('Arial','',8);
-	    $this->pdf->Cell(20,6,$simbolo . number_format($fila['subtotal'],2),'TR',0,'R');
+	    $this->pdf->Cell(20,6,$simbolo . number_format($fila['subtotal'],$fConfig['num_decimal_total_key']),'TR',0,'R');
 	    $this->pdf->Ln(6);
 	    $this->pdf->SetFont('Arial','',8);
 	    $this->pdf->Cell(150,6,'');
 	    $this->pdf->Cell(20,6,'IGV:','L',0,'R');
 	    $this->pdf->SetFont('Arial','',8);
-	    $this->pdf->Cell(20,6,$simbolo . number_format($fila['igv'],2),'R',0,'R');
+	    $this->pdf->Cell(20,6,$simbolo . number_format($fila['igv'],$fConfig['num_decimal_total_key']),'R',0,'R');
 	    $this->pdf->Ln(6);
 	    $this->pdf->SetFont('Arial','B',9);
 	    $this->pdf->Cell(150,8,'');
 	    $this->pdf->Cell(20,8,'TOTAL:','TLB',0,'R');
-	    $this->pdf->Cell(20,8,$simbolo . number_format($fila['total'],2),'TRB',0,'R');
+	    $this->pdf->Cell(20,8,$simbolo . number_format($fila['total'],$fConfig['num_decimal_total_key']),'TRB',0,'R');
 	    // $this->pdf->Cell(30,8,$simbolo . substr($fila['total_a_pagar'], 4),'TRB',0,'R');
 	    // $this->pdf->Ln(15);
 	    // $monto = new EnLetras();
