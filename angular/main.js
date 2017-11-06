@@ -196,8 +196,11 @@ angular.module('app')
           $location.path('/access/login');
         });
       } 
-      $scope.getValidateSession();
-      $scope.getConfiguracionSys();
+      $timeout(function() {
+        $scope.getValidateSession();
+        $scope.getConfiguracionSys();
+      }, 1000);
+      
   }])
   .service('rootServices', function($http, $q, handleBehavior) { 
     return({

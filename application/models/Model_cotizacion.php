@@ -121,7 +121,7 @@ class Model_cotizacion extends CI_Model {
 		$this->db->join('forma_pago fp','cot.idformapago = fp.idformapago'); 
 		$this->db->join('detalle_cotizacion dcot','cot.idcotizacion = dcot.idcotizacion'); 
 		$this->db->join('elemento ele','dcot.idelemento = ele.idelemento'); 
-		$this->db->join('unidad_medida um','ele.idunidadmedida = um.idunidadmedida'); 
+		$this->db->join('unidad_medida um','dcot.idunidadmedida = um.idunidadmedida','left'); 
 		$this->db->join('categoria_elemento cael','ele.idcategoriaelemento = cael.idcategoriaelemento'); 
 		if( !empty($paramDatos['cliente']) ){
 			if( $paramDatos['cliente']['tipo_cliente'] == 'ce' ){
@@ -176,7 +176,7 @@ class Model_cotizacion extends CI_Model {
 		$this->db->join('forma_pago fp','cot.idformapago = fp.idformapago'); 
 		$this->db->join('detalle_cotizacion dcot','cot.idcotizacion = dcot.idcotizacion'); 
 		$this->db->join('elemento ele','dcot.idelemento = ele.idelemento'); 
-		$this->db->join('unidad_medida um','ele.idunidadmedida = um.idunidadmedida'); 
+		$this->db->join('unidad_medida um','dcot.idunidadmedida = um.idunidadmedida','left'); 
 		$this->db->join('categoria_elemento cael','ele.idcategoriaelemento = cael.idcategoriaelemento'); 
 		if( !empty($paramDatos['cliente']) ){
 			if( $paramDatos['cliente']['tipo_cliente'] == 'ce' ){
@@ -329,7 +329,8 @@ class Model_cotizacion extends CI_Model {
 		$this->db->from('cotizacion cot'); 
 		$this->db->join('detalle_cotizacion dcot','cot.idcotizacion = dcot.idcotizacion'); 
 		$this->db->join('elemento ele','dcot.idelemento = ele.idelemento'); 
-		$this->db->join('unidad_medida um','ele.idunidadmedida = um.idunidadmedida','left'); 
+		//$this->db->join('unidad_medida um','ele.idunidadmedida = um.idunidadmedida','left'); 
+		$this->db->join('unidad_medida um','dcot.idunidadmedida = um.idunidadmedida','left'); 
 		$this->db->join("detalle_caracteristica dc","dc.iddetalle = dcot.iddetallecotizacion AND dc.tipo_detalle = 'C'",'left'); 
 		$this->db->join('caracteristica c','dc.idcaracteristica = c.idcaracteristica','left'); 
 		$this->db->where('cot.idcotizacion',$idcotizacion); 

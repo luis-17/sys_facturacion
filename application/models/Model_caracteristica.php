@@ -42,10 +42,11 @@ class Model_caracteristica extends CI_Model {
 	}
 	public function m_cargar_caracteristica_agregar()
 	{
+		$this->db->select("IF (ca.orden_car IS NULL , 9999999 , ca.orden_car) AS orden_real",FALSE);
 		$this->db->select("ca.idcaracteristica, ca.descripcion_car, ca.orden_car");
 		$this->db->from('caracteristica ca');
 		$this->db->where('estado_car', 1);
-		$this->db->order_by('ca.orden_car','DESC');
+		$this->db->order_by('orden_real','ASC');
 		return $this->db->get()->result_array();
 	}
 	public function m_registrar($datos)

@@ -99,11 +99,11 @@ app.controller('HistorialVentasCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     enableFullRowSelection: true,
     multiSelect: false,
     columnDefs: [ 
-      { field: 'idmovimiento', name: 've.idmovimiento', displayName: 'ID', width: '75', visible: false },
+      { field: 'idmovimiento', name: 've.idmovimiento', displayName: 'ID', width: '75', visible: false,  sort: { direction: uiGridConstants.DESC} },
       { field: 'descripcion_tdm', name: 'tdm.descripcion_tdm', displayName: 'COMPROBANTE', width: 100 },
       { field: 'serie', name: 've.numero_serie', displayName: 'SERIE', width: 60 },
       { field: 'correlativo', name: 've.numero_correlativo', displayName: 'CORRELATIVO', width: 100 },
-      { field: 'fecha_emision', name: 've.fecha_emision', displayName: 'F. Emisión', minWidth: 100, enableFiltering: false,  sort: { direction: uiGridConstants.DESC} },
+      { field: 'fecha_emision', name: 've.fecha_emision', displayName: 'F. Emisión', minWidth: 100, enableFiltering: false },
       { field: 'fecha_registro', name: 've.fecha_registro', displayName: 'F. Registro', minWidth: 100, enableFiltering: false, visible: false },
       { field: 'cliente', name: 'cliente_persona_empresa', displayName: 'Cliente', minWidth: 180 },
       { field: 'colaborador', name: 'colaborador', displayName: 'Colaborador', minWidth: 160 },
@@ -167,7 +167,7 @@ app.controller('HistorialVentasCtrl', ['$scope', '$filter', '$uibModal', '$bootb
       });
     }
   };
-  paginationOptions.sortName = $scope.gridOptionsVE.columnDefs[2].name; 
+  paginationOptions.sortName = $scope.gridOptionsVE.columnDefs[0].name; 
   $scope.metodos.getPaginationServerSide = function(loader) { 
     if( loader ){
       blockUI.start('Procesando información...');

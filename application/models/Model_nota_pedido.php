@@ -212,7 +212,7 @@ class Model_nota_pedido extends CI_Model {
 		$this->db->from('movimiento np'); // nota de pedido 
 		$this->db->join('detalle_movimiento dm','np.idmovimiento = dm.idmovimiento');
 		$this->db->join('elemento ele','dm.idelemento = ele.idelemento');
-		$this->db->join('unidad_medida um','ele.idunidadmedida = um.idunidadmedida'); 
+		$this->db->join('unidad_medida um','dm.idunidadmedida = um.idunidadmedida','left'); 
 
 		$this->db->join('usuario us','np.idusuarionp = us.idusuario'); 
 		$this->db->join('colaborador col','us.idusuario = col.idusuario'); 
