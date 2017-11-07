@@ -6,28 +6,17 @@
 		<div class="row">
 			<div class="col-md-6 col-sm-12" >
 				<fieldset >
-					<legend class="lead lead-sm"> Datos del Cliente
-            <div class="btn-group pull-right">
-              <button type="button" class="btn btn-success dropdown-toggle btn-xs" data-toggle="dropdown">
-                  <i class="fa fa-tasks"> </i>  ACCIONES <span class="caret"></span>
-              </button>
-              <ul class="dropdown-menu" role="menu">
-                  <li><a href="" ng-click='btnNuevoCliente();'><i class="fa fa-file"></i> Nuevo Cliente </a></li>
-                  <li ng-class="fData.classEditCliente"><a href="" ng-click="btnEditarCliente();"><i class="fa fa-pencil"></i> Editar Cliente </a></li>
-                  <li><a href="" ng-click="btnBusquedaCliente();"><i class="fa fa-search"></i> Buscar Cliente</a></li>
-              </ul>
-            </div>
-        	</legend>
+					<legend class="lead lead-sm"> Datos del Cliente </legend>
 					<div class="form-group pull-in clearfix mb-n"> 
 						<div class="col-md-3">
               <label class="control-label text-ellipsis"> Tipo de Documento </label>
               <select class="form-control input-sm" ng-model="fData.tipo_documento_cliente" ng-options="item as item.descripcion for item in fArr.listaTiposDocumentoCliente" 
-              	tabindex="100" focus-me required > </select> 
+              	tabindex="100" focus-me required disabled > </select> 
           	</div>
 						<div class="col-md-3"> 
 							<label class="control-label text-ellipsis"> Num. Documento. <small class="text-danger">(*)</small></label> 
               <input id="numDocumento" type="text" class="form-control input-sm" ng-model="fData.num_documento" ng-enter="obtenerDatosCliente(); $event.preventDefault();" 
-              	placeholder="Numero de Documento" ng-change="limpiarCampos();" tabindex="110" ng-pattern="pNumeroDocumento" required /> 
+              	placeholder="Numero de Documento" ng-change="limpiarCampos();" tabindex="110" ng-pattern="pNumeroDocumento" required readonly="readonly" /> 
               <span class="help-block m-b-none f-10 text-ellipsis">Presiona "Enter" para buscar.</span>
 						</div>	
 						<div class="col-md-6" ng-show="fData.tipo_documento_cliente.destino == 1"> <!-- EMPRESA -->
@@ -42,13 +31,13 @@
           <div class="form-group pull-in clearfix mb-n"> 
           	<div class="col-md-6" ng-show="fData.tipo_documento_cliente.destino == 1"> 
 							<label class="control-label text-ellipsis"> Contacto. </label> 
-							<div class="input-group"> 
-              	<input type="text" ng-model="fData.contacto" class="form-control input-sm "
+							<div class="input-group" style="width: 100%;"> 
+              	<input type="text" ng-model="fData.contacto" class="form-control input-sm" readonly="readonly"
 									placeholder="Busque Contacto" typeahead-loading="loadingCT" uib-typeahead="item as item.contacto for item in getContactoAutocomplete($viewValue)"
 	            		typeahead-on-select="getSelectedContacto($item, $model, $label)" typeahead-min-length="2" autocomplete ="off" ng-blur="validateContacto();" tabindex="140"/> 
-	            	<span class="input-group-btn">
+	            	<!-- <span class="input-group-btn">
 	                <button class="btn btn-default btn-sm" type="button" ng-click="btnBusquedaContacto();" tabindex="150"><i class="fa fa-search"></i> </button>
-	              </span>
+	              </span> -->
 	            </div>
 	            <i ng-show="loadingCT" class="fa fa-refresh"></i>
 	            <div ng-show="noResultsCT" class="text-danger">
@@ -68,7 +57,6 @@
           		<label class="control-label text-ellipsis"> Correo Electrónico </label>
 							<input type="text" class="form-control input-sm" ng-model="fData.cliente.email" placeholder="Correo Electrónico" readonly="readonly" tabindex="160" /> 
 						</div> 
-						
 						<div class="col-md-3" ng-show="fData.tipo_documento_cliente.destino == 2">
               <label class="control-label text-ellipsis"> Telefono Móvil</label>
               <input type="text" class="form-control input-sm" ng-model="fData.cliente.telefono_movil" placeholder="Telefono" readonly="readonly" tabindex="170" /> 
@@ -99,7 +87,7 @@
           	</div>
           	<div class="col-md-3 col-sm-12">
               <label class="control-label text-ellipsis"> Estado </label> 
-              <select class="form-control input-sm" ng-model="fData.estado_cotizacion" ng-options="item as item.descripcion for item in fArr.listaEstadosCotizacion" 
+              <select disabled class="form-control input-sm" ng-model="fData.estado_cotizacion" ng-options="item as item.descripcion for item in fArr.listaEstadosCotizacion" 
               	tabindex="230" > </select> 
           	</div>
           </div>

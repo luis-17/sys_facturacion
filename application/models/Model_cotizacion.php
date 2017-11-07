@@ -261,6 +261,9 @@ class Model_cotizacion extends CI_Model {
 		$this->db->join('forma_pago fp','cot.idformapago = fp.idformapago'); 
 		$this->db->join('contacto ct','cot.idcontacto = ct.idcontacto','left'); 
 		$this->db->like('cot.num_cotizacion', $filtro['searchText']); 
+		if( !empty($filtro['idcotizacion']) ){
+			$this->db->like('cot.idcotizacion', $filtro['idcotizacion']); 
+		}
 		$this->db->where_in('cot.estado_cot',array(1,2)); // por enviar 
 		if( !empty($datos['cliente']) ){ 
 			if( !empty($datos['num_documento']) && !empty($datos['cliente']['idclienteempresa']) ){ 
@@ -332,7 +335,7 @@ class Model_cotizacion extends CI_Model {
 		$fData = $this->db->get()->row_array();
 		return $fData; 
 	}
-	public function m_cargar_detalle_cotizacion_por_id($idcotizacion,$iddetallecotizacion=NULL)
+	public function m_cargar_detalle_cotizacion_por_id($idcotizacion=NULL,$iddetallecotizacion=NULL)
 	{ 
 		$this->db->select('dcot.iddetallecotizacion, cot.idcotizacion, cot.num_cotizacion, cot.fecha_registro, cot.subtotal, cot.igv, cot.total, cot.estado_cot, cot.idempresaadmin, 
 			dcot.cantidad, dcot.precio_unitario, dcot.importe_con_igv, dcot.importe_sin_igv, 
@@ -345,11 +348,14 @@ class Model_cotizacion extends CI_Model {
 		$this->db->join('unidad_medida um','dcot.idunidadmedida = um.idunidadmedida','left'); 
 		$this->db->join("detalle_caracteristica dc","dc.iddetalle = dcot.iddetallecotizacion AND dc.tipo_detalle = 'C'",'left'); 
 		$this->db->join('caracteristica c','dc.idcaracteristica = c.idcaracteristica','left'); 
-		$this->db->where('cot.idcotizacion',$idcotizacion); 
+		if( $idcotizacion ){ 
+			$this->db->where('cot.idcotizacion',$idcotizacion); 
+		}
+		// para cotizacion múltiple en N.P.
 		if( $iddetallecotizacion ){
 			$this->db->where('dcot.iddetallecotizacion',$iddetallecotizacion); 
 		}
-		$this->db->where('estado_dcot',1); // detalle cot. habilitado 
+		$this->db->where_in('dcot.estado_dcot', array(1)); // habilitado 
 		$this->db->order_by('dcot.iddetallecotizacion','ASC');
 		$this->db->order_by('c.orden_car','ASC');
 		$this->db->order_by('c.descripcion_car','ASC');
@@ -385,7 +391,7 @@ class Model_cotizacion extends CI_Model {
 	public function m_registrar_detalle_cotizacion($datos)
 	{
 		$data = array(
-			'idcotizacion' => $datos['idcotizacion'],	
+			'idcotizacion' => $datos['idcotizacion'],
 			'idelemento' => $datos['id'],
 			'idunidadmedida' => $datos['unidad_medida']['id'],
 			'cantidad' => $datos['cantidad'],
@@ -417,14 +423,46 @@ class Model_cotizacion extends CI_Model {
 		$this->db->where_in('idcotizacion',$arrCotizacion); 
 		return $this->db->update('cotizacion', $data); 
 	}
-	public function m_editar($datos)
+	public function m_editar_cotizacion($datos)
 	{
 		$data = array(
 			'fecha_emision'=> $datos['fecha_emision'],
-			'estado_cot' => $datos['estado_cotizacion']['id'],
+			'idsede'=> $datos['sede']['id'],
+			'plazo_entrega'=> $datos['plazo_entrega'],
+			'validez_oferta'=> $datos['validez_oferta'],
+			'incluye_traslado_prov'=> $datos['incluye_tras_prov'],
+			'incluye_entrega_domicilio'=> $datos['incluye_entr_dom'],
+			'idformapago' => $datos['forma_pago']['id'],
+			'moneda' => $datos['moneda']['str_moneda'],
+			'modo_igv' => $datos['modo_igv'],
+			'subtotal' => $datos['subtotal'],
+			'igv' => $datos['igv'],
+			'total' => $datos['total'],
 		);
 		$this->db->where('idcotizacion',$datos['idcotizacion']); 
 		return $this->db->update('cotizacion', $data); 
+	}
+	public function m_editar_cotizacion_detalle($datos) 
+	{
+		$data = array( 
+			'cantidad' => $datos['cantidad'],
+			'precio_unitario' => $datos['precio_unitario'],
+			'importe_con_igv' => $datos['importe_con_igv'],
+			'importe_sin_igv' => $datos['importe_sin_igv'],
+			'excluye_igv' => $datos['excluye_igv'],
+			'igv_detalle' => $datos['igv'],
+			'agrupador_totalizado' => $datos['agrupacion']
+		);
+		$this->db->where('iddetallecotizacion',$datos['iddetallecotizacion']); 
+		return $this->db->update('detalle_cotizacion', $data); 
+	}
+	public function m_editar_detalle_caracteristica_cotizacion($datos)
+	{
+		$data = array( 
+			'valor' => strtoupper($datos['valor']) 
+		);
+		$this->db->where('iddetallecaracteristica',$datos['iddetallecaracteristica']); 
+		return $this->db->update('detalle_caracteristica', $data); 
 	}
 	public function m_anular($datos)
 	{
@@ -433,6 +471,14 @@ class Model_cotizacion extends CI_Model {
 		);
 		$this->db->where('idcotizacion',$datos['idcotizacion']); 
 		return $this->db->update('cotizacion', $data); 
+	}
+	public function m_anular_cotizacion_detalle($datos)
+	{
+		$data = array(
+			'estado_dcot' => 0 // anulado 
+		);
+		$this->db->where('iddetallecotizacion',$datos['iddetallecotizacion']); 
+		return $this->db->update('detalle_cotizacion', $data); 
 	}
 } 
 ?>

@@ -1080,11 +1080,12 @@ class Cotizacion extends CI_Controller {
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true); 
 		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
     	$arrData['flag'] = 0;
+    	print_r($allInputs); exit(); 
 		/* VALIDACIONES */
 		// validar que no sea una cotización enviada 
     	$fCotizacion = $this->model_cotizacion->m_cargar_esta_cotizacion_por_id_simple($allInputs['idcotizacion']);
     	if( $fCotizacion['estado_cot'] == 2 ){ // enviado 
-    		$arrData['message'] = 'Esta cotización ya ha sido enviada como Nota de Pedido. No se puede anular.'; 
+    		$arrData['message'] = 'Esta cotización ya ha sido enviada como Nota de Pedido. No se puede modificar.'; 
     		$arrData['flag'] = 0;
     		$this->output
 		    	->set_content_type('application/json')
@@ -1093,18 +1094,93 @@ class Cotizacion extends CI_Controller {
     	} 
     	// validar que no sea una cotización anulada 
     	if( $fCotizacion['estado_cot'] == 0 ){ // anulado 
-    		$arrData['message'] = 'Esta cotización ya ha sido anulada anteriormente.'; 
+    		$arrData['message'] = 'Esta cotización ya ha sido anulada anteriormente. No se puede modificar.'; 
     		$arrData['flag'] = 0;
     		$this->output
 		    	->set_content_type('application/json')
 		    	->set_output(json_encode($arrData));
 		    return;
     	}
-    	if( $this->model_cotizacion->m_editar($allInputs) ){ 
-			$arrData['message'] = 'Se editaron los datos correctamente';
-    		$arrData['flag'] = 1;
+    	$arrItemDetalle = array();
+    	$this->db->trans_start();
+    	if( $this->model_cotizacion->m_editar_cotizacion($allInputs) ){ 
+    		foreach ($allInputs['detalle'] as $key => $elemento) {
+    			if( !empty($elemento['iddetallecotizacion']) ){ 
+					$arrItemDetalle[] = $elemento['iddetallecotizacion'];
+				}
+    		} 
+    		// ANULAR ITEMS QUE HAN SIDO QUITADOS.
+    		$listaDetalle = $this->model_cotizacion->m_cargar_detalle_cotizacion_por_id($allInputs['idcotizacion']); 
+    		$arrDetalleAEliminar = array();
+    		foreach ($listaDetalle as $key => $row) {
+    			if( !(in_array($row['iddetallecotizacion'],$arrItemDetalle)) ){
+    				$arrDetalleAEliminar[] = $row['iddetallecotizacion']; 
+    			}
+    		}
+    		foreach ($arrDetalleAEliminar as $key => $val) { 
+    			$arrDatos = array(
+    				'iddetallecotizacion'=> $val 
+    			);
+    			$this->model_cotizacion->m_anular_cotizacion_detalle($arrDatos); 
+    		}
+    		foreach ($allInputs['detalle'] as $key => $elemento) { 
+    			$elemento['idcotizacion'] = $allInputs['idcotizacion'];
+    			if( empty($elemento['agrupacion']) ){ 
+					$elemento['agrupacion'] = 1; // por defecto 
+				}
+    			if( empty($elemento['iddetallecotizacion']) ){
+    				// agregar un detalle a cotizacion 
+    				if($this->model_cotizacion->m_registrar_detalle_cotizacion($elemento)){
+    					$arrData['message'] = 'Los datos se editaron correctamente - (no caracteristicas)'; 
+						$arrData['flag'] = 1; 
+						$arrData['iddetallecotizacion'] = GetLastId('iddetallecotizacion','detalle_cotizacion');
+						if( !empty($elemento['caracteristicas']) ){ 
+							foreach ($elemento['caracteristicas'] as $keyCa => $caracteristica) { 
+								if( !empty($caracteristica['valor']) ){ 
+									$caracteristica['iddetallecotizacion'] = $arrData['iddetallecotizacion']; 
+									if( $this->model_cotizacion->m_registrar_detalle_caracteristica_cotizacion($caracteristica) ){ 
+										$arrData['message'] = 'Los datos se editaron correctamente'; 
+										$arrData['flag'] = 1; 
+										$fVariable = $this->model_variable_car->m_buscar_variable($caracteristica); 
+										if( empty($fVariable) ){ 
+											// GRABAR COMO UNA VARIABLE 
+											$caracteristica['descripcion_vcar'] = $caracteristica['valor'];
+											$this->model_variable_car->m_registrar($caracteristica); 
+										}
+									} 
+								} 
+							} 
+						}
+    				}
+    			}else{ 
+    				// editar detalle de cotizacion 
+					if( $this->model_cotizacion->m_editar_cotizacion_detalle($elemento) ){ 
+						$arrData['message'] = 'Los datos se editaron correctamente - (no caracteristicas)'; 
+						$arrData['flag'] = 1; 
+						if( !empty($elemento['caracteristicas']) ){ 
+							foreach ($elemento['caracteristicas'] as $keyCa => $caracteristica) { 
+								// if( !empty($caracteristica['valor']) ){ 
+								if( $this->model_cotizacion->m_editar_detalle_caracteristica_cotizacion($caracteristica) ){ 
+									$arrData['message'] = 'Los datos se editaron correctamente'; 
+									//$arrData['flag'] = 1; 
+									$fVariable = $this->model_variable_car->m_buscar_variable($caracteristica); 
+									if( empty($fVariable) ){ 
+										// GRABAR COMO UNA VARIABLE 
+										$caracteristica['descripcion_vcar'] = $caracteristica['valor'];
+										$this->model_variable_car->m_registrar($caracteristica); 
+									}
+								} 
+								// } 
+							}
+						}
+					}
+    			}
+    		}
 		} 
-
+		$this->db->trans_complete(); 
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
 	}
 	public function anular()
 	{
