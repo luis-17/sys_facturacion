@@ -312,7 +312,7 @@ class Model_cotizacion extends CI_Model {
 			ea.idempresaadmin, (ea.razon_social) AS razon_social_ea, (ea.nombre_comercial) AS nombre_comercial_ea, (ea.ruc) AS ruc_ea, 
 			ea.nombre_logo, ea.direccion_legal, ea.pagina_web, (ea.telefono) AS telefono_ea, 
 			ce.idclienteempresa, (ce.razon_social) AS razon_social_ce, (ce.nombre_comercial) AS nombre_comercial_ce, (ce.ruc) AS ruc_ce, (ce.telefono) AS telefono_ce, 
-			ce.direccion_guia, (ce.direccion_legal) AS direccion_legal_ce, ce.nombre_corto, ce.representante_legal, ce.dni_representante_legal, ce.direccion_legal, 
+			ce.direccion_guia, (ce.direccion_legal) AS direccion_legal_ce, ce.nombre_corto, ce.representante_legal, ce.dni_representante_legal, ce.direccion_legal AS direccion_legal_ce, 
 			cp.idclientepersona, (cp.num_documento) AS num_documento_cp, 
 			se.idsede, se.descripcion_se, se.abreviatura_se, 
 			fp.idformapago, fp.descripcion_fp, fp.modo_fp, ct.idcontacto, ct.anexo, ct.telefono_fijo', FALSE); 
@@ -350,6 +350,7 @@ class Model_cotizacion extends CI_Model {
 			$this->db->where('dcot.iddetallecotizacion',$iddetallecotizacion); 
 		}
 		$this->db->where('estado_dcot',1); // detalle cot. habilitado 
+		$this->db->order_by('dcot.iddetallecotizacion','ASC');
 		$this->db->order_by('c.orden_car','ASC');
 		$this->db->order_by('c.descripcion_car','ASC');
 		return $this->db->get()->result_array();

@@ -64,7 +64,7 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
   $scope.fData.validez_oferta = 10;
   $scope.fData.incluye_tras_prov = 2; // no 
   $timeout(function() { 
-    console.log($scope.fConfigSys,'$scope.fConfigSys');
+    //console.log($scope.fConfigSys,'$scope.fConfigSys');
     $scope.fData.modo_igv = parseInt($scope.fConfigSys.precio_incluye_igv_cot); // INCLUYE IGV dinamico 
     $scope.fData.incluye_entr_dom = parseInt($scope.fConfigSys.incluye_entrega_dom_cot);  // dinamico 
   }, 500);

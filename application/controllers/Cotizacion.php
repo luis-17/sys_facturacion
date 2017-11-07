@@ -662,7 +662,7 @@ class Cotizacion extends CI_Controller {
       	$this->pdf->Cell(24,4,'CONTACTO '); 
       	$this->pdf->Cell(3,4,':',0,0,'C'); 
       	$this->pdf->SetFont('Arial','',8); 
-      	$this->pdf->MultiCell(55,4,strtoupper(strtoupper_total($fila['contacto'])));
+      	$this->pdf->MultiCell(55,4,utf8_decode(strtoupper_total($fila['contacto'])));
       	// $this->pdf->Cell(75,6,strtoupper(strtoupper_total(utf8_decode($fila['contacto']))));
       	$y3 = $this->pdf->GetY();
       	$this->pdf->SetXY(8,$y3-1); 
@@ -686,7 +686,7 @@ class Cotizacion extends CI_Controller {
       	$this->pdf->Cell(3,4,':',0,0,'C'); 
       	$this->pdf->SetFont('Arial','',7); 
       	// $this->pdf->Cell(75,6,strtoupper(strtoupper_total($fila['direccion_guia'])));
-      	$this->pdf->MultiCell(75,4,strtoupper(strtoupper_total($fila['direccion_guia'])));
+      	$this->pdf->MultiCell(75,4,utf8_decode(strtoupper_total($fila['direccion_guia'])));
       	// var_dump(strlen($fila['direccion_guia']));exit();
       	$y1b = $this->pdf->GetY();
       	$this->pdf->SetXY(96,$y1b); 
