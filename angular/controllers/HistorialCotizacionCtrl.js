@@ -117,8 +117,8 @@ app.controller('HistorialCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$b
       { field: 'igv', name: 'cot.igv', displayName: 'IGV', minWidth: 80 },
       { field: 'total', name: 'cot.total', displayName: 'Total', minWidth: 80 },
       { field: 'estado', type: 'object', name: 'estado', displayName: 'ESTADO', width: '95', enableFiltering: false, enableSorting: false, enableColumnMenus: false, enableColumnMenu: false, 
-          cellTemplate:'<div class="">' + 
-            '<label tooltip-placement="left" tooltip="{{ COL_FIELD.labelText }}" class="label {{ COL_FIELD.claseLabel }} ml-xs">'+ 
+          cellTemplate:'<div class="ui-grid-cell-contents">' + 
+            '<label tooltip-placement="left" tooltip="{{ COL_FIELD.labelText }}" class=" label {{ COL_FIELD.claseLabel }} ml-xs">'+ 
             '<i class="fa {{ COL_FIELD.claseIcon }}"></i> {{COL_FIELD.labelText}} </label>'+ 
             '</div>' 
       }
@@ -203,7 +203,31 @@ app.controller('HistorialCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$b
     }
     ModalReporteFactory.getPopupReporte(arrParams);
   }
-
+  $scope.btnAnular = function() {
+    var pMensaje = '¿Realmente desea anular la cotización?';
+    $bootbox.confirm(pMensaje, function(result) { 
+      if(result){
+        var arrParams = { 
+          idcotizacion: $scope.mySelectionGrid[0].idcotizacion 
+        };
+        blockUI.start('Procesando información...');
+        CotizacionServices.sAnular(arrParams).then(function (rpta) {
+          if(rpta.flag == 1){
+            var pTitle = 'OK!';
+            var pType = 'success';
+            $scope.metodos.getPaginationServerSide();
+          }else if(rpta.flag == 0){
+            var pTitle = 'Error!';
+            var pType = 'danger';
+          }else{
+            alert('Error inesperado');
+          }
+          pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2500 });
+          blockUI.stop(); 
+        });
+      }
+    });
+  }
   //***grid detalle cotizacion
   var paginationOptionsDet = { 
     pageNumber: 1,

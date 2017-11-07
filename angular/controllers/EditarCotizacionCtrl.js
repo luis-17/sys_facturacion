@@ -1,4 +1,4 @@
-app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$log', '$timeout', 'pinesNotifications', 'uiGridConstants', 'blockUI', 
+app.controller('EditarCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$log', '$state', '$stateParams', '$timeout', 'pinesNotifications', 'uiGridConstants', 'blockUI', 
     'ClientePersonaFactory',
     'ClienteEmpresaFactory',
     'ServicioFactory',
@@ -23,7 +23,7 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     'ContactoEmpresaServices',
     'VariableCarServices',
     'PlazoFormaPagoServices',
-	function($scope, $filter, $uibModal, $bootbox, $log, $timeout, pinesNotifications, uiGridConstants, blockUI, 
+	function($scope, $filter, $uibModal, $bootbox, $log, $state, $stateParams, $timeout, pinesNotifications, uiGridConstants, blockUI, 
     ClientePersonaFactory,
     ClienteEmpresaFactory,
     ServicioFactory,
@@ -54,26 +54,30 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
   $scope.fData = {}; // contiene todas las variables de formulario 
 	$scope.fArr = {}; // contiene todos los arrays generados por las funciones 
   
-  $scope.fData.classEditCliente = 'disabled';
-  $scope.fData.fecha_registro = $filter('date')(moment().toDate(),'dd-MM-yyyy'); 
-  $scope.fData.fecha_emision = $filter('date')(moment().toDate(),'dd-MM-yyyy'); 
-  $scope.fData.num_cotizacion = '[ ............... ]';
+  console.log($stateParams,'$stateParams');
+
   
 
-  $scope.fData.plazo_entrega = 5;
-  $scope.fData.validez_oferta = 10;
-  $scope.fData.incluye_tras_prov = 2; // no 
-  $timeout(function() { 
-    console.log($scope.fConfigSys,'$scope.fConfigSys');
-    $scope.fData.modo_igv = parseInt($scope.fConfigSys.precio_incluye_igv_cot); // INCLUYE IGV dinamico 
-    $scope.fData.incluye_entr_dom = parseInt($scope.fConfigSys.incluye_entrega_dom_cot);  // dinamico 
-  }, 500);
+  // $scope.fData.fecha_registro = $filter('date')(moment().toDate(),'dd-MM-yyyy'); 
+  // $scope.fData.fecha_emision = $filter('date')(moment().toDate(),'dd-MM-yyyy'); 
+  // $scope.fData.num_cotizacion = '[ ............... ]';
+  
 
+  // $scope.fData.plazo_entrega = 5;
+  // $scope.fData.validez_oferta = 10;
+  // $scope.fData.incluye_tras_prov = 2; // no 
+  // $timeout(function() { 
+  //   console.log($scope.fConfigSys,'$scope.fConfigSys');
+  //   $scope.fData.modo_igv = parseInt($scope.fConfigSys.precio_incluye_igv_cot); // INCLUYE IGV dinamico 
+  //   $scope.fData.incluye_entr_dom = parseInt($scope.fConfigSys.incluye_entrega_dom_cot);  // dinamico 
+  // }, 500); 
+
+  $scope.fData.classEditCliente = 'disabled';
   $scope.fData.idcotizacionanterior = null;
   $scope.fData.isRegisterSuccess = false;
   $scope.fData.temporal = {};
-  $scope.fData.temporal.cantidad = 1;
-  $scope.fData.temporal.caracteristicas = null; 
+  // $scope.fData.temporal.cantidad = 1;
+  // $scope.fData.temporal.caracteristicas = null; 
   $scope.metodos.listaCategoriasCliente = function(myCallback) {
     var myCallback = myCallback || function() { };
     CategoriaClienteServices.sListarCbo().then(function(rpta) {
@@ -101,14 +105,14 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     {'id' : 1, 'descripcion' : 'S/.', 'str_moneda' : 'S'},
     {'id' : 2, 'descripcion' : 'US$', 'str_moneda' : 'D'}
   ];
-  $scope.fData.moneda = $scope.fArr.listaMoneda[0];
+  //$scope.fData.moneda = $scope.fArr.listaMoneda[0];
 
   // ESTADO DE COTIZACION 
   $scope.fArr.listaEstadosCotizacion = [
     {'id' : 1, 'descripcion' : 'POR ENVIAR'},
     {'id' : 2, 'descripcion' : 'ENVIADO'}
   ]; 
-  $scope.fData.estado_cotizacion = $scope.fArr.listaEstadosCotizacion[0];
+  // $scope.fData.estado_cotizacion = $scope.fArr.listaEstadosCotizacion[0];
 
   // TIPOS DE DOCUMENTO CLIENTE
   $scope.metodos.listaTiposDocumentoCliente = function(myCallback) { 
@@ -120,10 +124,10 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
       } 
     });
   }
-  var myCallback = function() { 
-    $scope.fData.tipo_documento_cliente = $scope.fArr.listaTiposDocumentoCliente[0];
-  }
-  $scope.metodos.listaTiposDocumentoCliente(myCallback); 
+  // var myCallback = function() { 
+  //   $scope.fData.tipo_documento_cliente = $scope.fArr.listaTiposDocumentoCliente[0];
+  // }
+  // $scope.metodos.listaTiposDocumentoCliente(myCallback); 
 
   // SEDE 
   $scope.metodos.listaSedes = function(myCallback) { 
@@ -135,11 +139,11 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
       } 
     });
   }
-  var myCallback = function() { 
-    $scope.fData.sede = $scope.fArr.listaSedes[0]; 
-    $scope.metodos.generarNumeroCotizacion();
-  }
-  $scope.metodos.listaSedes(myCallback); 
+  // var myCallback = function() { 
+  //   $scope.fData.sede = $scope.fArr.listaSedes[0]; 
+  //   $scope.metodos.generarNumeroCotizacion();
+  // }
+  // $scope.metodos.listaSedes(myCallback); 
 
   // FORMAS DE PAGO 
   $scope.metodos.listaFormaPago = function(myCallback) { 
@@ -151,10 +155,10 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
       } 
     });
   }
-  var myCallback = function() { 
-    $scope.fData.forma_pago = $scope.fArr.listaFormaPago[0]; 
-  }
-  $scope.metodos.listaFormaPago(myCallback); 
+  // var myCallback = function() { 
+  //   $scope.fData.forma_pago = $scope.fArr.listaFormaPago[0]; 
+  // }
+  // $scope.metodos.listaFormaPago(myCallback); 
 
   // TIPOS DE ELEMENTO 
   $scope.fArr.listaTipoElemento = [ 
@@ -180,11 +184,183 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
       } 
     });
   }
-  var myCallback = function() { 
-    $scope.fData.temporal.unidad_medida = $scope.fArr.listaUnidadMedida[0]; 
-  }
-  $scope.metodos.listaUnidadMedida(myCallback); 
+  // CESTA DE ELEMENTOS 
+  $scope.mySelectionGrid = [];
+  $scope.gridOptions = { 
+    paginationPageSize: 50,
+    enableRowSelection: true,
+    enableSelectAll: false,
+    enableFiltering: false,
+    enableFullRowSelection: false,
+    data: null,
+    rowHeight: 26,
+    enableCellEditOnFocus: true,
+    multiSelect: false,
+    columnDefs: [
+      { field: 'idelemento', displayName: 'COD.', width: 50, enableCellEdit: false, enableSorting: false },
+      { field: 'descripcion', displayName: 'DESCRIPCION', minWidth: 130, enableCellEdit: false, enableSorting: false,
+        cellTemplate:'<div class="ui-grid-cell-contents "> <a class="text-info block" href="" ng-click="grid.appScope.btnGestionCaracteristicasDetalle(row)">'+ '{{ COL_FIELD }}</a></div>', 
+        cellTooltip: function( row, col ) {
+          return row.entity.descripcion;
+        }
+      },
+      { field: 'cantidad', displayName: 'CANT.', width: 80, enableCellEdit: true, enableSorting: false, cellClass:'ui-editCell text-center' },
+      { field: 'unidad_medida', type:'object', displayName: 'U. MED.', width: 90, enableCellEdit: false, enableSorting: false, 
+        cellTemplate:'<div class="ui-grid-cell-contents text-center ">'+ '{{ COL_FIELD.descripcion }}</div>' 
+      },
+      { field: 'precio_unitario', displayName: 'P. UNIT', width: 80, enableCellEdit: true, enableSorting: false, cellClass:'ui-editCell text-right' },
+      { field: 'importe_sin_igv', displayName: 'IMPORTE SIN IGV', width: 120, enableCellEdit: false, enableSorting: false, cellClass:'text-right', visible: true },
+      { field: 'igv', displayName: 'IGV', width: 80, enableCellEdit: false, enableSorting: false, cellClass:'text-right', visible:true },
+      { field: 'importe_con_igv', displayName: 'IMPORTE', width: 120, enableCellEdit: false, enableSorting: false, cellClass:'text-right', visible:true },
+      { field: 'excluye_igv', displayName: 'INAFECTO', width: 90, enableCellEdit: true, enableSorting: false, cellClass:'ui-editCell',
+        editableCellTemplate: 'ui-grid/dropdownEditor',cellFilter: 'mapInafecto', editDropdownValueLabel: 'inafecto', editDropdownOptionsArray: [
+          { id: 1, inafecto: 'SI' },
+          { id: 2, inafecto: 'NO' }
+        ],cellTemplate: '<div class="text-center ui-grid-cell-contents" ng-if="COL_FIELD == 1"> SI </div><div class="text-center" ng-if="COL_FIELD == 2"> NO </div>'
+      },
+      { field: 'agrupacion', displayName: 'AGRUPAR', width: 90, enableCellEdit: true, enableSorting: false, cellClass:'ui-editCell text-right', visible:true,
+        editableCellTemplate: 'ui-grid/dropdownEditor',cellFilter: 'mapAgrupacion', editDropdownValueLabel: 'agrupacion', editDropdownOptionsArray: [
+          { id: 0, agrupacion: 'SIN GRUPO' },
+          { id: 1, agrupacion: 'GRUPO 1' },
+          { id: 2, agrupacion: 'GRUPO 2' },
+          { id: 3, agrupacion: 'GRUPO 3' },
+          { id: 4, agrupacion: 'GRUPO 4' }
+        ]//,cellTemplate: '<div class="ui-grid-cell-contents text-center ">'+ '{{ COL_FIELD }}</div>' 
+      },
+      { field: 'accion', displayName: 'ACCIÓN', width: 110, enableCellEdit: false, enableSorting: false, 
+        cellTemplate:'<div class="m-xxs text-center">'+ 
+          '<button uib-tooltip="Clonar" tooltip-placement="left" type="button" class="btn btn-xs btn-gray mr-xs" ng-click="grid.appScope.btnClonarFila(row)"> <i class="fa fa-plus"></i> </button>' + 
+          '<button uib-tooltip="Ver Características" tooltip-placement="left" type="button" class="btn btn-xs btn-info mr-xs" ng-click="grid.appScope.btnGestionCaracteristicasDetalle(row)"> <i class="fa fa-eye"></i> </button>' +
+          '<button uib-tooltip="Quitar" tooltip-placement="left" type="button" class="btn btn-xs btn-danger" ng-click="grid.appScope.btnQuitarDeLaCesta(row)"> <i class="fa fa-trash"></i> </button>' + 
+          '</div>' 
+      } // uib-tooltip
+    ]
+    ,onRegisterApi: function(gridApi) { 
+      $scope.gridApi = gridApi;
+      gridApi.edit.on.afterCellEdit($scope,function (rowEntity, colDef, newValue, oldValue){ 
+        rowEntity.column = colDef.field;
+        console.log(oldValue,newValue,'oldValue,newValue');
+        if(rowEntity.column == 'cantidad'){
+          if( !(rowEntity.cantidad >= 1) ){
+            var pTitle = 'Advertencia!';
+            var pType = 'warning';
+            rowEntity.cantidad = oldValue;
+            pinesNotifications.notify({ title: pTitle, text: 'La cantidad debe ser mayor o igual a 1', type: pType, delay: 3500 });
+            return false;
+          }
+        }
+        if(rowEntity.column == 'precio_unitario'){
+          if( !(rowEntity.precio_unitario >= 0) ){
+            var pTitle = 'Advertencia!';
+            var pType = 'warning';
+            rowEntity.precio_unitario = oldValue;
+            pinesNotifications.notify({ title: pTitle, text: 'El Precio debe ser mayor o igual a 0', type: pType, delay: 3500 });
+            return false;
+          }
+        }
+        if( $scope.fData.modo_igv == 2 ){ 
+          console.log('Calculando modo NO INCLUYE IGV');
+          rowEntity.importe_sin_igv = (parseFloat(rowEntity.precio_unitario) * parseFloat(rowEntity.cantidad)).toFixed($scope.fConfigSys.num_decimal_precio_key);
+          if(rowEntity.excluye_igv == 1){
+           rowEntity.igv = 0.00;
+          }else{
+           rowEntity.igv = (0.18 * rowEntity.importe_sin_igv).toFixed($scope.fConfigSys.num_decimal_precio_key);
+          }
+          rowEntity.importe_con_igv = (parseFloat(rowEntity.importe_sin_igv) + parseFloat(rowEntity.igv)).toFixed($scope.fConfigSys.num_decimal_precio_key);
+        }
+        if( $scope.fData.modo_igv == 1 ){ 
+          console.log('Calculando modo INCLUYE IGV');
+          rowEntity.importe_con_igv = (parseFloat(rowEntity.precio_unitario) * parseFloat(rowEntity.cantidad)).toFixed($scope.fConfigSys.num_decimal_precio_key);
+          if(rowEntity.excluye_igv == 1){
+            rowEntity.importe_sin_igv = rowEntity.importe_con_igv;
+            rowEntity.igv = 0.00;
+          }else{
+            rowEntity.importe_sin_igv = (rowEntity.importe_con_igv / 1.18).toFixed($scope.fConfigSys.num_decimal_precio_key);
+            rowEntity.igv = (0.18 * rowEntity.importe_sin_igv).toFixed($scope.fConfigSys.num_decimal_precio_key);
+          }
+        }
+        $scope.calcularTotales();
+        $scope.$apply();
+      });
+    }
+  };
+        
+  // OBTENER DATOS DE LA COTIZACION 
+  $scope.obtenerDatosCotizacion = function() { 
+    if( !($stateParams.identify) ){ 
+      return; 
+    } 
+    blockUI.start('Procesando cotización...'); 
+    var arrParams = {
+      'identify': $stateParams.identify 
+    }; 
+    CotizacionServices.sObtenerEstaCotizacion(arrParams).then(function(rpta) { 
+      if( rpta.flag == 1 ){
+        $scope.fData = rpta.datos; 
+        //$scope.gridOptions.data = rpta.datos.detalle;
+        //console.log($scope.gridOptions.data,'$scope.gridOptions.data');
+        // bindings 
+        $timeout(function() {
+          $scope.gridOptions.data = rpta.detalle;
+        }, 200);
+        // tipo documento cliente 
+        var myCallBackTD = function() { 
+          var objIndex = $scope.fArr.listaTiposDocumentoCliente.filter(function(obj) { 
+            return obj.id == $scope.fData.tipo_documento_cliente.id; 
+          }).shift(); 
+          $scope.fData.tipo_documento_cliente = objIndex; 
+        }
+        $scope.metodos.listaTiposDocumentoCliente(myCallBackTD); 
 
+        // forma de pago 
+        var myCallBackFP = function() { 
+          var objIndex = $scope.fArr.listaFormaPago.filter(function(obj) { 
+            return obj.id == $scope.fData.forma_pago.id;
+          }).shift(); 
+          $scope.fData.forma_pago = objIndex; 
+        }
+        $scope.metodos.listaFormaPago(myCallBackFP); 
+
+        // sede 
+        var myCallBackSE = function() { 
+          var objIndex = $scope.fArr.listaSedes.filter(function(obj) { 
+            return obj.id == $scope.fData.sede.id;
+          }).shift(); 
+          $scope.fData.sede = objIndex; 
+        }
+        $scope.metodos.listaSedes(myCallBackSE); 
+
+        // moneda 
+        var objIndex = $scope.fArr.listaMoneda.filter(function(obj) { 
+          return obj.id == $scope.fData.moneda.id;
+        }).shift(); 
+        $scope.fData.moneda = objIndex; 
+
+        // estado cotizacion
+        var objIndex = $scope.fArr.listaEstadosCotizacion.filter(function(obj) { 
+          return obj.id == $scope.fData.estado_cotizacion.id;
+        }).shift(); 
+        $scope.fData.estado_cotizacion = objIndex; 
+
+        // unidad de medida 
+        var myCallbackUM = function() { 
+          $scope.fData.temporal.unidad_medida = $scope.fArr.listaUnidadMedida[0]; 
+        }
+        $scope.metodos.listaUnidadMedida(myCallbackUM); 
+        //pinesNotifications.notify({ title: 'OK!', text: rpta.message, type: 'success', delay: 2500 });
+      }else{
+        // $scope.fData.cliente = {}; 
+        // ABRIMOS EL MODAL DE BUSQUEDA DE CLIENTE 
+        // pinesNotifications.notify({ title: 'Advertencia', text: rpta.message, type: 'warning', delay: 2500 });
+        // $scope.fData.classEditCliente = 'disabled';
+        // $scope.btnBusquedaCliente();
+      }
+      blockUI.stop(); 
+    });
+  }
+  $timeout(function() {
+    $scope.obtenerDatosCotizacion(); 
+  }, 500);
   //WATCHERS 
   $scope.$watch('fData.num_documento', function(newValue,oldValue){ 
     if( oldValue == newValue ){
@@ -195,25 +371,6 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
       $scope.fData.classEditCliente = 'disabled';
     }
   }, true);
-
-  // GENERACION DE NUMERO DE COTIZACION 
-  $scope.metodos.generarNumeroCotizacion = function(loader) { 
-    if(loader){
-      blockUI.start('Generando numero de cotización...'); 
-    }
-    var arrParams = {
-      'sede': $scope.fData.sede 
-    }; 
-    CotizacionServices.sGenerarNumeroCotizacion(arrParams).then(function(rpta) { 
-      $scope.fData.num_cotizacion = '[ ............... ]';
-      if( rpta.flag == 1){ 
-        $scope.fData.num_cotizacion = rpta.datos.num_cotizacion; 
-      }
-      if(loader){
-        blockUI.stop(); 
-      }
-    });
-  }
   
   // OBTENER DATOS DE CLIENTE 
   $scope.obtenerDatosCliente = function() { 
@@ -895,106 +1052,7 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     }; 
     CaracteristicaFactory.regCaracteristicaModal(arrParams); 
   }
-  // CESTA DE ELEMENTOS 
-  $scope.mySelectionGrid = [];
-  $scope.gridOptions = { 
-    paginationPageSize: 50,
-    enableRowSelection: true,
-    enableSelectAll: false,
-    enableFiltering: false,
-    enableFullRowSelection: false,
-    data: null,
-    rowHeight: 26,
-    enableCellEditOnFocus: true,
-    multiSelect: false,
-    columnDefs: [
-      { field: 'idelemento', displayName: 'COD.', width: 50, enableCellEdit: false, enableSorting: false },
-      { field: 'descripcion', displayName: 'DESCRIPCION', minWidth: 130, enableCellEdit: false, enableSorting: false,
-        cellTemplate:'<div class="ui-grid-cell-contents "> <a class="text-info block" href="" ng-click="grid.appScope.btnGestionCaracteristicasDetalle(row)">'+ '{{ COL_FIELD }}</a></div>', 
-        cellTooltip: function( row, col ) {
-          return row.entity.descripcion;
-        }
-      },
-      { field: 'cantidad', displayName: 'CANT.', width: 80, enableCellEdit: true, enableSorting: false, cellClass:'ui-editCell text-center' },
-      { field: 'unidad_medida', type:'object', displayName: 'U. MED.', width: 90, enableCellEdit: false, enableSorting: false, 
-        cellTemplate:'<div class="ui-grid-cell-contents text-center ">'+ '{{ COL_FIELD.descripcion }}</div>' 
-      },
-      { field: 'precio_unitario', displayName: 'P. UNIT', width: 80, enableCellEdit: true, enableSorting: false, cellClass:'ui-editCell text-right' },
-      { field: 'importe_sin_igv', displayName: 'IMPORTE SIN IGV', width: 120, enableCellEdit: false, enableSorting: false, cellClass:'text-right', visible: true },
-      { field: 'igv', displayName: 'IGV', width: 80, enableCellEdit: false, enableSorting: false, cellClass:'text-right', visible:true },
-      { field: 'importe_con_igv', displayName: 'IMPORTE', width: 120, enableCellEdit: false, enableSorting: false, cellClass:'text-right', visible:true },
-      { field: 'excluye_igv', displayName: 'INAFECTO', width: 90, enableCellEdit: true, enableSorting: false, cellClass:'ui-editCell',
-        editableCellTemplate: 'ui-grid/dropdownEditor',cellFilter: 'mapInafecto', editDropdownValueLabel: 'inafecto', editDropdownOptionsArray: [
-          { id: 1, inafecto: 'SI' },
-          { id: 2, inafecto: 'NO' }
-        ],cellTemplate: '<div class="text-center ui-grid-cell-contents" ng-if="COL_FIELD == 1"> SI </div><div class="text-center" ng-if="COL_FIELD == 2"> NO </div>'
-      },
-      { field: 'agrupacion', displayName: 'AGRUPAR', width: 90, enableCellEdit: true, enableSorting: false, cellClass:'ui-editCell text-right', visible:true,
-        editableCellTemplate: 'ui-grid/dropdownEditor',cellFilter: 'mapAgrupacion', editDropdownValueLabel: 'agrupacion', editDropdownOptionsArray: [
-          { id: 0, agrupacion: 'SIN GRUPO' },
-          { id: 1, agrupacion: 'GRUPO 1' },
-          { id: 2, agrupacion: 'GRUPO 2' },
-          { id: 3, agrupacion: 'GRUPO 3' },
-          { id: 4, agrupacion: 'GRUPO 4' }
-        ]//,cellTemplate: '<div class="ui-grid-cell-contents text-center ">'+ '{{ COL_FIELD }}</div>' 
-      },
-      { field: 'accion', displayName: 'ACCIÓN', width: 110, enableCellEdit: false, enableSorting: false, 
-        cellTemplate:'<div class="m-xxs text-center">'+ 
-          '<button uib-tooltip="Clonar" tooltip-placement="left" type="button" class="btn btn-xs btn-gray mr-xs" ng-click="grid.appScope.btnClonarFila(row)"> <i class="fa fa-plus"></i> </button>' + 
-          '<button uib-tooltip="Ver Características" tooltip-placement="left" type="button" class="btn btn-xs btn-info mr-xs" ng-click="grid.appScope.btnGestionCaracteristicasDetalle(row)"> <i class="fa fa-eye"></i> </button>' +
-          '<button uib-tooltip="Quitar" tooltip-placement="left" type="button" class="btn btn-xs btn-danger" ng-click="grid.appScope.btnQuitarDeLaCesta(row)"> <i class="fa fa-trash"></i> </button>' + 
-          '</div>' 
-      } // uib-tooltip
-    ]
-    ,onRegisterApi: function(gridApi) { 
-      $scope.gridApi = gridApi;
-      gridApi.edit.on.afterCellEdit($scope,function (rowEntity, colDef, newValue, oldValue){ 
-        rowEntity.column = colDef.field;
-        console.log(oldValue,newValue,'oldValue,newValue');
-        if(rowEntity.column == 'cantidad'){
-          if( !(rowEntity.cantidad >= 1) ){
-            var pTitle = 'Advertencia!';
-            var pType = 'warning';
-            rowEntity.cantidad = oldValue;
-            pinesNotifications.notify({ title: pTitle, text: 'La cantidad debe ser mayor o igual a 1', type: pType, delay: 3500 });
-            return false;
-          }
-        }
-        if(rowEntity.column == 'precio_unitario'){
-          if( !(rowEntity.precio_unitario >= 0) ){
-            var pTitle = 'Advertencia!';
-            var pType = 'warning';
-            rowEntity.precio_unitario = oldValue;
-            pinesNotifications.notify({ title: pTitle, text: 'El Precio debe ser mayor o igual a 0', type: pType, delay: 3500 });
-            return false;
-          }
-        }
-        if( $scope.fData.modo_igv == 2 ){ 
-          console.log('Calculando modo NO INCLUYE IGV');
-          rowEntity.importe_sin_igv = (parseFloat(rowEntity.precio_unitario) * parseFloat(rowEntity.cantidad)).toFixed($scope.fConfigSys.num_decimal_precio_key);
-          if(rowEntity.excluye_igv == 1){
-           rowEntity.igv = 0.00;
-          }else{
-           rowEntity.igv = (0.18 * rowEntity.importe_sin_igv).toFixed($scope.fConfigSys.num_decimal_precio_key);
-          }
-          rowEntity.importe_con_igv = (parseFloat(rowEntity.importe_sin_igv) + parseFloat(rowEntity.igv)).toFixed($scope.fConfigSys.num_decimal_precio_key);
-        }
-        if( $scope.fData.modo_igv == 1 ){ 
-          console.log('Calculando modo INCLUYE IGV');
-          rowEntity.importe_con_igv = (parseFloat(rowEntity.precio_unitario) * parseFloat(rowEntity.cantidad)).toFixed($scope.fConfigSys.num_decimal_precio_key);
-          if(rowEntity.excluye_igv == 1){
-            rowEntity.importe_sin_igv = rowEntity.importe_con_igv;
-            rowEntity.igv = 0.00;
-          }else{
-            rowEntity.importe_sin_igv = (rowEntity.importe_con_igv / 1.18).toFixed($scope.fConfigSys.num_decimal_precio_key);
-            rowEntity.igv = (0.18 * rowEntity.importe_sin_igv).toFixed($scope.fConfigSys.num_decimal_precio_key);
-          }
-        }
-        $scope.calcularTotales();
-        $scope.$apply();
-      });
-    }
-  };
+  
   $scope.getTableHeight = function() {
      var rowHeight = 26; // your row height 
      var headerHeight = 25; // your header height 
@@ -1050,28 +1108,6 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
       pinesNotifications.notify({ title: 'Advertencia.', text: 'Ingrese una cantidad válida', type: 'warning', delay: 2000 });
       return false;
     }
-    // var elementoNew = true;
-    // angular.forEach($scope.gridOptions.data, function(value, key) { 
-    //   if(value.id == $scope.fData.temporal.elemento.id ){ 
-    //     elementoNew = false;
-    //   }
-    // });
-    // if( elementoNew === false ){
-    //   $scope.fData.temporal = {
-    //     cantidad: 1,
-    //     descuento: 0,
-    //     importe_con_igv: null,
-    //     importe_sin_igv: null,
-    //     elemento: null,
-    //     excluye_igv: 2,
-    //     agrupacion: 0,
-    //     unidad_medida : $scope.fArr.listaUnidadMedida[0],
-    //     caracteristicas: null
-    //   };
-    //   $('#temporalElemento').focus();
-    //   pinesNotifications.notify({ title: 'Advertencia.', text: 'El elemento ya ha sido agregado a la cesta.', type: 'warning', delay: 2000 });
-    //   return false;
-    // } 
     // empieza el juego... 
     $scope.arrTemporal = { 
       'id' : $scope.fData.temporal.elemento.id,
@@ -1086,6 +1122,7 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
       'agrupacion': 0,
       'caracteristicas': angular.copy($scope.fData.temporal.caracteristicas)
     };
+    console.log($scope.gridOptions,'$scope.gridOptions xd');
     if( $scope.gridOptions.data === null ){
       $scope.gridOptions.data = [];
     }
@@ -1303,13 +1340,13 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
       return false; 
     }
     blockUI.start('Ejecutando proceso...');
-    CotizacionServices.sRegistrar($scope.fData).then(function (rpta) { 
+    CotizacionServices.sEditar($scope.fData).then(function (rpta) { 
       blockUI.stop();
       if(rpta.flag == 1){
         pTitle = 'OK!';
         pType = 'success'; 
-        $scope.fData.isRegisterSuccess = true;
-        $scope.fData.idcotizacionanterior = rpta.idcotizacion;
+        // $scope.fData.isRegisterSuccess = true;
+        // $scope.fData.idcotizacionanterior = rpta.idcotizacion;
       }else if(rpta.flag == 0){
         var pTitle = 'Advertencia!';
         var pType = 'warning';
@@ -1319,11 +1356,11 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
       pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 3000 });
     });
   }
-  $scope.imprimir = function() {
+  $scope.imprimir = function() { 
     var arrParams = { 
       titulo: 'VISTA PREVIA DE COTIZACIÓN',
       datos:{
-        id: $scope.fData.idcotizacionanterior,
+        id: $scope.fData.idcotizacion,
         codigo_reporte: 'COT-FCOT'
       },
       envio_correo: 'si',
@@ -1373,94 +1410,8 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
         }
       });  
   }
-
+  
 }]);
-
-app.service("CotizacionServices",function($http, $q, handleBehavior) {
-    return({
-        sGenerarNumeroCotizacion: sGenerarNumeroCotizacion,
-        sBuscarNumCotizacionAutocomplete: sBuscarNumCotizacionAutocomplete,
-        sObtenerEstaCotizacion: sObtenerEstaCotizacion,
-        sListarDetalleEstaCotizacion: sListarDetalleEstaCotizacion, 
-        sListarHistorialCotizaciones: sListarHistorialCotizaciones,
-        sListarHistorialDetalleCotizaciones: sListarHistorialDetalleCotizaciones,
-        sRegistrar: sRegistrar,
-        sEditar: sEditar,
-        sAnular: sAnular
-    });
-    function sGenerarNumeroCotizacion(datos) {
-      var request = $http({
-            method : "post",
-            url : angular.patchURLCI+"Cotizacion/generar_numero_cotizacion",
-            data : datos
-      });
-      return (request.then(handleBehavior.success,handleBehavior.error));
-    }
-    function sBuscarNumCotizacionAutocomplete(datos) {
-      var request = $http({
-            method : "post",
-            url : angular.patchURLCI+"Cotizacion/buscar_numero_cotizacion_autocomplete",
-            data : datos
-      });
-      return (request.then(handleBehavior.success,handleBehavior.error));
-    }
-    function sObtenerEstaCotizacion(datos) {
-      var request = $http({
-            method : "post",
-            url : angular.patchURLCI+"Cotizacion/obtener_esta_cotizacion",
-            data : datos
-      });
-      return (request.then(handleBehavior.success,handleBehavior.error));
-    }
-    function sListarDetalleEstaCotizacion(datos) { 
-      var request = $http({
-            method : "post",
-            url : angular.patchURLCI+"Cotizacion/listar_detalle_esta_cotizacion",
-            data : datos
-      });
-      return (request.then(handleBehavior.success,handleBehavior.error));
-    }
-    function sListarHistorialCotizaciones(datos) {
-      var request = $http({
-            method : "post",
-            url : angular.patchURLCI+"Cotizacion/listar_cotizaciones_historial",
-            data : datos
-      });
-      return (request.then(handleBehavior.success,handleBehavior.error));
-    }
-    function sListarHistorialDetalleCotizaciones(datos) {
-      var request = $http({
-            method : "post",
-            url : angular.patchURLCI+"Cotizacion/listar_detalle_cotizaciones_historial",
-            data : datos
-      });
-      return (request.then(handleBehavior.success,handleBehavior.error));
-    }
-    function sRegistrar (datos) {
-      var request = $http({
-            method : "post",
-            url : angular.patchURLCI+"Cotizacion/registrar",
-            data : datos
-      });
-      return (request.then(handleBehavior.success,handleBehavior.error));
-    }
-    function sEditar (datos) {
-      var request = $http({
-            method : "post",
-            url : angular.patchURLCI+"Cotizacion/editar",
-            data : datos
-      });
-      return (request.then(handleBehavior.success,handleBehavior.error));
-    }
-    function sAnular (datos) {
-      var request = $http({
-            method : "post",
-            url : angular.patchURLCI+"Cotizacion/anular",
-            data : datos
-      });
-      return (request.then(handleBehavior.success,handleBehavior.error));
-    }
-});
 
 app.filter('mapInafecto', function() { 
   var inafectoHash = { 

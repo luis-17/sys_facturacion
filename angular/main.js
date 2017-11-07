@@ -199,7 +199,7 @@ angular.module('app')
       $timeout(function() {
         $scope.getValidateSession();
         $scope.getConfiguracionSys();
-      }, 1000);
+      }, 400);
       
   }])
   .service('rootServices', function($http, $q, handleBehavior) { 

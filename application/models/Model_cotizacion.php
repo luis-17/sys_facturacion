@@ -41,7 +41,7 @@ class Model_cotizacion extends CI_Model {
 			$this->db->where('se.idsede', $paramDatos['sede']['id']);
 		}
 		$this->db->where('ea.idempresaadmin', $this->sessionFactur['idempresaadmin']); // empresa session 
-		$this->db->where_in('cot.estado_cot', array(1,2)); // por enviar y enviado 
+		$this->db->where_in('cot.estado_cot', array(0,1,2)); // por enviar, enviado y anulado 
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
 			foreach ($paramPaginate['searchColumn'] as $key => $value) {
 				if(! empty($value)){
@@ -85,7 +85,7 @@ class Model_cotizacion extends CI_Model {
 			$this->db->where('se.idsede', $paramDatos['sede']['id']);
 		}
 		$this->db->where('ea.idempresaadmin', $this->sessionFactur['idempresaadmin']); // empresa session 
-		$this->db->where_in('cot.estado_cot', array(1,2)); // por enviar y enviado 
+		$this->db->where_in('cot.estado_cot', array(0,1,2)); // por enviar, enviado y anulado 
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
 			foreach ($paramPaginate['searchColumn'] as $key => $value) {
 				if(! empty($value)){
@@ -144,7 +144,7 @@ class Model_cotizacion extends CI_Model {
 		if(!empty($paramDatos['categoria_elemento']) && $paramDatos['categoria_elemento']['id'] !== 'ALL' ){ 
 			$this->db->where('cael.idcategoriaelemento', $paramDatos['categoria_elemento']['id']);
 		}
-		$this->db->where_in('cot.estado_cot', array(1,2)); // por enviar y enviado 
+		$this->db->where_in('cot.estado_cot', array(0,1,2)); // por enviar, enviado y anulado 
 		$this->db->where_in('dcot.estado_dcot', array(1)); // habilitado 
 		$this->db->where_in('ele.estado_ele', array(1)); // habilitado 
 		$this->db->where('ea.idempresaadmin', $this->sessionFactur['idempresaadmin']); // empresa session 
@@ -196,7 +196,7 @@ class Model_cotizacion extends CI_Model {
 		if(!empty($paramDatos['sede']) && $paramDatos['sede']['id'] !== 'ALL' ){ 
 			$this->db->where('se.idsede', $paramDatos['sede']['id']);
 		}
-		$this->db->where_in('cot.estado_cot', array(1,2)); // por enviar y enviado 
+		$this->db->where_in('cot.estado_cot', array(0,1,2)); // por enviar, enviado y anulado 
 		$this->db->where_in('dcot.estado_dcot', array(1)); // habilitado 
 		$this->db->where_in('ele.estado_ele', array(1)); // habilitado 
 		$this->db->where('ea.idempresaadmin', $this->sessionFactur['idempresaadmin']); // empresa session 
@@ -285,25 +285,37 @@ class Model_cotizacion extends CI_Model {
 		$this->db->limit(1);
 		return $this->db->get()->row_array();
 	}
+	public function m_cargar_esta_cotizacion_por_id_simple($idcotizacion)
+	{
+		$this->db->select('co.idcotizacion, co.num_cotizacion, co.estado_cot'); 
+		$this->db->from('cotizacion co');
+		$this->db->join('sede se', 'co.idsede = se.idsede');
+		$this->db->where_in('co.estado_cot',array(0,1,2)); // "anulado" "por enviar" y "enviado" 
+		$this->db->where('co.idcotizacion',$idcotizacion);
+		$this->db->limit(1);
+		return $this->db->get()->row_array();
+	}
 	public function m_cargar_cotizacion_por_id($idcotizacion)
 	{
 		$this->db->select("CONCAT(COALESCE(ct.nombres,''), ' ', COALESCE(ct.apellidos,'')) AS contacto",FALSE);
 		$this->db->select("CONCAT(COALESCE(col.nombres,''), ' ', COALESCE(col.apellidos,'')) AS colaborador",FALSE);
 		$this->db->select("TRIM(CONCAT(COALESCE(cp.nombres,''), ' ', COALESCE(cp.apellidos,''), ' ', COALESCE(ce.razon_social,''))) AS cliente_persona_empresa",FALSE);
 		$this->db->select("TRIM(CONCAT(COALESCE(cp.email,''), ' ', COALESCE(ct.email,''))) AS email_persona_empresa",FALSE);
+		$this->db->select("TRIM(CONCAT(COALESCE(tdc_ce.idtipodocumentocliente,''), ' ', COALESCE(tdc_cp.idtipodocumentocliente,''))) AS idtipodocumentocliente",FALSE);
 		$this->db->select("TRIM(CONCAT(COALESCE(tdc_ce.abreviatura_tdc,''), ' ', COALESCE(tdc_cp.abreviatura_tdc,''))) AS tipo_documento_abv",FALSE);
 		$this->db->select("TRIM(CONCAT(COALESCE(ce.ruc,''), ' ', COALESCE(cp.num_documento,''))) AS num_documento_persona_empresa",FALSE);
 		$this->db->select("CONCAT(cp.nombres, ' ', cp.apellidos) AS cliente_persona",FALSE);
 		$this->db->select('cot.idcotizacion, cot.num_cotizacion, cot.fecha_registro, cot.fecha_emision, cot.tipo_cliente, cot.plazo_entrega, 
+			cot.incluye_traslado_prov, cot.incluye_entrega_domicilio, 
 			cot.validez_oferta, cot.moneda, cot.modo_igv, cot.subtotal, cot.igv, cot.total, cot.estado_cot, 
 			col.idcolaborador, (col.num_documento) AS num_documento_col, col.email, col.cargo, col.telefono ,us.idusuario, us.username, 
 			ea.idempresaadmin, (ea.razon_social) AS razon_social_ea, (ea.nombre_comercial) AS nombre_comercial_ea, (ea.ruc) AS ruc_ea, 
 			ea.nombre_logo, ea.direccion_legal, ea.pagina_web, (ea.telefono) AS telefono_ea, 
 			ce.idclienteempresa, (ce.razon_social) AS razon_social_ce, (ce.nombre_comercial) AS nombre_comercial_ce, (ce.ruc) AS ruc_ce, (ce.telefono) AS telefono_ce, 
-			ce.direccion_guia, (ce.direccion_legal) AS direccion_legal_ce, 
+			ce.direccion_guia, (ce.direccion_legal) AS direccion_legal_ce, ce.nombre_corto, ce.representante_legal, ce.dni_representante_legal, ce.direccion_legal, 
 			cp.idclientepersona, (cp.num_documento) AS num_documento_cp, 
 			se.idsede, se.descripcion_se, se.abreviatura_se, 
-			fp.idformapago, fp.descripcion_fp, ct.idcontacto', FALSE); 
+			fp.idformapago, fp.descripcion_fp, fp.modo_fp, ct.idcontacto, ct.anexo, ct.telefono_fijo', FALSE); 
 		$this->db->from('cotizacion cot'); 
 		$this->db->join('colaborador col','cot.idcolaborador = col.idcolaborador'); 
 		$this->db->join('usuario us','cot.idusuarioregistro = us.idusuario'); 
@@ -402,6 +414,23 @@ class Model_cotizacion extends CI_Model {
 			'fecha_envio' => date('Y-m-d H:i:s')
 		);
 		$this->db->where_in('idcotizacion',$arrCotizacion); 
+		return $this->db->update('cotizacion', $data); 
+	}
+	public function m_editar($datos)
+	{
+		$data = array(
+			'fecha_emision'=> $datos['fecha_emision'],
+			'estado_cot' => $datos['estado_cotizacion']['id'],
+		);
+		$this->db->where('idcotizacion',$datos['idcotizacion']); 
+		return $this->db->update('cotizacion', $data); 
+	}
+	public function m_anular($datos)
+	{
+		$data = array(
+			'estado_cot' => 0 // anulado 
+		);
+		$this->db->where('idcotizacion',$datos['idcotizacion']); 
 		return $this->db->update('cotizacion', $data); 
 	}
 } 

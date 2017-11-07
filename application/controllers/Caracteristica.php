@@ -110,7 +110,7 @@ class Caracteristica extends CI_Controller {
 		    return;
     	}        	
     	$this->db->trans_start();
-		if($this->model_caracteristica->m_editar($allInputs)) {
+		if($this->model_caracteristica->m_editar($allInputs)) { 
 			$arrData['message'] = 'Se editaron los datos correctamente';
 			$arrData['flag'] = 1;
 		}

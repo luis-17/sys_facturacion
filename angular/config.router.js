@@ -81,6 +81,31 @@ angular.module('app')
               'angular/controllers/PlazoFormaPagoCtrl.js'  
             ])
           })
+          .state('app.editar-cotizacion', {
+            url: '/editar-cotizacion/:identify',
+            templateUrl: 'tpl/editar-cotizacion.html',
+            resolve: load([
+              'angular/controllers/EditarCotizacionCtrl.js',
+              'angular/controllers/NuevaCotizacionCtrl.js',
+              'angular/controllers/ClienteEmpresaCtrl.js',
+              'angular/controllers/ClientePersonaCtrl.js',
+              'angular/controllers/ElementoCtrl.js',
+              'angular/controllers/ProductoCtrl.js',
+              'angular/controllers/ServicioCtrl.js',
+              'angular/controllers/ClienteCtrl.js',
+              'angular/controllers/ColaboradorCtrl.js',
+              'angular/controllers/CategoriaClienteCtrl.js',
+              'angular/controllers/CategoriaElementoCtrl.js',
+              'angular/controllers/CaracteristicaCtrl.js',
+              'angular/controllers/TipoDocumentoClienteCtrl.js',
+              'angular/controllers/SedeCtrl.js',
+              'angular/controllers/FormaPagoCtrl.js',
+              'angular/controllers/UnidadMedidaCtrl.js',
+              'angular/controllers/ContactoEmpresaCtrl.js',
+              'angular/controllers/VariableCarCtrl.js',
+              'angular/controllers/PlazoFormaPagoCtrl.js'  
+            ])
+          })
           .state('app.historial-cotizacion', {
             url: '/historial-cotizacion',
             templateUrl: 'tpl/historial-cotizacion.html',
