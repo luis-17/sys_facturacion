@@ -45,7 +45,7 @@ class Caracteristica extends CI_Controller {
 		foreach ($lista as $row) { 
 			array_push($arrListado,
 				array(
-					'id' => $row['idcaracteristica'], 
+					'idcaracteristica' => $row['idcaracteristica'], 
 					'descripcion' => strtoupper($row['descripcion_car']), 
 					'orden'=> $row['orden_car'],
 					'valor'=> NULL 

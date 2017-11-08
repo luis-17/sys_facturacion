@@ -6,7 +6,7 @@ class Cotizacion extends CI_Controller {
     {
         parent::__construct(); 
         $this->load->helper(array('fechas','otros','pdf','contable','config')); 
-        $this->load->model(array('model_cotizacion','model_categoria_cliente','model_cliente_persona','model_cliente_empresa','model_configuracion','model_variable_car','model_banco_empresa_admin')); 
+        $this->load->model(array('model_cotizacion','model_categoria_cliente','model_cliente_persona','model_cliente_empresa','model_configuracion','model_variable_car','model_banco_empresa_admin','model_caracteristica')); 
         $this->load->library('excel');
     	$this->load->library('Fpdfext');
         //cache
@@ -250,14 +250,48 @@ class Cotizacion extends CI_Controller {
 		}
 		foreach ($detalleLista as $key => $row) { 
 			$arrAux2 = array(
-				'id'=> $row['iddetallecaracteristica'],
+				'iddetallecaracteristica'=> $row['iddetallecaracteristica'],
 				'idcaracteristica'=> $row['idcaracteristica'],
 				'orden'=> $row['orden_car'],
 				'descripcion'=> $row['descripcion_car'],
 				'valor'=> $row['valor']
 			);
-			$arrListadoDetalle[$row['iddetallecotizacion']]['caracteristicas'][$row['iddetallecaracteristica']] = $arrAux2; 
+			if( !empty($row['iddetallecaracteristica']) ){ 
+				$arrListadoDetalle[$row['iddetallecotizacion']]['caracteristicas'][$row['iddetallecaracteristica']] = $arrAux2; 
+				$arrListadoDetalle[$row['iddetallecotizacion']]['caracteristicas'] = array_values($arrListadoDetalle[$row['iddetallecotizacion']]['caracteristicas']);
+			}
+
 		} 
+		// agregar caracteristicas sin valor 
+		$arrCaractsAll = array();
+		$listaCaracteristicas = $this->model_caracteristica->m_cargar_caracteristica_agregar(); 
+		foreach ($listaCaracteristicas as $key => $row) {
+			$arrAux = array(
+				'iddetallecaracteristica'=> NULL,
+				'idcaracteristica'=> $row['idcaracteristica'],
+				'orden'=> $row['orden_car'],
+				'descripcion'=> $row['descripcion_car'],
+				'valor'=> NULL 
+			);
+			$arrCaractsAll[] = $arrAux;
+		}
+		$arrCaractsSelect = array();
+		foreach ($arrListadoDetalle as $key => $item) { 
+			foreach ($arrCaractsAll as $key3 => $caracAll) { 
+				$caracIgual = FALSE;
+				foreach ($item['caracteristicas'] as $key2 => $carac) { 
+					if( $caracAll['idcaracteristica'] == $carac['idcaracteristica'] ){ 
+						$caracIgual = TRUE;
+					}
+				}
+				if( $caracIgual === FALSE ){ 
+					$arrListadoDetalle[$key]['caracteristicas'][] = $caracAll;
+					// $arrCaractsSelect[] = $caracAll;
+				}
+			}
+		}
+		// print_r($arrListadoDetalle); exit(); 
+		//$resultado = array_merge_recursive($m1, $m2);
 		// reindexado 
 		$arrListadoDetalle = array_values($arrListadoDetalle);
 		$arrData['datos'] = $arrListado; 
@@ -865,7 +899,7 @@ class Cotizacion extends CI_Controller {
 		   	$this->pdf->SetFont('Arial','',6);
 		   	// $this->pdf->Cell(194,0.8,'','B',1,'C',0); 
 			foreach ($value['detallecaracteristica'] as $key => $row) { 
-				$this->pdf->SetWidths(array(10, 50, 5, 100));
+				$this->pdf->SetWidths(array(10, 25, 5, 100));
 		    	$this->pdf->SetAligns(array('L', 'L', 'L', 'L'));
 				$arrCaracts = array( 
 					'data'=> array(
@@ -1080,7 +1114,7 @@ class Cotizacion extends CI_Controller {
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true); 
 		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
     	$arrData['flag'] = 0;
-    	print_r($allInputs); exit(); 
+    	// print_r($allInputs); exit(); 
 		/* VALIDACIONES */
 		// validar que no sea una cotización enviada 
     	$fCotizacion = $this->model_cotizacion->m_cargar_esta_cotizacion_por_id_simple($allInputs['idcotizacion']);
@@ -1159,18 +1193,33 @@ class Cotizacion extends CI_Controller {
 						$arrData['flag'] = 1; 
 						if( !empty($elemento['caracteristicas']) ){ 
 							foreach ($elemento['caracteristicas'] as $keyCa => $caracteristica) { 
-								// if( !empty($caracteristica['valor']) ){ 
-								if( $this->model_cotizacion->m_editar_detalle_caracteristica_cotizacion($caracteristica) ){ 
-									$arrData['message'] = 'Los datos se editaron correctamente'; 
-									//$arrData['flag'] = 1; 
-									$fVariable = $this->model_variable_car->m_buscar_variable($caracteristica); 
-									if( empty($fVariable) ){ 
-										// GRABAR COMO UNA VARIABLE 
-										$caracteristica['descripcion_vcar'] = $caracteristica['valor'];
-										$this->model_variable_car->m_registrar($caracteristica); 
+								if( !empty($caracteristica['iddetallecaracteristica']) ){ 
+									if( $this->model_cotizacion->m_editar_detalle_caracteristica_cotizacion($caracteristica) ){ 
+										$arrData['message'] = 'Los datos se editaron correctamente'; 
+										//$arrData['flag'] = 1; 
+										$fVariable = $this->model_variable_car->m_buscar_variable($caracteristica); 
+										if( empty($fVariable) ){ 
+											// GRABAR COMO UNA VARIABLE 
+											$caracteristica['descripcion_vcar'] = $caracteristica['valor'];
+											$this->model_variable_car->m_registrar($caracteristica); 
+										}
+									} 
+								}else{ 
+									if( !empty($caracteristica['valor']) ){ 
+										$caracteristica['iddetallecotizacion'] = $elemento['iddetallecotizacion'];
+										if( $this->model_cotizacion->m_registrar_detalle_caracteristica_cotizacion($caracteristica) ){
+											$arrData['message'] = 'Los datos se editaron correctamente'; 
+											$arrData['flag'] = 1; 
+											$fVariable = $this->model_variable_car->m_buscar_variable($caracteristica); 
+											if( empty($fVariable) ){ 
+												// GRABAR COMO UNA VARIABLE 
+												$caracteristica['descripcion_vcar'] = $caracteristica['valor'];
+												$this->model_variable_car->m_registrar($caracteristica); 
+											}
+										}
 									}
+									
 								} 
-								// } 
 							}
 						}
 					}

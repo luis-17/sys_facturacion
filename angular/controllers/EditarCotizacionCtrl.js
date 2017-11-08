@@ -184,106 +184,6 @@ app.controller('EditarCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$boot
       } 
     });
   }
-  // CESTA DE ELEMENTOS 
-  $scope.mySelectionGrid = [];
-  $scope.gridOptions = { 
-    paginationPageSize: 50,
-    enableRowSelection: true,
-    enableSelectAll: false,
-    enableFiltering: false,
-    enableFullRowSelection: false,
-    data: null,
-    rowHeight: 26,
-    enableCellEditOnFocus: true,
-    multiSelect: false,
-    columnDefs: [
-      { field: 'idelemento', displayName: 'COD.', width: 50, enableCellEdit: false, enableSorting: false },
-      { field: 'descripcion', displayName: 'DESCRIPCION', minWidth: 130, enableCellEdit: false, enableSorting: false,
-        cellTemplate:'<div class="ui-grid-cell-contents "> <a class="text-info block" href="" ng-click="grid.appScope.btnGestionCaracteristicasDetalle(row)">'+ '{{ COL_FIELD }}</a></div>', 
-        cellTooltip: function( row, col ) {
-          return row.entity.descripcion;
-        }
-      },
-      { field: 'cantidad', displayName: 'CANT.', width: 80, enableCellEdit: true, enableSorting: false, cellClass:'ui-editCell text-center' },
-      { field: 'unidad_medida', type:'object', displayName: 'U. MED.', width: 90, enableCellEdit: false, enableSorting: false, 
-        cellTemplate:'<div class="ui-grid-cell-contents text-center ">'+ '{{ COL_FIELD.descripcion }}</div>' 
-      },
-      { field: 'precio_unitario', displayName: 'P. UNIT', width: 80, enableCellEdit: true, enableSorting: false, cellClass:'ui-editCell text-right' },
-      { field: 'importe_sin_igv', displayName: 'IMPORTE SIN IGV', width: 120, enableCellEdit: false, enableSorting: false, cellClass:'text-right', visible: true },
-      { field: 'igv', displayName: 'IGV', width: 80, enableCellEdit: false, enableSorting: false, cellClass:'text-right', visible:true },
-      { field: 'importe_con_igv', displayName: 'IMPORTE', width: 120, enableCellEdit: false, enableSorting: false, cellClass:'text-right', visible:true },
-      { field: 'excluye_igv', displayName: 'INAFECTO', width: 90, enableCellEdit: true, enableSorting: false, cellClass:'ui-editCell',
-        editableCellTemplate: 'ui-grid/dropdownEditor',cellFilter: 'mapInafecto', editDropdownValueLabel: 'inafecto', editDropdownOptionsArray: [
-          { id: 1, inafecto: 'SI' },
-          { id: 2, inafecto: 'NO' }
-        ],cellTemplate: '<div class="text-center ui-grid-cell-contents" ng-if="COL_FIELD == 1"> SI </div><div class="text-center" ng-if="COL_FIELD == 2"> NO </div>'
-      },
-      { field: 'agrupacion', displayName: 'AGRUPAR', width: 90, enableCellEdit: true, enableSorting: false, cellClass:'ui-editCell text-right', visible:true,
-        editableCellTemplate: 'ui-grid/dropdownEditor',cellFilter: 'mapAgrupacion', editDropdownValueLabel: 'agrupacion', editDropdownOptionsArray: [
-          { id: 0, agrupacion: 'SIN GRUPO' },
-          { id: 1, agrupacion: 'GRUPO 1' },
-          { id: 2, agrupacion: 'GRUPO 2' },
-          { id: 3, agrupacion: 'GRUPO 3' },
-          { id: 4, agrupacion: 'GRUPO 4' }
-        ]//,cellTemplate: '<div class="ui-grid-cell-contents text-center ">'+ '{{ COL_FIELD }}</div>' 
-      },
-      { field: 'accion', displayName: 'ACCIÓN', width: 110, enableCellEdit: false, enableSorting: false, 
-        cellTemplate:'<div class="m-xxs text-center">'+ 
-          '<button uib-tooltip="Clonar" tooltip-placement="left" type="button" class="btn btn-xs btn-gray mr-xs" ng-click="grid.appScope.btnClonarFila(row)"> <i class="fa fa-plus"></i> </button>' + 
-          '<button uib-tooltip="Ver Características" tooltip-placement="left" type="button" class="btn btn-xs btn-info mr-xs" ng-click="grid.appScope.btnGestionCaracteristicasDetalle(row)"> <i class="fa fa-eye"></i> </button>' +
-          '<button uib-tooltip="Eliminar" tooltip-placement="left" type="button" class="btn btn-xs btn-danger" ng-click="grid.appScope.btnQuitarDeLaCesta(row)"> <i class="fa fa-trash"></i> </button>' + 
-          '</div>' 
-      } // uib-tooltip
-    ]
-    ,onRegisterApi: function(gridApi) { 
-      $scope.gridApi = gridApi;
-      gridApi.edit.on.afterCellEdit($scope,function (rowEntity, colDef, newValue, oldValue){ 
-        rowEntity.column = colDef.field;
-        console.log(oldValue,newValue,'oldValue,newValue');
-        if(rowEntity.column == 'cantidad'){
-          if( !(rowEntity.cantidad >= 1) ){
-            var pTitle = 'Advertencia!';
-            var pType = 'warning';
-            rowEntity.cantidad = oldValue;
-            pinesNotifications.notify({ title: pTitle, text: 'La cantidad debe ser mayor o igual a 1', type: pType, delay: 3500 });
-            return false;
-          }
-        }
-        if(rowEntity.column == 'precio_unitario'){
-          if( !(rowEntity.precio_unitario >= 0) ){
-            var pTitle = 'Advertencia!';
-            var pType = 'warning';
-            rowEntity.precio_unitario = oldValue;
-            pinesNotifications.notify({ title: pTitle, text: 'El Precio debe ser mayor o igual a 0', type: pType, delay: 3500 });
-            return false;
-          }
-        }
-        if( $scope.fData.modo_igv == 2 ){ 
-          console.log('Calculando modo NO INCLUYE IGV');
-          rowEntity.importe_sin_igv = (parseFloat(rowEntity.precio_unitario) * parseFloat(rowEntity.cantidad)).toFixed($scope.fConfigSys.num_decimal_precio_key);
-          if(rowEntity.excluye_igv == 1){
-           rowEntity.igv = 0.00;
-          }else{
-           rowEntity.igv = (0.18 * rowEntity.importe_sin_igv).toFixed($scope.fConfigSys.num_decimal_precio_key);
-          }
-          rowEntity.importe_con_igv = (parseFloat(rowEntity.importe_sin_igv) + parseFloat(rowEntity.igv)).toFixed($scope.fConfigSys.num_decimal_precio_key);
-        }
-        if( $scope.fData.modo_igv == 1 ){ 
-          console.log('Calculando modo INCLUYE IGV');
-          rowEntity.importe_con_igv = (parseFloat(rowEntity.precio_unitario) * parseFloat(rowEntity.cantidad)).toFixed($scope.fConfigSys.num_decimal_precio_key);
-          if(rowEntity.excluye_igv == 1){
-            rowEntity.importe_sin_igv = rowEntity.importe_con_igv;
-            rowEntity.igv = 0.00;
-          }else{
-            rowEntity.importe_sin_igv = (rowEntity.importe_con_igv / 1.18).toFixed($scope.fConfigSys.num_decimal_precio_key);
-            rowEntity.igv = (0.18 * rowEntity.importe_sin_igv).toFixed($scope.fConfigSys.num_decimal_precio_key);
-          }
-        }
-        $scope.calcularTotales();
-        $scope.$apply();
-      });
-    }
-  };
         
   // OBTENER DATOS DE LA COTIZACION 
   $scope.obtenerDatosCotizacion = function() { 
@@ -593,7 +493,7 @@ app.controller('EditarCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$boot
           multiSelect: false,
           data: $scope.fData.temporal.caracteristicas || [],
           columnDefs: [ 
-            { field: 'id', enableSorting: false, displayName: 'ID', width: '75', enableCellEdit: false, visible: false }, 
+            { field: 'idcaracteristica', enableSorting: false, displayName: 'ID', width: '75', enableCellEdit: false, visible: false }, 
             { field: 'orden', displayName: 'ORDEN', width: '100', enableCellEdit: false, enableColumnMenus: false, enableColumnMenu: false, 
               enableFiltering: false, enableSorting: false, sort: { direction: uiGridConstants.ASC } }, 
             { field: 'descripcion', enableSorting: false, displayName: 'Descripción', minWidth: 160, enableCellEdit: false }, 
@@ -663,6 +563,106 @@ app.controller('EditarCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$boot
     CaracteristicaFactory.regCaracteristicaModal(arrParams); 
   }
   
+  // CESTA DE ELEMENTOS 
+  $scope.mySelectionGrid = [];
+  $scope.gridOptions = { 
+    paginationPageSize: 50,
+    enableRowSelection: true,
+    enableSelectAll: false,
+    enableFiltering: false,
+    enableFullRowSelection: false,
+    data: null,
+    rowHeight: 26,
+    enableCellEditOnFocus: true,
+    multiSelect: false,
+    columnDefs: [
+      { field: 'idelemento', displayName: 'COD.', width: 50, enableCellEdit: false, enableSorting: false },
+      { field: 'descripcion', displayName: 'DESCRIPCION', minWidth: 130, enableCellEdit: false, enableSorting: false,
+        cellTemplate:'<div class="ui-grid-cell-contents "> <a class="text-info block" href="" ng-click="grid.appScope.btnGestionCaracteristicasDetalle(row)">'+ '{{ COL_FIELD }}</a></div>', 
+        cellTooltip: function( row, col ) {
+          return row.entity.descripcion;
+        }
+      },
+      { field: 'cantidad', displayName: 'CANT.', width: 80, enableCellEdit: true, enableSorting: false, cellClass:'ui-editCell text-center' },
+      { field: 'unidad_medida', type:'object', displayName: 'U. MED.', width: 90, enableCellEdit: false, enableSorting: false, 
+        cellTemplate:'<div class="ui-grid-cell-contents text-center ">'+ '{{ COL_FIELD.descripcion }}</div>' 
+      },
+      { field: 'precio_unitario', displayName: 'P. UNIT', width: 80, enableCellEdit: true, enableSorting: false, cellClass:'ui-editCell text-right' },
+      { field: 'importe_sin_igv', displayName: 'IMPORTE SIN IGV', width: 120, enableCellEdit: false, enableSorting: false, cellClass:'text-right', visible: true },
+      { field: 'igv', displayName: 'IGV', width: 80, enableCellEdit: false, enableSorting: false, cellClass:'text-right', visible:true },
+      { field: 'importe_con_igv', displayName: 'IMPORTE', width: 120, enableCellEdit: false, enableSorting: false, cellClass:'text-right', visible:true },
+      { field: 'excluye_igv', displayName: 'INAFECTO', width: 90, enableCellEdit: true, enableSorting: false, cellClass:'ui-editCell',
+        editableCellTemplate: 'ui-grid/dropdownEditor',cellFilter: 'mapInafecto', editDropdownValueLabel: 'inafecto', editDropdownOptionsArray: [
+          { id: 1, inafecto: 'SI' },
+          { id: 2, inafecto: 'NO' }
+        ],cellTemplate: '<div class="text-center ui-grid-cell-contents" ng-if="COL_FIELD == 1"> SI </div><div class="text-center" ng-if="COL_FIELD == 2"> NO </div>'
+      },
+      { field: 'agrupacion', displayName: 'AGRUPAR', width: 90, enableCellEdit: true, enableSorting: false, cellClass:'ui-editCell text-right', visible:true,
+        editableCellTemplate: 'ui-grid/dropdownEditor',cellFilter: 'mapAgrupacion', editDropdownValueLabel: 'agrupacion', editDropdownOptionsArray: [
+          { id: 0, agrupacion: 'SIN GRUPO' },
+          { id: 1, agrupacion: 'GRUPO 1' },
+          { id: 2, agrupacion: 'GRUPO 2' },
+          { id: 3, agrupacion: 'GRUPO 3' },
+          { id: 4, agrupacion: 'GRUPO 4' }
+        ]//,cellTemplate: '<div class="ui-grid-cell-contents text-center ">'+ '{{ COL_FIELD }}</div>' 
+      },
+      { field: 'accion', displayName: 'ACCIÓN', width: 110, enableCellEdit: false, enableSorting: false, 
+        cellTemplate:'<div class="m-xxs text-center">'+ 
+          '<button uib-tooltip="Clonar" tooltip-placement="left" type="button" class="btn btn-xs btn-gray mr-xs" ng-click="grid.appScope.btnClonarFila(row)"> <i class="fa fa-plus"></i> </button>' + 
+          '<button uib-tooltip="Ver Características" tooltip-placement="left" type="button" class="btn btn-xs btn-info mr-xs" ng-click="grid.appScope.btnGestionCaracteristicasDetalle(row)"> <i class="fa fa-eye"></i> </button>' +
+          '<button uib-tooltip="Eliminar" tooltip-placement="left" type="button" class="btn btn-xs btn-danger" ng-click="grid.appScope.btnQuitarDeLaCesta(row)"> <i class="fa fa-trash"></i> </button>' + 
+          '</div>' 
+      } // uib-tooltip
+    ]
+    ,onRegisterApi: function(gridApi) { 
+      $scope.gridApi = gridApi;
+      gridApi.edit.on.afterCellEdit($scope,function (rowEntity, colDef, newValue, oldValue){ 
+        rowEntity.column = colDef.field;
+        console.log(oldValue,newValue,'oldValue,newValue');
+        if(rowEntity.column == 'cantidad'){
+          if( !(rowEntity.cantidad >= 1) ){
+            var pTitle = 'Advertencia!';
+            var pType = 'warning';
+            rowEntity.cantidad = oldValue;
+            pinesNotifications.notify({ title: pTitle, text: 'La cantidad debe ser mayor o igual a 1', type: pType, delay: 3500 });
+            return false;
+          }
+        }
+        if(rowEntity.column == 'precio_unitario'){
+          if( !(rowEntity.precio_unitario >= 0) ){
+            var pTitle = 'Advertencia!';
+            var pType = 'warning';
+            rowEntity.precio_unitario = oldValue;
+            pinesNotifications.notify({ title: pTitle, text: 'El Precio debe ser mayor o igual a 0', type: pType, delay: 3500 });
+            return false;
+          }
+        }
+        if( $scope.fData.modo_igv == 2 ){ 
+          console.log('Calculando modo NO INCLUYE IGV');
+          rowEntity.importe_sin_igv = (parseFloat(rowEntity.precio_unitario) * parseFloat(rowEntity.cantidad)).toFixed($scope.fConfigSys.num_decimal_precio_key);
+          if(rowEntity.excluye_igv == 1){
+           rowEntity.igv = 0.00;
+          }else{
+           rowEntity.igv = (0.18 * rowEntity.importe_sin_igv).toFixed($scope.fConfigSys.num_decimal_precio_key);
+          }
+          rowEntity.importe_con_igv = (parseFloat(rowEntity.importe_sin_igv) + parseFloat(rowEntity.igv)).toFixed($scope.fConfigSys.num_decimal_precio_key);
+        }
+        if( $scope.fData.modo_igv == 1 ){ 
+          console.log('Calculando modo INCLUYE IGV');
+          rowEntity.importe_con_igv = (parseFloat(rowEntity.precio_unitario) * parseFloat(rowEntity.cantidad)).toFixed($scope.fConfigSys.num_decimal_precio_key);
+          if(rowEntity.excluye_igv == 1){
+            rowEntity.importe_sin_igv = rowEntity.importe_con_igv;
+            rowEntity.igv = 0.00;
+          }else{
+            rowEntity.importe_sin_igv = (rowEntity.importe_con_igv / 1.18).toFixed($scope.fConfigSys.num_decimal_precio_key);
+            rowEntity.igv = (0.18 * rowEntity.importe_sin_igv).toFixed($scope.fConfigSys.num_decimal_precio_key);
+          }
+        }
+        $scope.calcularTotales();
+        $scope.$apply();
+      });
+    }
+  };
   $scope.getTableHeight = function() {
      var rowHeight = 26; // your row height 
      var headerHeight = 25; // your header height 
@@ -792,23 +792,27 @@ app.controller('EditarCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$boot
             }
           });
         }; 
+        console.log('init mee');
         $scope.fArr.gridOptionsCRDet = { 
           useExternalPagination: false,
-          useExternalSorting: false,
+          useExternalSorting: true,
           enableGridMenu: false,
           enableRowSelection: true,
           enableSelectAll: false,
           enableFiltering: true,
           enableFullRowSelection: false,
           enableCellEditOnFocus: true,
+          enableColumnMenus: false, 
+          enableColumnMenu: false,
           multiSelect: false,
           columnDefs: [ 
-            { field: 'id', displayName: 'ID', width: '75', enableCellEdit: false, visible: false },
-            { field: 'orden', displayName: 'ORDEN', width: '100', enableCellEdit: false },
-            { field: 'descripcion', displayName: 'Descripción', minWidth: 160, enableCellEdit: false }, 
-            { field: 'valor', displayName: 'Valor', minWidth: 160, cellClass:'ui-editCell', enableCellEdit: true, sort: { direction: uiGridConstants.ASC }, 
+            { field: 'idcaracteristica', enableSorting: false, displayName: 'ID', width: '75', enableCellEdit: false, visible: false }, 
+            { field: 'orden', displayName: 'ORDEN', width: '100', enableCellEdit: false, enableColumnMenus: false, enableColumnMenu: false, 
+              enableFiltering: false, enableSorting: false, sort: { direction: uiGridConstants.ASC } }, 
+            { field: 'descripcion', enableSorting: false, displayName: 'Descripción', minWidth: 160, enableCellEdit: false }, 
+            { field: 'valor', enableSorting: false, displayName: 'Valor', minWidth: 160, cellClass:'ui-editCell', enableCellEdit: true, 
               editableCellTemplate: '<input type="text" ui-grid-editor ng-model="MODEL_COL_FIELD" uib-typeahead="item.descripcion as item.descripcion for item in grid.appScope.getVariableAutocomplete($viewValue)" class="" >'
-            } 
+            }
           ], 
           onRegisterApi: function(gridApi) { 
             $scope.gridApi = gridApi; 
@@ -817,10 +821,13 @@ app.controller('EditarCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$boot
         var myCallback = function() {
           $scope.fArr.gridOptionsCRDet.data = row.entity.caracteristicas;
         }
-        if( !(row.entity.caracteristicas) ){
+        //console.log(row.entity.caracteristicas.length,'row.entity.caracteristicas.length');
+        if( !(row.entity.caracteristicas) || row.entity.caracteristicas.length == 0 ){ 
           $scope.metodos.getPaginationServerSideCR(true,myCallback); 
+          //console.log(111,row.entity.caracteristicas,'row.entity.caracteristicas');
         }else{
           myCallback();
+          //console.log(222);
         }
         //var rowCaracteristicas = row.caracteristicas; 
         

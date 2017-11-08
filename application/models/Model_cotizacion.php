@@ -409,7 +409,7 @@ class Model_cotizacion extends CI_Model {
 		$data = array(
 			'tipo_detalle' => 'C', // COTIZACIÓN 
 			'iddetalle' => $datos['iddetallecotizacion'],
-			'idcaracteristica' => $datos['id'],
+			'idcaracteristica' => $datos['idcaracteristica'],
 			'valor' => strtoupper($datos['valor'])
 		);
 		return $this->db->insert('detalle_caracteristica', $data); 
@@ -426,7 +426,7 @@ class Model_cotizacion extends CI_Model {
 	public function m_editar_cotizacion($datos)
 	{
 		$data = array(
-			'fecha_emision'=> $datos['fecha_emision'],
+			'fecha_emision'=> darFormatoYMD($datos['fecha_emision']),
 			'idsede'=> $datos['sede']['id'],
 			'plazo_entrega'=> $datos['plazo_entrega'],
 			'validez_oferta'=> $datos['validez_oferta'],

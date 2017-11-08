@@ -826,7 +826,7 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
           multiSelect: false,
           data: $scope.fData.temporal.caracteristicas || [],
           columnDefs: [ 
-            { field: 'id', enableSorting: false, displayName: 'ID', width: '75', enableCellEdit: false, visible: false }, 
+            { field: 'idcaracteristica', enableSorting: false, displayName: 'ID', width: '75', enableCellEdit: false, visible: false }, 
             { field: 'orden', displayName: 'ORDEN', width: '100', enableCellEdit: false, enableColumnMenus: false, enableColumnMenu: false, 
               enableFiltering: false, enableSorting: false, sort: { direction: uiGridConstants.ASC } }, 
             { field: 'descripcion', enableSorting: false, displayName: 'Descripción', minWidth: 160, enableCellEdit: false }, 
@@ -1147,21 +1147,24 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
         }; 
         $scope.fArr.gridOptionsCRDet = { 
           useExternalPagination: false,
-          useExternalSorting: false,
+          useExternalSorting: true,
           enableGridMenu: false,
           enableRowSelection: true,
           enableSelectAll: false,
           enableFiltering: true,
           enableFullRowSelection: false,
           enableCellEditOnFocus: true,
+          enableColumnMenus: false, 
+          enableColumnMenu: false,
           multiSelect: false,
           columnDefs: [ 
-            { field: 'id', displayName: 'ID', width: '75', enableCellEdit: false, visible: false },
-            { field: 'orden', displayName: 'ORDEN', width: '100', enableCellEdit: false },
-            { field: 'descripcion', displayName: 'Descripción', minWidth: 160, enableCellEdit: false }, 
-            { field: 'valor', displayName: 'Valor', minWidth: 160, cellClass:'ui-editCell', enableCellEdit: true, sort: { direction: uiGridConstants.ASC }, 
+            { field: 'idcaracteristica', enableSorting: false, displayName: 'ID', width: '75', enableCellEdit: false, visible: false }, 
+            { field: 'orden', displayName: 'ORDEN', width: '100', enableCellEdit: false, enableColumnMenus: false, enableColumnMenu: false, 
+              enableFiltering: false, enableSorting: false, sort: { direction: uiGridConstants.ASC } }, 
+            { field: 'descripcion', enableSorting: false, displayName: 'Descripción', minWidth: 160, enableCellEdit: false }, 
+            { field: 'valor', enableSorting: false, displayName: 'Valor', minWidth: 160, cellClass:'ui-editCell', enableCellEdit: true, 
               editableCellTemplate: '<input type="text" ui-grid-editor ng-model="MODEL_COL_FIELD" uib-typeahead="item.descripcion as item.descripcion for item in grid.appScope.getVariableAutocomplete($viewValue)" class="" >'
-            } 
+            }
           ], 
           onRegisterApi: function(gridApi) { 
             $scope.gridApi = gridApi; 
