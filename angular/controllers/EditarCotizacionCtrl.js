@@ -54,7 +54,7 @@ app.controller('EditarCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$boot
   $scope.fData = {}; // contiene todas las variables de formulario 
 	$scope.fArr = {}; // contiene todos los arrays generados por las funciones 
   
-  console.log($stateParams,'$stateParams');
+  // console.log($stateParams,'$stateParams');
 
   
 
@@ -203,6 +203,16 @@ app.controller('EditarCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$boot
         $timeout(function() {
           $scope.gridOptions.data = rpta.detalle;
         }, 200);
+
+        // colaborador 
+        var myCallbackCol = function() { 
+          var objIndex = $scope.fArr.listaColaboradores.filter(function(obj) { 
+            return obj.id == $scope.fData.colaborador.id; 
+          }).shift(); 
+          $scope.fData.colaborador = objIndex; 
+        }
+        $scope.metodos.listaColaboradores(myCallbackCol); 
+
         // tipo documento cliente 
         var myCallBackTD = function() { 
           var objIndex = $scope.fArr.listaTiposDocumentoCliente.filter(function(obj) { 

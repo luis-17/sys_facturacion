@@ -596,9 +596,11 @@ class Cotizacion extends CI_Controller {
 	    if($fila['moneda'] == 'S'){
 	    	$fila['moneda_str'] = 'SOLES';
 	    	$simbolo = 'S/. ';
+	    	$fila['moneda_str_completo'] = 'SOLES';
 	    }
 	    if($fila['moneda'] == 'D'){
 	    	$fila['moneda_str'] = 'DÓLARES';
+	    	$fila['moneda_str_completo'] = 'DÓLARES AMERICANOS';
 	    	$simbolo = 'US$ ';
 	    } 
 	    $strIncluyeIGV = NULL;
@@ -771,7 +773,7 @@ class Cotizacion extends CI_Controller {
       	$this->pdf->Cell(38,6,'MONEDA '); 
       	$this->pdf->Cell(3,6,':',0,0,'C'); 
       	$this->pdf->SetFont('Arial','',8); 
-      	$this->pdf->Cell(75,6,utf8_decode($fila['moneda_str'])); 
+      	$this->pdf->Cell(75,6,utf8_decode($fila['moneda_str_completo'])); 
 
       	$this->pdf->SetXY(8,$y5+7); 
       	$this->pdf->SetFont('Arial','B',8); 
@@ -925,15 +927,15 @@ class Cotizacion extends CI_Controller {
 	    $this->pdf->SetXY(8,-34); 
 	    //$this->pdf->Ln(1);
 	    $this->pdf->SetFont('Arial','B',9);
-	    $en_letra = ValorEnLetras($fila['total'],$fila['moneda_str']);
-	    $this->pdf->Cell(140,5,'TOTAL SON: ' . $en_letra);
+	    $en_letra = ValorEnLetras($fila['total'],$fila['moneda_str_completo']);
+	    $this->pdf->Cell(140,5,'TOTAL SON: ' . utf8_decode($en_letra));
 	    $this->pdf->SetXY(8,-23); 
 	    $this->pdf->SetFont('Arial','',8);
 	    $bancoEmpresa = $this->model_banco_empresa_admin->m_cargar_cuentas_banco_por_filtros($fila['idempresaadmin'],$fila['moneda']);
  		//$this->pdf->SetTextColor(0,0,0);
    		$this->pdf->SetFont('Arial','',9);
 	    foreach ($bancoEmpresa as $key => $value) {
-	    	$this->pdf->Cell(40,5,'Cta. Cte. '.$value['abreviatura_ba'].' '. $fila['moneda_str'],0,0,'L',0); 	  
+	    	$this->pdf->Cell(40,5,'Cta. Cte. '.$value['abreviatura_ba'].' '. utf8_decode($fila['moneda_str']),0,0,'L',0); 	  
 	    }
 	    $this->pdf->SetXY(8,-19); 
 	    foreach ($bancoEmpresa as $key => $value) {

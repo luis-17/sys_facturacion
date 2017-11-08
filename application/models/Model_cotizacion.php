@@ -365,7 +365,7 @@ class Model_cotizacion extends CI_Model {
 	{
 		$data = array( 
 			'num_cotizacion' => $datos['num_cotizacion'], 
-			'idcolaborador' => $this->sessionFactur['idcolaborador'], 
+			'idcolaborador' => $datos['colaborador']['id'], 
 			'fecha_registro' => date('Y-m-d H:i:s'),
 			'fecha_emision' => darFormatoYMD($datos['fecha_emision']),
 			'tipo_cliente' => $datos['tipo_cliente'],
@@ -427,6 +427,7 @@ class Model_cotizacion extends CI_Model {
 	{
 		$data = array(
 			'fecha_emision'=> darFormatoYMD($datos['fecha_emision']),
+			'idcolaborador' => $datos['colaborador']['id'], 
 			'idsede'=> $datos['sede']['id'],
 			'plazo_entrega'=> $datos['plazo_entrega'],
 			'validez_oferta'=> $datos['validez_oferta'],

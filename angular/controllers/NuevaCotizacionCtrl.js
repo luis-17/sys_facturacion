@@ -81,13 +81,24 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
       myCallback();
     });
   };
-  $scope.metodos.listaColaboradores = function(myCallback) {
-    var myCallback = myCallback || function() { };
+  // colaboradores 
+  $scope.metodos.listaColaboradores = function(myCallbackCol) {
+    var myCallbackCol = myCallbackCol || function() { };
     ColaboradorServices.sListarCbo().then(function(rpta) {
       $scope.fArr.listaColaboradores = rpta.datos; 
-      myCallback();
+      myCallbackCol();
     });
   };
+  var myCallbackCol = function() { 
+    var objIndex = $scope.fArr.listaColaboradores.filter(function(obj) { 
+      return obj.id == $scope.fSessionCI.idcolaborador; 
+    }).shift(); 
+    $scope.fData.colaborador = objIndex; 
+  }
+  // var myCallbackCol = function() { 
+  //   $scope.fData.colaborador = $scope.fArr.listaColaboradores[0]; 
+  // }
+  $scope.metodos.listaColaboradores(myCallbackCol); 
   // sexos 
   $scope.fArr.listaSexo = [ 
     { id:'M', descripcion:'MASCULINO' },

@@ -102,9 +102,14 @@
               	tabindex="220" > </select> 
               <span class="help-block m-b-none f-10"> <a ng-show="fData.forma_pago.modo == 2" href="" class="text-info pull-right" ng-click='metodos.verPlazosPago();'> VER PLAZOS DE PAGO. </a> </span> 
           	</div>
-          	<div class="col-md-3 col-sm-12">
+          	<!-- <div class="col-md-3 col-sm-12">
               <label class="control-label text-ellipsis"> Colaborador </label> 
               <label class="control-label text-info text-bold text-ellipsis"> {{ fData.colaborador.colaborador }} </label> 
+          	</div> -->
+          	<div class="col-md-3 col-sm-12" > 
+              <label class="control-label text-ellipsis"> Colaborador </label> 
+              <select class="form-control input-sm" ng-disabled="!(fSessionCI.key_tu == 'key_root' || fSessionCI.key_tu == 'key_superadmin')" ng-model="fData.colaborador" 
+              	ng-options="item as item.descripcion for item in fArr.listaColaboradores" tabindex="230" > </select> 
           	</div>
           </div>
 	    	</fieldset>

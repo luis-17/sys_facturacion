@@ -732,8 +732,8 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
           multiSelect: false,
           columnDefs: [ 
             { field: 'idcotizacion', name: 'cot.idcotizacion', displayName: 'ID', width: '75', visible: false },
-            { field: 'num_cotizacion', name: 'cot.num_cotizacion', displayName: 'COD. COTIZACION', width: '120' },
-            { field: 'fecha_emision', name: 'cot.fecha_emision', displayName: 'F. Emisión', minWidth: 100, enableFiltering: false,  sort: { direction: uiGridConstants.DESC} },
+            { field: 'num_cotizacion', name: 'cot.num_cotizacion', displayName: 'COD. COTIZACION', width: '120',  sort: { direction: uiGridConstants.DESC} },
+            { field: 'fecha_emision', name: 'cot.fecha_emision', displayName: 'F. Emisión', minWidth: 100, enableFiltering: false },
             { field: 'fecha_registro', name: 'cot.fecha_registro', displayName: 'F. Registro', minWidth: 100, enableFiltering: false, visible: false },
             { field: 'cliente', name: 'cliente_persona_empresa', displayName: 'Cliente', minWidth: 180 },
             { field: 'colaborador', name: 'colaborador', displayName: 'Colaborador', minWidth: 160, visible: false },
@@ -821,7 +821,7 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
             });
           }
         };
-        paginationOptions.sortName = $scope.gridOptionsCOT.columnDefs[2].name; 
+        paginationOptions.sortName = $scope.gridOptionsCOT.columnDefs[1].name; 
         $scope.metodos.getPaginationServerSide = function(loader) { 
           if( loader ){
             blockUI.start('Procesando información...');
