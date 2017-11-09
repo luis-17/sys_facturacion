@@ -214,21 +214,21 @@ app.controller('HistorialVentasCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     enableFullRowSelection: true,
     multiSelect: false,
     columnDefs: [ 
-      { field: 'idmovimiento', name: 've.idmovimiento', displayName: 'ID', width: '75', visible: false },
+      { field: 'iddetallemovimiento', name: 'ved.iddetallemovimiento', displayName: 'ID', width: '75', visible: false },
       { field: 'descripcion_tdm', name: 'tdm.descripcion_tdm', displayName: 'COMPROBANTE', width: 100 },
       { field: 'serie', name: 've.numero_serie', displayName: 'SERIE', width: 60 },
       { field: 'correlativo', name: 've.numero_correlativo', displayName: 'CORRELATIVO', width: 100 },
       { field: 'fecha_emision', name: 've.fecha_emision', displayName: 'F. Emisión', minWidth: 100, enableFiltering: false,  sort: { direction: uiGridConstants.DESC} },
       { field: 'fecha_registro', name: 've.fecha_registro', displayName: 'F. Registro', minWidth: 100, enableFiltering: false, visible: false },
       { field: 'cliente', name: 'cliente_persona_empresa', displayName: 'Cliente', minWidth: 180 },
-      { field: 'colaborador', name: 'colaborador', displayName: 'Colaborador', minWidth: 160 },
       { field: 'usuario', name: 'us.username', displayName: 'Usuario', minWidth: 160, visible: false },
-      { field: 'forma_pago', name: 'fp.descripcion_fp', displayName: 'Forma de Pago', minWidth: 100 },
       { field: 'sede', name: 'se.descripcion_se', displayName: 'Sede', minWidth: 100 },
-      { field: 'moneda', name: 've.moneda', displayName: 'Moneda', minWidth: 76, enableFiltering: false },
-      { field: 'subtotal', name: 've.subtotal', displayName: 'Subtotal', minWidth: 90 },
-      { field: 'igv', name: 've.igv', displayName: 'IGV', minWidth: 70 },
-      { field: 'total', name: 've.total', displayName: 'Total', minWidth: 80 },
+      { field: 'categoria_elemento', type: 'object', name: 'cael.descripcion_cael', displayName: 'Categoria Elemento', minWidth: 160, enableColumnMenus: false, enableColumnMenu: false,cellTemplate:'<div class="ui-grid-cell-contents text-center ">'+'<label class="label bg-primary block" style="background-color:{{COL_FIELD.color}}">{{ COL_FIELD.descripcion }}</label></div>' 
+      },  
+      { field: 'elemento', name: 'ele.descripcion_ele', displayName: 'Elemento', minWidth: 160 },          
+      { field: 'precio_unitario', name: 'npd.precio_unitario', displayName: 'P. Unitario', minWidth: 90 }, 
+      { field: 'cantidad', name: 'npd.cantidad', displayName: 'Cantidad', minWidth: 90 },
+      { field: 'importe_con_igv', name: 'npd.importe_con_igv', displayName: 'Importe', minWidth: 90 }, 
       { field: 'estado', type: 'object', name: 'estado', displayName: 'ESTADO', width: '95', enableFiltering: false, enableSorting: false, enableColumnMenus: false, enableColumnMenu: false, 
           cellTemplate:'<div class="">' + 
             '<label tooltip-placement="left" tooltip="{{ COL_FIELD.labelText }}" class="label {{ COL_FIELD.claseLabel }} ml-xs">'+ 
@@ -264,7 +264,7 @@ app.controller('HistorialVentasCtrl', ['$scope', '$filter', '$uibModal', '$bootb
         var grid = this.grid;
         paginationOptionsVEDet.search = true; 
         paginationOptionsVEDet.searchColumn = { 
-          've.idmovimiento' : grid.columns[1].filters[0].term,
+          'ved.iddetallemovimiento' : grid.columns[1].filters[0].term,
           'tdm.descripcion_tdm' : grid.columns[2].filters[0].term,
           've.numero_serie' : grid.columns[3].filters[0].term,
           've.numero_correlativo' : grid.columns[4].filters[0].term,
