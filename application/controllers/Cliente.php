@@ -28,7 +28,7 @@ class Cliente extends CI_Controller {
 			return; 
 		}
 		$arrListado = array();
-		if( $allInputs['tipo_documento']['destino'] == 1 ){ // empresa 
+		if( $allInputs['tipo_documento']['destino'] == 1 ){ // empresa razon_social
 			$fCliente = $this->model_cliente_empresa->m_buscar_cliente_empresa($allInputs);
 			$fCliente['id'] = @$fCliente['idclienteempresa'];
 		}

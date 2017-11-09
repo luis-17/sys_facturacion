@@ -1,33 +1,22 @@
 <div class="bg-light lter b-b wrapper-sm">
-  <h1 class="m-n font-thin h3">Nueva Cotización</h1>
+  <h1 class="m-n font-thin h3">Edición de Cotización N° {{ fData.num_cotizacion }} </h1> 
 </div>
-<div class="wrapper-sm" ng-controller="NuevaCotizacionCtrl">
+<div class="wrapper-sm" ng-controller="EditarCotizacionCtrl">
 	<form name="formCotizacion">
 		<div class="row">
 			<div class="col-md-6 col-sm-12" >
 				<fieldset >
-					<legend class="lead lead-sm"> Datos del Cliente
-            <div class="btn-group pull-right">
-              <button type="button" class="btn btn-success dropdown-toggle btn-xs" data-toggle="dropdown">
-                  <i class="fa fa-tasks"> </i>  ACCIONES <span class="caret"></span>
-              </button>
-              <ul class="dropdown-menu" role="menu">
-                  <li><a href="" ng-click='btnNuevoCliente();'><i class="fa fa-file"></i> Nuevo Cliente </a></li>
-                  <li ng-class="fData.classEditCliente"><a href="" ng-click="btnEditarCliente();"><i class="fa fa-pencil"></i> Editar Cliente </a></li>
-                  <li><a href="" ng-click="btnBusquedaCliente();"><i class="fa fa-search"></i> Buscar Cliente</a></li>
-              </ul>
-            </div>
-        	</legend>
+					<legend class="lead lead-sm"> Datos del Cliente </legend>
 					<div class="form-group pull-in clearfix mb-n"> 
 						<div class="col-md-3">
               <label class="control-label text-ellipsis"> Tipo de Documento </label>
               <select class="form-control input-sm" ng-model="fData.tipo_documento_cliente" ng-options="item as item.descripcion for item in fArr.listaTiposDocumentoCliente" 
-              	tabindex="100" focus-me required > </select> 
+              	tabindex="100" focus-me required disabled > </select> 
           	</div>
 						<div class="col-md-3"> 
 							<label class="control-label text-ellipsis"> Num. Documento. <small class="text-danger">(*)</small></label> 
               <input id="numDocumento" type="text" class="form-control input-sm" ng-model="fData.num_documento" ng-enter="obtenerDatosCliente(); $event.preventDefault();" 
-              	placeholder="Numero de Documento" ng-change="limpiarCampos();" tabindex="110" ng-pattern="pNumeroDocumento" required /> 
+              	placeholder="Numero de Documento" ng-change="limpiarCampos();" tabindex="110" ng-pattern="pNumeroDocumento" required readonly="readonly" /> 
               <span class="help-block m-b-none f-10 text-ellipsis">Presiona "Enter" para buscar.</span>
 						</div>	
 						<div class="col-md-6" ng-show="fData.tipo_documento_cliente.destino == 1"> <!-- EMPRESA -->
@@ -42,13 +31,13 @@
           <div class="form-group pull-in clearfix mb-n"> 
           	<div class="col-md-6" ng-show="fData.tipo_documento_cliente.destino == 1"> 
 							<label class="control-label text-ellipsis"> Contacto. </label> 
-							<div class="input-group"> 
-              	<input type="text" ng-model="fData.contacto" class="form-control input-sm "
+							<div class="input-group" style="width: 100%;"> 
+              	<input type="text" ng-model="fData.contacto" class="form-control input-sm" readonly="readonly"
 									placeholder="Busque Contacto" typeahead-loading="loadingCT" uib-typeahead="item as item.contacto for item in getContactoAutocomplete($viewValue)"
 	            		typeahead-on-select="getSelectedContacto($item, $model, $label)" typeahead-min-length="2" autocomplete ="off" ng-blur="validateContacto();" tabindex="140"/> 
-	            	<span class="input-group-btn">
+	            	<!-- <span class="input-group-btn">
 	                <button class="btn btn-default btn-sm" type="button" ng-click="btnBusquedaContacto();" tabindex="150"><i class="fa fa-search"></i> </button>
-	              </span>
+	              </span> -->
 	            </div>
 	            <i ng-show="loadingCT" class="fa fa-refresh"></i>
 	            <div ng-show="noResultsCT" class="text-danger">
@@ -64,15 +53,6 @@
 									tabindex="157" style="width:30%;display: inline-block;" /> 
 							</div> 
 						</div> 
-          	<!-- <div class="col-md-6" ng-show="fData.tipo_documento_cliente.destino == 1"> 
-          		<label class="control-label"> Representante Legal </label>
-							<div class="input-group-btn">
-								<input type="text" class="form-control input-sm" ng-model="fData.cliente.representante_legal" placeholder="Representante Legal" readonly="readonly" 
-									tabindex="140" style="margin-right: 4%;width:66%;display: inline-block;" />
-								<input type="text" class="form-control input-sm" ng-model="fData.cliente.dni_representante_legal" placeholder="DNI" readonly="readonly" 
-									tabindex="150" style="width:30%;display: inline-block;" />
-							</div> 
-						</div>  -->
 						<div class="col-md-6" ng-show="fData.tipo_documento_cliente.destino == 2">
           		<label class="control-label text-ellipsis"> Correo Electrónico </label>
 							<input type="text" class="form-control input-sm" ng-model="fData.cliente.email" placeholder="Correo Electrónico" readonly="readonly" tabindex="160" /> 
@@ -88,10 +68,7 @@
 				<fieldset >
 					<legend class="lead lead-sm"> Datos de la Cotización 
 						<div class="pull-right text-right">
-              <small class="text-default block" style="font-size: 18px;" > Cot. N° <strong>{{ fData.num_cotizacion }}</strong>
-                  <button tooltip-placement="bottom" tooltip="Actualizar" title="" type="button" class="btn btn-xs btn-warning" uib-tooltip="Actualizar" 
-                  	ng-click="metodos.generarNumeroCotizacion(true); $event.preventDefault();" > <i class="icon-reload"></i> </button>
-              </small>  
+              <small class="text-default block" style="font-size: 18px;" > Cot. N° <strong>{{ fData.num_cotizacion }}</strong> </small>  
             </div>
 					</legend>
 					<div class="form-group-sm pull-in clearfix " > 
@@ -110,7 +87,7 @@
           	</div>
           	<div class="col-md-3 col-sm-12">
               <label class="control-label text-ellipsis"> Estado </label> 
-              <select class="form-control input-sm" ng-model="fData.estado_cotizacion" ng-options="item as item.descripcion for item in fArr.listaEstadosCotizacion" 
+              <select disabled class="form-control input-sm" ng-model="fData.estado_cotizacion" ng-options="item as item.descripcion for item in fArr.listaEstadosCotizacion" 
               	tabindex="230" > </select> 
           	</div>
           </div>
@@ -125,9 +102,9 @@
               	tabindex="220" > </select> 
               <span class="help-block m-b-none f-10"> <a ng-show="fData.forma_pago.modo == 2" href="" class="text-info pull-right" ng-click='metodos.verPlazosPago();'> VER PLAZOS DE PAGO. </a> </span> 
           	</div>
-          	<!-- <div class="col-md-3 col-sm-12" ng-if=""> 
+          	<!-- <div class="col-md-3 col-sm-12">
               <label class="control-label text-ellipsis"> Colaborador </label> 
-              <label class="control-label text-info text-bold text-ellipsis"> {{ fSessionCI.nombres + ' ' + fSessionCI.apellidos }} </label> 
+              <label class="control-label text-info text-bold text-ellipsis"> {{ fData.colaborador.colaborador }} </label> 
           	</div> -->
           	<div class="col-md-3 col-sm-12" > 
               <label class="control-label text-ellipsis"> Colaborador </label> 
@@ -280,14 +257,12 @@
 	    <div class="col-xs-12 text-right" >
 	    	<button type="button" class="btn-info btn pull-left" ng-click="goToUrl('/app/historial-cotizacion'); $event.preventDefault();" tabindex="415"> 
 	    		<i class="fa fa-save"> </i> COTIZACIONES </button> 
-	    	<button type="button" class="btn-primary btn" ng-click="grabar(); $event.preventDefault();" ng-disabled="formCotizacion.$invalid && !fData.isRegisterSuccess" tabindex="420"> 
+	    	<button type="button" class="btn-primary btn" ng-click="grabar(); $event.preventDefault();" tabindex="420"> 
 	    		<i class="fa fa-save"> </i> [F2] GRABAR </button> 
-	    	<button type="button" class="btn-success btn mr-lg" ng-click="imprimir(); $event.preventDefault();" ng-disabled="!fData.isRegisterSuccess" tabindex="430"> 
+	    	<button type="button" class="btn-success btn mr-lg" ng-click="imprimir(); $event.preventDefault();" tabindex="430"> 
 	        	<i class="fa fa-print"> </i> [F4] IMPRIMIR </button> 
-	      <button type="button" class="btn-default btn" ng-click="reloadPage(); $event.preventDefault();" tabindex="440"> 
+	      <button type="button" class="btn-default btn" ng-click="goToUrl('/app/nueva-cotizacion'); $event.preventDefault();" tabindex="440"> 
 	        	<i class="fa fa-file"> </i> [F3] NUEVO </button>
-	      <button type="button" class="btn-warning btn" ng-click="mismoCliente(); $event.preventDefault();" tabindex="450" > 
-	        	<i class="fa fa-file"> </i> [F6] MISMO CLIENTE </button> 
 	    </div>
 	  </div>
 	</form>

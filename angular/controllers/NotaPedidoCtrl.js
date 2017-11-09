@@ -566,6 +566,11 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
       $scope.fData.temporal.num_cotizacion = null; 
       return false;
     }
+    if(model.estado == 0){ // anulado 
+      pinesNotifications.notify({ title: 'OK!', text: 'Esta cotización no puede enviarse ya que a sido anulada.', type: 'warning', delay: 3500 });
+      $scope.fData.temporal.num_cotizacion = null; 
+      return false;
+    }
     
     var clear = clear || false;
     var iddetallecotizacion = iddetallecotizacion || null;
@@ -727,8 +732,8 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
           multiSelect: false,
           columnDefs: [ 
             { field: 'idcotizacion', name: 'cot.idcotizacion', displayName: 'ID', width: '75', visible: false },
-            { field: 'num_cotizacion', name: 'cot.num_cotizacion', displayName: 'COD. COTIZACION', width: '120' },
-            { field: 'fecha_emision', name: 'cot.fecha_emision', displayName: 'F. Emisión', minWidth: 100, enableFiltering: false,  sort: { direction: uiGridConstants.DESC} },
+            { field: 'num_cotizacion', name: 'cot.num_cotizacion', displayName: 'COD. COTIZACION', width: '120',  sort: { direction: uiGridConstants.DESC} },
+            { field: 'fecha_emision', name: 'cot.fecha_emision', displayName: 'F. Emisión', minWidth: 100, enableFiltering: false },
             { field: 'fecha_registro', name: 'cot.fecha_registro', displayName: 'F. Registro', minWidth: 100, enableFiltering: false, visible: false },
             { field: 'cliente', name: 'cliente_persona_empresa', displayName: 'Cliente', minWidth: 180 },
             { field: 'colaborador', name: 'colaborador', displayName: 'Colaborador', minWidth: 160, visible: false },
@@ -754,6 +759,7 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
               $scope.mySelectionGridCOT = gridApi.selection.getSelectedRows(); 
               var params = { 
                 searchText: $scope.mySelectionGridCOT[0].num_cotizacion, 
+                idcotizacion: $scope.mySelectionGridCOT[0].idcotizacion,
                 searchColumn: "num_cotizacion",
                 sensor: false,
                 datos: $scope.fData, 
@@ -761,8 +767,8 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
               }; 
               // console.log(params,'params'); 
               CotizacionServices.sBuscarNumCotizacionAutocomplete(params).then(function(rpta) { 
-                if( rpta.flag === 0 ){ 
-                  pinesNotifications.notify({ title: 'OK!', text: 'No se encontraron cotizaciones.', type: 'warning', delay: 3000 });
+                if( rpta.flag == 0 ){ 
+                  pinesNotifications.notify({ title: 'OK!', text: 'No se encontraron cotizaciones o a sido anulada.', type: 'warning', delay: 3000 });
                 }else if(rpta.flag === 1){ 
                   $scope.getSelectedNumCotizacion(false,rpta.datos[0],true); 
                   $scope.fData.temporal.num_cotizacion = $scope.mySelectionGridCOT[0].num_cotizacion;
@@ -815,7 +821,7 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
             });
           }
         };
-        paginationOptions.sortName = $scope.gridOptionsCOT.columnDefs[2].name; 
+        paginationOptions.sortName = $scope.gridOptionsCOT.columnDefs[1].name; 
         $scope.metodos.getPaginationServerSide = function(loader) { 
           if( loader ){
             blockUI.start('Procesando información...');
@@ -922,6 +928,7 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
               $scope.mySelectionGridDETCOT = gridApi.selection.getSelectedRows(); 
               var params = { 
                 searchText: $scope.mySelectionGridDETCOT[0].num_cotizacion, 
+                idcotizacion: $scope.mySelectionGridDETCOT[0].idcotizacion,
                 searchColumn: "num_cotizacion",
                 sensor: false,
                 datos: $scope.fData, 
@@ -929,8 +936,8 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
               }; 
               // console.log(params,'params'); 
               CotizacionServices.sBuscarNumCotizacionAutocomplete(params).then(function(rpta) { 
-                if( rpta.flag === 0 ){ 
-                  pinesNotifications.notify({ title: 'OK!', text: 'No se encontraron cotizaciones.', type: 'warning', delay: 3000 });
+                if( rpta.flag == 0 ){ 
+                  pinesNotifications.notify({ title: 'OK!', text: 'No se encontraron cotizaciones o a sido anulada.', type: 'warning', delay: 3000 });
                 }else if(rpta.flag === 1){ 
                   $scope.getSelectedNumCotizacion(false,rpta.datos[0],false,$scope.mySelectionGridDETCOT[0].iddetallecotizacion); 
                   // $scope.fData.temporal.num_cotizacion = $scope.mySelectionGridDETCOT[0].num_cotizacion;
@@ -1259,8 +1266,11 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
     $scope.fData.igv = MathFactory.redondear(igv).toFixed($scope.fConfigSys.num_decimal_total_key);
     $scope.fData.total = MathFactory.redondear(total).toFixed($scope.fConfigSys.num_decimal_total_key);
   }
-  $scope.calcularImporte = function (){
-    if(/*$scope.fData.temporal.precio_unitario != '' && $scope.fData.temporal.cantidad != '' &&*/ angular.isObject($scope.fData.temporal.elemento) ){ 
+  $scope.calcularImporte = function (){ 
+    if( !$scope.fData.temporal.precio_unitario ){
+      return false; 
+    }
+    if(angular.isObject($scope.fData.temporal.elemento) ){ 
       if( $scope.fData.modo_igv == 2 ){ 
         console.log('Calculando modo NO INCLUYE IGV');
         $scope.fData.temporal.importe_sin_igv = (parseFloat($scope.fData.temporal.precio_unitario) * parseFloat($scope.fData.temporal.cantidad)).toFixed($scope.fConfigSys.num_decimal_precio_key);

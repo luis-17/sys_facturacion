@@ -62,7 +62,14 @@ class Colaborador extends CI_Controller {
 		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
     	$arrData['flag'] = 0;
     	// VALIDACIONES
-    	
+    	if( empty($allInputs['idusuario']) ){ 
+    		$arrData['message'] = 'Asigne un usuario para el colaborador.';
+    		$arrData['flag'] = 0;
+    		$this->output
+			    ->set_content_type('application/json')
+			    ->set_output(json_encode($arrData));
+		    return;
+    	}
     	$this->db->trans_start();
 		if($this->model_colaborador->m_registrar($allInputs)) { // registro de elemento
 			$arrData['message'] = 'Se registraron los datos correctamente';

@@ -103,8 +103,8 @@ app.controller('HistorialCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$b
     multiSelect: false,
     columnDefs: [ 
       { field: 'idcotizacion', name: 'cot.idcotizacion', displayName: 'ID', width: '75', visible: false },
-      { field: 'num_cotizacion', name: 'cot.num_cotizacion', displayName: 'COD. COTIZACION', width: '120' },
-      { field: 'fecha_emision', name: 'cot.fecha_emision', displayName: 'F. Emisión', minWidth: 100, enableFiltering: false,  sort: { direction: uiGridConstants.DESC} },
+      { field: 'num_cotizacion', name: 'cot.num_cotizacion', displayName: 'COD. COTIZACION', width: '120',  sort: { direction: uiGridConstants.DESC} },
+      { field: 'fecha_emision', name: 'cot.fecha_emision', displayName: 'F. Emisión', minWidth: 100, enableFiltering: false },
       { field: 'fecha_registro', name: 'cot.fecha_registro', displayName: 'F. Registro', minWidth: 100, enableFiltering: false, visible: false },
       { field: 'cliente', name: 'cliente_persona_empresa', displayName: 'Cliente', minWidth: 180 },
       { field: 'colaborador', name: 'colaborador', displayName: 'Colaborador', minWidth: 160 },
@@ -117,8 +117,8 @@ app.controller('HistorialCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$b
       { field: 'igv', name: 'cot.igv', displayName: 'IGV', minWidth: 80 },
       { field: 'total', name: 'cot.total', displayName: 'Total', minWidth: 80 },
       { field: 'estado', type: 'object', name: 'estado', displayName: 'ESTADO', width: '95', enableFiltering: false, enableSorting: false, enableColumnMenus: false, enableColumnMenu: false, 
-          cellTemplate:'<div class="">' + 
-            '<label tooltip-placement="left" tooltip="{{ COL_FIELD.labelText }}" class="label {{ COL_FIELD.claseLabel }} ml-xs">'+ 
+          cellTemplate:'<div class="ui-grid-cell-contents">' + 
+            '<label tooltip-placement="left" tooltip="{{ COL_FIELD.labelText }}" class=" label {{ COL_FIELD.claseLabel }} ml-xs">'+ 
             '<i class="fa {{ COL_FIELD.claseIcon }}"></i> {{COL_FIELD.labelText}} </label>'+ 
             '</div>' 
       }
@@ -167,7 +167,7 @@ app.controller('HistorialCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$b
       });
     }
   };
-  paginationOptions.sortName = $scope.gridOptionsCot.columnDefs[2].name; 
+  paginationOptions.sortName = $scope.gridOptionsCot.columnDefs[1].name; 
   $scope.metodos.getPaginationServerSide = function(loader) { 
     if( loader ){
       blockUI.start('Procesando información...');
@@ -203,7 +203,31 @@ app.controller('HistorialCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$b
     }
     ModalReporteFactory.getPopupReporte(arrParams);
   }
-
+  $scope.btnAnular = function() {
+    var pMensaje = '¿Realmente desea anular la cotización?';
+    $bootbox.confirm(pMensaje, function(result) { 
+      if(result){
+        var arrParams = { 
+          idcotizacion: $scope.mySelectionGrid[0].idcotizacion 
+        };
+        blockUI.start('Procesando información...');
+        CotizacionServices.sAnular(arrParams).then(function (rpta) {
+          if(rpta.flag == 1){
+            var pTitle = 'OK!';
+            var pType = 'success';
+            $scope.metodos.getPaginationServerSide();
+          }else if(rpta.flag == 0){
+            var pTitle = 'Error!';
+            var pType = 'danger';
+          }else{
+            alert('Error inesperado');
+          }
+          pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2500 });
+          blockUI.stop(); 
+        });
+      }
+    });
+  }
   //***grid detalle cotizacion
   var paginationOptionsDet = { 
     pageNumber: 1,
@@ -228,14 +252,15 @@ app.controller('HistorialCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$b
     multiSelect: false,
     columnDefs: [ 
       { field: 'iddetallecotizacion', name: 'dcot.iddetallecotizacion', displayName: 'ID', width: '75', visible: false },
-      { field: 'num_cotizacion', name: 'cot.num_cotizacion', displayName: 'COD. COTIZACION', width: '120' },
-      { field: 'fecha_emision', name: 'cot.fecha_emision', displayName: 'F. Emisión', minWidth: 100, enableFiltering: false,  sort: { direction: uiGridConstants.DESC} },
+      { field: 'num_cotizacion', name: 'cot.num_cotizacion', displayName: 'COD. COTIZACION', width: '120',  sort: { direction: uiGridConstants.DESC} },
+      { field: 'fecha_emision', name: 'cot.fecha_emision', displayName: 'F. Emisión', minWidth: 100, enableFiltering: false },
       { field: 'fecha_registro', name: 'cot.fecha_registro', displayName: 'F. Registro', minWidth: 100, enableFiltering: false, visible: false },
       { field: 'sede', name: 'se.descripcion_se', displayName: 'Sede', minWidth: 105 },
-      { field: 'cliente', name: 'cliente_persona_empresa', displayName: 'Cliente', minWidth: 180 },
-      { field: 'categoria_elemento', type: 'object', name: 'cael.descripcion_cael', displayName: 'Categoria Elemento', minWidth: 160, enableColumnMenus: false, enableColumnMenu: false,cellTemplate:'<div class="ui-grid-cell-contents text-center ">'+'<label class="label bg-primary block" style="background-color:{{COL_FIELD.color}}">{{ COL_FIELD.descripcion }}</label></div>' 
-      },    
-      { field: 'elemento', name: 'ele.descripcion_ele', displayName: 'Elemento', minWidth: 160 }, 
+      { field: 'cliente', name: 'cliente_persona_empresa', displayName: 'Cliente', minWidth: 220 },
+      { field: 'categoria_elemento', type: 'object', name: 'cael.descripcion_cael', displayName: 'Categoria Elemento', minWidth: 160, visible: false, enableColumnMenus: false, enableColumnMenu: false, 
+        cellTemplate:'<div class="ui-grid-cell-contents text-center ">'+'<label class="label bg-primary block" style="background-color:{{COL_FIELD.color}}">{{ COL_FIELD.descripcion }}</label></div>' 
+      }, 
+      { field: 'elemento', name: 'ele.descripcion_ele', displayName: 'Elemento', minWidth: 280 }, 
       { field: 'precio_unitario', name: 'dcot.precio_unitario', displayName: 'Precio Unitario', minWidth: 90 }, 
       { field: 'cantidad', name: 'dcot.cantidad', displayName: 'Cantidad', minWidth: 90 },
       { field: 'importe_con_igv', name: 'dcot.importe_con_igv', displayName: 'Importe', minWidth: 90 }, 
@@ -288,7 +313,7 @@ app.controller('HistorialCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$b
       });
     }
   };
-  paginationOptionsDet.sortName = $scope.gridOptionsCotDet.columnDefs[2].name; 
+  paginationOptionsDet.sortName = $scope.gridOptionsCotDet.columnDefs[1].name; 
   $scope.metodos.getPaginationServerSideCotDet = function(loader) { 
     if( loader ){
       blockUI.start('Procesando información...');
