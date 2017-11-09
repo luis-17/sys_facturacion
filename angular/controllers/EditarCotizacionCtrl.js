@@ -614,7 +614,7 @@ app.controller('EditarCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$boot
           { id: 2, agrupacion: 'GRUPO 2' },
           { id: 3, agrupacion: 'GRUPO 3' },
           { id: 4, agrupacion: 'GRUPO 4' }
-        ]//,cellTemplate: '<div class="ui-grid-cell-contents text-center ">'+ '{{ COL_FIELD }}</div>' 
+        ]//,cellTemplate: '<div class="ui-grid-cell-contents text-center ">'+ '{{ COL_FIELD }}</div>' agrupador_totalizado
       },
       { field: 'accion', displayName: 'ACCIÓN', width: 110, enableCellEdit: false, enableSorting: false, 
         cellTemplate:'<div class="m-xxs text-center">'+ 
@@ -628,7 +628,7 @@ app.controller('EditarCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$boot
       $scope.gridApi = gridApi;
       gridApi.edit.on.afterCellEdit($scope,function (rowEntity, colDef, newValue, oldValue){ 
         rowEntity.column = colDef.field;
-        console.log(oldValue,newValue,'oldValue,newValue');
+        console.log($scope.fConfigSys.num_decimal_precio_key,'$scope.fConfigSys.num_decimal_precio_key',rowEntity,'rowEntity');
         if(rowEntity.column == 'cantidad'){
           if( !(rowEntity.cantidad >= 1) ){
             var pTitle = 'Advertencia!';
@@ -852,31 +852,6 @@ app.controller('EditarCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$boot
     $scope.gridOptions.data.splice(index,1);
     $scope.calcularTotales(); 
   }
-  // $scope.btnEliminarDeLaCesta = function (row) {
-  //   var pMensaje = '¿Realmente desea quitar el item?';
-  //   $bootbox.confirm(pMensaje, function(result) { 
-  //     if(result){
-  //       var arrParams = {  
-  //         idcotizacion: row.entity.idcotizacion 
-  //       };
-  //       blockUI.start('Procesando información...');
-  //       CotizacionServices.sAnularDetalleCotizacion(arrParams).then(function (rpta) {
-  //         if(rpta.flag == 1){
-  //           var pTitle = 'OK!';
-  //           var pType = 'success';
-  //           //$scope.metodos.getPaginationServerSide();
-  //         }else if(rpta.flag == 0){
-  //           var pTitle = 'Error!';
-  //           var pType = 'danger';
-  //         }else{
-  //           alert('Error inesperado');
-  //         }
-  //         pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2500 });
-  //         blockUI.stop(); 
-  //       });
-  //     }
-  //   });
-  // }
   $scope.cambiarModo = function(){ // 
     if( $scope.fData.modo_igv == 2){
       console.log('Calculando modo NO INCLUYE IGV');
@@ -1062,7 +1037,6 @@ app.controller('EditarCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$boot
         }
       });  
   }
-  
 }]);
 
 app.filter('mapInafecto', function() { 
@@ -1087,6 +1061,7 @@ app.filter('mapAgrupacion', function() {
     4: 'GRUPO 4'
   };
   return function(input) {
+    console.log(input,'inputinputinput');
     if (!input){
       return '';
     } else {

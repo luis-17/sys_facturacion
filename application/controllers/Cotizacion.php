@@ -237,13 +237,13 @@ class Cotizacion extends CI_Controller {
 				'importe_con_igv' => number_format($row['importe_con_igv'],$fConfig['num_decimal_total_key'],'.',''), 
 				'importe_sin_igv' => number_format($row['importe_sin_igv'],$fConfig['num_decimal_total_key'],'.',''), 
 				'excluye_igv' => $row['excluye_igv'], 
-				'igv_detalle' => number_format($row['igv_detalle'],$fConfig['num_decimal_total_key'],'.',''), 
+				'igv_detalle' => number_format($row['igv_detalle'],$fConfig['num_decimal_total_key'],'.',''), // agrupacion
 				'igv' => $row['igv_detalle'], 
 				'unidad_medida' => array( 
 					'id'=> $row['idunidadmedida'],
 					'descripcion'=> $row['descripcion_um'] 
 				),
-				'agrupador_totalizado' => (int)$row['agrupador_totalizado'],
+				'agrupacion' => (int)$row['agrupador_totalizado'],
 				'caracteristicas' => array() 
 			);
 			$arrListadoDetalle[$row['iddetallecotizacion']] = $arrAux; 
@@ -331,7 +331,7 @@ class Cotizacion extends CI_Controller {
 					'id'=> $row['idunidadmedida'],
 					'descripcion'=> $row['descripcion_um'] 
 				),
-				'agrupador_totalizado' => $row['agrupador_totalizado'],
+				'agrupacion' => (int)$row['agrupador_totalizado'],
 				'caracteristicas' => array() 
 			);
 			$arrListado[$row['iddetallecotizacion']] = $arrAux; 
@@ -403,7 +403,7 @@ class Cotizacion extends CI_Controller {
 				'excluye_igv' => $row['excluye_igv'], 
 				'igv_detalle' => $row['igv_detalle'], 
 				'unidad_medida' => $row['descripcion_um'], 
-				'agrupador_totalizado' => $row['agrupador_totalizado'],
+				'agrupacion' => (int)$row['agrupador_totalizado'],
 				'estado' => $objEstado, 
 				'caracteristicas' => array() 
 
@@ -831,30 +831,67 @@ class Cotizacion extends CI_Controller {
 	    $detalleEle = $this->model_cotizacion->m_cargar_detalle_cotizacion_por_id($allInputs['id']);
 	    // var_dump($detalleEle); exit(); 
 	    $arrGroupBy = array(); 
-
-	    foreach ($detalleEle as $key => $value) {
-	    	// var_dump($detalleEle);
-	    	$rowAux = array(
-	    		'iddetallecotizacion' =>$value['iddetallecotizacion'],
-	    		'descripcion_ele' =>$value['descripcion_ele'],
-	    		'cantidad' =>$value['cantidad'],
-	    		'abreviatura_um' =>$value['abreviatura_um'],
-	    		'precio_unitario' =>$value['precio_unitario'],
-	    		'importe_con_igv' =>$value['importe_con_igv'],
-	    		'importe_sin_igv' =>$value['importe_sin_igv'],
-	    		'detallecaracteristica' =>array()
-	    	);
-	    	$arrGroupBy[$value['iddetallecotizacion']] = $rowAux;
-	    }
-	    
-		foreach ($detalleEle as $key => $value) {
+	    foreach ($detalleEle as $key => $value) { 
+	    	if( !empty($value['agrupador_totalizado']) ){ 
+	    		$rowAux = array(
+		    		'iddetallecotizacion' =>$value['iddetallecotizacion'],
+		    		'descripcion_ele' =>$value['descripcion_ele'],
+		    		// 'cantidad' =>$value['cantidad'],
+		    		// 'abreviatura_um' =>$value['abreviatura_um'],
+		    		// 'precio_unitario' =>$value['precio_unitario'],
+		    		// 'importe_con_igv' =>$value['importe_con_igv'],
+		    		// 'importe_sin_igv' =>$value['importe_sin_igv'],
+		    		'num_agrupacion' =>$value['agrupador_totalizado'],
+		    		'agrupado' => TRUE,
+		    		'detallesubitems' => array(),
+		    		'detallecaracteristica' =>array()
+		    	); 
+	    		$arrGroupBy[$value['agrupador_totalizado'].'.dif'] = $rowAux;
+	    	}else{
+	    		$rowAux = array(
+		    		'iddetallecotizacion' =>$value['iddetallecotizacion'],
+		    		'descripcion_ele' =>$value['descripcion_ele'],
+		    		'cantidad' =>$value['cantidad'],
+		    		'abreviatura_um' =>$value['abreviatura_um'],
+		    		'precio_unitario' =>$value['precio_unitario'],
+		    		'importe_con_igv' =>$value['importe_con_igv'],
+		    		'importe_sin_igv' =>$value['importe_sin_igv'],
+		    		'num_agrupacion' =>$value['agrupador_totalizado'],
+		    		'agrupado' => FALSE,
+		    		'detallesubitems' => array(),
+		    		'detallecaracteristica' =>array()
+		    	); 
+	    		$arrGroupBy[$value['iddetallecotizacion']] = $rowAux;
+	    	}
+	    	
+	    } 
+	    // caracteristicas
+		foreach ($detalleEle as $key => $value) { 
 			if( !empty($value['iddetallecaracteristica']) ){ 
-				$rowAux=array(
+				$rowAux = array( 
 		    		'iddetallecaracteristica' => $value['iddetallecaracteristica'],
 		    		'descripcion_car' => $value['descripcion_car'],
 		    		'valor' => $value['valor'] 
 		    	);
-		    	$arrGroupBy[$value['iddetallecotizacion']]['detallecaracteristica'][$value['iddetallecaracteristica']] = $rowAux; 
+		    	if( !empty($value['agrupador_totalizado']) ){ 
+		    		$arrGroupBy[$value['agrupador_totalizado'].'.dif']['detallecaracteristica'][$value['idcaracteristica']] = $rowAux; 
+		    	}else{
+		    		$arrGroupBy[$value['iddetallecotizacion']]['detallecaracteristica'][$value['iddetallecaracteristica']] = $rowAux; 
+	    		}
+
+	    	} 
+		}
+		// subitems 
+		foreach ($detalleEle as $key => $value) {
+			if( !empty($value['agrupador_totalizado']) ){ 
+				$rowAux = array( 
+		    		'cantidad' =>$value['cantidad'],
+	    			'abreviatura_um' =>$value['abreviatura_um'],
+	    			'precio_unitario' =>$value['precio_unitario'],
+	    			'importe_con_igv' =>$value['importe_con_igv'],
+	    			'importe_sin_igv' =>$value['importe_sin_igv']
+		    	);
+		    	$arrGroupBy[$value['agrupador_totalizado'].'.dif']['detallesubitems'][$value['iddetallecotizacion']] = $rowAux; 
 	    	} 
 		}
 	  	// print_r($arrGroupBy); exit();
@@ -863,12 +900,14 @@ class Cotizacion extends CI_Controller {
 	    $this->pdf->SetDrawColor($r_sec,$g_sec,$b_sec); // gris fill 
 	    $this->pdf->SetLineWidth(.1);
 	    foreach ($arrGroupBy as $key => $value) { 
-	    	if( $fila['modo_igv'] == 1){ 
-	    		$valImporte = $value['importe_con_igv'];
-	    	}
-	    	if( $fila['modo_igv'] == 2 ){
-	    		$valImporte = $value['importe_sin_igv'];
-	    	}
+	    	if( $value['agrupado'] === FALSE ){ 
+		    	if( $fila['modo_igv'] == 1){ 
+		    		$valImporte = $value['importe_con_igv'];
+		    	}
+		    	if( $fila['modo_igv'] == 2 ){
+		    		$valImporte = $value['importe_sin_igv'];
+		    	}
+		    }
 		    $fill = !$fill;		
 		    $this->pdf->SetWidths(array(10, 100, 20, 18, 20, 26));
 		    $this->pdf->SetAligns(array('L', 'L', 'C', 'C', 'R', 'R'));
@@ -885,23 +924,40 @@ class Cotizacion extends CI_Controller {
 					array('family'=> NULL, 'weight'=> NULL, 'size'=> 8 )
 				)
 			);
-		    $this->pdf->Row( 
-		      array(
-		        $i,
-		        utf8_decode($value['descripcion_ele']),
-		        strtoupper($value['abreviatura_um']),
-		        $value['cantidad'],
-		        number_format($value['precio_unitario'],$fConfig['num_decimal_precio_key'],'.',' '),
-		        number_format($valImporte,$fConfig['num_decimal_total_key'],'.',' ')
-		      ),
-		      FALSE, 0, FALSE, 4, FALSE, FALSE, FALSE, FALSE, $arrItemDetalle['fontSize'] 
-		    );
+			if( $value['agrupado'] === FALSE ){ 
+				$this->pdf->Row( 
+			      array(
+			        $i,
+			        utf8_decode($value['descripcion_ele']),
+			        strtoupper($value['abreviatura_um']),
+			        $value['cantidad'],
+			        number_format($value['precio_unitario'],$fConfig['num_decimal_precio_key'],'.',' '),
+			        number_format($valImporte,$fConfig['num_decimal_total_key'],'.',' ')
+			      ),
+			      FALSE, 0, FALSE, 4, FALSE, FALSE, FALSE, FALSE, $arrItemDetalle['fontSize'] 
+			    );
+			}
+			if( $value['agrupado'] === TRUE ){ 
+				$this->pdf->Row( 
+			      array(
+			        $i,
+			        utf8_decode($value['descripcion_ele']),
+			        '',
+			        '',
+			        '',
+			        ''
+			      ),
+			      FALSE, 0, FALSE, 4, FALSE, FALSE, FALSE, FALSE, $arrItemDetalle['fontSize'] 
+			    );
+			    $GetYElement = $this->pdf->GetY()-2; 
+			    $GetXElement = $this->pdf->GetX() + 110; 
+			}
+		    
 		    $i++;
 		  	$this->pdf->SetTextColor(66,66,66);
 		   	$this->pdf->SetFont('Arial','',6);
-		   	// $this->pdf->Cell(194,0.8,'','B',1,'C',0); 
 			foreach ($value['detallecaracteristica'] as $key => $row) { 
-				$this->pdf->SetWidths(array(10, 25, 5, 100));
+				$this->pdf->SetWidths(array(10, 32, 5, 100));
 		    	$this->pdf->SetAligns(array('L', 'L', 'L', 'L'));
 				$arrCaracts = array( 
 					'data'=> array(
@@ -917,12 +973,50 @@ class Cotizacion extends CI_Controller {
 						array('family'=> NULL, 'weight'=> NULL, 'size'=> 6 )
 					)
 				);
-				$this->pdf->Row( $arrCaracts['data'],FALSE,0,FALSE,3,FALSE,FALSE,FALSE,FALSE,$arrCaracts['fontSize'] );
-				// $this->pdf->Cell(10,3,'',0,0,'C',0);  
-				// $this->pdf->Cell(184,3,utf8_decode($row['descripcion_car']).': ',0,1,'L',0); 
-				// $this->pdf->Cell(184,3,utf8_decode(': '.$row['valor']),0,1,'L',0); 
+				$this->pdf->Row( $arrCaracts['data'],FALSE,'0',FALSE,3,FALSE,FALSE,FALSE,FALSE,$arrCaracts['fontSize'] ); 
+			}
+			$GetYElementCaracts = $this->pdf->GetY(); 
+			if( $value['agrupado'] === TRUE ){ 
+				$this->pdf->SetY($GetYElement);
+				foreach ($value['detallesubitems'] as $key => $row) { 
+					$this->pdf->SetX($GetXElement);
+					$this->pdf->SetWidths(array(20, 18, 20, 26));
+			    	$this->pdf->SetAligns(array('C', 'C', 'R', 'R')); 
+			    	if( $fila['modo_igv'] == 1){ 
+			    		$valImporte = $row['importe_con_igv'];
+			    	}
+			    	if( $fila['modo_igv'] == 2 ){
+			    		$valImporte = $row['importe_sin_igv'];
+			    	}
+					$arrCaracts = array( 
+						'data'=> array( 
+							strtoupper($row['abreviatura_um']),
+							$row['cantidad'],
+							number_format($row['precio_unitario'],$fConfig['num_decimal_precio_key'],'.',' '),
+			        		number_format($valImporte,$fConfig['num_decimal_total_key'],'.',' ')
+						),
+						'fontSize'=> array( 
+							array('family'=> NULL, 'weight'=> NULL, 'size'=> 9 ),
+							array('family'=> NULL, 'weight'=> NULL, 'size'=> 9 ),
+							array('family'=> NULL, 'weight'=> NULL, 'size'=> 9 ),
+							array('family'=> NULL, 'weight'=> NULL, 'size'=> 9 )
+						)
+					);
+					$this->pdf->Row( $arrCaracts['data'],FALSE,'0',FALSE,6,FALSE,FALSE,FALSE,FALSE,$arrCaracts['fontSize'] ); 
+				} 
+			}
+			$GetYElementSubItems = $this->pdf->GetY(); 
+			if( $value['agrupado'] === TRUE ){ 
+				if( $GetYElementSubItems > $GetYElementCaracts ){
+					$GetYElementSelected = $GetYElementSubItems;
+				}else{
+					$GetYElementSelected = $GetYElementCaracts;
+				}
+				
+				$this->pdf->SetY($GetYElementSelected); 
 			}
 			$this->pdf->Cell(194,0.8,'','B',1,'C',0); 
+			
 	    }
 	    $this->pdf->SetXY(8,-34); 
 	    //$this->pdf->Ln(1);
@@ -1077,7 +1171,7 @@ class Cotizacion extends CI_Controller {
 			foreach ($allInputs['detalle'] as $key => $elemento) { 
 				$elemento['idcotizacion'] = $arrData['idcotizacion'];
 				if( empty($elemento['agrupacion']) ){ 
-					$elemento['agrupacion'] = 1; // por defecto 
+					$elemento['agrupacion'] = NULL; // por defecto 
 				} 
 				if( $this->model_cotizacion->m_registrar_detalle_cotizacion($elemento) ){ 
 					$arrData['message'] = 'Los datos se registraron correctamente - (no caracteristicas)'; 
@@ -1162,7 +1256,7 @@ class Cotizacion extends CI_Controller {
     		foreach ($allInputs['detalle'] as $key => $elemento) { 
     			$elemento['idcotizacion'] = $allInputs['idcotizacion'];
     			if( empty($elemento['agrupacion']) ){ 
-					$elemento['agrupacion'] = 1; // por defecto 
+					$elemento['agrupacion'] = NULL; // por defecto 
 				}
     			if( empty($elemento['iddetallecotizacion']) ){
     				// agregar un detalle a cotizacion 
