@@ -1346,6 +1346,23 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     }
     ModalReporteFactory.getPopupReporte(arrParams);
   }
+
+  $scope.imprimirvista = function() {
+    console.log($scope.gridOptions,'$scope.gridOptions')
+    console.log($scope.fData,'$scope.fData');
+    var arrParams = { 
+      titulo: 'VISTA PREVIA DE COTIZACIÓN',
+      datos:{
+        id: $scope.fData,
+        codigo_reporte: 'COT-FCOT'
+      },
+      envio_correo: 'si',
+      salida: 'pdf',
+      url: angular.patchURLCI + "Cotizacion/imprimir_cotizacion_vista" 
+    }
+    ModalReporteFactory.getPopupReporte(arrParams);
+  }
+
   $scope.metodos.verPlazosPago = function() {
     console.log($scope.fData.total,'$scope.fData.total');
       // console.log($scope.fData.fecha_emision,'$scope.fData.fecha_emision');
