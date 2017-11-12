@@ -58,7 +58,8 @@ app.controller('HistorialCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$b
   $scope.fArr.listaEstadosCotizacion = [
     {'id' : 'ALL', 'descripcion' : '--TODOS--'},
     {'id' : 1, 'descripcion' : 'POR ENVIAR'},
-    {'id' : 2, 'descripcion' : 'ENVIADO'}
+    {'id' : 2, 'descripcion' : 'ENVIADO'},
+    {'id' : 2, 'descripcion' : 'NOTA DE PEDIDO'}
   ]; 
   $scope.fBusqueda.estado_cotizacion = $scope.fArr.listaEstadosCotizacion[0]; 
 
@@ -212,6 +213,31 @@ app.controller('HistorialCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$b
         };
         blockUI.start('Procesando información...');
         CotizacionServices.sAnular(arrParams).then(function (rpta) {
+          if(rpta.flag == 1){
+            var pTitle = 'OK!';
+            var pType = 'success';
+            $scope.metodos.getPaginationServerSide();
+          }else if(rpta.flag == 0){
+            var pTitle = 'Error!';
+            var pType = 'danger';
+          }else{
+            alert('Error inesperado');
+          }
+          pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2500 });
+          blockUI.stop(); 
+        });
+      }
+    });
+  }
+  $scope.btnEnviarCotizacion = function() {
+    var pMensaje = '¿Realmente desea marcar la cotización como "ENVIADO"?';
+    $bootbox.confirm(pMensaje, function(result) { 
+      if(result){
+        var arrParams = { 
+          idcotizacion: $scope.mySelectionGrid[0].idcotizacion 
+        };
+        blockUI.start('Procesando información...');
+        CotizacionServices.sMarcarComoEnviado(arrParams).then(function (rpta) {
           if(rpta.flag == 1){
             var pTitle = 'OK!';
             var pType = 'success';

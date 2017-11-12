@@ -40,7 +40,7 @@ class Model_nota_pedido extends CI_Model {
 		}
 		$this->db->where('ea.idempresaadmin', $this->sessionFactur['idempresaadmin']); // empresa session 
 		$this->db->where('np.tipo_movimiento', 1); // nota de pedido 
-		$this->db->where_in('np.estado_movimiento', array(1,2)); // 1: registrado 2:enviado 
+		$this->db->where_in('np.estado_movimiento', array(1,2)); // 1: registrado 2:facturado  
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
 			foreach ($paramPaginate['searchColumn'] as $key => $value) {
 				if(! empty($value)){
@@ -85,7 +85,7 @@ class Model_nota_pedido extends CI_Model {
 		}
 		$this->db->where('ea.idempresaadmin', $this->sessionFactur['idempresaadmin']); // empresa session 
 		$this->db->where('np.tipo_movimiento', 1); // nota de pedido 
-		$this->db->where_in('np.estado_movimiento', array(1,2)); // 1: registrado 2:enviado 
+		$this->db->where_in('np.estado_movimiento', array(1,2)); // 1: registrado 2:facturado  
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
 			foreach ($paramPaginate['searchColumn'] as $key => $value) {
 				if(! empty($value)){
@@ -140,7 +140,7 @@ class Model_nota_pedido extends CI_Model {
 
 		$this->db->where('ea.idempresaadmin', $this->sessionFactur['idempresaadmin']); // empresa session 
 		$this->db->where('np.tipo_movimiento', 1); // nota de pedido 
-		$this->db->where_in('np.estado_movimiento', array(1,2)); // 1: registrado 2:enviado 
+		$this->db->where_in('np.estado_movimiento', array(1,2)); // 1: registrado 2:facturado  
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
 			foreach ($paramPaginate['searchColumn'] as $key => $value) {
 				if(! empty($value)){
@@ -192,7 +192,7 @@ class Model_nota_pedido extends CI_Model {
 		
 		$this->db->where('ea.idempresaadmin', $this->sessionFactur['idempresaadmin']); // empresa session 
 		$this->db->where('np.tipo_movimiento', 1); // nota de pedido 
-		$this->db->where_in('np.estado_movimiento', array(1,2)); // 1: registrado 2:enviado 
+		$this->db->where_in('np.estado_movimiento', array(1,2)); // 1: registrado 2:facturado  
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
 			foreach ($paramPaginate['searchColumn'] as $key => $value) {
 				if(! empty($value)){
@@ -221,7 +221,7 @@ class Model_nota_pedido extends CI_Model {
 		// $this->db->where('ea.idempresaadmin', $this->sessionFactur['idempresaadmin']); // empresa session 
 		$this->db->where('np.tipo_movimiento', 1); // nota de pedido 
 		$this->db->order_by('dm.iddetallemovimiento','ASC');
-		//$this->db->where_in('np.estado_movimiento', array(1,2)); // 1: registrado 2:enviado 
+		//$this->db->where_in('np.estado_movimiento', array(1,2)); // 1: registrado 2:facturado  
 		return $this->db->get()->result_array();
 	}
 	public function m_cargar_ultima_nota_pedido_segun_config($datos)

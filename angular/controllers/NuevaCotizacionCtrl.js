@@ -1417,7 +1417,8 @@ app.service("CotizacionServices",function($http, $q, handleBehavior) {
         sListarHistorialDetalleCotizaciones: sListarHistorialDetalleCotizaciones,
         sRegistrar: sRegistrar,
         sEditar: sEditar,
-        sAnular: sAnular
+        sAnular: sAnular,
+        sMarcarComoEnviado:sMarcarComoEnviado
     });
     function sGenerarNumeroCotizacion(datos) {
       var request = $http({
@@ -1487,6 +1488,14 @@ app.service("CotizacionServices",function($http, $q, handleBehavior) {
       var request = $http({
             method : "post",
             url : angular.patchURLCI+"Cotizacion/anular",
+            data : datos
+      });
+      return (request.then(handleBehavior.success,handleBehavior.error));
+    }
+    function sMarcarComoEnviado(datos) {
+      var request = $http({
+            method : "post",
+            url : angular.patchURLCI+"Cotizacion/marcar_como_enviado",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
