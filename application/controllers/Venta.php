@@ -155,23 +155,40 @@ class Venta extends CI_Controller {
 				$objEstado['labelText'] = 'ANULADO';
 			}
 			$arrAux = array( 
-				'iddetallecotizacion' => $row['iddetallecotizacion'],
-				'num_cotizacion' => $row['num_cotizacion'],
-				'fecha_emision' => $row['fecha_emision'],
-				'idempresaadmin' => $row['idempresaadmin'],
-				'idelemento' => $row['idelemento'], 
-				'elemento' => $row['descripcion_ele'], 
-				'cantidad' => $row['cantidad'], 
-				'precio_unitario' => $row['precio_unitario'], 
-				'importe_con_igv' => $row['importe_con_igv'], 
-				'importe_sin_igv' => $row['importe_sin_igv'], 
-				'excluye_igv' => $row['excluye_igv'], 
-				'igv_detalle' => $row['igv_detalle'], 
-				'unidad_medida' => $row['descripcion_um'], 
-				'agrupador_totalizado' => $row['agrupador_totalizado'],
-				'estado' => $objEstado, 
-				'caracteristicas' => array() 
-
+					'iddetallemovimiento' => $row['iddetallemovimiento'],	
+					'tipo_cliente' => $row['tipo_cliente'],
+					'fecha_registro' => darFormatoDMY($row['fecha_registro']),
+					'fecha_emision' => darFormatoDMY($row['fecha_emision']),
+					'idtipodocumentomov'=> $row['idtipodocumentomov'],
+					'descripcion_tdm'=> $row['descripcion_tdm'],
+					'serie'=> $row['numero_serie'],
+					'correlativo'=> $row['numero_correlativo'],
+					'cliente' => trim($row['cliente_persona_empresa']),
+					'categoria_elemento' => array(
+							'id'=> $row['idcategoriaelemento'],
+							'descripcion'=> strtoupper($row['descripcion_cael'])				
+					),	
+					'plazo_entrega' => $row['plazo_entrega'].' días útiles', 
+					'validez_oferta' => $row['validez_oferta'].' días útiles', 
+					'idformapago' => $row['idformapago'],
+					'forma_pago' => strtoupper($row['descripcion_fp']),
+					'idsede' => $row['idsede'],
+					'sede' => strtoupper($row['descripcion_se']),
+					'idempresaadmin' => $row['idempresaadmin'],
+					'empresa_admin' => strtoupper($row['razon_social_ea']),
+					'idusuario' => $row['idusuario'], 
+					'subtotal' => $row['subtotal'], 
+					'igv' => $row['igv'], 
+					'total' => $row['total'],
+					'idempresaadmin' => $row['idempresaadmin'],
+					'idelemento' => $row['idelemento'], 
+					'elemento' => $row['descripcion_ele'], 
+					'cantidad' => $row['cantidad'], 
+					'precio_unitario' => $row['precio_unitario'], 
+					'importe_con_igv' => $row['importe_con_igv'], 
+					'importe_sin_igv' => $row['importe_sin_igv'], 
+					'estado' => $objEstado,
+					'caracteristicas' => array() 
 			);
 
 			$arrListado[] = $arrAux; 

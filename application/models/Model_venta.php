@@ -99,28 +99,23 @@ class Model_venta extends CI_Model {
 	}
 	public function m_cargar_ventas_detalle($paramPaginate,$paramDatos)
 	{
-		$this->db->select("CONCAT(col.nombres, ' ', col.apellidos) AS colaborador",FALSE);
-		$this->db->select("CONCAT(cp.nombres, ' ', cp.apellidos) AS cliente_persona",FALSE);
-		$this->db->select('ve.idmovimiento, ve.fecha_registro, ve.fecha_emision, ve.tipo_cliente, ve.plazo_entrega, ve.validez_oferta, 
-			ve.moneda, ve.modo_igv, ve.subtotal, ve.igv, ve.total, ve.estado_movimiento, ve.num_cotizacion, 
-			col.idcolaborador, (col.num_documento) AS num_documento_col, us.idusuario, us.username, 
-			ea.idempresaadmin, (ea.razon_social) AS razon_social_ea, (ea.nombre_comercial) AS nombre_comercial_ea, (ea.ruc) AS ruc_ea, 
-			ce.idclienteempresa, (ce.razon_social) AS razon_social_ce, (ce.nombre_comercial) AS nombre_comercial_ce, (ce.ruc) AS ruc_ce, 
-			cp.idclientepersona, (cp.num_documento) AS num_documento_cp, 
-			dve.iddetallecotizacion, dve.cantidad, dve.precio_unitario, dve.importe_con_igv, dve.importe_sin_igv, 
-			dve.excluye_igv, dve.igv_detalle, dve.agrupador_totalizado, um.idunidadmedida, um.descripcion_um, um.abreviatura_um, 
-			ele.idelemento, ele.descripcion_ele, ele.tipo_elemento', FALSE); 
+		$this->db->select("CONCAT(COALESCE(col.nombres,''), ' ', COALESCE(col.apellidos,'')) As colaborador",FALSE);
+		$this->db->select("CONCAT(COALESCE(cp.nombres,''), ' ', COALESCE(cp.apellidos,''), ' ', COALESCE(ce.razon_social,'')) As cliente_persona_empresa",FALSE);
+		$this->db->select("CONCAT(cp.nombres, ' ', cp.apellidos) As cliente_persona",FALSE);
+		$this->db->select('ved.iddetallemovimiento, ve.fecha_registro, ve.fecha_emision, ve.fecha_vencimiento, ve.fecha_ultimo_pago, ve.numero_serie, ve.numero_correlativo, ve.tipo_cliente, ve.plazo_entrega, ve.numero_orden_compra, ve.incluye_entrega_domicilio, ve.validez_oferta, ve.moneda, ve.modo_igv, ve.subtotal,ve.igv, ve.total, ve.estado_movimiento, tdm.idtipodocumentomov, tdm.descripcion_tdm, col.idcolaborador, (col.num_documento) AS num_documento_col, us.idusuario, us.username,ea.idempresaadmin, (ea.razon_social) AS razon_social_ea, (ea.nombre_comercial) AS nombre_comercial_ea, (ea.ruc) AS ruc_ea,ce.idclienteempresa, (ce.razon_social) AS razon_social_ce, (ce.nombre_comercial) AS nombre_comercial_ce, (ce.ruc) AS ruc_ce, cp.idclientepersona, (cp.num_documento) AS num_documento_cp, se.idsede, se.descripcion_se, se.abreviatura_se,fp.idformapago, fp.descripcion_fp,ele.idelemento, ele.descripcion_ele, ele.tipo_elemento,cael.idcategoriaelemento,cael.descripcion_cael,ved.cantidad,ved.importe_sin_igv,ved.importe_con_igv,ved.precio_unitario', FALSE); 
 		$this->db->from('movimiento ve'); 
-		$this->db->join('colaborador col','ve.idcolaborador = col.idcolaborador'); 
-		$this->db->join('usuario us','ve.idusuarioregistro = us.idusuario'); 
+		$this->db->join('tipo_documento_mov tdm','ve.idtipodocumentomov = tdm.idtipodocumentomov'); 
+		$this->db->join('usuario us','ve.idusuarioventa = us.idusuario'); 
+		$this->db->join('colaborador col','us.idusuario = col.idusuario'); 
 		$this->db->join('empresa_admin ea','ve.idempresaadmin = ea.idempresaadmin'); 
 		$this->db->join("cliente_empresa ce","ve.idcliente = ce.idclienteempresa AND ve.tipo_cliente = 'E'",'left'); 
-		$this->db->join("cliente_persona cp","ve.idcliente = cp.idclientepersona AND ve.tipo_cliente = 'p'",'left'); 
+		$this->db->join("cliente_persona cp","ve.idcliente = cp.idclientepersona AND ve.tipo_cliente = 'P'",'left'); 
 		$this->db->join('sede se','ve.idsede = se.idsede'); 
 		$this->db->join('forma_pago fp','ve.idformapago = fp.idformapago'); 
-		$this->db->join('detalle_cotizacion dcot','ve.idmovimiento = dve.idmovimiento'); 
-		$this->db->join('elemento ele','dve.idelemento = ele.idelemento'); 
-		$this->db->join('unidad_medida um','ele.idunidadmedida = um.idunidadmedida'); 
+		$this->db->join('detalle_movimiento ved','ved.idmovimiento = ve.idmovimiento'); 
+		$this->db->join('elemento ele','ved.idelemento = ele.idelemento'); 
+		$this->db->join('categoria_elemento cael','ele.idcategoriaelemento = cael.idcategoriaelemento'); 
+
 		if( !empty($paramDatos['cliente']) ){
 			if( $paramDatos['cliente']['tipo_cliente'] == 'ce' ){
 				$this->db->where('ce.idclienteempresa',$paramDatos['cliente']['id']);
@@ -130,18 +125,20 @@ class Model_venta extends CI_Model {
 			}
 		}
 		if( !empty($paramDatos['desde']) || !empty($paramDatos['hasta'])){
-			$this->db->where('ve.fecha_emision BETWEEN '. $this->db->escape($paramDatos['desde'].' '.$paramDatos['desdeHora'].':'.$paramDatos['desdeMinuto']) .' AND ' 
-				. $this->db->escape($paramDatos['hasta'].' '.$paramDatos['hastaHora'].':'.$paramDatos['hastaMinuto']));
+			$this->db->where('ve.fecha_emision BETWEEN '. $this->db->escape( darFormatoYMD($paramDatos['desde']).' '.$paramDatos['desdeHora'].':'.$paramDatos['desdeMinuto']) .' AND ' 
+			. $this->db->escape( darFormatoYMD($paramDatos['hasta']).' '.$paramDatos['hastaHora'].':'.$paramDatos['hastaMinuto']));
 		}
 		if(!empty($paramDatos['estado_movimiento']) && $paramDatos['estado_movimiento']['id'] !== 'ALL' ){ 
 			$this->db->where('ve.estado_movimiento', $paramDatos['estado_movimiento']['id']);
 		} 
+		if(!empty($paramDatos['sede']) && $paramDatos['sede']['id'] !== 'ALL' ){ 
+			$this->db->where('se.idsede', $paramDatos['sede']['id']);
+		}		
 		if(!empty($paramDatos['categoria_elemento']) && $paramDatos['categoria_elemento']['id'] !== 'ALL' ){ 
 			$this->db->where('cael.idcategoriaelemento', $paramDatos['categoria_elemento']['id']);
 		}
-
 		$this->db->where_in('ve.estado_movimiento', array(1,2)); // por enviar y enviado 
-		$this->db->where_in('dve.estado_dcot', array(1)); // habilitado 
+		// $this->db->where_in('dve.estado_dcot', array(1)); // habilitado 
 		$this->db->where_in('ele.estado_ele', array(1)); // habilitado 
 		$this->db->where('ea.idempresaadmin', $this->sessionFactur['idempresaadmin']); // empresa session 
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
@@ -163,16 +160,17 @@ class Model_venta extends CI_Model {
 	{ 
 		$this->db->select('COUNT(*) AS contador', FALSE); 
 		$this->db->from('movimiento ve'); 
-		//$this->db->join('colaborador col','ve.idcolaborador = col.idcolaborador'); 
-		$this->db->join('usuario us','ve.idusuarioregistro = us.idusuario'); 
+		$this->db->join('tipo_documento_mov tdm','ve.idtipodocumentomov = tdm.idtipodocumentomov'); 
+		$this->db->join('usuario us','ve.idusuarioventa = us.idusuario'); 
+		$this->db->join('colaborador col','us.idusuario = col.idusuario'); 
 		$this->db->join('empresa_admin ea','ve.idempresaadmin = ea.idempresaadmin'); 
 		$this->db->join("cliente_empresa ce","ve.idcliente = ce.idclienteempresa AND ve.tipo_cliente = 'E'",'left'); 
-		$this->db->join("cliente_persona cp","ve.idcliente = cp.idclientepersona AND ve.tipo_cliente = 'p'",'left'); 
-		// $this->db->join('sede se','ve.idsede = se.idsede'); 
-		// $this->db->join('forma_pago fp','ve.idformapago = fp.idformapago'); 
-		$this->db->join('detalle_cotizacion dcot','ve.idmovimiento = dve.idmovimiento'); 
-		$this->db->join('elemento ele','dve.idelemento = ele.idelemento'); 
-		$this->db->join('unidad_medida um','ele.idunidadmedida = um.idunidadmedida'); 
+		$this->db->join("cliente_persona cp","ve.idcliente = cp.idclientepersona AND ve.tipo_cliente = 'P'",'left'); 
+		$this->db->join('sede se','ve.idsede = se.idsede'); 
+		$this->db->join('forma_pago fp','ve.idformapago = fp.idformapago'); 
+		$this->db->join('detalle_movimiento ved','ved.idmovimiento = ve.idmovimiento'); 
+		$this->db->join('elemento ele','ved.idelemento = ele.idelemento'); 
+		$this->db->join('categoria_elemento cael','ele.idcategoriaelemento = cael.idcategoriaelemento'); 
 		if( !empty($paramDatos['cliente']) ){
 			if( $paramDatos['cliente']['tipo_cliente'] == 'ce' ){
 				$this->db->where('ce.idclienteempresa',$paramDatos['cliente']['id']);
@@ -182,17 +180,20 @@ class Model_venta extends CI_Model {
 			}
 		}
 		if( !empty($paramDatos['desde']) || !empty($paramDatos['hasta'])){
-			$this->db->where('ve.fecha_emision BETWEEN '. $this->db->escape($paramDatos['desde'].' '.$paramDatos['desdeHora'].':'.$paramDatos['desdeMinuto']) .' AND ' 
-				. $this->db->escape($paramDatos['hasta'].' '.$paramDatos['hastaHora'].':'.$paramDatos['hastaMinuto']));
+			$this->db->where('ve.fecha_emision BETWEEN '. $this->db->escape( darFormatoYMD($paramDatos['desde']).' '.$paramDatos['desdeHora'].':'.$paramDatos['desdeMinuto']) .' AND ' 
+			. $this->db->escape( darFormatoYMD($paramDatos['hasta']).' '.$paramDatos['hastaHora'].':'.$paramDatos['hastaMinuto']));
 		}
 		if(!empty($paramDatos['estado_movimiento']) && $paramDatos['estado_movimiento']['id'] !== 'ALL' ){ 
 			$this->db->where('ve.estado_movimiento', $paramDatos['estado_movimiento']['id']);
 		} 
 		if(!empty($paramDatos['categoria_elemento']) && $paramDatos['categoria_elemento']['id'] !== 'ALL' ){ 
 			$this->db->where('cael.idcategoriaelemento', $paramDatos['categoria_elemento']['id']);
-		}		
+		}
+		if(!empty($paramDatos['sede']) && $paramDatos['sede']['id'] !== 'ALL' ){ 
+			$this->db->where('se.idsede', $paramDatos['sede']['id']);
+		}
 		$this->db->where_in('ve.estado_movimiento', array(1,2)); // por enviar y enviado 
-		$this->db->where_in('dve.estado_dcot', array(1)); // habilitado 
+		// $this->db->where_in('dve.estado_dcot', array(1)); // habilitado 
 		$this->db->where_in('ele.estado_ele', array(1)); // habilitado 
 		$this->db->where('ea.idempresaadmin', $this->sessionFactur['idempresaadmin']); // empresa session 
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
