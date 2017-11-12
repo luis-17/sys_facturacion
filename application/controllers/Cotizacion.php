@@ -1335,7 +1335,7 @@ class Cotizacion extends CI_Controller {
     	// validar que no sea una cotización enviada 
     	$fCotizacion = $this->model_cotizacion->m_cargar_esta_cotizacion_por_id_simple($allInputs['idcotizacion']);
     	if( $fCotizacion['estado_cot'] == 2 ){ // enviado 
-    		$arrData['message'] = 'Esta cotización ya ha sido enviada como Nota de Pedido. No se puede anular.'; 
+    		$arrData['message'] = 'Esta cotización ya ha sido enviada anteriormente. Operación rechazada'; 
     		$arrData['flag'] = 0;
     		$this->output
 		    	->set_content_type('application/json')
@@ -1344,7 +1344,16 @@ class Cotizacion extends CI_Controller {
     	} 
     	// validar que no sea una cotización anulada 
     	if( $fCotizacion['estado_cot'] == 0 ){ // anulado 
-    		$arrData['message'] = 'Esta cotización ya ha sido anulada anteriormente.'; 
+    		$arrData['message'] = 'Esta cotización ya ha sido anulada anteriormente. Operación rechazada'; 
+    		$arrData['flag'] = 0;
+    		$this->output
+		    	->set_content_type('application/json')
+		    	->set_output(json_encode($arrData));
+		    return;
+    	} 
+    	// validar que no sea una cotizacion convertida a nota de pedido 
+    	if( $fCotizacion['estado_cot'] == 3 ){ // nota de pedido  
+    		$arrData['message'] = 'Esta cotización ya se a convertido en una nota de pedido. Operación rechazada.'; 
     		$arrData['flag'] = 0;
     		$this->output
 		    	->set_content_type('application/json')
@@ -1353,6 +1362,47 @@ class Cotizacion extends CI_Controller {
     	} 
 		if( $this->model_cotizacion->m_anular($allInputs) ){ 
 			$arrData['message'] = 'Se anularon los datos correctamente';
+    		$arrData['flag'] = 1;
+		}
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
+	public function marcar_como_enviado()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$arrData['message'] = 'No se pudo anular los datos';
+    	$arrData['flag'] = 0;
+    	// validar que no sea una cotización enviada 
+    	$fCotizacion = $this->model_cotizacion->m_cargar_esta_cotizacion_por_id_simple($allInputs['idcotizacion']);
+    	if( $fCotizacion['estado_cot'] == 2 ){ // enviado 
+    		$arrData['message'] = 'Esta cotización ya ha sido enviada anteriormente. Operación rechazada'; 
+    		$arrData['flag'] = 0;
+    		$this->output
+		    	->set_content_type('application/json')
+		    	->set_output(json_encode($arrData));
+		    return;
+    	} 
+    	// validar que no sea una cotización anulada 
+    	if( $fCotizacion['estado_cot'] == 0 ){ // anulado 
+    		$arrData['message'] = 'Esta cotización ya ha sido anulada anteriormente. Operación rechazada'; 
+    		$arrData['flag'] = 0;
+    		$this->output
+		    	->set_content_type('application/json')
+		    	->set_output(json_encode($arrData));
+		    return;
+    	} 
+    	// validar que no sea una cotizacion convertida a nota de pedido 
+    	if( $fCotizacion['estado_cot'] == 3 ){ // nota de pedido  
+    		$arrData['message'] = 'Esta cotización ya se a convertido en una nota de pedido. Operación rechazada.'; 
+    		$arrData['flag'] = 0;
+    		$this->output
+		    	->set_content_type('application/json')
+		    	->set_output(json_encode($arrData));
+		    return;
+    	} 
+		if( $this->model_cotizacion->m_cambiar_estado_enviado($allInputs) ){ 
+			$arrData['message'] = 'Se cambió el estado correctamente';
     		$arrData['flag'] = 1;
 		}
 		$this->output
