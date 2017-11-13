@@ -1195,6 +1195,7 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
           }
         }; 
         var myCallbackCaract = function() { 
+          console.log(row.entity.caracteristicas,'row.entity.caracteristicas');
           angular.forEach(row.entity.caracteristicas, function(val,key) { 
             var arrFilaTemp = { 
               'id' : val.id,

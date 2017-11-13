@@ -195,8 +195,17 @@
 	              	placeholder="Importe" ng-show="fData.modo_igv == 1" style="position:absolute;" tabindex="310"/> 
 	            </div>
           	</div>
-          	<div class="col-md-2 col-sm-6 col-xs-12"> 
+<!--           	<div class="col-md-2 col-sm-6 col-xs-12"> 
 	            <a style="margin-top: 22px;" href="" class="btn btn-info btn-sm btn-block" ng-click="agregarItem(); $event.preventDefault();" tabindex="320">Agregar</a> 
+	          </div> -->
+          	<div class="col-md-2 col-sm-6 col-xs-12"> 
+          		<div style="margin-top: 22px;" class="btn-group" style="min-width: 100%">
+		            <a href="" class="btn btn-info btn-sm" ng-click="agregarItem(); $event.preventDefault();" tabindex="320">AGREGAR</a> 
+		            <a href="" class="btn btn-info btn-sm dropdown-toggle" tabindex="113" data-toggle="dropdown"><span class="caret"></span></a>
+	              <ul class="dropdown-menu sm" role="menu" style="padding:0;">
+	                  <li><a ng-click="btnClonar(); $event.preventDefault();" class="btn btn-info-alt" href="" tabindex="114">CLONAR</a></li>
+	              </ul>
+	            </div>
 	          </div>
 					</div>
 					<div class="form-group-sm pull-in clearfix">
@@ -284,8 +293,8 @@
 	    		<i class="fa fa-save"> </i> [F2] GRABAR </button> 
 	    	<button type="button" class="btn-success btn " ng-click="imprimir(); $event.preventDefault();" ng-disabled="!fData.isRegisterSuccess" tabindex="430"> 
 	        	<i class="fa fa-print"> </i> [F4] IMPRIMIR </button> 
-	    	<button type="button" class="btn-success btn mr-lg" ng-click="imprimirvista(); $event.preventDefault();"  tabindex="430"> 
-	        	<i class="fa fa-print"> </i> [F6] VISTA PREVIA </button> 	        	
+	    	<button type="button" class="btn-success btn mr-lg" ng-click="imprimirvista(); $event.preventDefault();"  ng-disabled="!fData.isRegisterSuccessVista" tabindex="430"> 
+	        	<i class="fa fa-print"> </i> [F9] VISTA PREVIA </button> 	        	
 	      <button type="button" class="btn-default btn" ng-click="reloadPage(); $event.preventDefault();" tabindex="440"> 
 	        	<i class="fa fa-file"> </i> [F3] NUEVO </button>
 	      <button type="button" class="btn-warning btn" ng-click="mismoCliente(); $event.preventDefault();" tabindex="450" > 
