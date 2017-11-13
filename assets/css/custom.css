@@ -110,3 +110,6 @@ form.edit-form input, form.edit-form select {
     line-height: 1.2;
     border-radius: 3px;
 }
+.text-danger {
+    color: #f05050 !important;
+}
