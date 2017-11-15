@@ -264,7 +264,11 @@ class Model_cotizacion extends CI_Model {
 		if( !empty($filtro['idcotizacion']) ){
 			$this->db->like('cot.idcotizacion', $filtro['idcotizacion']); 
 		}
-		$this->db->where_in('cot.estado_cot',array(1,2)); // por enviar y enviado 
+		if( isset($filtro['estado'])){
+			$this->db->where_in('cot.estado_cot',array(0,1,2));// anulado, por enviar y enviado 
+		}else{
+			$this->db->where_in('cot.estado_cot',array(1,2)); // por enviar y enviado 
+		}		
 		if( !empty($datos['cliente']) ){ 
 			if( !empty($datos['num_documento']) && !empty($datos['cliente']['idclienteempresa']) ){ 
 				$this->db->where('ce.idclienteempresa',$datos['cliente']['idclienteempresa']);

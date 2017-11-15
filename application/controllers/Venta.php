@@ -187,6 +187,7 @@ class Venta extends CI_Controller {
 					'precio_unitario' => $row['precio_unitario'], 
 					'importe_con_igv' => $row['importe_con_igv'], 
 					'importe_sin_igv' => $row['importe_sin_igv'], 
+					'igv_detalle' => $row['igv_detalle'], 
 					'estado' => $objEstado,
 					'caracteristicas' => array() 
 			);

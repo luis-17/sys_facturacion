@@ -293,8 +293,8 @@
 	    		<i class="fa fa-save"> </i> [F2] GRABAR </button> 
 	    	<button type="button" class="btn-success btn " ng-click="imprimir(); $event.preventDefault();" ng-disabled="!fData.isRegisterSuccess" tabindex="430"> 
 	        	<i class="fa fa-print"> </i> [F4] IMPRIMIR </button> 
-	    	<button type="button" class="btn-success btn mr-lg" ng-click="imprimirvista(); $event.preventDefault();"  ng-disabled="!fData.isRegisterSuccessVista" tabindex="430"> 
-	        	<i class="fa fa-print"> </i> [F9] VISTA PREVIA </button> 	        	
+	    	<button type="button" class="btn-dark btn mr-lg" ng-click="imprimirvista(); $event.preventDefault();" ng-disabled="gridOptions.data.length==0"   tabindex="430"> 
+	        	<i class="fa fa-eye"> </i> [F9] VISTA PREVIA </button> 	        	
 	      <button type="button" class="btn-default btn" ng-click="reloadPage(); $event.preventDefault();" tabindex="440"> 
 	        	<i class="fa fa-file"> </i> [F3] NUEVO </button>
 	      <button type="button" class="btn-warning btn" ng-click="mismoCliente(); $event.preventDefault();" tabindex="450" > 
