@@ -334,7 +334,8 @@ class Cotizacion extends CI_Controller {
 				'igv_detalle' => $row['igv_detalle'], 
 				'unidad_medida' => array( 
 					'id'=> $row['idunidadmedida'],
-					'descripcion'=> $row['descripcion_um'] 
+					'descripcion'=> $row['descripcion_um'],
+					'abreviatura'=> $row['abreviatura_um']  
 				),
 				'agrupacion' => (int)$row['agrupador_totalizado'],
 				'caracteristicas' => array() 
@@ -495,9 +496,8 @@ class Cotizacion extends CI_Controller {
 	}
 	public function buscar_numero_cotizacion_autocomplete()
 	{
-		$allInputs = json_decode(trim($this->input->raw_input_stream),true);	
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true); 
 		$lista = $this->model_cotizacion->m_cargar_numero_cotizacion_autocomplete($allInputs,$allInputs['datos']); 
-		// print_r($lista); exit();
 		$hayStock = true;
 		$arrListado = array();
 		foreach ($lista as $row) { 
@@ -1084,17 +1084,17 @@ class Cotizacion extends CI_Controller {
 	public function imprimir_cotizacion_vista()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true); 
-		$datosCotizacion=$allInputs['id'];
-	    $datosCliente= @$allInputs['id']['cliente'];
-	    $datosContacto= @$allInputs['id']['contacto'];
-	    $datosColaborador= $allInputs['id']['colaborador'];
-	    $tipoDocCliente= $allInputs['id']['tipo_documento_cliente'];
-	    $datosElemento=$allInputs['elemento'];
-	    $moneda= $allInputs['id']['moneda'];
+		$paramDatos=@$allInputs['cotizacion'];
+	    $Cliente= @$allInputs['cliente'];
+	    $Contacto= @$allInputs['contacto'];
+	    $Colaborador= @$allInputs['colaborador'];
+	    $tipoDocCliente= @$allInputs['tipDocCliente'];
+	    $datosElemento=@$allInputs['elemento'];
+	    $moneda= @$allInputs['moneda'];
 
 	    // RECUPERACIÓN DE DATOS 
 	    $fConfig = obtener_parametros_configuracion();
-	    $fila = $this->model_empresa_admin->m_cargar_empresa_admin_por_id($this->sessionFactur['idempresaadmin']);	 
+	    $datosEmpresa = $this->model_empresa_admin->m_cargar_empresa_admin_por_id($this->sessionFactur['idempresaadmin']);	 
 	    $moneda['moneda_str'] = NULL; 
 	    $simbolo = NULL;
 	    if($moneda['str_moneda'] == 'S'){
@@ -1108,10 +1108,10 @@ class Cotizacion extends CI_Controller {
 	    	$simbolo = 'US$ ';
 	    } 
 	    $strIncluyeIGV = NULL;
-	    if($datosCotizacion['modo_igv'] == 1){ 
+	    if($paramDatos['modo_igv'] == 1){ 
 	    	$strIncluyeIGV = 'SI';
 	    }
-	    if($datosCotizacion['modo_igv'] == 2){ 
+	    if($paramDatos['modo_igv'] == 2){ 
 	    	$strIncluyeIGV = 'NO';
 	    } 
 	    // CONFIGURACION DEL PDF
@@ -1125,23 +1125,23 @@ class Cotizacion extends CI_Controller {
 	    $this->pdf->SetTextColor(95,95,95);
 	    $this->pdf->SetFont('Arial','B',9);
         $this->pdf->SetXY(8,21);
-        $this->pdf->MultiCell( 120,6,utf8_decode( $fila['razon_social'] ) ); 
+        $this->pdf->MultiCell( 120,6,utf8_decode( $datosEmpresa['razon_social'] ) ); 
         $this->pdf->SetFont('Arial','',8);
         $this->pdf->SetXY(8,25);
-        $this->pdf->MultiCell( 120,6,utf8_decode( $fila['direccion_legal'] ),0,'L' );
+        $this->pdf->MultiCell( 120,6,utf8_decode( $datosEmpresa['direccion_legal'] ),0,'L' );
         $this->pdf->SetXY(8,29);
         $this->pdf->MultiCell( 120,6,'Sitio Web: ',0,'L' ); 
         $this->pdf->SetXY(36,29);
-        $this->pdf->MultiCell( 120,6,utf8_decode(strtolower($fila['pagina_web']) ),0,'L' );
+        $this->pdf->MultiCell( 120,6,utf8_decode(strtolower($datosEmpresa['pagina_web']) ),0,'L' );
         $this->pdf->SetXY(8,33);
         $this->pdf->MultiCell( 120,6,utf8_decode('Teléfono: '),0,'L' );
 	    $this->pdf->SetXY(36,33);
-	    $this->pdf->MultiCell( 120,6,utf8_decode( $fila['telefono'] ),0,'L' );
+	    $this->pdf->MultiCell( 120,6,utf8_decode( $datosEmpresa['telefono'] ),0,'L' );
 
         $this->pdf->SetTextColor(0,0,0);
         $this->pdf->SetFont('Arial','B',12);
         $this->pdf->SetXY(100,8);
-        $this->pdf->Cell(120,10,utf8_decode( 'COTIZACIÓN N° '.$datosCotizacion['num_cotizacion'] ),0,0);
+        $this->pdf->Cell(120,10,utf8_decode( 'COTIZACIÓN N° '.$paramDatos['num_cotizacion'] ),0,0);
         $this->pdf->Ln(15);
         if( @$this->estado == 1 ){ 
           $this->SetFont('Arial','B',50);
@@ -1186,35 +1186,35 @@ class Cotizacion extends CI_Controller {
       	$this->pdf->Cell(24,4,'CLIENTE '); 
       	$this->pdf->Cell(3,4,':',0,0,'C'); 
       	$this->pdf->SetFont('Arial','',8); 
-      	$this->pdf->MultiCell(55,4,strtoupper(strtoupper_total(@$datosCliente['cliente'])));
+      	$this->pdf->MultiCell(55,4,strtoupper(strtoupper_total(@$Cliente['cliente'])));
       	$y1 = $this->pdf->GetY();
       	$this->pdf->SetXY(8,$y1-1); 
       	$this->pdf->SetFont('Arial','B',8); 
       	$this->pdf->Cell(24,6,strtoupper($tipoDocCliente['descripcion'])); 
       	$this->pdf->Cell(3,6,':',0,0,'C'); 
       	$this->pdf->SetFont('Arial','',8); 
-      	$this->pdf->Cell(75,6,strtoupper(@$datosCliente['ruc'])); 
+      	$this->pdf->Cell(75,6,strtoupper(@$Cliente['ruc'])); 
       	$y2 = $this->pdf->GetY();
 		$this->pdf->SetXY(8,$y2+5); 
       	$this->pdf->SetFont('Arial','B',8); 
       	$this->pdf->Cell(24,4,'CONTACTO '); 
       	$this->pdf->Cell(3,4,':',0,0,'C'); 
       	$this->pdf->SetFont('Arial','',8); 
-      	$this->pdf->MultiCell(55,4,utf8_decode(strtoupper_total($datosContacto['contacto'])));
+      	$this->pdf->MultiCell(55,4,utf8_decode(strtoupper_total($Contacto['contacto'])));
       	$y3 = $this->pdf->GetY();
       	$this->pdf->SetXY(8,$y3-1); 
       	$this->pdf->SetFont('Arial','B',8); 
       	$this->pdf->Cell(24,6,'E-MAIL '); 
       	$this->pdf->Cell(3,6,':',0,0,'C'); 
       	$this->pdf->SetFont('Arial','',8); 
-      	$this->pdf->Cell(75,6,strtoupper($datosContacto['email']));
+      	$this->pdf->Cell(75,6,strtoupper($Contacto['email']));
 
       	$this->pdf->SetXY(96,$y); 
       	$this->pdf->SetFont('Arial','B',8); 
       	$this->pdf->Cell(26,4,utf8_decode('DIRECCIÓN ')); 
       	$this->pdf->Cell(3,4,':',0,0,'C'); 
       	$this->pdf->SetFont('Arial','',7); 
-      	$this->pdf->MultiCell(75,4,utf8_decode(strtoupper_total(@$datosCliente['direccion_legal'])));
+      	$this->pdf->MultiCell(75,4,utf8_decode(strtoupper_total(@$Cliente['direccion_legal'])));
       	$y1a = $this->pdf->GetY();
       	$this->pdf->SetXY(96,$y1a); 
       	$this->pdf->SetFont('Arial','B',8); 
@@ -1222,16 +1222,16 @@ class Cotizacion extends CI_Controller {
       	$this->pdf->Cell(3,4,':',0,0,'C'); 
       	$this->pdf->SetFont('Arial','',7); 
 
-      	$this->pdf->MultiCell(75,4,utf8_decode(strtoupper_total(@$datosCliente['telefono'])));
+      	$this->pdf->MultiCell(75,4,utf8_decode(strtoupper_total(@$Cliente['direccion_guia'])));
       	$y1b = $this->pdf->GetY();
       	$this->pdf->SetXY(96,$y1b); 
       	$this->pdf->SetFont('Arial','B',8); 
       	$this->pdf->Cell(26,6,utf8_decode('TELÉFONO ')); 
       	$this->pdf->Cell(3,6,':',0,0,'C'); 
       	$this->pdf->SetFont('Arial','',7); 
-      	$this->pdf->Cell(75,6,strtoupper(@$datosCliente['telefono']));
+      	$this->pdf->Cell(75,6,strtoupper(@$Cliente['telefono']));
 
-		if(strlen(@$datosCliente['telefono'])> 44){$sumY= 4;}else{$sumY= 0;} 
+		if(strlen(@$Cliente['telefono'])> 44){$sumY= 4;}else{$sumY= 0;} 
       	$this->pdf->SetXY(8,$y3+5+$sumY); 
       	$this->pdf->SetFillColor($r,$g,$b);
 		$this->pdf->SetWidths(array(60));
@@ -1257,14 +1257,14 @@ class Cotizacion extends CI_Controller {
       	$this->pdf->Cell(38,4,'ASESOR DE VENTA '); 
       	$this->pdf->Cell(3,4,':',0,0,'C'); 
       	$this->pdf->SetFont('Arial','',8); 
-      	$this->pdf->MultiCell(45,4,strtoupper(strtoupper_total($datosColaborador['descripcion'])));
+      	$this->pdf->MultiCell(45,4,strtoupper(strtoupper_total($Colaborador['descripcion'])));
       	$y5 = $this->pdf->GetY();
       	$this->pdf->SetXY(8,$y5-1); 
       	$this->pdf->SetFont('Arial','B',8); 
       	$this->pdf->Cell(38,6,utf8_decode('FECHA EMISIÓN ')); 
       	$this->pdf->Cell(3,6,':',0,0,'C'); 
       	$this->pdf->SetFont('Arial','',8); 
-      	$this->pdf->Cell(75,6,darFormatoDMY($datosCotizacion['fecha_emision'])); 
+      	$this->pdf->Cell(75,6,darFormatoDMY($paramDatos['fecha_emision'])); 
 
       	$this->pdf->SetXY(8,$y5+3); 
       	$this->pdf->SetFont('Arial','B',8); 
@@ -1278,21 +1278,21 @@ class Cotizacion extends CI_Controller {
       	$this->pdf->Cell(38,6,utf8_decode('PLAZO DE ENTREGA(*) ')); 
       	$this->pdf->Cell(3,6,':',0,0,'C'); 
       	$this->pdf->SetFont('Arial','',8); 
-      	$this->pdf->Cell(75,6,utf8_decode($datosCotizacion['plazo_entrega']. ' días útiles')); 
+      	$this->pdf->Cell(75,6,utf8_decode($paramDatos['plazo_entrega']. ' días útiles')); 
 
       	$this->pdf->SetXY(96,$y4-1); 
       	$this->pdf->SetFont('Arial','B',8); 
       	$this->pdf->Cell(26,6,utf8_decode('COND. DE PAGO ')); 
       	$this->pdf->Cell(3,6,':',0,0,'C'); 
       	$this->pdf->SetFont('Arial','',8); 
-      	$this->pdf->Cell(75,6,utf8_decode($datosCotizacion['forma_pago']['descripcion'])); 
+      	$this->pdf->Cell(75,6,utf8_decode($paramDatos['forma_pago']['descripcion'])); 
 
       	$this->pdf->SetXY(96,$y4+3); 
       	$this->pdf->SetFont('Arial','B',8); 
       	$this->pdf->Cell(26,6,utf8_decode('VALIDEZ'));  // DE OFERTA
       	$this->pdf->Cell(3,6,':',0,0,'C'); 
       	$this->pdf->SetFont('Arial','',8); 
-      	$this->pdf->Cell(75,6,utf8_decode($datosCotizacion['validez_oferta'].' días ')); 
+      	$this->pdf->Cell(75,6,utf8_decode($paramDatos['validez_oferta'].' días ')); 
 
       	$this->pdf->SetXY(96,$y4+7); 
       	$this->pdf->SetFont('Arial','B',8); 
@@ -1330,10 +1330,10 @@ class Cotizacion extends CI_Controller {
 	    $this->pdf->SetLineWidth(.1);
 	    $i=1;
 	    foreach ($datosElemento as $key => $value) { 
-	    	if( $datosCotizacion['modo_igv'] == 1){ 
+	    	if( $paramDatos['modo_igv'] == 1){ 
 	    		$valImporte = $value['importe_con_igv'];
 	    	}
-	    	if( $datosCotizacion['modo_igv'] == 2 ){
+	    	if( $paramDatos['modo_igv'] == 2 ){
 	    		$valImporte = $value['importe_sin_igv'];
 	    	}
 		    $fill = !$fill;		
@@ -1371,11 +1371,12 @@ class Cotizacion extends CI_Controller {
 
 	    $this->pdf->SetXY(8,-34); 
 	    $this->pdf->SetFont('Arial','B',9);
-	    $en_letra = ValorEnLetras($datosCotizacion['total'],$moneda['moneda_str']);
+	    $en_letra = ValorEnLetras($paramDatos['total'],$moneda['moneda_str']);
 	    $this->pdf->Cell(140,5,'TOTAL SON: ' . utf8_decode($en_letra));
 	    $this->pdf->SetXY(8,-23); 
 	    $this->pdf->SetFont('Arial','',8);
-	    $bancoEmpresa = $this->model_banco_empresa_admin->m_cargar_cuentas_banco_por_filtros($this->sessionFactur['idempresaadmin'],$datosCotizacion['moneda']['str_moneda']);
+
+	    $bancoEmpresa = $this->model_banco_empresa_admin->m_cargar_cuentas_banco_por_filtros($this->sessionFactur['idempresaadmin'],$paramDatos['moneda']['str_moneda']);
    		$this->pdf->SetFont('Arial','',9);
 	    foreach ($bancoEmpresa as $key => $value) {
 	    	$this->pdf->Cell(40,5,'Cta. Cte. '.$value['abreviatura_ba'].' '. utf8_decode($moneda['moneda_str']),0,0,'L',0); 	  
@@ -1391,26 +1392,26 @@ class Cotizacion extends CI_Controller {
 	    $this->pdf->Cell(150,20,'');
 	    $this->pdf->Cell(20,6,'SUBTOTAL:','LT',0,'R');
 	    $this->pdf->SetFont('Arial','',8);
-	    $this->pdf->Cell(20,6,$simbolo . number_format($datosCotizacion['subtotal'],$fConfig['num_decimal_total_key'],'.',' '),'TR',0,'R');
+	    $this->pdf->Cell(20,6,$simbolo . number_format($paramDatos['subtotal'],$fConfig['num_decimal_total_key'],'.',' '),'TR',0,'R');
 	    $this->pdf->Ln(6);
 	    $this->pdf->SetFont('Arial','',8);
 	    $this->pdf->Cell(150,6,'');
 	    $this->pdf->Cell(20,6,'IGV:','L',0,'R');
 	    $this->pdf->SetFont('Arial','',8);
-	    $this->pdf->Cell(20,6,$simbolo . number_format($datosCotizacion['igv'],$fConfig['num_decimal_total_key'],'.',' '),'R',0,'R');
+	    $this->pdf->Cell(20,6,$simbolo . number_format($paramDatos['igv'],$fConfig['num_decimal_total_key'],'.',' '),'R',0,'R');
 	    $this->pdf->Ln(6);
 	    $this->pdf->SetFont('Arial','B',9);
 	    $this->pdf->Cell(150,8,'');
 	    $this->pdf->Cell(20,8,'TOTAL:','TLB',0,'R');
-	    $this->pdf->Cell(20,8,$simbolo . number_format($datosCotizacion['total'],$fConfig['num_decimal_total_key'],'.',' '),'TRB',0,'R');
+	    $this->pdf->Cell(20,8,$simbolo . number_format($paramDatos['total'],$fConfig['num_decimal_total_key'],'.',' '),'TRB',0,'R');
 	    $arrData['message'] = 'ERROR';
 	    $arrData['flag'] = 2;
-	    if($this->pdf->Output( 'F','assets/dinamic/pdfTemporales/Cot_'. $datosCotizacion['num_cotizacion'] .'.pdf' )){
+	    if($this->pdf->Output( 'F','assets/dinamic/pdfTemporales/Cot_'. $paramDatos['num_cotizacion'] .'.pdf' )){
 	      $arrData['message'] = 'OK';
 	      $arrData['flag'] = 1;
 	    }
 	    $arrData = array(
-	      'urlTempPDF'=> 'assets/dinamic/pdfTemporales/Cot_'. $datosCotizacion['num_cotizacion'] .'.pdf'
+	      'urlTempPDF'=> 'assets/dinamic/pdfTemporales/Cot_'. $paramDatos['num_cotizacion'] .'.pdf'
 	    );
 
 	    $this->output
@@ -1424,6 +1425,7 @@ class Cotizacion extends CI_Controller {
 	    ini_set('xdebug.var_display_max_children', 256);
 	    ini_set('xdebug.var_display_max_data', 1024);
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true); 
+		// var_dump($allInputs);exit();
 		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
     	$arrData['flag'] = 0;
 		/* VALIDACIONES */

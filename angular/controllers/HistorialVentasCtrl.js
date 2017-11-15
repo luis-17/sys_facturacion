@@ -214,7 +214,7 @@ app.controller('HistorialVentasCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     enableFullRowSelection: true,
     multiSelect: false,
     columnDefs: [ 
-      { field: 'iddetallemovimiento', name: 'ved.iddetallemovimiento', displayName: 'ID', width: '75', visible: false },
+      { field: 'iddetallemovimiento', name: 'ved.iddetallemovimiento', displayName: 'ID', width: '75' },
       { field: 'descripcion_tdm', name: 'tdm.descripcion_tdm', displayName: 'COMPROBANTE', width: 100 },
       { field: 'serie', name: 've.numero_serie', displayName: 'SERIE', width: 60 },
       { field: 'correlativo', name: 've.numero_correlativo', displayName: 'CORRELATIVO', width: 100 },
@@ -223,12 +223,13 @@ app.controller('HistorialVentasCtrl', ['$scope', '$filter', '$uibModal', '$bootb
       { field: 'cliente', name: 'cliente_persona_empresa', displayName: 'Cliente', minWidth: 180 },
       { field: 'usuario', name: 'us.username', displayName: 'Usuario', minWidth: 160, visible: false },
       { field: 'sede', name: 'se.descripcion_se', displayName: 'Sede', minWidth: 100 },
-      { field: 'categoria_elemento', type: 'object', name: 'cael.descripcion_cael', displayName: 'Categoria Elemento', minWidth: 160, enableColumnMenus: false, enableColumnMenu: false,cellTemplate:'<div class="ui-grid-cell-contents text-center ">'+'<label class="label bg-primary block" style="background-color:{{COL_FIELD.color}}">{{ COL_FIELD.descripcion }}</label></div>' 
+      { field: 'categoria_elemento', type: 'object', name: 'cael.descripcion_cael', displayName: 'Categoria Elemento', visible: false,minWidth: 160, enableColumnMenus: false, enableColumnMenu: false,cellTemplate:'<div class="ui-grid-cell-contents text-center ">'+'<label class="label bg-primary block" style="background-color:{{COL_FIELD.color}}">{{ COL_FIELD.descripcion }}</label></div>' 
       },  
       { field: 'elemento', name: 'ele.descripcion_ele', displayName: 'Elemento', minWidth: 160 },          
-      { field: 'precio_unitario', name: 'npd.precio_unitario', displayName: 'P. Unitario', minWidth: 90 }, 
-      { field: 'cantidad', name: 'npd.cantidad', displayName: 'Cantidad', minWidth: 90 },
-      { field: 'importe_con_igv', name: 'npd.importe_con_igv', displayName: 'Importe', minWidth: 90 }, 
+      { field: 'precio_unitario', name: 'ved.precio_unitario', displayName: 'P. Unitario', minWidth: 90 }, 
+      { field: 'cantidad', name: 'ved.cantidad', displayName: 'Cantidad', minWidth: 90 },
+      { field: 'igv_detalle', name: 'ved.igv_detalle', displayName: 'IGV', minWidth: 90 },
+      { field: 'importe_con_igv', name: 'ved.importe_con_igv', displayName: 'Importe', minWidth: 90 }, 
       { field: 'estado', type: 'object', name: 'estado', displayName: 'ESTADO', width: '95', enableFiltering: false, enableSorting: false, enableColumnMenus: false, enableColumnMenu: false, 
           cellTemplate:'<div class="">' + 
             '<label tooltip-placement="left" tooltip="{{ COL_FIELD.labelText }}" class="label {{ COL_FIELD.claseLabel }} ml-xs">'+ 
@@ -269,14 +270,13 @@ app.controller('HistorialVentasCtrl', ['$scope', '$filter', '$uibModal', '$bootb
           've.numero_serie' : grid.columns[3].filters[0].term,
           've.numero_correlativo' : grid.columns[4].filters[0].term,
           "CONCAT(COALESCE(cp.nombres,''), ' ', COALESCE(cp.apellidos,''), ' ', COALESCE(ce.razon_social,''))" : grid.columns[7].filters[0].term,
-          "CONCAT(col.nombres, ' ', col.apellidos)" : grid.columns[8].filters[0].term,
-          "us.username" : grid.columns[9].filters[0].term, 
-          'fp.descripcion_fp' : grid.columns[10].filters[0].term, 
-          'se.descripcion_se' : grid.columns[11].filters[0].term, 
-          've.moneda' : grid.columns[12].filters[0].term, 
-          've.subtotal' : grid.columns[13].filters[0].term, 
-          've.igv' : grid.columns[14].filters[0].term, 
-          've.total' : grid.columns[15].filters[0].term 
+          "CONCAT(col.nombres, ' ', col.apellidos)" : grid.columns[7].filters[0].term,
+          'se.descripcion_se' : grid.columns[9].filters[0].term,  
+          'ele.descripcion_ele' : grid.columns[11].filters[0].term, 
+          'ved.precio_unitario' : grid.columns[12].filters[0].term, 
+          'ved.cantidad' : grid.columns[13].filters[0].term, 
+          'ved.igv_detalle' : grid.columns[14].filters[0].term, 
+          'ved.importe_con_igv' : grid.columns[15].filters[0].term 
         } 
         $scope.metodos.getPaginationServerSideVEDet(); 
       });
