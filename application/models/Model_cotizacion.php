@@ -295,7 +295,7 @@ class Model_cotizacion extends CI_Model {
 	public function m_cargar_esta_cotizacion_por_id_simple($idcotizacion)
 	{
 		$this->db->select('cot.idcotizacion, cot.num_cotizacion, cot.estado_cot'); 
-		$this->db->from('cotizacion co');
+		$this->db->from('cotizacion cot');
 		$this->db->join('sede se', 'cot.idsede = se.idsede');
 		$this->db->where_in('cot.estado_cot', array(0,1,2,3)); // anulado, por enviar, enviado y nota de pedido
 		$this->db->where('cot.idcotizacion',$idcotizacion);
@@ -490,6 +490,14 @@ class Model_cotizacion extends CI_Model {
 	{
 		$data = array(
 			'estado_cot' => 2 // enviado 
+		);
+		$this->db->where('idcotizacion',$datos['idcotizacion']); 
+		return $this->db->update('cotizacion', $data); 
+	}
+	public function m_cambiar_estado_nota_pedido($datos) 
+	{
+		$data = array(
+			'estado_cot' => 3 // nota de pedido 
 		);
 		$this->db->where('idcotizacion',$datos['idcotizacion']); 
 		return $this->db->update('cotizacion', $data); 

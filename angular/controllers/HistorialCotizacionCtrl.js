@@ -216,7 +216,7 @@ app.controller('HistorialCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$b
           if(rpta.flag == 1){
             var pTitle = 'OK!';
             var pType = 'success';
-            $scope.metodos.getPaginationServerSide();
+            $scope.metodos.getPaginationServerSide(true);
           }else if(rpta.flag == 0){
             var pTitle = 'Error!';
             var pType = 'danger';
@@ -230,7 +230,7 @@ app.controller('HistorialCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$b
     });
   }
   $scope.btnEnviarCotizacion = function() {
-    var pMensaje = '¿Realmente desea marcar la cotización como "ENVIADO"?';
+    var pMensaje = '¿Realmente desea marcar la cotización como "ENVIADA"?';
     $bootbox.confirm(pMensaje, function(result) { 
       if(result){
         var arrParams = { 
@@ -241,7 +241,7 @@ app.controller('HistorialCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$b
           if(rpta.flag == 1){
             var pTitle = 'OK!';
             var pType = 'success';
-            $scope.metodos.getPaginationServerSide();
+            $scope.metodos.getPaginationServerSide(true);
           }else if(rpta.flag == 0){
             var pTitle = 'Error!';
             var pType = 'danger';
