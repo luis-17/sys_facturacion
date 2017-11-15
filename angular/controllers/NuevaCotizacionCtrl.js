@@ -63,8 +63,14 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
   $scope.fData.plazo_entrega = 5;
   $scope.fData.validez_oferta = 10;
   $scope.fData.incluye_tras_prov = 2; // no 
+  // recargar fConfigSys si no se encuentra 
+  // console.log($scope.fConfigSys,'$scope.fConfigSys');
+  if(angular.isUndefined($scope.fConfigSys.precio_incluye_igv_cot) || $scope.fConfigSys.precio_incluye_igv_cot === null){ 
+    //console.log('entre');
+    $scope.$parent.getConfiguracionSys();
+  }
+
   $timeout(function() { 
-    
     $scope.fData.modo_igv = parseInt($scope.fConfigSys.precio_incluye_igv_cot); // INCLUYE IGV dinamico 
     $scope.fData.incluye_entr_dom = parseInt($scope.fConfigSys.incluye_entrega_dom_cot);  // dinamico 
   }, 500);
@@ -679,6 +685,8 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
   $scope.getSelectedContacto = function (item, model) { 
     $scope.fData.num_documento = model.ruc;
     $scope.fData.cliente.id = model.idclienteempresa;
+    $scope.fData.cliente.tipo_cliente = 'ce'; // empresa 
+    $scope.fData.cliente.descripcion = model.razon_social;
     $scope.fData.cliente.razon_social = model.razon_social;
     $scope.fData.cliente.representante_legal = model.representante_legal;
     $scope.fData.cliente.dni_representante_legal = model.dni_representante_legal; 
@@ -1344,7 +1352,6 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     });
   }
 
-
   $scope.btnClonar = function() {
     blockUI.start('Procesando información...'); 
     $uibModal.open({ 
@@ -1364,11 +1371,11 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
         $scope.fBusquedaCOT.cliente.id = null;
         $scope.fBusquedaCOT.cliente.tipo_cliente = null;
         $scope.fBusquedaCOT.cliente.descripcion = '-- Todos --'; 
-        console.log($scope.fData.cliente,'$scope.fData.cliente');
+        // console.log($scope.fData.cliente,'$scope.fData.cliente');
         if( $scope.fData.cliente.id ){
           $scope.fBusquedaCOT.cliente.id = $scope.fData.cliente.id;
           $scope.fBusquedaCOT.cliente.tipo_cliente = $scope.fData.cliente.tipo_cliente;
-          $scope.fBusquedaCOT.cliente.descripcion = $scope.fData.cliente.cliente; 
+          $scope.fBusquedaCOT.cliente.descripcion = $scope.fData.cliente.descripcion; 
         }
         $scope.fBusquedaCOT.desde = $filter('date')(new Date(),'01-MM-yyyy');
         $scope.fBusquedaCOT.desdeHora = '00';
@@ -1441,27 +1448,41 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
             gridApi.selection.on.rowSelectionChanged($scope,function(row){ 
 
               $scope.mySelectionGridCOT = gridApi.selection.getSelectedRows(); 
-              console.log($scope.mySelectionGridCOT,'$scope.mySelectionGridCOT');
-              var params = { 
-                searchText: $scope.mySelectionGridCOT[0].num_cotizacion, 
-                idcotizacion: $scope.mySelectionGridCOT[0].idcotizacion,
-                searchColumn: "num_cotizacion",
-                sensor: false,
-                estado: 'estado',
-                datos: $scope.fData, 
-                limit: 1  
+              var arrParams = { 
+                'identify': $scope.mySelectionGridCOT[0].idcotizacion  
               }; 
-              console.log(params,'params'); 
-              CotizacionServices.sBuscarNumCotizacionAutocomplete(params).then(function(rpta) { 
-                if( rpta.flag == 0 ){ 
-                  pinesNotifications.notify({ title: 'OK!', text: 'No se encontraron cotizaciones', type: 'warning', delay: 3000 });
-                }else { 
-                  $scope.getSelectedNumCotizacion(false,rpta.datos[0],true); 
-                  $scope.fData.temporal.num_cotizacion = $scope.mySelectionGridCOT[0].num_cotizacion;
-                  pinesNotifications.notify({ title: 'OK!', text: 'Se agregaron los items a la lista', type: 'success', delay: 3000 }); 
+              blockUI.start('Procesando cotización...'); 
+              CotizacionServices.sObtenerEstaCotizacion(arrParams).then(function(rpta) {
+                if( rpta.flag == 1 ){
+                  $timeout(function() {
+                    $scope.gridOptions.data = rpta.detalle;
+                  }, 200);
+                  pinesNotifications.notify({ title: 'OK!', text: 'Se clonaron los items a la lista', type: 'success', delay: 3000 }); 
                   $uibModalInstance.dismiss('cancel');
-                }                
-              });
+                }
+                blockUI.stop(); 
+              }); 
+              // console.log($scope.mySelectionGridCOT,'$scope.mySelectionGridCOT');
+              // var params = { 
+              //   searchText: $scope.mySelectionGridCOT[0].num_cotizacion, 
+              //   idcotizacion: $scope.mySelectionGridCOT[0].idcotizacion,
+              //   searchColumn: "num_cotizacion",
+              //   sensor: false,
+              //   estado: 'estado',
+              //   datos: $scope.fData, 
+              //   limit: 1  
+              // }; 
+              // console.log(params,'params'); 
+              // CotizacionServices.sBuscarNumCotizacionAutocomplete(params).then(function(rpta) { 
+              //   if( rpta.flag == 0 ){ 
+              //     pinesNotifications.notify({ title: 'OK!', text: 'No se encontraron cotizaciones', type: 'warning', delay: 3000 });
+              //   }else { 
+              //     $scope.getSelectedNumCotizacion(false,rpta.datos[0],true); 
+              //     $scope.fData.temporal.num_cotizacion = $scope.mySelectionGridCOT[0].num_cotizacion;
+              //     pinesNotifications.notify({ title: 'OK!', text: 'Se agregaron los items a la lista', type: 'success', delay: 3000 }); 
+              //     $uibModalInstance.dismiss('cancel');
+              //   }                
+              // });
               
             });
             gridApi.selection.on.rowSelectionChangedBatch($scope,function(rows){
@@ -1533,8 +1554,6 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
       }
     });
   }
-
-
   $scope.grabar = function() { 
     if($scope.fData.isRegisterSuccess){
       pinesNotifications.notify({ title: 'Advertencia.', text: 'La cotización ya fue registrada', type: 'warning', delay: 3000 });
@@ -1592,7 +1611,6 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     }
     ModalReporteFactory.getPopupReporte(arrParams);
   }
-
   $scope.imprimirvista = function() {
 
     var arrParams = { 
@@ -1613,7 +1631,6 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     }
     ModalReporteFactory.getPopupReporte(arrParams);
   }
-
   $scope.metodos.verPlazosPago = function() {
     console.log($scope.fData.total,'$scope.fData.total');
       // console.log($scope.fData.fecha_emision,'$scope.fData.fecha_emision');
@@ -1655,7 +1672,6 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
         }
       });  
   }
-
 }]);
 
 app.service("CotizacionServices",function($http, $q, handleBehavior) {

@@ -31,6 +31,8 @@ class Cliente extends CI_Controller {
 		if( $allInputs['tipo_documento']['destino'] == 1 ){ // empresa razon_social
 			$fCliente = $this->model_cliente_empresa->m_buscar_cliente_empresa($allInputs);
 			$fCliente['id'] = @$fCliente['idclienteempresa'];
+			$fCliente['descripcion'] = strtoupper(@$fCliente['razon_social']);
+			$fCliente['tipo_cliente'] = 'ce';
 		}
 		if( $allInputs['tipo_documento']['destino'] == 2 ){ // persona 
 			$fCliente = $this->model_cliente_persona->m_buscar_cliente_persona($allInputs);
@@ -42,6 +44,8 @@ class Cliente extends CI_Controller {
 			}
 			$fCliente['email'] = strtoupper($fCliente['email']); 
 			$fCliente['id'] = @$fCliente['idclientepersona'];
+			$fCliente['descripcion'] = strtoupper(@$fCliente['nombres'].' '.@$fCliente['apellidos']);
+			$fCliente['tipo_cliente'] = 'cp';
 			$fCliente['cliente'] = strtoupper(@$fCliente['nombres'].' '.@$fCliente['apellidos']); 
 			$fCliente['sexo'] = array( 
 				'id'=> @$fCliente['sexo'],
@@ -78,7 +82,6 @@ class Cliente extends CI_Controller {
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		// var_dump($allInputs);
 		$paramDatos = $allInputs['datos'];
-		// $paramDatosCo = @$allInputs['datosCo']; // contacto 
 		$paramPaginate = $allInputs['paginate'];
 		if(empty($paramDatos['tipo_cliente'])){ 
 			$arrData['message'] = 'No hay datos.';
@@ -99,6 +102,7 @@ class Cliente extends CI_Controller {
 						'id' => $row['idclienteempresa'],
 						'idclienteempresa' => $row['idclienteempresa'],
 						'cliente' => strtoupper($row['razon_social']),
+						'descripcion' => strtoupper($row['razon_social']),
 						'tipo_cliente' => 'ce',
 						'nombre_comercial' => strtoupper($row['nombre_comercial']),
 						'nombre_corto' => strtoupper($row['nombre_corto']),
@@ -139,6 +143,7 @@ class Cliente extends CI_Controller {
 						'nombres' => strtoupper($row['nombres']),
 						'apellidos' => strtoupper($row['apellidos']),
 						'cliente' => strtoupper($row['nombres'].' '.$row['apellidos']),
+						'descripcion' => strtoupper($row['nombres'].' '.$row['apellidos']),
 						'tipo_cliente' => 'cp',
 						'num_documento' => $row['num_documento'],
 						'categoria_cliente' => array(

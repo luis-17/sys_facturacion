@@ -1061,7 +1061,6 @@ app.filter('mapAgrupacion', function() {
     4: 'GRUPO 4'
   };
   return function(input) {
-    console.log(input,'inputinputinput');
     if (!input){
       return '';
     } else {

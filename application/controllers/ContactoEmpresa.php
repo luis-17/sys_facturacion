@@ -78,11 +78,11 @@ class ContactoEmpresa extends CI_Controller {
 					'ruc' => $row['ruc'],
 					'cliente_empresa' => array(
 						'id' => trim($row['idclienteempresa']),
-						'descripcion'=> strtoupper($row['nombre_comercial']),
+						'descripcion'=> strtoupper($row['razon_social']),
 						'nombre_comercial' => strtoupper($row['nombre_comercial']),
 						'nombre_corto' => strtoupper($row['nombre_corto']),
 						'razon_social' => strtoupper($row['razon_social']),
-						'tipo_cliente' => 'ce',
+						'tipo_cliente' => 'ce', // empresa
 						'cliente' => strtoupper($row['razon_social']),
 						'categoria_cliente' => array(
 							'id'=> $row['idcategoriacliente'],

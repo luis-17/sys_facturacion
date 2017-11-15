@@ -352,6 +352,7 @@ class Cotizacion extends CI_Controller {
 			);
 			$arrListado[$row['iddetallecotizacion']]['caracteristicas'][$row['iddetallecaracteristica']] = $arrAux2; 
 		} 
+		$arrListado = array_values($arrListado);
 		$arrData['datos'] = $arrListado; 
     	// $arrData['paginate']['totalRows'] = $totalRows['contador']; 
     	$arrData['message'] = ''; 
