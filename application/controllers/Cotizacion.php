@@ -99,6 +99,9 @@ class Cotizacion extends CI_Controller {
 		$fila = $this->model_cotizacion->m_cargar_cotizacion_por_id($idcotizacion);
 		$detalleLista = $this->model_cotizacion->m_cargar_detalle_cotizacion_por_id($idcotizacion);
 		$rowEstadoId = $fila['estado_cot']; 
+		if( $fila['estado_cot'] == 0 ){ // por enviar
+			$rowEstadoDescripcion = 'ANULADO'; 
+		}
 		if( $fila['estado_cot'] == 1 ){ // por enviar
 			$rowEstadoDescripcion = 'POR ENVIAR'; 
 		}
