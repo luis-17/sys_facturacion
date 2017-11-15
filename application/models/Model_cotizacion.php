@@ -215,7 +215,7 @@ class Model_cotizacion extends CI_Model {
 		$this->db->select('cot.idcotizacion, cot.num_cotizacion');
 		$this->db->from('cotizacion cot');
 		$this->db->join('sede se', 'cot.idsede = se.idsede');
-		$this->db->where_in('cot.estado_cot', array(1,2,3)); // por enviar, enviado y nota de pedido 
+		$this->db->where_in('cot.estado_cot', array(0,1,2,3)); // por enviar, enviado y nota de pedido 
 		//$this->db->where('se.idsede',$datos['sede']['id']);
 		if($datos['config']['incluye_mes_en_codigo_cot'] == 'no' && $datos['config']['incluye_dia_en_codigo_cot'] == 'no'){
 			$this->db->where('YEAR(DATE(cot.fecha_registro))', (int)date('Y')); // año 
@@ -260,7 +260,10 @@ class Model_cotizacion extends CI_Model {
 		$this->db->join('sede se','cot.idsede = se.idsede'); 
 		$this->db->join('forma_pago fp','cot.idformapago = fp.idformapago'); 
 		$this->db->join('contacto ct','cot.idcontacto = ct.idcontacto','left'); 
-		$this->db->like('cot.num_cotizacion', $filtro['searchText']); 
+		if( !empty($filtro['searchText']) ){
+			$this->db->like('cot.num_cotizacion', $filtro['searchText']); 
+		}
+		
 		if( !empty($filtro['idcotizacion']) ){
 			$this->db->like('cot.idcotizacion', $filtro['idcotizacion']); 
 		}
@@ -283,7 +286,7 @@ class Model_cotizacion extends CI_Model {
 		$this->db->select('co.idcotizacion, co.num_cotizacion');
 		$this->db->from('cotizacion co');
 		$this->db->join('sede se', 'co.idsede = se.idsede');
-		$this->db->where_in('co.estado_cot',array(1,2)); // solo "por enviar" y "enviado" 
+		$this->db->where_in('co.estado_cot',array(0,1,2,3)); // todos 
 		$this->db->where('co.num_cotizacion',$numCoti);
 		$this->db->limit(1);
 		return $this->db->get()->row_array();
@@ -486,14 +489,6 @@ class Model_cotizacion extends CI_Model {
 	{
 		$data = array(
 			'estado_cot' => 2 // enviado 
-		);
-		$this->db->where('idcotizacion',$datos['idcotizacion']); 
-		return $this->db->update('cotizacion', $data); 
-	}
-	public function m_cambiar_estado_nota_pedido($datos) 
-	{
-		$data = array(
-			'estado_cot' => 3 // nota de pedido 
 		);
 		$this->db->where('idcotizacion',$datos['idcotizacion']); 
 		return $this->db->update('cotizacion', $data); 

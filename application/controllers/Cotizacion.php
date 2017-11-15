@@ -36,6 +36,11 @@ class Cotizacion extends CI_Controller {
 				$objEstado['claseLabel'] = 'label-success';
 				$objEstado['labelText'] = 'ENVIADO';
 			}
+			if( $row['estado_cot'] == 3 ){ // NOTA DE PEDIDO    
+				$objEstado['claseIcon'] = 'fa-check';
+				$objEstado['claseLabel'] = 'label-primary';
+				$objEstado['labelText'] = ' PEDIDO';
+			}
 			if( $row['estado_cot'] == 0 ){ // ANULADO   
 				$objEstado['claseIcon'] = 'fa-ban';
 				$objEstado['claseLabel'] = 'label-danger';
@@ -377,13 +382,19 @@ class Cotizacion extends CI_Controller {
 				$objEstado['claseLabel'] = 'label-success';
 				$objEstado['labelText'] = 'ENVIADO';
 			}
+			if( $row['estado_cot'] == 3 ){ // NOTA DE PEDIDO    
+				$objEstado['claseIcon'] = 'fa-check';
+				$objEstado['claseLabel'] = 'label-primary';
+				$objEstado['labelText'] = 'PEDIDO';
+			}
 			if( $row['estado_cot'] == 0 ){ // ANULADO   
 				$objEstado['claseIcon'] = 'fa-ban';
 				$objEstado['claseLabel'] = 'label-danger';
 				$objEstado['labelText'] = 'ANULADO';
 			}
 			$arrAux = array( 
-				'iddetallecotizacion' => $row['iddetallecotizacion'],
+				'iddetallecotizacion' => $row['iddetallecotizacion'], // idcotizacion
+				'idcotizacion' => $row['idcotizacion'],
 				'num_cotizacion' => $row['num_cotizacion'],
 				'fecha_emision' => $row['fecha_emision'],
 				'idempresaadmin' => $row['idempresaadmin'],
@@ -411,15 +422,6 @@ class Cotizacion extends CI_Controller {
 
 			$arrListado[] = $arrAux; 
 		}
-		// foreach ($lista as $key => $row) {
-		// 	$arrAux2 = array(
-		// 		'id'=> $row['iddetallecaracteristica'],
-		// 		'orden'=> $row['orden_car'],
-		// 		'descripcion'=> $row['descripcion_car'],
-		// 		'valor'=> $row['valor']
-		// 	);
-		// 	$arrListado[$row['iddetallecotizacion']]['caracteristicas'][$row['iddetallecaracteristica']] = $arrAux2; 
-		// }
 		$arrData['datos'] = $arrListado; 
     	$arrData['paginate']['totalRows'] = $totalRows['contador']; 
     	$arrData['message'] = ''; 
@@ -494,7 +496,8 @@ class Cotizacion extends CI_Controller {
 	public function buscar_numero_cotizacion_autocomplete()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);	
-		$lista = $this->model_cotizacion->m_cargar_numero_cotizacion_autocomplete($allInputs,$allInputs['datos']);
+		$lista = $this->model_cotizacion->m_cargar_numero_cotizacion_autocomplete($allInputs,$allInputs['datos']); 
+		// print_r($lista); exit();
 		$hayStock = true;
 		$arrListado = array();
 		foreach ($lista as $row) { 
@@ -575,8 +578,8 @@ class Cotizacion extends CI_Controller {
 		if(empty($lista)){
 			$arrData['flag'] = 0;
 		}else{
-			if( @$allInputs['limit'] == 1 && @$lista[0]['estado_cot'] == 2 /*enviado*/ ){ 
-				$arrData['flag'] = 2;
+			if( @$allInputs['limit'] == 1 && @$lista[0]['estado_cot'] == 3 /*pedido*/ ){ 
+				$arrData['flag'] = 3;
 			}
 		}
 		

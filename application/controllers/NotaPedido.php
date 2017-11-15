@@ -351,8 +351,8 @@ class NotaPedido extends CI_Controller {
 					}
 				} 
 			}
-			// actualizar las cotizaciones a "ENVIADAS" 
-			$boolEstado = 2; 
+			// actualizar las cotizaciones a "PEDIDO" 
+			$boolEstado = 3; //PEDIDO 
 			$arrCotizaciones = array_unique($arrCotizaciones); 
 			if( $this->model_cotizacion->m_actualizar_estado_cotizaciones($arrCotizaciones,$boolEstado) ){ 
 				$arrData['message'] .= '<br/> - Se actualizó el estado de las cotizaciones seleccionadas.';  

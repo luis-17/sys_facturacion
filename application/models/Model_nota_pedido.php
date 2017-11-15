@@ -229,7 +229,7 @@ class Model_nota_pedido extends CI_Model {
 		$this->db->select('np.idmovimiento, np.num_nota_pedido');
 		$this->db->from('movimiento np');
 		$this->db->join('sede se', 'np.idsede = se.idsede');
-		$this->db->where_in('np.estado_movimiento',array(1,2)); // solo "registrado" y "facturado" 
+		$this->db->where_in('np.estado_movimiento',array(0,1,2)); // solo anulado, "registrado" y "facturado" 
 		$this->db->where('np.tipo_movimiento',1); // solo nota de pedido 
 		//$this->db->where('se.idsede',$datos['sede']['id']);
 		if($datos['config']['incluye_mes_en_codigo_np'] == 'no' && $datos['config']['incluye_dia_en_codigo_np'] == 'no'){
@@ -252,7 +252,7 @@ class Model_nota_pedido extends CI_Model {
 		$this->db->select('np.idmovimiento, np.num_nota_pedido');
 		$this->db->from('movimiento np');
 		$this->db->join('sede se', 'np.idsede = se.idsede');
-		$this->db->where_in('np.estado_movimiento',array(1,2)); // solo "registrado" y "facturado" 
+		$this->db->where_in('np.estado_movimiento',array(0,1,2)); // solo "anulado", "registrado" y "facturado" 
 		$this->db->where('np.num_nota_pedido',$numNP);
 		$this->db->where('np.tipo_movimiento',1); // 1 : nota de pedido 
 		$this->db->limit(1);

@@ -1,6 +1,7 @@
 app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$log', '$timeout', 'pinesNotifications', 'uiGridConstants', 'blockUI', 
     'MathFactory',
     'CaracteristicaFactory',
+    'ContactoEmpresaFactory',
 		'NotaPedidoServices',
 		'ClienteEmpresaServices',
 		'ClientePersonaServices', 
@@ -14,12 +15,13 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
     // 'UnidadMedidaServices', 
     //'ElementoServices',
     'CaracteristicaServices',
-    'ContactoEmpresaServices',
+    'ContactoEmpresaServices', 
     'CotizacionServices',
     //'VariableCarServices',
 	function($scope, $filter, $uibModal, $bootbox, $log, $timeout, pinesNotifications, uiGridConstants, blockUI, 
     MathFactory,
     CaracteristicaFactory,
+    ContactoEmpresaFactory,
 		NotaPedidoServices,
 		ClienteEmpresaServices,
 		ClientePersonaServices,
@@ -44,13 +46,17 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
   $scope.fData.fecha_registro = $filter('date')(moment().toDate(),'dd-MM-yyyy'); 
   $scope.fData.fecha_emision = $filter('date')(moment().toDate(),'dd-MM-yyyy'); 
   $scope.fData.num_nota_pedido = '[ ............... ]';
-  $scope.fData.modo_igv = parseInt($scope.fSessionCI.config.precio_incluye_igv_np); // INCLUYE IGV dinamico 
-  $scope.fData.tipo_cambio = parseFloat($scope.fSessionCI.config.valor_tipo_cambio_dolar); // Tipo de cambio dinamico 
+  $timeout(function() { 
+    // console.log($scope.fConfigSys,'$scope.fConfigSys');
+    $scope.fData.modo_igv = parseInt($scope.fConfigSys.precio_incluye_igv_np); // INCLUYE IGV dinamico 
+    $scope.fData.tipo_cambio = parseFloat($scope.fConfigSys.valor_tipo_cambio_dolar); // Tipo de cambio dinamico 
+    $scope.fData.incluye_entr_dom = parseInt($scope.fConfigSys.incluye_entrega_dom_np);  // dinamico 
+  }, 500);
   $scope.fData.plazo_entrega = 5;
   $scope.fData.validez_oferta = 10;
   $scope.fData.incluye_tras_prov = 2; // no 
   
-  $scope.fData.incluye_entr_dom = parseInt($scope.fSessionCI.config.incluye_entrega_dom_np);  // dinamico 
+  
   $scope.fData.idnotapedidoanterior = null;
   $scope.fData.isRegisterSuccess = false;
   $scope.fData.temporal = {};
@@ -561,8 +567,8 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
     });
   }
   $scope.getSelectedNumCotizacion = function(item, model, clear, iddetallecotizacion) { 
-    if(model.estado == 2){ // enviado 
-      pinesNotifications.notify({ title: 'OK!', text: 'Esta cotización ya ha sido enviada anteriormente.', type: 'warning', delay: 3500 });
+    if(model.estado == 3){ // nota pedido 
+      pinesNotifications.notify({ title: 'OK!', text: 'Esta cotización ya ha sido marcado como pedido anteriormente.', type: 'warning', delay: 3500 });
       $scope.fData.temporal.num_cotizacion = null; 
       return false;
     }
@@ -607,6 +613,7 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
     if(iddetallecotizacion){
       model.iddetallecotizacion = iddetallecotizacion;
     }
+    console.log(model,'modelmodelmodel')
     CotizacionServices.sListarDetalleEstaCotizacion(model).then(function(rpta) { 
       if( rpta.flag == 1 ){ 
         angular.forEach(rpta.datos, function(val,key) { 
@@ -758,9 +765,9 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
 
               $scope.mySelectionGridCOT = gridApi.selection.getSelectedRows(); 
               var params = { 
-                searchText: $scope.mySelectionGridCOT[0].num_cotizacion, 
+                //searchText: $scope.mySelectionGridCOT[0].num_cotizacion, 
                 idcotizacion: $scope.mySelectionGridCOT[0].idcotizacion,
-                searchColumn: "num_cotizacion",
+                //searchColumn: "num_cotizacion",
                 sensor: false,
                 datos: $scope.fData, 
                 limit: 1  
@@ -768,14 +775,14 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
               // console.log(params,'params'); 
               CotizacionServices.sBuscarNumCotizacionAutocomplete(params).then(function(rpta) { 
                 if( rpta.flag == 0 ){ 
-                  pinesNotifications.notify({ title: 'OK!', text: 'No se encontraron cotizaciones o a sido anulada.', type: 'warning', delay: 3000 });
-                }else if(rpta.flag === 1){ 
+                  pinesNotifications.notify({ title: 'OK!', text: 'Solo puede agregar cotizaciones en estado: "POR ENVIAR" ó "ENVIADA".', type: 'warning', delay: 3000 });
+                }else if(rpta.flag === 1 || rpta.flag === 2){ //por enviar o enviado
                   $scope.getSelectedNumCotizacion(false,rpta.datos[0],true); 
                   $scope.fData.temporal.num_cotizacion = $scope.mySelectionGridCOT[0].num_cotizacion;
                   pinesNotifications.notify({ title: 'OK!', text: 'Se agregaron los items a la lista', type: 'success', delay: 3000 }); 
                   $uibModalInstance.dismiss('cancel');
-                }else if(rpta.flag === 2){ // COTIZACION ENVIADA 
-                  pinesNotifications.notify({ title: 'OK!', text: 'Esta cotización ya ha sido enviada anteriormente.', type: 'warning', delay: 3000 });
+                }else if(rpta.flag === 3){ // COTIZACION MARCADA COMO PEDIDO 
+                  pinesNotifications.notify({ title: 'OK!', text: 'Esta cotización ya ha sido marcada como pedido anteriormente.', type: 'warning', delay: 3000 });
                 }
                 //return rpta.datos;
                 
@@ -854,7 +861,7 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
   $scope.buscarCotizacionMultiple = function() {
     blockUI.start('Procesando información...'); 
     $uibModal.open({ 
-      templateUrl: angular.patchURLCI+'Cotizacion/ver_popup_busqueda_cotizacion_detalle', // btnBusquedaCotizacion
+      templateUrl: angular.patchURLCI+'Cotizacion/ver_popup_busqueda_cotizacion_detalle', 
       size: 'lg',
       backdrop: 'static',
       keyboard:false,
@@ -927,9 +934,9 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
 
               $scope.mySelectionGridDETCOT = gridApi.selection.getSelectedRows(); 
               var params = { 
-                searchText: $scope.mySelectionGridDETCOT[0].num_cotizacion, 
+                //searchText: $scope.mySelectionGridDETCOT[0].num_cotizacion, 
                 idcotizacion: $scope.mySelectionGridDETCOT[0].idcotizacion,
-                searchColumn: "num_cotizacion",
+                //searchColumn: "num_cotizacion",
                 sensor: false,
                 datos: $scope.fData, 
                 limit: 1  
@@ -937,14 +944,14 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
               // console.log(params,'params'); 
               CotizacionServices.sBuscarNumCotizacionAutocomplete(params).then(function(rpta) { 
                 if( rpta.flag == 0 ){ 
-                  pinesNotifications.notify({ title: 'OK!', text: 'No se encontraron cotizaciones o a sido anulada.', type: 'warning', delay: 3000 });
-                }else if(rpta.flag === 1){ 
+                  pinesNotifications.notify({ title: 'OK!', text: 'Solo puede agregar cotizaciones en estado: "POR ENVIAR" ó "ENVIADA".', type: 'warning', delay: 3000 });
+                }else if(rpta.flag === 1 || rpta.flag === 2){ //por enviar o enviado 
                   $scope.getSelectedNumCotizacion(false,rpta.datos[0],false,$scope.mySelectionGridDETCOT[0].iddetallecotizacion); 
                   // $scope.fData.temporal.num_cotizacion = $scope.mySelectionGridDETCOT[0].num_cotizacion;
                   pinesNotifications.notify({ title: 'OK!', text: 'Se agregaron los items a la lista', type: 'success', delay: 3000 }); 
                   // $uibModalInstance.dismiss('cancel');
-                }else if(rpta.flag === 2){ // COTIZACION ENVIADA 
-                  pinesNotifications.notify({ title: 'OK!', text: 'Esta cotización ya ha sido enviada anteriormente.', type: 'warning', delay: 3000 });
+                }else if(rpta.flag === 3){ // COTIZACION MARCADA COMO PEDIDO 
+                  pinesNotifications.notify({ title: 'OK!', text: 'Esta cotización ya ha sido marcada como pedido anteriormente.', type: 'warning', delay: 3000 });
                 }
               });
               

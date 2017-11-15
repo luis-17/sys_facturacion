@@ -6,7 +6,7 @@
 		<div class="row">
 			<div class="col-xs-12"> 
 		        <div class="inline pull-right"> 
-		        	<button class="btn m-b-xs btn-success btn-xs" ng-click="btnNuevoContacto();">
+		        	<button type="button" class="btn m-b-xs btn-success btn-xs" ng-click="btnNuevoContacto();">
 	        			<i class="fa fa-file-text"></i> Nuevo Contacto </button> 
 		        </div>
 			</div>
