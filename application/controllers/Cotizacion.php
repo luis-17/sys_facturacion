@@ -1524,6 +1524,10 @@ class Cotizacion extends CI_Controller {
 				if( empty($elemento['agrupacion']) ){ 
 					$elemento['agrupacion'] = NULL; // por defecto 
 				} 
+				/* fix clon */
+				if( empty($elemento['id']) ){
+					$elemento['id'] = @$elemento['idelemento']; 
+				}
 				if( $this->model_cotizacion->m_registrar_detalle_cotizacion($elemento) ){ 
 					$arrData['message'] = 'Los datos se registraron correctamente - (no caracteristicas)'; 
 					$arrData['flag'] = 1; 
