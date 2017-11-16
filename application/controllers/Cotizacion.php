@@ -1360,7 +1360,7 @@ class Cotizacion extends CI_Controller {
 		      array(
 		        $i,
 		        utf8_decode($value['descripcion']),
-		        strtoupper($value['unidad_medida']['abreviatura']),
+		        strtoupper(@$value['unidad_medida']['abreviatura']),
 		        $value['cantidad'],
 		        number_format($value['precio_unitario'],$fConfig['num_decimal_precio_key'],'.',' '),
 		        number_format($valImporte,$fConfig['num_decimal_total_key'],'.',' ')

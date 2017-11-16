@@ -1255,6 +1255,7 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     $scope.calcularTotales();
   };
   $scope.calcularTotales = function () { 
+    console.log('calcularTotales');
     var subtotal = 0;
     var igv = 0;
     var total = 0;
@@ -1455,7 +1456,8 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
               CotizacionServices.sObtenerEstaCotizacion(arrParams).then(function(rpta) {
                 if( rpta.flag == 1 ){
                   $timeout(function() {
-                    $scope.gridOptions.data = rpta.detalle;
+                    $scope.gridOptions.data = rpta.detalle; 
+                    $scope.calcularTotales();
                   }, 200);
                   pinesNotifications.notify({ title: 'OK!', text: 'Se clonaron los items a la lista', type: 'success', delay: 3000 }); 
                   $uibModalInstance.dismiss('cancel');
