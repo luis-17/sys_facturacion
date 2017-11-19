@@ -1360,7 +1360,7 @@ class Cotizacion extends CI_Controller {
 		      array(
 		        $i,
 		        utf8_decode($value['descripcion']),
-		        strtoupper($value['unidad_medida']['abreviatura']),
+		        strtoupper(@$value['unidad_medida']['abreviatura']),
 		        $value['cantidad'],
 		        number_format($value['precio_unitario'],$fConfig['num_decimal_precio_key'],'.',' '),
 		        number_format($valImporte,$fConfig['num_decimal_total_key'],'.',' ')
@@ -1524,6 +1524,10 @@ class Cotizacion extends CI_Controller {
 				if( empty($elemento['agrupacion']) ){ 
 					$elemento['agrupacion'] = NULL; // por defecto 
 				} 
+				/* fix clon */
+				if( empty($elemento['id']) ){
+					$elemento['id'] = @$elemento['idelemento']; 
+				}
 				if( $this->model_cotizacion->m_registrar_detalle_cotizacion($elemento) ){ 
 					$arrData['message'] = 'Los datos se registraron correctamente - (no caracteristicas)'; 
 					$arrData['flag'] = 1; 
