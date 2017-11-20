@@ -75,7 +75,7 @@ class Model_serie extends CI_Model {
 		$this->db->where('idtipodocumentomov',$datos['idtipodocumentomov']);
 		return $this->db->update('tipo_documento_serie', $data);
 	}
-	public function actualizar_serie_correlativo_por_movimiento($datos)
+	public function m_actualizar_serie_correlativo_por_movimiento($datos)
 	{
 		$this->db->set('correlativo_actual', 'correlativo_actual + 1', FALSE);
 		$this->db->where('idserie',$datos['serie']['id']);

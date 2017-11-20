@@ -664,7 +664,7 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
   $scope.btnBusquedaCotizacion = function() {
     blockUI.start('Procesando información...'); 
     $uibModal.open({ 
-      templateUrl: angular.patchURLCI+'Cotizacion/ver_popup_busqueda_cotizacion', // btnBusquedaCotizacion
+      templateUrl: angular.patchURLCI+'Cotizacion/ver_popup_busqueda_cotizacion', 
       size: 'lg',
       backdrop: 'static',
       keyboard:false,
@@ -680,7 +680,7 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
         $scope.fBusquedaCOT.cliente.id = null;
         $scope.fBusquedaCOT.cliente.tipo_cliente = null;
         $scope.fBusquedaCOT.cliente.descripcion = '-- Todos --'; 
-        console.log($scope.fData.cliente,'$scope.fData.cliente');
+        // console.log($scope.fData.cliente,'$scope.fData.cliente');
         if( $scope.fData.cliente.id ){
           $scope.fBusquedaCOT.cliente.id = $scope.fData.cliente.id;
           $scope.fBusquedaCOT.cliente.tipo_cliente = $scope.fData.cliente.tipo_cliente;
@@ -709,13 +709,6 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
         }
         $scope.metodos.listaSedes(myCallback); 
 
-        // ESTADO DE COTIZACION 
-        // $scope.fArr.listaEstadosNP = [
-        //   {'id' : 'ALL', 'descripcion' : '--TODOS--'},
-        //   {'id' : 1, 'descripcion' : 'POR ENVIAR'},
-        //   {'id' : 2, 'descripcion' : 'ENVIADO'}
-        // ]; 
-        // $scope.fBusquedaCOT.estado_np = $scope.fArr.listaEstadosNP[0];
         var paginationOptions = {
           pageNumber: 1,
           firstRow: 0,
@@ -1369,7 +1362,7 @@ app.service("NotaPedidoServices",function($http, $q, handleBehavior) {
         sGenerarNumeroNotaPedido: sGenerarNumeroNotaPedido,
         sListarHistorialNotaPedidos: sListarHistorialNotaPedidos,
         sListarHistorialDetalleNotaPedidos: sListarHistorialDetalleNotaPedidos,
-        sListarDetalleEstaNotaPedido: sListarDetalleEstaNotaPedido,
+        sObtenerEstaNotaPedido: sObtenerEstaNotaPedido,
         sRegistrar: sRegistrar,
         sEditar: sEditar,
         sAnular: sAnular
@@ -1398,10 +1391,10 @@ app.service("NotaPedidoServices",function($http, $q, handleBehavior) {
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
     }    
-    function sListarDetalleEstaNotaPedido(datos) {
+    function sObtenerEstaNotaPedido(datos) {
       var request = $http({
             method : "post",
-            url : angular.patchURLCI+"NotaPedido/lista_detalle_esta_nota_pedido",
+            url : angular.patchURLCI+"NotaPedido/obtener_esta_nota_pedido",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));

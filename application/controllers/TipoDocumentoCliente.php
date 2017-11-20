@@ -19,7 +19,7 @@ class TipoDocumentoCliente extends CI_Controller {
 		foreach ($lista as $row) {
 			array_push($arrListado,
 				array(
-					'id' => $row['idtipodocumentocliente'],
+					'id' => (int)$row['idtipodocumentocliente'],
 					'destino' => $row['destino_tdc'],
 					'destino_str' => ($row['destino_tdc'] == 1) ? 'ce' : 'cp',
 					'descripcion' => strtoupper($row['abreviatura_tdc']),

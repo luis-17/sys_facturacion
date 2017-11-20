@@ -1356,7 +1356,7 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
   $scope.btnClonar = function() {
     blockUI.start('Procesando información...'); 
     $uibModal.open({ 
-      templateUrl: angular.patchURLCI+'Cotizacion/ver_popup_busqueda_cotizacion', // btnBusquedaCotizacion
+      templateUrl: angular.patchURLCI+'Cotizacion/ver_popup_busqueda_cotizacion', 
       size: 'lg',
       backdrop: 'static',
       keyboard:false,

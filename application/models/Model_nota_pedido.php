@@ -9,7 +9,7 @@ class Model_nota_pedido extends CI_Model {
 		$this->db->select("CONCAT(COALESCE(col.nombres,''), ' ', COALESCE(col.apellidos,'')) As colaborador",FALSE); 
 		$this->db->select("CONCAT(COALESCE(cp.nombres,''), ' ', COALESCE(cp.apellidos,''), ' ', COALESCE(ce.razon_social,'')) As cliente_persona_empresa",FALSE);
 		$this->db->select("CONCAT(cp.nombres, ' ', cp.apellidos) As cliente_persona",FALSE);
-		$this->db->select('np.idmovimiento, np.num_nota_pedido, np.fecha_registro, np.dir_movimiento, np.tipo_movimiento, np.fecha_emision, np.tipo_cliente, , incluye_traslado_prov, incluye_entrega_domicilio, np.moneda, np.modo_igv, np.subtotal, np.igv, np.total, np.estado_movimiento, np.plazo_entrega, np.validez_oferta, 
+		$this->db->select('np.idmovimiento, np.num_nota_pedido, np.fecha_registro, np.dir_movimiento, np.tipo_movimiento, np.fecha_emision, np.tipo_cliente, incluye_traslado_prov, incluye_entrega_domicilio, np.moneda, np.modo_igv, np.subtotal, np.igv, np.total, np.estado_movimiento, np.plazo_entrega, np.validez_oferta, 
 			col.idcolaborador, (col.num_documento) AS num_documento_col, us.idusuario, us.username, 
 			ea.idempresaadmin, (ea.razon_social) AS razon_social_ea, (ea.nombre_comercial) AS nombre_comercial_ea, (ea.ruc) AS ruc_ea, 
 			ce.idclienteempresa, (ce.razon_social) AS razon_social_ce, (ce.nombre_comercial) AS nombre_comercial_ce, (ce.ruc) AS ruc_ce, 
@@ -203,26 +203,69 @@ class Model_nota_pedido extends CI_Model {
 		$fData = $this->db->get()->row_array();
 		return $fData; 
 	}
-	public function m_cargar_detalle_esta_nota_pedido($datos)
+	public function m_cargar_detalle_nota_pedido_por_id($idnotapedido)
 	{
-		$this->db->select('np.idmovimiento, np.num_nota_pedido, np.fecha_registro, dm.iddetallemovimiento, dm.cantidad, dm.precio_unitario, dm.importe_con_igv, 
-			dm.importe_sin_igv, dm.excluye_igv, dm.igv_detalle, 
+		$this->db->select('np.idmovimiento, np.idempresaadmin, np.num_nota_pedido, np.fecha_registro, 
+			dm.iddetallemovimiento, dm.cantidad, dm.precio_unitario, dm.importe_con_igv, dm.importe_sin_igv, dm.excluye_igv, dm.igv_detalle, 
 			ele.idelemento, ele.descripcion_ele, ele.tipo_elemento, 
-			um.idunidadmedida, um.descripcion_um, um.abreviatura_um', FALSE); 
+			um.idunidadmedida, um.descripcion_um, um.abreviatura_um, 
+			c.idcaracteristica, c.orden_car, c.descripcion_car, dc.iddetallecaracteristica, dc.valor', FALSE); // idclientepersona
 		$this->db->from('movimiento np'); // nota de pedido 
 		$this->db->join('detalle_movimiento dm','np.idmovimiento = dm.idmovimiento');
 		$this->db->join('elemento ele','dm.idelemento = ele.idelemento');
 		$this->db->join('unidad_medida um','dm.idunidadmedida = um.idunidadmedida','left'); 
-
+		$this->db->join("detalle_caracteristica dc","dc.iddetalle = dm.iddetallemovimiento AND dc.tipo_detalle = 'NP'",'left'); 
+		$this->db->join('caracteristica c','dc.idcaracteristica = c.idcaracteristica','left'); 
 		$this->db->join('usuario us','np.idusuarionp = us.idusuario'); 
 		$this->db->join('colaborador col','us.idusuario = col.idusuario'); 
 		$this->db->join('sede se','np.idsede = se.idsede'); 
-		$this->db->where('np.idmovimiento', $datos['idmovimiento']); 
-		// $this->db->where('ea.idempresaadmin', $this->sessionFactur['idempresaadmin']); // empresa session 
+		$this->db->where('np.idmovimiento', $idnotapedido); 
+		// $this->db->where('ea.idempresaadmin', $this->sessionFactur['idempresaadmin']); // empresa session agrupador 
 		$this->db->where('np.tipo_movimiento', 1); // nota de pedido 
 		$this->db->order_by('dm.iddetallemovimiento','ASC');
 		//$this->db->where_in('np.estado_movimiento', array(1,2)); // 1: registrado 2:facturado  
 		return $this->db->get()->result_array();
+	}
+	public function m_cargar_nota_pedido_por_id($idnotapedido) // moneda idtipodocumentocliente
+	{
+		$this->db->select("TRIM(CONCAT(COALESCE(tdc_ce.idtipodocumentocliente,''), ' ', COALESCE(tdc_cp.idtipodocumentocliente,''))) AS idtipodocumentocliente",FALSE);
+		$this->db->select("CONCAT(COALESCE(cp.nombres,''), ' ', COALESCE(cp.apellidos,''), ' ', COALESCE(ce.razon_social,'')) As cliente_persona_empresa",FALSE);
+		$this->db->select("CONCAT(cp.nombres, ' ', cp.apellidos) As cliente_persona",FALSE);
+		$this->db->select("CONCAT(COALESCE(ct.nombres,''), ' ', COALESCE(ct.apellidos,'')) AS contacto",FALSE);
+		$this->db->select("TRIM(CONCAT(COALESCE(tdc_ce.abreviatura_tdc,''), ' ', COALESCE(tdc_cp.abreviatura_tdc,''))) AS tipo_documento_abv",FALSE);
+		$this->db->select('np.idmovimiento, np.num_nota_pedido, np.fecha_registro, np.dir_movimiento, np.tipo_movimiento, np.fecha_emision, np.tipo_cliente, np.incluye_traslado_prov, np.incluye_entrega_domicilio, np.moneda, np.modo_igv, np.subtotal, np.igv, np.total, np.estado_movimiento, np.plazo_entrega, np.validez_oferta, np.idempresaadmin, 
+			ce.idclienteempresa, (ce.razon_social) AS razon_social_ce, (ce.nombre_comercial) AS nombre_comercial_ce, (ce.ruc) AS ruc_ce, 
+			ce.representante_legal AS representante_legal_ce, ce.dni_representante_legal AS dni_representante_legal_ce, ce.nombre_corto, 
+			ce.idtipodocumentocliente AS ce_idtipodocumentocliente, ce.telefono AS telefono_ce, ce.direccion_legal AS direccion_legal_ce, 
+			cp.idclientepersona, (cp.num_documento) AS num_documento_cp, (cp.telefono_movil) AS telefono_movil_cp, (cp.telefono_fijo) AS telefono_fijo_cp, 
+			cp.idtipodocumentocliente AS cp_idtipodocumentocliente, cp.sexo, cp.email,  
+			se.idsede, se.descripcion_se, se.abreviatura_se, fp.idformapago, fp.descripcion_fp, fp.modo_fp, 
+			ct.idcontacto, ct.telefono_fijo, ct.anexo, ct.area_encargada'); 
+		$this->db->from('movimiento np');
+		$this->db->join("cliente_empresa ce","np.idcliente = ce.idclienteempresa AND np.tipo_cliente = 'E'",'left'); 
+		$this->db->join("tipo_documento_cliente tdc_ce","ce.idtipodocumentocliente = tdc_ce.idtipodocumentocliente",'left'); 
+		$this->db->join("cliente_persona cp","np.idcliente = cp.idclientepersona AND np.tipo_cliente = 'P'",'left'); 
+		$this->db->join("tipo_documento_cliente tdc_cp","cp.idtipodocumentocliente = tdc_cp.idtipodocumentocliente",'left'); 
+		$this->db->join('sede se', 'np.idsede = se.idsede');
+		$this->db->join('forma_pago fp','np.idformapago = fp.idformapago'); 
+		$this->db->join('contacto ct','np.idcontacto = ct.idcontacto','left'); 
+		$this->db->where_in('np.estado_movimiento',array(0,1,2)); // solo "anulado", "registrado" y "facturado" 
+		$this->db->where('np.idmovimiento',$idnotapedido);
+		$this->db->where('np.tipo_movimiento',1); // 1 : nota de pedido 
+		$this->db->limit(1);
+		return $this->db->get()->row_array();
+	}
+	
+	public function m_cargar_esta_nota_pedido_por_codigo($numNP) 
+	{
+		$this->db->select('np.idmovimiento, np.num_nota_pedido');
+		$this->db->from('movimiento np');
+		$this->db->join('sede se', 'np.idsede = se.idsede');
+		$this->db->where_in('np.estado_movimiento',array(0,1,2)); // solo "anulado", "registrado" y "facturado" 
+		$this->db->where('np.num_nota_pedido',$numNP);
+		$this->db->where('np.tipo_movimiento',1); // 1 : nota de pedido 
+		$this->db->limit(1);
+		return $this->db->get()->row_array();
 	}
 	public function m_cargar_ultima_nota_pedido_segun_config($datos)
 	{
@@ -246,18 +289,7 @@ class Model_nota_pedido extends CI_Model {
 		$this->db->order_by('np.fecha_registro','DESC');
 		$this->db->limit(1);
 		return $this->db->get()->row_array();
-	}
-	public function m_cargar_esta_nota_pedido_por_codigo($numNP) 
-	{
-		$this->db->select('np.idmovimiento, np.num_nota_pedido');
-		$this->db->from('movimiento np');
-		$this->db->join('sede se', 'np.idsede = se.idsede');
-		$this->db->where_in('np.estado_movimiento',array(0,1,2)); // solo "anulado", "registrado" y "facturado" 
-		$this->db->where('np.num_nota_pedido',$numNP);
-		$this->db->where('np.tipo_movimiento',1); // 1 : nota de pedido 
-		$this->db->limit(1);
-		return $this->db->get()->row_array();
-	}
+	} 
 	public function m_registrar_nota_pedido($datos)
 	{
 		$data = array( 
@@ -311,6 +343,15 @@ class Model_nota_pedido extends CI_Model {
 			'valor' => strtoupper($datos['valor'])
 		);
 		return $this->db->insert('detalle_caracteristica', $data); 
+	}
+	public function m_actualizar_nota_pedido_a_venta($datos)
+	{
+		$data = array(
+			'estado_movimiento' => 2, // facturado 
+			'fecha_facturacion' => date('Y-m-d H:i:s') 
+		);
+		$this->db->where('idmovimiento',$datos['idnotapedido']); 
+		return $this->db->update('movimiento', $data); 
 	}
 } 
 ?>

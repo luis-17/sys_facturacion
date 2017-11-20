@@ -6,7 +6,7 @@ class NotaPedido extends CI_Controller {
     {
         parent::__construct(); 
         $this->load->helper(array('fechas','otros','pdf','contable','config')); 
-        $this->load->model(array('model_nota_pedido','model_cliente_persona','model_cliente_empresa','model_configuracion', 'model_cotizacion')); 
+        $this->load->model(array('model_nota_pedido','model_cliente_persona','model_cliente_empresa','model_configuracion', 'model_cotizacion','model_caracteristica')); 
         $this->load->library('excel');
     	$this->load->library('Fpdfext');
         //cache
@@ -149,41 +149,240 @@ class NotaPedido extends CI_Controller {
 		    ->set_content_type('application/json') 
 		    ->set_output(json_encode($arrData)); 
 	}
-    public function lista_detalle_esta_nota_pedido()
+    public function obtener_esta_nota_pedido()
     {
-    	$allInputs = json_decode(trim($this->input->raw_input_stream),true); // var_dump($allInputs); exit(); 
-		$lista = $this->model_nota_pedido->m_cargar_detalle_esta_nota_pedido($allInputs); 
-		$arrListado = array(); 
-		foreach ($lista as $row) { 
-			array_push($arrListado, 
-				array(
-					'idmovimiento' => $row['idmovimiento'],
-					'num_nota_pedido' => $row['num_nota_pedido'],
-					'iddetallemovimiento' => $row['iddetallemovimiento'],
-					'cantidad' => $row['cantidad'],
-					'precio_unitario' => $row['precio_unitario'],
-					'importe_con_igv' => $row['importe_con_igv'],
-					'importe_sin_igv' => $row['importe_sin_igv'],
-					'excluye_igv' => $row['excluye_igv'],
-					'igv_detalle' => $row['igv_detalle'],
-					'idunidadmedida' => $row['idunidadmedida'],
-					'unidadmedida' => $row['descripcion_um'],
-					'idelemento' => $row['idelemento'],
-					'elemento' => $row['descripcion_ele']
-				)
+
+    	$allInputs = json_decode(trim($this->input->raw_input_stream),true); 
+		$fConfig = obtener_parametros_configuracion();
+		$idnotapedido = $allInputs['identify']; 
+		$fila = $this->model_nota_pedido->m_cargar_nota_pedido_por_id($idnotapedido);
+		$detalleLista = $this->model_nota_pedido->m_cargar_detalle_nota_pedido_por_id($idnotapedido); 
+		if( $fila['estado_movimiento'] == 2 ){ // facturado 
+			$arrData['message'] = 'La nota de pedido ya ha sido facturada con anterioridad.'; 
+			$arrData['flag'] = 2; 
+			$this->output
+			    ->set_content_type('application/json')
+			    ->set_output(json_encode($arrData));
+		    return;
+		}
+		
+
+		$rowEstadoId = $fila['estado_movimiento']; 
+		if( $fila['estado_movimiento'] == 0 ){ // anulado
+			$rowEstadoDescripcion = 'ANULADO'; 
+		}
+		if( $fila['estado_movimiento'] == 1 ){ // registrado
+			$rowEstadoDescripcion = 'REGISTRADO'; 
+		}
+		if( $fila['estado_movimiento'] == 2 ){ // facturado 
+			$rowEstadoDescripcion = 'FACTURADO'; 
+		}
+		if($fila['moneda'] == 'S'){
+			$strIdMoneda = 1; 
+			$strDescripcion = 'S/.';
+			$strMoneda = $fila['moneda'];
+		}
+		if($fila['moneda'] == 'D'){
+			$strIdMoneda = 2; 
+			$strDescripcion = 'US$'; 
+			$strMoneda = $fila['moneda']; 
+		}
+		$arrListadoDetalle = array(); 
+		$arrListado = array( 
+			'tipo_documento_cliente'=> array(
+				'id'=> (int)$fila['idtipodocumentocliente'],
+				'descripcion'=> $fila['tipo_documento_abv']
+			),
+			'idnotapedido'=> $fila['idmovimiento'],
+			'num_nota_pedido'=> $fila['num_nota_pedido'],
+			'sede'=> array(
+				'id'=> $fila['idsede'],
+				'descripcion'=> strtoupper($fila['descripcion_se']),
+			),
+			'fecha_registro'=> darFormatoDMY($fila['fecha_registro']),
+			'fecha_emision'=> darFormatoDMY($fila['fecha_emision']),
+			'estado_movimiento'=> array(
+				'id'=> (int)$rowEstadoId,
+				'descripcion'=> $rowEstadoDescripcion 
+			),
+			'moneda'=> array( 
+				'id'=> (int)$strIdMoneda,
+				'descripcion'=> strtoupper($strDescripcion),
+				'str_moneda'=> strtoupper($strMoneda)
+			), 
+			'forma_pago'=> array(
+				'id'=> (int)$fila['idformapago'],
+				'descripcion'=> strtoupper($fila['descripcion_fp']),
+				'modo'=> $fila['modo_fp']
+			),
+			'idcontacto'=> $fila['idcontacto'],
+			'contacto'=> strtoupper($fila['contacto']),
+			'incluye_tras_prov'=> (int)$fila['incluye_traslado_prov'],
+			'incluye_entr_dom'=> (int)$fila['incluye_entrega_domicilio'],
+			'plazo_entrega'=> $fila['plazo_entrega'],
+			'validez_oferta'=> $fila['validez_oferta'],
+			'modo_igv'=> (int)$fila['modo_igv'],
+			'subtotal'=> number_format($fila['subtotal'],$fConfig['num_decimal_total_key'],'.',''),
+			'igv'=> number_format($fila['igv'],$fConfig['num_decimal_total_key'],'.',''),
+			'total'=> number_format($fila['total'],$fConfig['num_decimal_total_key'],'.',''),
+			'cliente' => array(),
+			'temporal' => array( 
+				'cantidad'=> 1,
+				'unidad_medida'=> array(),
+				'caracteristicas'=> array()
+			)
+		); 
+		if( $fila['tipo_cliente'] === 'E' ){ // empresa 
+			$arrListado['num_documento'] = $fila['ruc_ce'];
+			$arrListado['cliente'] = array(
+				'id' => $fila['idclienteempresa'],
+				'idclienteempresa' => $fila['idclienteempresa'],
+				'cliente' => strtoupper($fila['razon_social_ce']),
+				'tipo_cliente' => 'ce',
+				'nombre_comercial' => strtoupper($fila['nombre_comercial_ce']),
+				'nombre_corto' => strtoupper($fila['nombre_corto']),
+				'razon_social' => strtoupper($fila['razon_social_ce']),
+				'telefono_contacto'=> $fila['telefono_fijo'],
+				'anexo_contacto'=> $fila['anexo'],
+				// 'categoria_cliente' => array(
+				// 	'id'=> $fila['idcategoriacliente'],
+				// 	'descripcion'=> $fila['descripcion_cc']
+				// ),
+				// 'colaborador' => array(
+				// 	'id'=> $fila['idcolaborador'],
+				// 	'descripcion'=> $fila['colaborador']
+				// ),
+				'ruc' => $fila['ruc_ce'],
+				'num_documento' => $fila['ruc_ce'],
+				'representante_legal' => $fila['representante_legal_ce'],
+				'dni_representante_legal' => $fila['dni_representante_legal_ce'],
+				'direccion_legal' => $fila['direccion_legal_ce'],
+				'telefono' => $fila['telefono_ce']
 			);
-		}		
+		}
+		if( $fila['tipo_cliente'] === 'P' ){ // PERSONA 
+			$arrListado['num_documento'] = $fila['num_documento'];
+			if( $fila['sexo'] == 'M' ){
+				$fila['desc_sexo'] = 'MASCULINO';
+			}
+			if( $fila['sexo'] == 'F' ){
+				$fila['desc_sexo'] = 'FEMENINO';
+			}
+			$arrListado['cliente'] = array( 
+				'id' => $fila['idclientepersona'],
+				'idclientepersona' => $fila['idclientepersona'],
+				'nombres' => strtoupper($fila['nombres']),
+				'apellidos' => strtoupper($fila['apellidos']),
+				'cliente' => strtoupper($fila['nombres'].' '.$fila['apellidos']),
+				'tipo_cliente' => 'cp',
+				'num_documento' => $fila['num_documento'],
+				// 'categoria_cliente' => array(
+				// 	'id'=> $fila['idcategoriacliente'],
+				// 	'descripcion'=> $fila['descripcion_cc'] telefono_contacto
+				// ),
+				// 'colaborador' => array(
+				// 	'id'=> $fila['idcolaborador'],
+				// 	'descripcion'=> $fila['colaborador']
+				// ),
+				'sexo'=> array(
+					'id'=> $fila['sexo'],
+					'descripcion'=> $fila['desc_sexo'] 
+				),
+				// 'edad' => devolverEdad($fila['fecha_nacimiento']),
+				// 'fecha_nacimiento' => darFormatoDMY($fila['fecha_nacimiento']),
+				// 'fecha_nacimiento_str' => formatoFechaReporte3($fila['fecha_nacimiento']),
+				'telefono_fijo' => $fila['telefono_movil_cp'],
+				'telefono_movil' => $fila['telefono_movil_cp'],
+				'email' => $fila['email']
+			);
+		}
+		foreach ($detalleLista as $key => $row) { 
+			$arrAux = array( 
+				'iddetallenotapedido' => $row['iddetallemovimiento'],
+				'idnotapedido' => $row['idmovimiento'],
+				'num_nota_pedido' => $row['num_nota_pedido'],
+				'idempresaadmin' => $row['idempresaadmin'],
+				'idelemento' => $row['idelemento'], 
+				'descripcion'=> $row['descripcion_ele'], 
+				'elemento' => $row['descripcion_ele'], 
+				'cantidad' => $row['cantidad'], 
+				'precio_unitario' => number_format($row['precio_unitario'],$fConfig['num_decimal_precio_key'],'.',''), 
+				'importe_con_igv' => number_format($row['importe_con_igv'],$fConfig['num_decimal_total_key'],'.',''), 
+				'importe_sin_igv' => number_format($row['importe_sin_igv'],$fConfig['num_decimal_total_key'],'.',''), 
+				'excluye_igv' => $row['excluye_igv'], 
+				'igv_detalle' => number_format($row['igv_detalle'],$fConfig['num_decimal_total_key'],'.',''),
+				'igv' => $row['igv_detalle'], 
+				'unidad_medida' => array( 
+					'id'=> $row['idunidadmedida'],
+					'descripcion'=> $row['descripcion_um'] 
+				),
+				//'agrupacion' => (int)$row['agrupador_totalizado'],
+				'caracteristicas' => array() 
+			);
+			$arrListadoDetalle[$row['iddetallemovimiento']] = $arrAux; 
+		}
+		foreach ($detalleLista as $key => $row) { 
+			$arrAux2 = array(
+				'iddetallecaracteristica'=> $row['iddetallecaracteristica'],
+				'idcaracteristica'=> $row['idcaracteristica'],
+				'id'=> $row['idcaracteristica'],
+				'orden'=> $row['orden_car'],
+				'descripcion'=> $row['descripcion_car'],
+				'valor'=> $row['valor']
+			);
+			if( !empty($row['iddetallecaracteristica']) ){ 
+				$arrListadoDetalle[$row['iddetallemovimiento']]['caracteristicas'][$row['iddetallecaracteristica']] = $arrAux2; 
+				$arrListadoDetalle[$row['iddetallemovimiento']]['caracteristicas'] = array_values($arrListadoDetalle[$row['iddetallemovimiento']]['caracteristicas']);
+			}
+
+		} 
+		// agregar caracteristicas sin valor 
+		$arrCaractsAll = array();
+		$listaCaracteristicas = $this->model_caracteristica->m_cargar_caracteristica_agregar(); 
+		foreach ($listaCaracteristicas as $key => $row) {
+			$arrAux = array(
+				'iddetallecaracteristica'=> NULL,
+				'idcaracteristica'=> $row['idcaracteristica'],
+				'orden'=> $row['orden_car'],
+				'descripcion'=> $row['descripcion_car'],
+				'valor'=> NULL 
+			);
+			$arrCaractsAll[] = $arrAux;
+		}
+		$arrCaractsSelect = array();
+		foreach ($arrListadoDetalle as $key => $item) { 
+			foreach ($arrCaractsAll as $key3 => $caracAll) { 
+				$caracIgual = FALSE;
+				foreach ($item['caracteristicas'] as $key2 => $carac) { 
+					if( $caracAll['idcaracteristica'] == $carac['idcaracteristica'] ){ 
+						$caracIgual = TRUE;
+					}
+				}
+				if( $caracIgual === FALSE ){ 
+					$arrListadoDetalle[$key]['caracteristicas'][] = $caracAll;
+					// $arrCaractsSelect[] = $caracAll;
+				}
+			}
+		}
+		// print_r($arrListadoDetalle); exit(); 
+		//$resultado = array_merge_recursive($m1, $m2);
+		// reindexado 
+		$arrListadoDetalle = array_values($arrListadoDetalle);
 		$arrData['datos'] = $arrListado; 
-    	$arrData['message'] = ''; 
-    	$arrData['flag'] = 1; 
-		if(empty($lista)){ 
+		$arrData['detalle'] = $arrListadoDetalle; 
+
+		$arrData['flag'] = 1; 
+		if(empty($fila)){ 
 			$arrData['flag'] = 0; 
 		} 
-		$this->output 
+		$this->output
 		    ->set_content_type('application/json') 
 		    ->set_output(json_encode($arrData)); 
-
     } 
+    public function ver_popup_busqueda_nota_pedido()
+	{
+		$this->load->view('nota-pedido/busq_nota_pedido_popup'); 
+	}
 	public function generar_numero_nota_pedido() 
 	{ 
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true); 

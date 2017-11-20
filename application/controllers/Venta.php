@@ -6,7 +6,8 @@ class Venta extends CI_Controller {
     {
         parent::__construct(); 
         $this->load->helper(array('fechas','otros','pdf','contable','config')); 
-        $this->load->model(array('model_venta','model_categoria_cliente','model_cliente_persona','model_cliente_empresa','model_configuracion','model_variable_car','model_banco_empresa_admin','model_serie')); 
+        $this->load->model(array('model_venta','model_categoria_cliente','model_cliente_persona','model_cliente_empresa','model_configuracion',
+        	'model_variable_car','model_banco_empresa_admin','model_serie','model_nota_pedido')); 
         $this->load->library('excel');
     	$this->load->library('Fpdfext');
         //cache
@@ -279,7 +280,8 @@ class Venta extends CI_Controller {
 		ini_set('xdebug.var_display_max_depth', 5);
 	    ini_set('xdebug.var_display_max_children', 256);
 	    ini_set('xdebug.var_display_max_data', 1024);
-		$allInputs = json_decode(trim($this->input->raw_input_stream),true);  
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true); 
+		// print_r($allInputs); exit(); 
 		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
     	$arrData['flag'] = 0;
 		/* VALIDACIONES */ 
@@ -419,10 +421,22 @@ class Venta extends CI_Controller {
 				'tipo_documento_mov'=> $allInputs['tipo_documento_mov'], 
 				'serie'=> $allInputs['serie'] 
 			);
-			if( $this->model_serie->actualizar_serie_correlativo_por_movimiento($arrDataSC) ){ 
+			if( $this->model_serie->m_actualizar_serie_correlativo_por_movimiento($arrDataSC) ){ 
 				$arrData['message'] .= '<br /> - Se actualizó el correlativo correctamente'; 
 				$arrData['flag'] = 1; 
 			}
+
+			// ACTUALIZAR FECHA Y ESTADO DE NOTA DE PEDIDO 
+			if( !empty( $allInputs['idnotapedido'] ) ){
+				$arrDataNPV = array(
+					'idnotapedido'=> $allInputs['idnotapedido'] 
+				);
+				if( $this->model_nota_pedido->m_actualizar_nota_pedido_a_venta($arrDataNPV) ){
+					$arrData['message'] .= '<br /> - Se actualizó el estado de la nota de pedido correctamente'; 
+					$arrData['flag'] = 1; 
+				}
+			}
+			
 		} 
 		$this->db->trans_complete();
 		$this->output

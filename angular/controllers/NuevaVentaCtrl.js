@@ -59,13 +59,22 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
   $scope.fData.classEditCliente = 'disabled';
   $scope.fData.fecha_registro = $filter('date')(moment().toDate(),'dd-MM-yyyy'); 
   $scope.fData.fecha_emision = $filter('date')(moment().toDate(),'dd-MM-yyyy'); 
-  $scope.fData.num_serie_correlativo = '[ ............... ]';
-  $scope.fData.modo_igv = parseInt($scope.fSessionCI.config.precio_incluye_igv_ve); // INCLUYE IGV dinamico 
+  $scope.fData.num_serie_correlativo = '[ ............... ]'; 
+
+  if(angular.isUndefined($scope.fConfigSys.precio_incluye_igv_ve) || $scope.fConfigSys.precio_incluye_igv_ve === null){ 
+    //console.log('entre');
+    $scope.$parent.getConfiguracionSys();
+  }
+
+  $timeout(function() { 
+    $scope.fData.modo_igv = parseInt($scope.fConfigSys.precio_incluye_igv_ve); // INCLUYE IGV dinamico 
+    $scope.fData.incluye_entr_dom = parseInt($scope.fConfigSys.incluye_entrega_dom_ve);  // dinamico 
+  }, 500); 
 
   $scope.fData.plazo_entrega = 5;
   $scope.fData.validez_oferta = 10;
   $scope.fData.incluye_tras_prov = 2; // no 
-  $scope.fData.incluye_entr_dom = parseInt($scope.fSessionCI.config.incluye_entrega_dom_ve);  // dinamico 
+  
   $scope.fData.idventaanterior = null;
   $scope.fData.isRegisterSuccess = false;
   $scope.fData.temporal = {};
@@ -114,6 +123,7 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
       if( rpta.flag == 1){
         $scope.fArr.listaTiposDocumentoCliente = rpta.datos; 
         myCallback();
+        console.log($scope.fData.tipo_documento_cliente,'fData.tipo_documento_cliente');
       } 
     });
   }
@@ -139,19 +149,19 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
   $scope.metodos.listaTiposDocumentoMov(myCallback); 
 
   // SEDE 
-  $scope.metodos.listaSedes = function(myCallback) { 
-    var myCallback = myCallback || function() { };
+  $scope.metodos.listaSedes = function(myCallbackSede) { 
+    var myCallbackSede = myCallbackSede || function() { };
     SedeServices.sListarCbo().then(function(rpta) { 
       if( rpta.flag == 1){
         $scope.fArr.listaSedes = rpta.datos; 
-        myCallback();
+        myCallbackSede();
       } 
     });
   }
-  var myCallback = function() { 
+  var myCallbackSede = function() { 
     $scope.fData.sede = $scope.fArr.listaSedes[0]; 
   }
-  $scope.metodos.listaSedes(myCallback); 
+  $scope.metodos.listaSedes(myCallbackSede); 
 
   // SERIE 
   $scope.metodos.listaSeries = function(myCallback) { 
@@ -1283,8 +1293,8 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
         $scope.fBusquedaNP.cliente.descripcion = '-- Todos --'; 
         //console.log($scope.fData.cliente,'$scope.fData.cliente');
         if( $scope.fData.cliente.id ){
-          $scope.fBusquedaNP.cliente.id = $scope.fData.cliente.id;
-          $scope.fBusquedaNP.cliente.tipo_cliente = $scope.fData.cliente.tipo_cliente;
+          $scope.fBusquedaNP.cliente.id = $scope.fData.cliente.id; 
+          $scope.fBusquedaNP.cliente.tipo_cliente = $scope.fData.cliente.tipo_cliente; 
           $scope.fBusquedaNP.cliente.descripcion = $scope.fData.cliente.cliente; 
         }
         $scope.fBusquedaNP.desde = $filter('date')(new Date(),'01-MM-yyyy');
@@ -1356,11 +1366,70 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
             $scope.gridApi = gridApi;
             gridApi.selection.on.rowSelectionChanged($scope,function(row){ 
               $scope.mySelectionGridNP = gridApi.selection.getSelectedRows(); 
-              NotaPedidoServices.sListarDetalleEstaNotaPedido(arrParams).then(function(rpta) { 
-                if( rpta.flag == 1 ){ 
-                  
-                }
-              }); 
+              if( $scope.mySelectionGridNP.length > 0 ){
+                var arrParams = { 
+                  'identify' : $scope.mySelectionGridNP[0].idmovimiento 
+                };
+                NotaPedidoServices.sObtenerEstaNotaPedido(arrParams).then(function(rpta) { 
+                  if( rpta.flag == 1 ){ // normal 
+                    $timeout(function() { 
+                      /*bindeo*/ 
+                      $scope.gridOptions.data = rpta.detalle; 
+                      $scope.fData.cliente = rpta.datos.cliente; 
+                      $scope.fData.num_documento = rpta.datos.num_documento; 
+                      $scope.fData.contacto = rpta.datos.contacto; 
+                      $scope.fData.idcontacto = rpta.datos.idcontacto; 
+                      $scope.fData.idnotapedido = rpta.datos.idnotapedido; 
+                      // tipo documento cliente 
+                      var myCallBackTD = function() { 
+                        var objIndex = $scope.fArr.listaTiposDocumentoCliente.filter(function(obj) { 
+                          //console.log(obj.id == $scope.fData.tipo_documento_cliente.id,'obj.id == $scope.fData.tipo_documento_cliente.id')
+                          return obj.id == rpta.datos.tipo_documento_cliente.id; 
+                        }).shift(); 
+                        $scope.fData.tipo_documento_cliente = objIndex; 
+                        //console.log(objIndex,'objIndex');
+                      }
+                      $scope.metodos.listaTiposDocumentoCliente(myCallBackTD); 
+                      // console.log(objIndex,'objIndex',$scope.fData.tipo_documento_cliente.id,'$scope.fData.tipo_documento_cliente.id',$scope.fArr.listaTiposDocumentoCliente,'$scope.fArr.listaTiposDocumentoCliente');
+                      
+                      // forma de pago 
+                      var myCallBackFP = function() { 
+                        var objIndex = $scope.fArr.listaFormaPago.filter(function(obj) { 
+                          return obj.id == rpta.datos.forma_pago.id;
+                        }).shift(); 
+                        $scope.fData.forma_pago = objIndex; 
+                      }
+                      $scope.metodos.listaFormaPago(myCallBackFP); 
+
+                      // sede 
+                      var myCallBackSE = function() { 
+                        var objIndex = $scope.fArr.listaSedes.filter(function(obj) { 
+                          return obj.id == rpta.datos.sede.id;
+                        }).shift(); 
+                        $scope.fData.sede = objIndex; 
+                      }
+                      $scope.metodos.listaSedes(myCallBackSE); 
+
+                      // moneda 
+                      var objIndex = $scope.fArr.listaMoneda.filter(function(obj) { 
+                        return obj.id == rpta.datos.moneda.id;
+                      }).shift(); 
+                      $scope.fData.moneda = objIndex; 
+                      /*end bindeo*/
+                      $scope.calcularTotales();
+                    }, 200);
+                    pinesNotifications.notify({ title: 'OK!', text: 'Se cargó la nota de pedido.', type: 'success', delay: 3000 }); 
+                    $uibModalInstance.dismiss('cancel');
+                  }else if( rpta.flag == 2 ){ // facturado 
+                    pinesNotifications.notify({ title: 'OK!', text: 'La Nota de Pedido ya ha sido facturada con anterioridad.', type: 'warning', delay: 3000 }); 
+                    // return false;
+                  }
+                  blockUI.stop(); 
+                }); 
+              }else{
+                $scope.metodos.listaSedes(myCallbackSede); 
+              }
+              
             });
             gridApi.selection.on.rowSelectionChangedBatch($scope,function(rows){
               $scope.mySelectionGridNP = gridApi.selection.getSelectedRows();
@@ -1373,13 +1442,13 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
                 paginationOptions.sort = sortColumns[0].sort.direction;
                 paginationOptions.sortName = sortColumns[0].name;
               }
-              $scope.metodos.getPaginationServerSide(true);
+              $scope.metodos.getPaginationServerSideNP(true);
             });
             gridApi.pagination.on.paginationChanged($scope, function (newPage, pageSize) {
               paginationOptions.pageNumber = newPage;
               paginationOptions.pageSize = pageSize;
               paginationOptions.firstRow = (paginationOptions.pageNumber - 1) * paginationOptions.pageSize;
-              $scope.metodos.getPaginationServerSide(true);
+              $scope.metodos.getPaginationServerSideNP(true);
             });
             $scope.gridApi.core.on.filterChanged( $scope, function(grid, searchColumns) {
               var grid = this.grid;
@@ -1396,18 +1465,18 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
                 'np.igv' : grid.columns[11].filters[0].term,
                 'np.total' : grid.columns[12].filters[0].term
               }
-              $scope.metodos.getPaginationServerSide();
+              $scope.metodos.getPaginationServerSideNP();
             });
           }
         };
         paginationOptions.sortName = $scope.gridOptionsNP.columnDefs[2].name; 
-        $scope.metodos.getPaginationServerSide = function(loader) { 
+        $scope.metodos.getPaginationServerSideNP = function(loader) { 
           if( loader ){
             blockUI.start('Procesando información...');
           }
-          var arrParams = {
+          var arrParams = { 
             paginate : paginationOptions,
-            datos: $scope.fBusqueda 
+            datos: $scope.fBusquedaNP 
           };
           NotaPedidoServices.sListarHistorialNotaPedidos(arrParams).then(function (rpta) { 
             if( rpta.datos.length == 0 ){
@@ -1421,7 +1490,7 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
           });
           $scope.mySelectionGrid = [];
         };
-        $scope.metodos.getPaginationServerSide(true); 
+        $scope.metodos.getPaginationServerSideNP(true); 
         
         $scope.cancel = function () {
           $uibModalInstance.dismiss('cancel'); 

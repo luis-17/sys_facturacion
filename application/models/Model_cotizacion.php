@@ -17,7 +17,7 @@ class Model_cotizacion extends CI_Model {
 			cp.idclientepersona, (cp.num_documento) AS num_documento_cp, se.idsede, se.descripcion_se, se.abreviatura_se, 
 			fp.idformapago, fp.descripcion_fp', FALSE); 
 		$this->db->from('cotizacion cot'); 
-		$this->db->join('colaborador col','cot.idcolaborador = col.idcolaborador'); 
+		$this->db->join('colaborador col','cot.idcolaborador = col.idcolaborador'); // idtipodocumentocliente
 		$this->db->join('usuario us','cot.idusuarioregistro = us.idusuario'); 
 		$this->db->join('empresa_admin ea','cot.idempresaadmin = ea.idempresaadmin'); 
 		$this->db->join("cliente_empresa ce","cot.idcliente = ce.idclienteempresa AND cot.tipo_cliente = 'E'",'left'); 
@@ -232,7 +232,7 @@ class Model_cotizacion extends CI_Model {
 		$this->db->limit(1);
 		return $this->db->get()->row_array();
 	}
-	public function m_cargar_numero_cotizacion_autocomplete($filtro,$datos)
+	public function m_cargar_numero_cotizacion_autocomplete($filtro,$datos) // telefono_fijo representante_legal sexo
 	{ 
 		$this->db->select("TRIM(CONCAT(COALESCE(cp.nombres,''), ' ', COALESCE(cp.apellidos,''), ' ', COALESCE(ce.razon_social,''))) AS cliente_persona_empresa",FALSE);
 		$this->db->select("TRIM(CONCAT(COALESCE(cp.email,''), ' ', COALESCE(ct.email,''))) AS email_persona_empresa",FALSE);
@@ -300,12 +300,12 @@ class Model_cotizacion extends CI_Model {
 		$this->db->select('cot.idcotizacion, cot.num_cotizacion, cot.estado_cot'); 
 		$this->db->from('cotizacion cot');
 		$this->db->join('sede se', 'cot.idsede = se.idsede');
-		$this->db->where_in('cot.estado_cot', array(0,1,2,3)); // anulado, por enviar, enviado y nota de pedido
+		$this->db->where_in('cot.estado_cot', array(0,1,2,3)); // anulado, por enviar, enviado y nota de pedido 
 		$this->db->where('cot.idcotizacion',$idcotizacion);
 		$this->db->limit(1);
 		return $this->db->get()->row_array();
 	}
-	public function m_cargar_cotizacion_por_id($idcotizacion)
+	public function m_cargar_cotizacion_por_id($idcotizacion) // modo_fp nombre_corto
 	{
 		$this->db->select("CONCAT(COALESCE(ct.nombres,''), ' ', COALESCE(ct.apellidos,'')) AS contacto",FALSE);
 		$this->db->select("CONCAT(COALESCE(col.nombres,''), ' ', COALESCE(col.apellidos,'')) AS colaborador",FALSE);
