@@ -209,6 +209,7 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     }
     if( !(newValue) ){
       $scope.fData.cliente = {};
+      $scope.fData.contacto = null;
       $scope.fData.classEditCliente = 'disabled';
     }
   }, true);

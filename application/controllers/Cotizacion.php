@@ -61,7 +61,8 @@ class Cotizacion extends CI_Controller {
 					'fecha_registro' => darFormatoDMY($row['fecha_registro']),
 					'fecha_emision' => darFormatoDMY($row['fecha_emision']),
 					'cliente' => trim($row['cliente_persona_empresa']),
-					'colaborador' => strtoupper($row['colaborador']),
+					'colaborador' => strtoupper($row['colaborador']), // al que se le asigna la coti 
+					'colaborador_reg' => strtoupper($row['colaborador_reg']), // el que registra la coti 
 					'moneda' => $strMoneda,
 					'plazo_entrega' => $row['plazo_entrega'].' días útiles', 
 					'validez_oferta' => $row['validez_oferta'].' días útiles', 

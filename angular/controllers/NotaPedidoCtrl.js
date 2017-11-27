@@ -180,6 +180,7 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
     }
     if( !(newValue) ){
       $scope.fData.cliente = {};
+      $scope.fData.contacto = null;
       $scope.fData.classEditCliente = 'disabled'; 
       $scope.gridOptions.data = []; 
       $scope.calcularTotales(); 

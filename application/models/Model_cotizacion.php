@@ -7,6 +7,7 @@ class Model_cotizacion extends CI_Model {
 	public function m_cargar_cotizaciones($paramPaginate,$paramDatos)
 	{
 		$this->db->select("CONCAT(COALESCE(col.nombres,''), ' ', COALESCE(col.apellidos,'')) As colaborador",FALSE);
+		$this->db->select("CONCAT(COALESCE(col_reg.nombres,''), ' ', COALESCE(col_reg.apellidos,'')) As colaborador_reg",FALSE);
 		$this->db->select("CONCAT(COALESCE(cp.nombres,''), ' ', COALESCE(cp.apellidos,''), ' ', COALESCE(ce.razon_social,'')) As cliente_persona_empresa",FALSE);
 		$this->db->select("CONCAT(cp.nombres, ' ', cp.apellidos) As cliente_persona",FALSE);
 		$this->db->select('cot.idcotizacion, cot.num_cotizacion, cot.fecha_registro, cot.fecha_emision, cot.tipo_cliente, cot.plazo_entrega, 
@@ -17,8 +18,9 @@ class Model_cotizacion extends CI_Model {
 			cp.idclientepersona, (cp.num_documento) AS num_documento_cp, se.idsede, se.descripcion_se, se.abreviatura_se, 
 			fp.idformapago, fp.descripcion_fp', FALSE); 
 		$this->db->from('cotizacion cot'); 
-		$this->db->join('colaborador col','cot.idcolaborador = col.idcolaborador'); // idtipodocumentocliente
-		$this->db->join('usuario us','cot.idusuarioregistro = us.idusuario'); 
+		$this->db->join('colaborador col','cot.idcolaborador = col.idcolaborador'); // al que se le asigna la cotizacion
+		$this->db->join('usuario us','cot.idusuarioregistro = us.idusuario'); // registra cotizacion 
+		$this->db->join('colaborador col_reg','us.idusuario = col_reg.idusuario'); // registra cotizacion
 		$this->db->join('empresa_admin ea','cot.idempresaadmin = ea.idempresaadmin'); 
 		$this->db->join("cliente_empresa ce","cot.idcliente = ce.idclienteempresa AND cot.tipo_cliente = 'E'",'left'); 
 		$this->db->join("cliente_persona cp","cot.idcliente = cp.idclientepersona AND cot.tipo_cliente = 'P'",'left'); 
@@ -41,7 +43,10 @@ class Model_cotizacion extends CI_Model {
 			$this->db->where('se.idsede', $paramDatos['sede']['id']);
 		}
 		$this->db->where('ea.idempresaadmin', $this->sessionFactur['idempresaadmin']); // empresa session 
-		$this->db->where_in('cot.estado_cot', array(0,1,2,3)); // anulado, por enviar, enviado y nota de pedido
+		$this->db->where_in('cot.estado_cot', array(0,1,2,3)); // anulado, por enviar, enviado y nota de pedido 
+		if( $this->sessionFactur['key_tu'] == 'key_vendedor' ){
+			$this->db->where('col.idcolaborador', $this->sessionFactur['idcolaborador']);
+		}
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
 			foreach ($paramPaginate['searchColumn'] as $key => $value) {
 				if(! empty($value)){
@@ -85,7 +90,10 @@ class Model_cotizacion extends CI_Model {
 			$this->db->where('se.idsede', $paramDatos['sede']['id']);
 		}
 		$this->db->where('ea.idempresaadmin', $this->sessionFactur['idempresaadmin']); // empresa session 
-		$this->db->where_in('cot.estado_cot', array(0,1,2,3)); // anulado, por enviar, enviado y nota de pedido
+		$this->db->where_in('cot.estado_cot', array(0,1,2,3)); // anulado, por enviar, enviado y nota de pedido 
+		if( $this->sessionFactur['key_tu'] == 'key_vendedor' ){
+			$this->db->where('col.idcolaborador', $this->sessionFactur['idcolaborador']);
+		}
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
 			foreach ($paramPaginate['searchColumn'] as $key => $value) {
 				if(! empty($value)){
@@ -144,9 +152,12 @@ class Model_cotizacion extends CI_Model {
 		if(!empty($paramDatos['categoria_elemento']) && $paramDatos['categoria_elemento']['id'] !== 'ALL' ){ 
 			$this->db->where('cael.idcategoriaelemento', $paramDatos['categoria_elemento']['id']);
 		}
-		$this->db->where_in('cot.estado_cot', array(0,1,2,3)); // anulado, por enviar, enviado y nota de pedido
+		$this->db->where_in('cot.estado_cot', array(0,1,2,3)); // anulado, por enviar, enviado y nota de pedido 
 		$this->db->where_in('dcot.estado_dcot', array(1)); // habilitado 
 		$this->db->where_in('ele.estado_ele', array(1)); // habilitado 
+		if( $this->sessionFactur['key_tu'] == 'key_vendedor' ){
+			$this->db->where('col.idcolaborador', $this->sessionFactur['idcolaborador']);
+		}
 		$this->db->where('ea.idempresaadmin', $this->sessionFactur['idempresaadmin']); // empresa session 
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
 			foreach ($paramPaginate['searchColumn'] as $key => $value) {
@@ -187,8 +198,8 @@ class Model_cotizacion extends CI_Model {
 			}
 		}
 		if( !empty($paramDatos['desde']) || !empty($paramDatos['hasta'])){
-			$this->db->where('cot.fecha_emision BETWEEN '. $this->db->escape($paramDatos['desde'].' '.$paramDatos['desdeHora'].':'.$paramDatos['desdeMinuto']) .' AND ' 
-				. $this->db->escape($paramDatos['hasta'].' '.$paramDatos['hastaHora'].':'.$paramDatos['hastaMinuto']));
+			$this->db->where('cot.fecha_emision BETWEEN '. $this->db->escape( darFormatoYMD($paramDatos['desde']).' '.$paramDatos['desdeHora'].':'.$paramDatos['desdeMinuto']) .' AND ' 
+			. $this->db->escape( darFormatoYMD($paramDatos['hasta']).' '.$paramDatos['hastaHora'].':'.$paramDatos['hastaMinuto']));
 		}
 		if(!empty($paramDatos['estado_cotizacion']) && $paramDatos['estado_cotizacion']['id'] !== 'ALL' ){ 
 			$this->db->where('cot.estado_cot', $paramDatos['estado_cotizacion']['id']);
@@ -196,9 +207,15 @@ class Model_cotizacion extends CI_Model {
 		if(!empty($paramDatos['sede']) && $paramDatos['sede']['id'] !== 'ALL' ){ 
 			$this->db->where('se.idsede', $paramDatos['sede']['id']);
 		}
-		$this->db->where_in('cot.estado_cot', array(0,1,2,3)); // anulado, por enviar, enviado y nota de pedido
+		if(!empty($paramDatos['categoria_elemento']) && $paramDatos['categoria_elemento']['id'] !== 'ALL' ){ 
+			$this->db->where('cael.idcategoriaelemento', $paramDatos['categoria_elemento']['id']);
+		}
+		$this->db->where_in('cot.estado_cot', array(0,1,2,3)); // anulado, por enviar, enviado y nota de pedido 
 		$this->db->where_in('dcot.estado_dcot', array(1)); // habilitado 
 		$this->db->where_in('ele.estado_ele', array(1)); // habilitado 
+		if( $this->sessionFactur['key_tu'] == 'key_vendedor' ){
+			$this->db->where('col.idcolaborador', $this->sessionFactur['idcolaborador']);
+		}
 		$this->db->where('ea.idempresaadmin', $this->sessionFactur['idempresaadmin']); // empresa session 
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
 			foreach ($paramPaginate['searchColumn'] as $key => $value) {
