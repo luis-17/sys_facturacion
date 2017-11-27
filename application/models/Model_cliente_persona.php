@@ -80,12 +80,12 @@ class Model_cliente_persona extends CI_Model {
 			'idtipodocumentocliente' => 1, // DNI 
 			'idcategoriacliente' => $datos['categoria_cliente']['id'],
 			'num_documento' => $datos['num_documento'],
-			'nombres' => strtoupper($datos['nombres']),	
-			'apellidos' => strtoupper($datos['apellidos']),	
+			'nombres' => strtoupper($datos['nombres']), 
+			'apellidos' => empty($datos['apellidos']) ? NULL : strtoupper($datos['apellidos']), 
 			'sexo' => $datos['sexo']['id'], 
-			'telefono_movil' => $datos['telefono_movil'],	
+			'telefono_movil' => empty($datos['telefono_movil']) ? NULL : $datos['telefono_movil'], 
 			'telefono_fijo' => empty($datos['telefono_fijo']) ? NULL : $datos['telefono_fijo'],	
-			'email' => empty($datos['email']) ? NULL : strtoupper($datos['email']),
+			'email' => empty($datos['email']) ? NULL : strtoupper($datos['email']), 
 			'fecha_nacimiento' => empty($datos['fecha_nacimiento']) ? NULL : darFormatoYMD($datos['fecha_nacimiento']),	
 			'idempresaadmin' => $this->sessionFactur['idempresaadmin'],
 			'idcolaborador' => empty($datos['colaborador']['id']) ? NULL : $datos['colaborador']['id'], 
@@ -97,17 +97,17 @@ class Model_cliente_persona extends CI_Model {
 	public function m_editar($datos){
 		$data = array(
 			'idtipodocumentocliente' => 1, // DNI 
-			'idcategoriacliente' => $datos['categoria_cliente']['id'],
-			'idcolaborador' => empty($datos['colaborador']['id']) ? NULL : $datos['colaborador']['id'], 
-			'num_documento' => $datos['num_documento'],
-			'nombres' => strtoupper($datos['nombres']),	
-			'apellidos' => strtoupper($datos['apellidos']),	
+			'idcategoriacliente' => $datos['categoria_cliente']['id'], 
+			'num_documento' => $datos['num_documento'], 
+			'nombres' => strtoupper($datos['nombres']), 
+			'apellidos' => empty($datos['apellidos']) ? NULL : strtoupper($datos['apellidos']), 
 			'sexo' => $datos['sexo']['id'], 
-			'telefono_movil' => $datos['telefono_movil'],
+			'telefono_movil' => empty($datos['telefono_movil']) ? NULL : $datos['telefono_movil'], 
 			'telefono_fijo' => empty($datos['telefono_fijo']) ? NULL : $datos['telefono_fijo'],	
-			'email' => empty($datos['email']) ? NULL : strtoupper($datos['email']),
+			'email' => empty($datos['email']) ? NULL : strtoupper($datos['email']), 
 			'fecha_nacimiento' => empty($datos['fecha_nacimiento']) ? NULL : darFormatoYMD($datos['fecha_nacimiento']),	
-			'updatedat' => date('Y-m-d H:i:s')
+			'idcolaborador' => empty($datos['colaborador']['id']) ? NULL : $datos['colaborador']['id'], 
+			'updatedat' => date('Y-m-d H:i:s') 
 		);
 		$this->db->where('idclientepersona',$datos['id']);
 		return $this->db->update('cliente_persona', $data);

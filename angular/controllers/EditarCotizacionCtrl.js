@@ -684,7 +684,7 @@ app.controller('EditarCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$boot
   $scope.btnClonarFila = function(row) { 
     console.log(row,'row');
     var arrFClon = { 
-      'id' : row.entity.id,
+      'id' : row.entity.idelemento,
       'descripcion' : row.entity.descripcion,
       'cantidad' : row.entity.cantidad,
       'precio_unitario' : row.entity.precio_unitario,

@@ -24,10 +24,11 @@ class ClientePersona extends CI_Controller {
 		$fCount = $this->model_cliente_persona->m_count_cliente_persona($paramPaginate);
 		$arrListado = array();
 		foreach ($lista as $row) { 
-			if( $row['sexo'] == 'M' ){
-				$row['desc_sexo'] = 'MASCULINO';
-			}
-			if( $row['sexo'] == 'F' ){
+			$row['desc_sexo'] = NULL; 
+			if( @$row['sexo'] == 'M' ){ 
+				$row['desc_sexo'] = 'MASCULINO'; 
+			} 
+			if( @$row['sexo'] == 'F' ){
 				$row['desc_sexo'] = 'FEMENINO';
 			}
 			array_push($arrListado,
@@ -77,7 +78,23 @@ class ClientePersona extends CI_Controller {
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
     	$arrData['flag'] = 0;
-    	// VALIDACIONES
+    	// VALIDACIONES 
+    	if( empty($allInputs['sexo']['id']) ){
+    		$arrData['message'] = 'Debe tener sexo para poder registrar los datos';
+    		$arrData['flag'] = 0;
+    		$this->output
+			    ->set_content_type('application/json')
+			    ->set_output(json_encode($arrData));
+		    return;
+    	}
+    	if( empty($allInputs['nombres']) ){ 
+    		$arrData['message'] = 'Debe llenar el campo nombre para poder registrar los datos';
+    		$arrData['flag'] = 0;
+    		$this->output
+			    ->set_content_type('application/json')
+			    ->set_output(json_encode($arrData));
+		    return;
+    	}
 	    /* VALIDAR SI EL DNI YA EXISTE */ 
     	$fCliente = $this->model_cliente_persona->m_validar_cliente_persona_num_documento($allInputs['num_documento']); 
     	if( !empty($fCliente) ) {
@@ -103,7 +120,23 @@ class ClientePersona extends CI_Controller {
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		$arrData['message'] = 'Error al editar los datos, inténtelo nuevamente';
     	$arrData['flag'] = 0;
-    	// VALIDACIONES
+    	// VALIDACIONES 
+    	if( empty($allInputs['sexo']['id']) ){
+    		$arrData['message'] = 'Debe tener sexo para poder registrar los datos';
+    		$arrData['flag'] = 0;
+    		$this->output
+			    ->set_content_type('application/json')
+			    ->set_output(json_encode($arrData));
+		    return;
+    	}
+    	if( empty($allInputs['nombres']) ){ 
+    		$arrData['message'] = 'Debe llenar el campo nombre para poder registrar los datos';
+    		$arrData['flag'] = 0;
+    		$this->output
+			    ->set_content_type('application/json')
+			    ->set_output(json_encode($arrData));
+		    return;
+    	}
 		/* VALIDAR SI EL RUC YA EXISTE */
     	$fCliente = $this->model_cliente_persona->m_validar_cliente_persona_num_documento($allInputs['num_documento'],TRUE,$allInputs['id']);
     	if( $fCliente ) {

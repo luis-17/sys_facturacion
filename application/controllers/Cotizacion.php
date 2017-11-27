@@ -196,7 +196,7 @@ class Cotizacion extends CI_Controller {
 			);
 		}
 		if( $fila['tipo_cliente'] === 'P' ){ 
-			$arrListado['num_documento'] = $fila['num_documento'];
+			$arrListado['num_documento'] = $fila['num_documento_cp'];
 			if( $fila['sexo'] == 'M' ){
 				$fila['desc_sexo'] = 'MASCULINO';
 			}
@@ -206,11 +206,11 @@ class Cotizacion extends CI_Controller {
 			$arrListado['cliente'] = array( 
 				'id' => $fila['idclientepersona'],
 				'idclientepersona' => $fila['idclientepersona'],
-				'nombres' => strtoupper($fila['nombres']),
-				'apellidos' => strtoupper($fila['apellidos']),
-				'cliente' => strtoupper($fila['nombres'].' '.$fila['apellidos']),
+				'nombres' => strtoupper($fila['nombres_cp']),
+				'apellidos' => strtoupper($fila['apellidos_cp']),
+				'cliente' => strtoupper($fila['cliente_persona']),
 				'tipo_cliente' => 'cp',
-				'num_documento' => $fila['num_documento'],
+				'num_documento' => $fila['num_documento_cp'],
 				// 'categoria_cliente' => array(
 				// 	'id'=> $fila['idcategoriacliente'],
 				// 	'descripcion'=> $fila['descripcion_cc'] telefono_contacto
@@ -226,9 +226,9 @@ class Cotizacion extends CI_Controller {
 				'edad' => devolverEdad($fila['fecha_nacimiento']),
 				'fecha_nacimiento' => darFormatoDMY($fila['fecha_nacimiento']),
 				'fecha_nacimiento_str' => formatoFechaReporte3($fila['fecha_nacimiento']),
-				'telefono_fijo' => $fila['telefono_fijo'],
-				'telefono_movil' => $fila['telefono_movil'],
-				'email' => $fila['email']
+				'telefono_fijo' => $fila['telefono_fijo_cp'],
+				'telefono_movil' => $fila['telefono_movil_cp'],
+				'email' => $fila['email_persona_empresa']
 			);
 		}
 		foreach ($detalleLista as $key => $row) { 
@@ -1444,6 +1444,14 @@ class Cotizacion extends CI_Controller {
     	}
 		if( count($allInputs['detalle']) < 1){
     		$arrData['message'] = 'No se ha agregado ningún elemento';
+    		$arrData['flag'] = 0;
+    		$this->output
+			    ->set_content_type('application/json')
+			    ->set_output(json_encode($arrData));
+		    return;
+    	}
+    	if( empty($allInputs['colaborador']['id']) ){
+    		$arrData['message'] = 'Debe tener asignado un colaborador para poder registrar los datos';
     		$arrData['flag'] = 0;
     		$this->output
 			    ->set_content_type('application/json')

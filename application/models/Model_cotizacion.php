@@ -323,7 +323,8 @@ class Model_cotizacion extends CI_Model {
 			ea.nombre_logo, ea.direccion_legal, ea.pagina_web, (ea.telefono) AS telefono_ea, 
 			ce.idclienteempresa, (ce.razon_social) AS razon_social_ce, (ce.nombre_comercial) AS nombre_comercial_ce, (ce.ruc) AS ruc_ce, (ce.telefono) AS telefono_ce, 
 			ce.direccion_guia, (ce.direccion_legal) AS direccion_legal_ce, ce.nombre_corto, ce.representante_legal, ce.dni_representante_legal, ce.direccion_legal AS direccion_legal_ce, 
-			cp.idclientepersona, (cp.num_documento) AS num_documento_cp, 
+			cp.idclientepersona, (cp.num_documento) AS num_documento_cp, cp.sexo, cp.nombres AS nombres_cp, cp.apellidos AS apellidos_cp, cp.fecha_nacimiento, 
+			cp.telefono_fijo AS telefono_fijo_cp, cp.telefono_movil AS telefono_movil_cp, 
 			se.idsede, se.descripcion_se, se.abreviatura_se, 
 			fp.idformapago, fp.descripcion_fp, fp.modo_fp, ct.idcontacto, ct.anexo, ct.telefono_fijo', FALSE); 
 		$this->db->from('cotizacion cot'); 
