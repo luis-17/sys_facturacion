@@ -171,6 +171,33 @@ angular.module('app')
               'angular/controllers/VariableCarCtrl.js' 
             ])
           })
+          .state('app.editar-venta', {
+            url: '/editar-venta/:identify',
+            templateUrl: 'tpl/editar-venta.html',
+            resolve: load([
+              'angular/controllers/EditarVentaCtrl.js',
+              'angular/controllers/NuevaVentaCtrl.js',
+              'angular/controllers/NotaPedidoCtrl.js',
+              'angular/controllers/ClienteEmpresaCtrl.js',
+              'angular/controllers/ClientePersonaCtrl.js',
+              'angular/controllers/ElementoCtrl.js',
+              'angular/controllers/ProductoCtrl.js',
+              'angular/controllers/ServicioCtrl.js',
+              'angular/controllers/ClienteCtrl.js',
+              'angular/controllers/ColaboradorCtrl.js',
+              'angular/controllers/CategoriaClienteCtrl.js',
+              'angular/controllers/CategoriaElementoCtrl.js',
+              'angular/controllers/CaracteristicaCtrl.js',
+              'angular/controllers/TipoDocumentoClienteCtrl.js',
+              'angular/controllers/TipoDocumentoMovCtrl.js',
+              'angular/controllers/SedeCtrl.js',
+              'angular/controllers/SerieCtrl.js',
+              'angular/controllers/FormaPagoCtrl.js',
+              'angular/controllers/UnidadMedidaCtrl.js',
+              'angular/controllers/ContactoEmpresaCtrl.js',
+              'angular/controllers/VariableCarCtrl.js'  
+            ])
+          })
           .state('app.historial-ventas', { 
             url: '/historial-ventas',
             templateUrl: 'tpl/historial-ventas.html',

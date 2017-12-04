@@ -241,28 +241,29 @@ class Model_venta extends CI_Model {
 		$fData = $this->db->get()->row_array();
 		return $fData; 
 	}
+	public function m_cargar_esta_venta_por_id_simple($idventa)
+	{
+		$this->db->select('ve.idmovimiento, ve.estado_movimiento'); 
+		$this->db->from('movimiento ve');
+		$this->db->join('sede se', 've.idsede = se.idsede');
+		$this->db->where_in('ve.estado_movimiento', array(0,1,2,3)); // anulado, por enviar, enviado y nota de pedido 
+		$this->db->where('ve.idmovimiento',$idventa);
+		$this->db->limit(1);
+		return $this->db->get()->row_array();
+	}
 	public function m_cargar_venta_por_id($idmovimiento)
 	{
 		$this->db->select("CONCAT(COALESCE(ct.nombres,''), ' ', COALESCE(ct.apellidos,'')) AS contacto",FALSE);
-		$this->db->select("CONCAT(COALESCE(col.nombres,''), ' ', COALESCE(col.apellidos,'')) AS colaborador",FALSE);
 		$this->db->select("TRIM(CONCAT(COALESCE(cp.nombres,''), ' ', COALESCE(cp.apellidos,''), ' ', COALESCE(ce.razon_social,''))) AS cliente_persona_empresa",FALSE);
 		$this->db->select("TRIM(CONCAT(COALESCE(cp.email,''), ' ', COALESCE(ct.email,''))) AS email_persona_empresa",FALSE);
+		$this->db->select("TRIM(CONCAT(COALESCE(tdc_ce.idtipodocumentocliente,''), ' ', COALESCE(tdc_cp.idtipodocumentocliente,''))) AS idtipodocumentocliente",FALSE);
 		$this->db->select("TRIM(CONCAT(COALESCE(tdc_ce.abreviatura_tdc,''), ' ', COALESCE(tdc_cp.abreviatura_tdc,''))) AS tipo_documento_abv",FALSE);
 		$this->db->select("TRIM(CONCAT(COALESCE(ce.ruc,''), ' ', COALESCE(cp.num_documento,''))) AS num_documento_persona_empresa",FALSE);
 		$this->db->select("CONCAT(cp.nombres, ' ', cp.apellidos) AS cliente_persona",FALSE);
-		$this->db->select('ve.idmovimiento, ve.num_cotizacion, ve.fecha_registro, ve.fecha_emision, ve.tipo_cliente, ve.plazo_entrega, 
-			ve.validez_oferta, ve.moneda, ve.modo_igv, ve.subtotal, ve.igv, ve.total, ve.estado_movimiento, 
-			col.idcolaborador, (col.num_documento) AS num_documento_col, col.email, col.cargo, col.telefono ,us.idusuario, us.username, 
-			ea.idempresaadmin, (ea.razon_social) AS razon_social_ea, (ea.nombre_comercial) AS nombre_comercial_ea, (ea.ruc) AS ruc_ea, 
-			ea.nombre_logo, ea.direccion_legal, ea.pagina_web, (ea.telefono) AS telefono_ea, 
-			ce.idclienteempresa, (ce.razon_social) AS razon_social_ce, (ce.nombre_comercial) AS nombre_comercial_ce, (ce.ruc) AS ruc_ce, (ce.telefono) AS telefono_ce, 
-			ce.direccion_guia, (ce.direccion_legal) AS direccion_legal_ce, 
-			cp.idclientepersona, (cp.num_documento) AS num_documento_cp, 
-			se.idsede, se.descripcion_se, se.abreviatura_se, 
-			fp.idformapago, fp.descripcion_fp, ct.idcontacto', FALSE); 
+		$this->db->select('	ve.idmovimiento,ve.num_nota_pedido,ve.fecha_registro,ve.fecha_emision,ve.tipo_cliente,ve.plazo_entrega,ve.incluye_traslado_prov,ve.incluye_entrega_domicilio,ve.validez_oferta,ve.moneda,ve.modo_igv,ve.subtotal,ve.igv,ve.total,ve.estado_movimiento,us.idusuario,	us.username,ea.idempresaadmin,(ea.razon_social) AS razon_social_ea,(ea.nombre_comercial) AS nombre_comercial_ea,(ea.ruc) AS ruc_ea,	ea.nombre_logo,ea.direccion_legal,ea.pagina_web,(ea.telefono) AS telefono_ea,ce.idclienteempresa,(ce.razon_social) AS razon_social_ce,(ce.nombre_comercial) AS nombre_comercial_ce,(ce.ruc) AS ruc_ce,(ce.telefono) AS telefono_ce,	ce.direccion_guia,(ce.direccion_legal) AS direccion_legal_ce,ce.nombre_corto,ce.representante_legal,ce.dni_representante_legal,ce.direccion_legal AS direccion_legal_ce,cp.idclientepersona,(cp.num_documento) AS num_documento_cp,se.idsede,se.descripcion_se,se.abreviatura_se,fp.idformapago,fp.descripcion_fp,fp.modo_fp,ct.idcontacto,ct.anexo,ct.telefono_fijo,tdm.idtipodocumentomov,tdm.descripcion_tdm,s.idserie,s.numero_serie', FALSE); 
 		$this->db->from('movimiento ve'); 
-		//$this->db->join('colaborador col','ve.idcolaborador = col.idcolaborador'); 
-		$this->db->join('usuario us','ve.idusuarioregistro = us.idusuario'); 
+		$this->db->join('tipo_documento_mov tdm','ve.idtipodocumentomov = tdm.idtipodocumentomov'); 
+		$this->db->join('usuario us','ve.idusuarioventa = us.idusuario'); 
 		$this->db->join('empresa_admin ea','ve.idempresaadmin = ea.idempresaadmin'); 
 		$this->db->join("cliente_empresa ce","ve.idcliente = ce.idclienteempresa AND ve.tipo_cliente = 'E'",'left'); 
 		$this->db->join("tipo_documento_cliente tdc_ce","ce.idtipodocumentocliente = tdc_ce.idtipodocumentocliente",'left'); 
@@ -271,36 +272,39 @@ class Model_venta extends CI_Model {
 		$this->db->join('sede se','ve.idsede = se.idsede'); 
 		$this->db->join('forma_pago fp','ve.idformapago = fp.idformapago'); 
 		$this->db->join('contacto ct','ve.idcontacto = ct.idcontacto','left'); 
+		$this->db->join('serie s','s.idempresaadmin = ea.idempresaadmin','left'); 
 		$this->db->where_in( 've.idmovimiento', array($idmovimiento) ); 
 		$this->db->limit(1);
 		$fData = $this->db->get()->row_array();
 		return $fData; 
 	}
-	public function m_cargar_detalle_venta_por_id($idmovimiento,$iddetallecotizacion=NULL)
+	public function m_cargar_detalle_venta_por_id($idmovimiento=NULL,$iddetalleventa=NULL)
 	{ 
-		$this->db->select('dve.iddetallecotizacion, ve.idmovimiento, ve.num_cotizacion, ve.fecha_registro, ve.subtotal, ve.igv, ve.total, ve.estado_movimiento, ve.idempresaadmin, 
-			dve.cantidad, dve.precio_unitario, dve.importe_con_igv, dve.importe_sin_igv, 
-			dve.excluye_igv, dve.igv_detalle, dve.agrupador_totalizado, um.idunidadmedida, um.descripcion_um, um.abreviatura_um, 
-			ele.idelemento, ele.descripcion_ele, ele.tipo_elemento, c.idcaracteristica, c.orden_car, c.descripcion_car, dc.iddetallecaracteristica,dc.valor', FALSE); 
+		$this->db->select('dve.iddetallemovimiento,ve.idmovimiento,ve.fecha_registro,ve.subtotal,ve.igv,ve.total,ve.idempresaadmin,dve.cantidad,dve.precio_unitario,dve.importe_con_igv,dve.importe_sin_igv,dve.excluye_igv,dve.igv_detalle,dve.agrupador_totalizado,um.idunidadmedida,um.descripcion_um,um.abreviatura_um,ele.idelemento,ele.descripcion_ele,ele.tipo_elemento,c.idcaracteristica,c.orden_car,c.descripcion_car,dc.iddetallecaracteristica,dc.valor', FALSE); 		
 		$this->db->from('movimiento ve'); 
-		$this->db->join('detalle_cotizacion dcot','ve.idmovimiento = dve.idmovimiento'); 
+		$this->db->join('detalle_movimiento dve','ve.idmovimiento = dve.idmovimiento'); 
 		$this->db->join('elemento ele','dve.idelemento = ele.idelemento'); 
-		$this->db->join('unidad_medida um','ele.idunidadmedida = um.idunidadmedida'); 
-		$this->db->join("detalle_caracteristica dc","dc.iddetalle = dve.iddetallecotizacion AND dc.tipo_detalle = 'C'",'left'); 
+		//$this->db->join('unidad_medida um','ele.idunidadmedida = um.idunidadmedida','left'); 
+		$this->db->join('unidad_medida um','dve.idunidadmedida = um.idunidadmedida','left'); 
+		$this->db->join("detalle_caracteristica dc","dc.iddetalle = dve.iddetallemovimiento AND dc.tipo_detalle = 'C'",'left'); 
 		$this->db->join('caracteristica c','dc.idcaracteristica = c.idcaracteristica','left'); 
-		$this->db->where('ve.idmovimiento',$idmovimiento); 
-		if( $iddetallecotizacion ){
-			$this->db->where('dve.iddetallecotizacion',$iddetallecotizacion); 
+		if( $idmovimiento ){ 
+			$this->db->where('ve.idmovimiento',$idmovimiento); 
 		}
-		$this->db->where('estado_dcot',1); // detalle ve. habilitado 
+		// para cotizacion múltiple en N.P.
+		if( $iddetalleventa ){
+			$this->db->where('dve.iddetallemovimiento',$iddetalleventa); 
+		}
+		$this->db->where_in('dve.estado_dmov', array(1)); // habilitado 
+		$this->db->order_by('dve.iddetallemovimiento','ASC');
 		$this->db->order_by('c.orden_car','ASC');
 		$this->db->order_by('c.descripcion_car','ASC');
+
 		return $this->db->get()->result_array();
 	}
 	public function m_registrar_venta($datos)
 	{
 		$data = array( 
-
 			'tipo_cliente' => $datos['tipo_cliente'],
 			'idcliente' => $datos['cliente']['id'],
 			'idaperturacaja' => empty($datos['idaperturacaja']) ? NULL : $datos['idaperturacaja'],
@@ -330,11 +334,12 @@ class Model_venta extends CI_Model {
 		return $this->db->insert('movimiento', $data); 
 	}
 	public function m_registrar_detalle_venta($datos)
-	{
+	{	
+		// var_dump($datos);exit();
 		$data = array(
 			'idmovimiento' => $datos['idmovimiento'],	
-			'idelemento' => $datos['idelemento'],
-			'idunidadmedida' => $datos['unidad_medida']['id'], 
+			'idelemento' => $datos['id'],
+			'idunidadmedida' => $datos['unidad_medida'], 
 			'cantidad' => $datos['cantidad'],
 			'precio_unitario' => $datos['precio_unitario'],
 			'importe_con_igv' => $datos['importe_con_igv'],
@@ -348,10 +353,12 @@ class Model_venta extends CI_Model {
 	}
 	public function m_registrar_detalle_caracteristica_venta($datos) 
 	{ 
+		// var_dump($datos);exit();
 		$data = array(
 			'tipo_detalle' => 'VE', // VENTA  
 			'iddetalle' => $datos['iddetalleventa'],
-			'idcaracteristica' => $datos['id'],
+			'idcaracteristica' => $datos['idcaracteristica'],
+			// 'idcaracteristica' => $datos['id'],
 			'valor' => strtoupper($datos['valor'])
 		);
 		return $this->db->insert('detalle_caracteristica', $data); 
@@ -365,5 +372,62 @@ class Model_venta extends CI_Model {
 		$this->db->where_in('idmovimiento',$arrIdVentas); 
 		return $this->db->update('movimiento', $data); 
 	}
+	public function m_editar_venta($datos)
+	{
+			// var_dump($datos);exit();
+		$data = array(
+			'fecha_emision'=> darFormatoYMD($datos['fecha_emision']),
+			'idtipodocumentomov' => $datos['tipo_documento_mov']['id'], 
+			// 'estado_cot' => $datos['estado_cotizacion']['id'], 
+			'idsede'=> $datos['sede']['id'],
+			'plazo_entrega'=> $datos['plazo_entrega'],
+			'validez_oferta'=> $datos['validez_oferta'],
+			'incluye_traslado_prov'=> $datos['incluye_tras_prov'],
+			'incluye_entrega_domicilio'=> $datos['incluye_entr_dom'],
+			'idformapago' => $datos['forma_pago']['id'],
+			'moneda' => $datos['moneda']['str_moneda'],
+			'modo_igv' => $datos['modo_igv'],
+			'subtotal' => $datos['subtotal'],
+			'igv' => $datos['igv'],
+			'total' => $datos['total'],
+		);
+		$this->db->where('idmovimiento',$datos['idmovimiento']); 
+		return $this->db->update('movimiento', $data); 
+	}
+	public function m_editar_venta_detalle($datos) 
+	{
+		// var_dump($datos);exit();
+		$data = array( 
+			'cantidad' => $datos['cantidad'],
+			'idunidadmedida' => $datos['unidad_medida'],
+			'precio_unitario' => $datos['precio_unitario'],
+			'importe_con_igv' => $datos['importe_con_igv'],
+			'importe_sin_igv' => $datos['importe_sin_igv'],
+			'importe_sin_igv' => $datos['importe_sin_igv'],
+			'excluye_igv' => $datos['excluye_igv'],
+			'igv_detalle' => $datos['igv'],
+			'agrupador_totalizado' => $datos['agrupacion']
+		);
+		$this->db->where('iddetallemovimiento',$datos['iddetallemovimiento']); 
+		return $this->db->update('detalle_movimiento', $data); 
+	}
+	public function m_editar_detalle_caracteristica_venta($datos)
+	{
+		$data = array( 
+			'valor' => strtoupper($datos['valor']) 
+		);
+		$this->db->where('iddetallecaracteristica',$datos['iddetallecaracteristica']); 
+		return $this->db->update('detalle_caracteristica', $data); 
+	}
+	public function m_anular_venta_detalle($datos)
+	{
+		$data = array(
+			'estado_dmov' => 0 // anulado 
+		);
+		$this->db->where('iddetallemovimiento',$datos['iddetallemovimiento']); 
+		return $this->db->update('detalle_movimiento', $data); 
+	}	
+
+
 } 
 ?>
