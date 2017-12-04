@@ -7,7 +7,7 @@ class Venta extends CI_Controller {
         parent::__construct(); 
         $this->load->helper(array('fechas','otros','pdf','contable','config')); 
         $this->load->model(array('model_venta','model_categoria_cliente','model_cliente_persona','model_cliente_empresa','model_configuracion',
-        	'model_variable_car','model_banco_empresa_admin','model_serie','model_nota_pedido')); 
+        	'model_variable_car','model_banco_empresa_admin','model_serie','model_nota_pedido','model_caracteristica')); 
         $this->load->library('excel');
     	$this->load->library('Fpdfext');
         //cache
@@ -46,6 +46,7 @@ class Venta extends CI_Controller {
 			array_push($arrListado, 
 				array(
 					'idmovimiento' => $row['idmovimiento'],
+					'identify_trunc'=> $row['idmovimiento'],
 					'tipo_cliente' => $row['tipo_cliente'],
 					'fecha_registro' => darFormatoDMY($row['fecha_registro']),
 					'fecha_emision' => darFormatoDMY($row['fecha_emision']),
@@ -68,6 +69,7 @@ class Venta extends CI_Controller {
 					'subtotal' => $row['subtotal'], 
 					'igv' => $row['igv'], 
 					'total' => $row['total'],
+					'estado_movimiento' => $row['estado_movimiento'],
 					'estado' => $objEstado 
 				)
 			);
@@ -206,6 +208,241 @@ class Venta extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
+
+	public function obtener_esta_venta()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true); 
+		// var_dump($allInputs);exit();
+		$fConfig = obtener_parametros_configuracion();
+		$idventa = $allInputs['identify']; 
+		$fila = $this->model_venta->m_cargar_venta_por_id($idventa);
+		$detalleLista = $this->model_venta->m_cargar_detalle_venta_por_id($idventa);
+		// var_dump($detalleLista);exit();
+		$rowEstadoId = $fila['estado_movimiento']; 
+		if( $fila['estado_movimiento'] == 0 ){ // por enviar
+			$rowEstadoDescripcion = 'ANULADO'; 
+		}
+		if( $fila['estado_movimiento'] == 1 ){ // por enviar
+			$rowEstadoDescripcion = 'POR ENVIAR'; 
+		}
+		if( $fila['estado_movimiento'] == 2 ){ // enviado
+			$rowEstadoDescripcion = 'ENVIADO'; 
+		}
+		if($fila['moneda'] == 'S'){
+			$strIdMoneda = 1; 
+			$strDescripcion = 'S/.';
+			$strMoneda = $fila['moneda'];
+		}
+		if($fila['moneda'] == 'D'){
+			$strIdMoneda = 2; 
+			$strDescripcion = 'US$'; 
+			$strMoneda = $fila['moneda']; 
+		}
+		$arrListadoDetalle = array();
+		$arrListado = array( 
+			'tipo_documento_cliente'=> array(
+				'id'=> $fila['idtipodocumentocliente'],
+				'descripcion'=> $fila['tipo_documento_abv']
+			),
+			'serie'=> array(
+				'id'=> $fila['idserie'],
+				'descripcion'=> $fila['numero_serie']
+			),			
+			'tipo_documento_mov'=> array(
+				'id'=> $fila['idtipodocumentomov'],
+				'descripcion'=> $fila['descripcion_tdm']
+			),			
+			'idmovimiento'=> $fila['idmovimiento'],
+			'num_nota_pedido'=> $fila['num_nota_pedido'],
+			'sede'=> array(
+				'id'=> $fila['idsede'],
+				'descripcion'=> strtoupper($fila['descripcion_se']),
+			),
+			'fecha_registro'=> darFormatoDMY($fila['fecha_registro']),
+			'fecha_emision'=> darFormatoDMY($fila['fecha_emision']),
+			'estado_venta'=> array(
+				'id'=> (int)$rowEstadoId,
+				'descripcion'=> $rowEstadoDescripcion 
+			),
+			'moneda'=> array( 
+				'id'=> (int)$strIdMoneda,
+				'descripcion'=> strtoupper($strDescripcion),
+				'str_moneda'=> strtoupper($strMoneda)
+			), 
+			'forma_pago'=> array(
+				'id'=> (int)$fila['idformapago'],
+				'descripcion'=> strtoupper($fila['descripcion_fp']),
+				'modo'=> $fila['modo_fp']
+			),
+			// 'colaborador'=> array(
+			// 	'id'=> (int)$fila['idcolaborador'],
+			// 	'colaborador'=> strtoupper($fila['colaborador']) 
+			// ),
+			'contacto'=> strtoupper($fila['contacto']),
+			'incluye_tras_prov'=> (int)$fila['incluye_traslado_prov'],
+			'incluye_entr_dom'=> (int)$fila['incluye_entrega_domicilio'],
+			'plazo_entrega'=> $fila['plazo_entrega'],
+			'validez_oferta'=> $fila['validez_oferta'],
+			'modo_igv'=> (int)$fila['modo_igv'],
+			'subtotal'=> number_format($fila['subtotal'],$fConfig['num_decimal_total_key'],'.',''),
+			'igv'=> number_format($fila['igv'],$fConfig['num_decimal_total_key'],'.',''),
+			'total'=> number_format($fila['total'],$fConfig['num_decimal_total_key'],'.',''),
+			'cliente' => array(),
+			//'detalle' => array(),
+			'temporal' => array( 
+				'cantidad'=> 1,
+				'unidad_medida'=> array(),
+				'caracteristicas'=> array()
+			)
+		); 
+		if( $fila['tipo_cliente'] === 'E' ){ 
+			$arrListado['num_documento'] = $fila['ruc_ce'];
+			$arrListado['cliente'] = array(
+				'id' => $fila['idclienteempresa'],
+				'idclienteempresa' => $fila['idclienteempresa'],
+				'cliente' => strtoupper($fila['razon_social_ce']),
+				'tipo_cliente' => 'ce',
+				'nombre_comercial' => strtoupper($fila['nombre_comercial_ce']),
+				'nombre_corto' => strtoupper($fila['nombre_corto']),
+				'razon_social' => strtoupper($fila['razon_social_ce']),
+				'telefono_contacto'=> $fila['telefono_fijo'],
+				'anexo_contacto'=> $fila['anexo'],
+				// 'categoria_cliente' => array(
+				// 	'id'=> $fila['idcategoriacliente'],
+				// 	'descripcion'=> $fila['descripcion_cc']
+				// ),
+				// 'colaborador' => array(
+				// 	'id'=> $fila['idcolaborador'],
+				// 	'descripcion'=> $fila['colaborador']
+				// ),
+				'ruc' => $fila['ruc_ce'],
+				'num_documento' => $fila['ruc_ce'],
+				'representante_legal' => $fila['representante_legal'],
+				'dni_representante_legal' => $fila['dni_representante_legal'],
+				'direccion_legal' => $fila['direccion_legal'],
+				// 'telefono' => $fila['telefono']
+			);
+		}
+		if( $fila['tipo_cliente'] === 'P' ){ 
+			$arrListado['num_documento'] = $fila['num_documento'];
+			if( $fila['sexo'] == 'M' ){
+				$fila['desc_sexo'] = 'MASCULINO';
+			}
+			if( $fila['sexo'] == 'F' ){
+				$fila['desc_sexo'] = 'FEMENINO';
+			}
+			$arrListado['cliente'] = array( 
+				'id' => $fila['idclientepersona'],
+				'idclientepersona' => $fila['idclientepersona'],
+				'nombres' => strtoupper($fila['nombres']),
+				'apellidos' => strtoupper($fila['apellidos']),
+				'cliente' => strtoupper($fila['nombres'].' '.$fila['apellidos']),
+				'tipo_cliente' => 'cp',
+				'num_documento' => $fila['num_documento'],
+				// 'categoria_cliente' => array(
+				// 	'id'=> $fila['idcategoriacliente'],
+				// 	'descripcion'=> $fila['descripcion_cc'] telefono_contacto
+				// ),
+				// 'colaborador' => array(
+				// 	'id'=> $fila['idcolaborador'],
+				// 	'descripcion'=> $fila['colaborador']
+				// ),
+				'sexo'=> array(
+					'id'=> $fila['sexo'],
+					'descripcion'=> $fila['desc_sexo'] 
+				),
+				'edad' => devolverEdad($fila['fecha_nacimiento']),
+				'fecha_nacimiento' => darFormatoDMY($fila['fecha_nacimiento']),
+				'fecha_nacimiento_str' => formatoFechaReporte3($fila['fecha_nacimiento']),
+				'telefono_fijo' => $fila['telefono_fijo'],
+				'telefono_movil' => $fila['telefono_movil'],
+				'email' => $fila['email']
+			);
+		}
+
+		foreach ($detalleLista as $key => $row) { 
+			$arrAux = array( 
+				'iddetallemovimiento' => $row['iddetallemovimiento'],
+				'idmovimiento' => $row['idmovimiento'],
+				// 'num_cotizacion' => $row['num_cotizacion'],
+				'idempresaadmin' => $row['idempresaadmin'],
+				'idelemento' => $row['idelemento'], 
+				'descripcion'=> $row['descripcion_ele'], 
+				'elemento' => $row['descripcion_ele'], 
+				'cantidad' => $row['cantidad'], 
+				'precio_unitario' => number_format($row['precio_unitario'],$fConfig['num_decimal_precio_key'],'.',''), 
+				'importe_con_igv' => number_format($row['importe_con_igv'],$fConfig['num_decimal_total_key'],'.',''), 
+				'importe_sin_igv' => number_format($row['importe_sin_igv'],$fConfig['num_decimal_total_key'],'.',''), 
+				'excluye_igv' => $row['excluye_igv'], 
+				'igv_detalle' => number_format($row['igv_detalle'],$fConfig['num_decimal_total_key'],'.',''), // agrupacion
+				'igv' => $row['igv_detalle'], 
+				'unidad_medida' => array( 
+					'id'=> $row['idunidadmedida'],
+					'descripcion'=> $row['descripcion_um'] 
+				),
+				'agrupacion' => (int)$row['agrupador_totalizado'],
+				'caracteristicas' => array() 
+			);
+			$arrListadoDetalle[$row['iddetallemovimiento']] = $arrAux; 
+		}
+		foreach ($detalleLista as $key => $row) { 
+			$arrAux2 = array(
+				'iddetallecaracteristica'=> $row['iddetallecaracteristica'],
+				'idcaracteristica'=> $row['idcaracteristica'],
+				'orden'=> $row['orden_car'],
+				'descripcion'=> $row['descripcion_car'],
+				'valor'=> $row['valor']
+			);
+			if( !empty($row['iddetallecaracteristica']) ){ 
+				$arrListadoDetalle[$row['iddetallemovimiento']]['caracteristicas'][$row['iddetallecaracteristica']] = $arrAux2; 
+				$arrListadoDetalle[$row['iddetallemovimiento']]['caracteristicas'] = array_values($arrListadoDetalle[$row['iddetallemovimiento']]['caracteristicas']);
+			}
+
+		} 
+		// agregar caracteristicas sin valor 
+		$arrCaractsAll = array();
+		$listaCaracteristicas = $this->model_caracteristica->m_cargar_caracteristica_agregar(); 
+		foreach ($listaCaracteristicas as $key => $row) {
+			$arrAux = array(
+				'iddetallecaracteristica'=> NULL,
+				'idcaracteristica'=> $row['idcaracteristica'],
+				'orden'=> $row['orden_car'],
+				'descripcion'=> $row['descripcion_car'],
+				'valor'=> NULL 
+			);
+			$arrCaractsAll[] = $arrAux;
+		}
+		$arrCaractsSelect = array();
+		foreach ($arrListadoDetalle as $key => $item) { 
+			foreach ($arrCaractsAll as $key3 => $caracAll) { 
+				$caracIgual = FALSE;
+				foreach ($item['caracteristicas'] as $key2 => $carac) { 
+					if( $caracAll['idcaracteristica'] == $carac['idcaracteristica'] ){ 
+						$caracIgual = TRUE;
+					}
+				}
+				if( $caracIgual === FALSE ){ 
+					$arrListadoDetalle[$key]['caracteristicas'][] = $caracAll;
+					// $arrCaractsSelect[] = $caracAll;
+				}
+			}
+		}
+		// print_r($arrListadoDetalle); exit(); 
+		// $resultado = array_merge_recursive($m1, $m2);
+		// reindexado 
+		$arrListadoDetalle = array_values($arrListadoDetalle);
+		$arrData['datos'] = $arrListado; 
+		$arrData['detalle'] = $arrListadoDetalle; 
+
+		$arrData['flag'] = 1; 
+		if(empty($fila)){ 
+			$arrData['flag'] = 0; 
+		} 
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
+
 	public function ver_popup_busqueda_venta()
 	{
 		$this->load->view('venta/busq_venta_popup'); 
@@ -281,7 +518,7 @@ class Venta extends CI_Controller {
 	    ini_set('xdebug.var_display_max_children', 256);
 	    ini_set('xdebug.var_display_max_data', 1024);
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true); 
-		// print_r($allInputs); exit(); 
+		// var_dump($allInputs); exit(); 
 		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
     	$arrData['flag'] = 0;
 		/* VALIDACIONES */ 
@@ -389,10 +626,15 @@ class Venta extends CI_Controller {
 		if( $this->model_venta->m_registrar_venta($allInputs) ){ 
 			$arrData['idmovimiento'] = GetLastId('idmovimiento','movimiento');
 			foreach ($allInputs['detalle'] as $key => $elemento) { 
+				// var_dump($elemento);
 				$elemento['idmovimiento'] = $arrData['idmovimiento'];
 				if( empty($elemento['agrupacion']) ){ 
 					$elemento['agrupacion'] = 1; // por defecto 
 				} 
+				/* fix clon */
+				if( empty($elemento['id']) ){
+					$elemento['id'] = @$elemento['idelemento']; 
+				}				
 				if( $this->model_venta->m_registrar_detalle_venta($elemento) ){ 
 					$arrData['message'] = 'Los datos se registraron correctamente - (no caracteristicas)'; 
 					$arrData['flag'] = 1; 
@@ -443,6 +685,136 @@ class Venta extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
+	public function editar()
+	{
+		ini_set('xdebug.var_display_max_depth', 5);
+	    ini_set('xdebug.var_display_max_children', 256);
+	    ini_set('xdebug.var_display_max_data', 1024);
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true); 
+		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
+    	$arrData['flag'] = 0;
+    	// var_dump($allInputs); exit(); 
+		/* VALIDACIONES */
+		//validar que no sea una venta enviada 
+    	$fVenta = $this->model_venta->m_cargar_esta_venta_por_id_simple($allInputs['idmovimiento']);
+    	// var_dump($fVenta);exit();
+    	if( $fVenta['estado_movimiento'] == 2 ){ // enviado 
+    		$arrData['message'] = 'Esta Venta ya ha sido enviada como Nota de Pedido. No se puede modificar.'; 
+    		$arrData['flag'] = 0;
+    		$this->output
+		    	->set_content_type('application/json')
+		    	->set_output(json_encode($arrData));
+		    return;
+    	} 
+    	// validar que no sea una venta anulada 
+    	if( $fVenta['estado_movimiento'] == 0 ){ // anulado 
+    		$arrData['message'] = 'Esta Venta ya ha sido anulada anteriormente. No se puede modificar.'; 
+    		$arrData['flag'] = 0;
+    		$this->output
+		    	->set_content_type('application/json')
+		    	->set_output(json_encode($arrData));
+		    return;
+    	}
+    	// var_dump($allInputs);exit();
+    	$arrItemDetalle = array();
+    	$this->db->trans_start();
+    	if( $this->model_venta->m_editar_venta($allInputs) ){ 
+    		foreach ($allInputs['detalle'] as $key => $elemento) {
+    			if( !empty($elemento['iddetallemovimiento']) ){ 
+					$arrItemDetalle[] = $elemento['iddetallemovimiento'];
+				}
+    		} 
+    		// ANULAR ITEMS QUE HAN SIDO QUITADOS.
+    		$listaDetalle = $this->model_venta->m_cargar_detalle_venta_por_id($allInputs['idmovimiento']); 
+    		$arrDetalleAEliminar = array();
+    		foreach ($listaDetalle as $key => $row) {
+    			if( !(in_array($row['iddetallemovimiento'],$arrItemDetalle)) ){
+    				$arrDetalleAEliminar[] = $row['iddetallemovimiento']; 
+    			}
+    		}
+    		foreach ($arrDetalleAEliminar as $key => $val) { 
+    			$arrDatos = array(
+    				'iddetallemovimiento'=> $val 
+    			);
+    			$this->model_venta->m_anular_venta_detalle($arrDatos); 
+    		}
+    		foreach ($allInputs['detalle'] as $key => $elemento) { 
+    			$elemento['idmovimiento'] = $allInputs['idmovimiento'];
+    			if( empty($elemento['agrupacion']) ){ 
+					$elemento['agrupacion'] = NULL; // por defecto 
+				}
+    			if( empty($elemento['iddetallemovimiento']) ){
+    				// agregar un detalle a venta 
+    				if($this->model_venta->m_registrar_detalle_venta($elemento)){
+    					$arrData['message'] = 'Los datos se editaron correctamente - (no caracteristicas)'; 
+						$arrData['flag'] = 1; 
+						$arrData['iddetallemovimiento'] = GetLastId('iddetallemovimiento','detalle_movimiento');
+
+						if( !empty($elemento['caracteristicas']) ){ 
+							foreach ($elemento['caracteristicas'] as $keyCa => $caracteristica) { 
+								if( !empty($caracteristica['valor']) ){ 
+									$caracteristica['iddetalleventa'] = $arrData['iddetallemovimiento']; 
+									if( $this->model_venta->m_registrar_detalle_caracteristica_venta($caracteristica) ){ 
+										$arrData['message'] = 'Los datos se editaron correctamente'; 
+										$arrData['flag'] = 1; 
+										$fVariable = $this->model_variable_car->m_buscar_variable($caracteristica); 
+										if( empty($fVariable) ){ 
+											// GRABAR COMO UNA VARIABLE 
+											$caracteristica['descripcion_vcar'] = $caracteristica['valor'];
+											$this->model_variable_car->m_registrar($caracteristica); 
+										}
+									} 
+								} 
+							} 
+						}
+    				}
+    			}else{ 
+    				// editar detalle de venta 
+    				
+					if( $this->model_venta->m_editar_venta_detalle($elemento) ){ 
+						$arrData['message'] = 'Los datos se editaron correctamente - (no caracteristicas)'; 
+						$arrData['flag'] = 1; 
+						if( !empty($elemento['caracteristicas']) ){ 
+							foreach ($elemento['caracteristicas'] as $keyCa => $caracteristica) { 
+								if( !empty($caracteristica['iddetallecaracteristica']) ){ 
+									if( $this->model_venta->m_editar_detalle_caracteristica_venta($caracteristica) ){ 
+										$arrData['message'] = 'Los datos se editaron correctamente'; 
+										//$arrData['flag'] = 1; 
+										$fVariable = $this->model_variable_car->m_buscar_variable($caracteristica); 
+										if( empty($fVariable) ){ 
+											// GRABAR COMO UNA VARIABLE 
+											$caracteristica['descripcion_vcar'] = $caracteristica['valor'];
+											$this->model_variable_car->m_registrar($caracteristica); 
+										}
+									} 
+								}else{ 
+									if( !empty($caracteristica['valor']) ){ 
+										$caracteristica['iddetalleventa'] = $elemento['iddetallemovimiento'];
+										if( $this->model_venta->m_registrar_detalle_caracteristica_venta($caracteristica) ){
+											$arrData['message'] = 'Los datos se editaron correctamente'; 
+											$arrData['flag'] = 1; 
+											$fVariable = $this->model_variable_car->m_buscar_variable($caracteristica); 
+											if( empty($fVariable) ){ 
+												// GRABAR COMO UNA VARIABLE 
+												$caracteristica['descripcion_vcar'] = $caracteristica['valor'];
+												$this->model_variable_car->m_registrar($caracteristica); 
+											}
+										}
+									}
+									
+								} 
+							}
+						}
+					}
+    			}
+    		}
+		} 
+		$this->db->trans_complete(); 
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
+
 	public function imprimir_venta()
 	{
 
