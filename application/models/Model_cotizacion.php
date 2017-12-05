@@ -309,6 +309,7 @@ class Model_cotizacion extends CI_Model {
 		$this->db->join('sede se', 'co.idsede = se.idsede');
 		$this->db->where_in('co.estado_cot',array(0,1,2,3)); // todos 
 		$this->db->where('co.num_cotizacion',$numCoti);
+		$this->db->where('co.idempresaadmin',$this->sessionFactur['idempresaadmin']);
 		$this->db->limit(1);
 		return $this->db->get()->row_array();
 	}
