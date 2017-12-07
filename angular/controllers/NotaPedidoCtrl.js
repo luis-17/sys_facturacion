@@ -17,6 +17,8 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
     'CaracteristicaServices',
     'ContactoEmpresaServices', 
     'CotizacionServices',
+    'ModalReporteFactory',
+
     //'VariableCarServices',
 	function($scope, $filter, $uibModal, $bootbox, $log, $timeout, pinesNotifications, uiGridConstants, blockUI, 
     MathFactory,
@@ -34,8 +36,9 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
     FormaPagoServices,
     CaracteristicaServices,
     ContactoEmpresaServices,
-    CotizacionServices
+    CotizacionServices,
     //VariableCarServices 
+    ModalReporteFactory
 ) {
    
   $scope.metodos = {}; // contiene todas las funciones 
@@ -1355,7 +1358,24 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
       pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 3000 });
     });
   }
+
+  $scope.imprimir = function() {
+    console.log($scope.fData,'$scope.fData');
+    var arrParams = { 
+      titulo: 'VISTA PREVIA DE NOTA PEDIDO',
+      datos:{
+        id: $scope.fData.idnotapedidoanterior,
+        codigo_reporte: 'COT-FCOT'
+      },
+      envio_correo: 'si',
+      salida: 'pdf',
+      url: angular.patchURLCI + "NotaPedido/imprimir_nota_pedido" 
+    }
+    ModalReporteFactory.getPopupReporte(arrParams);
+  }
+
 }]);
+
 
 app.service("NotaPedidoServices",function($http, $q, handleBehavior) { 
     return({

@@ -205,11 +205,11 @@ class Model_nota_pedido extends CI_Model {
 	}
 	public function m_cargar_detalle_nota_pedido_por_id($idnotapedido)
 	{
-		$this->db->select('np.idmovimiento, np.idempresaadmin, np.num_nota_pedido, np.fecha_registro, 
-			dm.iddetallemovimiento, dm.cantidad, dm.precio_unitario, dm.importe_con_igv, dm.importe_sin_igv, dm.excluye_igv, dm.igv_detalle, 
-			ele.idelemento, ele.descripcion_ele, ele.tipo_elemento, 
-			um.idunidadmedida, um.descripcion_um, um.abreviatura_um, 
-			c.idcaracteristica, c.orden_car, c.descripcion_car, dc.iddetallecaracteristica, dc.valor', FALSE); // idclientepersona
+		$this->db->select('dm.iddetallemovimiento, np.idmovimiento, np.num_nota_pedido, np.fecha_registro, np.subtotal, np.igv, np.total, np.estado_movimiento, np.idempresaadmin, 
+			dm.cantidad, dm.precio_unitario, dm.importe_con_igv, dm.importe_sin_igv, 
+			dm.excluye_igv, dm.igv_detalle, dm.agrupador_totalizado, um.idunidadmedida, um.descripcion_um, um.abreviatura_um, 
+			ele.idelemento, ele.descripcion_ele, ele.tipo_elemento, c.idcaracteristica, c.orden_car, c.descripcion_car, dc.iddetallecaracteristica,dc.valor', FALSE); 
+
 		$this->db->from('movimiento np'); // nota de pedido 
 		$this->db->join('detalle_movimiento dm','np.idmovimiento = dm.idmovimiento');
 		$this->db->join('elemento ele','dm.idelemento = ele.idelemento');
@@ -228,20 +228,24 @@ class Model_nota_pedido extends CI_Model {
 	}
 	public function m_cargar_nota_pedido_por_id($idnotapedido) // moneda idtipodocumentocliente
 	{
-		$this->db->select("TRIM(CONCAT(COALESCE(tdc_ce.idtipodocumentocliente,''), ' ', COALESCE(tdc_cp.idtipodocumentocliente,''))) AS idtipodocumentocliente",FALSE);
 		$this->db->select("CONCAT(COALESCE(cp.nombres,''), ' ', COALESCE(cp.apellidos,''), ' ', COALESCE(ce.razon_social,'')) As cliente_persona_empresa",FALSE);
 		$this->db->select("CONCAT(cp.nombres, ' ', cp.apellidos) As cliente_persona",FALSE);
 		$this->db->select("CONCAT(COALESCE(ct.nombres,''), ' ', COALESCE(ct.apellidos,'')) AS contacto",FALSE);
+		$this->db->select("TRIM(CONCAT(COALESCE(tdc_ce.idtipodocumentocliente,''), ' ', COALESCE(tdc_cp.idtipodocumentocliente,''))) AS idtipodocumentocliente",FALSE);
 		$this->db->select("TRIM(CONCAT(COALESCE(tdc_ce.abreviatura_tdc,''), ' ', COALESCE(tdc_cp.abreviatura_tdc,''))) AS tipo_documento_abv",FALSE);
+
+		$this->db->select("TRIM(CONCAT(COALESCE(ce.ruc,''), ' ', COALESCE(cp.num_documento,''))) AS num_documento_persona_empresa",FALSE);
+		$this->db->select("TRIM(CONCAT(COALESCE(cp.email,''), ' ', COALESCE(ct.email,''))) AS email_persona_empresa",FALSE);
 		$this->db->select('np.idmovimiento, np.num_nota_pedido, np.fecha_registro, np.dir_movimiento, np.tipo_movimiento, np.fecha_emision, np.tipo_cliente, np.incluye_traslado_prov, np.incluye_entrega_domicilio, np.moneda, np.modo_igv, np.subtotal, np.igv, np.total, np.estado_movimiento, np.plazo_entrega, np.validez_oferta, np.idempresaadmin, 
 			ce.idclienteempresa, (ce.razon_social) AS razon_social_ce, (ce.nombre_comercial) AS nombre_comercial_ce, (ce.ruc) AS ruc_ce, 
 			ce.representante_legal AS representante_legal_ce, ce.dni_representante_legal AS dni_representante_legal_ce, ce.nombre_corto, 
-			ce.idtipodocumentocliente AS ce_idtipodocumentocliente, ce.telefono AS telefono_ce, ce.direccion_legal AS direccion_legal_ce, 
+			ce.idtipodocumentocliente AS ce_idtipodocumentocliente, ce.telefono AS telefono_ce,ce.direccion_guia, ce.direccion_legal AS direccion_legal_ce, 
 			cp.idclientepersona, (cp.num_documento) AS num_documento_cp, (cp.telefono_movil) AS telefono_movil_cp, (cp.telefono_fijo) AS telefono_fijo_cp, 
 			cp.idtipodocumentocliente AS cp_idtipodocumentocliente, cp.sexo, cp.email,  
 			se.idsede, se.descripcion_se, se.abreviatura_se, fp.idformapago, fp.descripcion_fp, fp.modo_fp, 
-			ct.idcontacto, ct.telefono_fijo, ct.anexo, ct.area_encargada'); 
+			ct.idcontacto, ct.telefono_fijo, ct.anexo, ct.area_encargada,ea.idempresaadmin, (ea.razon_social) AS razon_social_ea, (ea.nombre_comercial) AS nombre_comercial_ea, (ea.ruc) AS ruc_ea,ea.nombre_logo, ea.direccion_legal, ea.pagina_web, (ea.telefono) AS telefono_ea',FALSE); 
 		$this->db->from('movimiento np');
+		$this->db->join('empresa_admin ea','np.idempresaadmin = ea.idempresaadmin'); 		
 		$this->db->join("cliente_empresa ce","np.idcliente = ce.idclienteempresa AND np.tipo_cliente = 'E'",'left'); 
 		$this->db->join("tipo_documento_cliente tdc_ce","ce.idtipodocumentocliente = tdc_ce.idtipodocumentocliente",'left'); 
 		$this->db->join("cliente_persona cp","np.idcliente = cp.idclientepersona AND np.tipo_cliente = 'P'",'left'); 
