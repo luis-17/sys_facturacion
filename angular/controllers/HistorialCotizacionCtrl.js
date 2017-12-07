@@ -108,7 +108,8 @@ app.controller('HistorialCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$b
       { field: 'fecha_emision', name: 'cot.fecha_emision', displayName: 'F. Emisión', minWidth: 100, enableFiltering: false },
       { field: 'fecha_registro', name: 'cot.fecha_registro', displayName: 'F. Registro', minWidth: 100, enableFiltering: false, visible: false },
       { field: 'cliente', name: 'cliente_persona_empresa', displayName: 'Cliente', minWidth: 180 },
-      { field: 'colaborador', name: 'colaborador', displayName: 'Colaborador', minWidth: 160 },
+      { field: 'colaborador', name: 'col.colaborador', displayName: 'Asignado a:', minWidth: 160 },
+      { field: 'colaborador_reg', name: 'colaborador_reg', displayName: 'Generado por:', minWidth: 160, visible: false },
       { field: 'plazo_entrega', name: 'cot.plazo_entrega', displayName: 'Plazo de Entrega', minWidth: 120 },
       { field: 'validez_oferta', name: 'cot.validez_oferta', displayName: 'Validez Oferta', minWidth: 120, visible: false },
       { field: 'forma_pago', name: 'fp.descripcion_fp', displayName: 'Forma de Pago', minWidth: 120 },
@@ -156,13 +157,14 @@ app.controller('HistorialCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$b
           'cot.num_cotizacion' : grid.columns[2].filters[0].term,
           "CONCAT(COALESCE(cp.nombres,''), ' ', COALESCE(cp.apellidos,''), ' ', COALESCE(ce.razon_social,''))" : grid.columns[5].filters[0].term,
           "CONCAT(col.nombres, ' ', col.apellidos)" : grid.columns[6].filters[0].term,
-          'cot.plazo_entrega' : grid.columns[7].filters[0].term, 
-          'cot.validez_oferta' : grid.columns[8].filters[0].term, 
-          'fp.descripcion_fp' : grid.columns[9].filters[0].term, 
-          'se.descripcion_se' : grid.columns[10].filters[0].term,
-          'cot.subtotal' : grid.columns[12].filters[0].term,
-          'cot.igv' : grid.columns[13].filters[0].term,
-          'cot.total' : grid.columns[14].filters[0].term
+          "CONCAT(col_reg.nombres, ' ', col_reg.apellidos)" : grid.columns[7].filters[0].term,
+          'cot.plazo_entrega' : grid.columns[8].filters[0].term, 
+          'cot.validez_oferta' : grid.columns[9].filters[0].term, 
+          'fp.descripcion_fp' : grid.columns[10].filters[0].term, 
+          'se.descripcion_se' : grid.columns[11].filters[0].term,
+          'cot.subtotal' : grid.columns[13].filters[0].term,
+          'cot.igv' : grid.columns[14].filters[0].term,
+          'cot.total' : grid.columns[15].filters[0].term
         }
         $scope.metodos.getPaginationServerSide();
       });

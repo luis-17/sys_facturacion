@@ -36,9 +36,6 @@
               	<input type="text" ng-model="fData.contacto" class="form-control input-sm"   readonly="readonly"
 									placeholder="Busque Contacto" typeahead-loading="loadingCT" uib-typeahead="item as item.contacto for item in getContactoAutocomplete($viewValue)"
 	            		typeahead-on-select="getSelectedContacto($item, $model, $label)" typeahead-min-length="2" autocomplete ="off" ng-blur="validateContacto();" tabindex="140" /> 
-<!-- 	            	<span class="input-group-btn">
-	                <button class="btn btn-default btn-sm" type="button" ng-click="btnBusquedaContacto();" tabindex="150"><i class="fa fa-search"></i> </button>
-	              </span> -->
 	            </div>
 	            <i ng-show="loadingCT" class="fa fa-refresh"></i>
 	            <div ng-show="noResultsCT" class="text-danger">
@@ -70,17 +67,14 @@
 				<fieldset >
 					<legend class="lead lead-sm"> Datos de la Venta 
 						<div class="pull-right text-right">
-              <small class="text-default block" style="font-size: 18px;" > <strong>{{ fData.num_serie_correlativo }}</strong>
-                  <button tooltip-placement="bottom" tooltip="Actualizar" title="" type="button" class="btn btn-xs btn-warning" uib-tooltip="Actualizar" 
-                  	ng-click="metodos.generarSerieCorrelativo(true); $event.preventDefault();" > <i class="icon-reload"></i> </button>
-              </small>  
+              <small class="text-default block" style="font-size: 18px;" > <strong>{{ fData.num_serie_correlativo }}</strong></small>  
             </div>
 					</legend>
 					<div class="form-group-sm pull-in clearfix " > 
 						<div class="col-md-3 col-sm-12">
 							<label class="control-label text-ellipsis"> Sede </label>
               <select class="form-control input-sm" ng-model="fData.sede" ng-options="item as item.descripcion for item in fArr.listaSedes" 
-              	tabindex="190"> </select> 
+              	tabindex="190" disabled > </select> 
           	</div>
           	<div class="col-md-3 col-sm-12">
               <label class="control-label text-ellipsis"> Comprobante </label> 

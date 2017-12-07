@@ -251,7 +251,8 @@ class Venta extends CI_Controller {
 			'tipo_documento_mov'=> array(
 				'id'=> $fila['idtipodocumentomov'],
 				'descripcion'=> $fila['descripcion_tdm']
-			),			
+			),
+			'num_serie_correlativo'=> $fila['numero_serie'].' - '.$fila['numero_correlativo'],
 			'idmovimiento'=> $fila['idmovimiento'],
 			'num_nota_pedido'=> $fila['num_nota_pedido'],
 			'sede'=> array(

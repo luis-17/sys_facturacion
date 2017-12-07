@@ -301,8 +301,12 @@ app.controller('EditarVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox',
         }).shift(); 
         $scope.fData.moneda = objIndex; 
 
+        var myCallbackUM = function() { 
+          $scope.fData.temporal.unidad_medida = $scope.fArr.listaUnidadMedida[0]; 
+        }
+        $scope.metodos.listaUnidadMedida(myCallbackUM); 
 
-        $scope.fData.temporal.unidad_medida = $scope.unidadMedidaOptions[0];
+        //$scope.fData.temporal.unidad_medida = $scope.fArr.listaUnidadMedida[0]; //$scope.unidadMedidaOptions[0];
         // // estado cotizacion
         // var objIndex = $scope.fArr.listaEstadosCotizacion.filter(function(obj) { 
         //   return obj.id == $scope.fData.estado_cotizacion.id;
@@ -310,10 +314,7 @@ app.controller('EditarVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox',
         // $scope.fData.estado_cotizacion = objIndex; 
 
         // unidad de medida 
-        var myCallbackUM = function() { 
-          $scope.fData.temporal.unidad_medida = $scope.fArr.listaUnidadMedida[0]; 
-        }
-        $scope.metodos.listaUnidadMedida(myCallbackUM); 
+        
         //pinesNotifications.notify({ title: 'OK!', text: rpta.message, type: 'success', delay: 2500 });
       }else{
         // $scope.fData.cliente = {}; 
@@ -657,11 +658,11 @@ app.controller('EditarVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox',
   UnidadMedidaServices.sListarCbo().then(function (rpta){
       console.log(rpta,'rpta')
       angular.forEach(rpta.datos, function (val,index) {
-        $scope.arrTemporal = {
+        var arrTemp = {
           'id': val.id,
           'descripcion': val.descripcion,
         }
-      $scope.unidadMedidaOptions.push($scope.arrTemporal);
+      $scope.unidadMedidaOptions.push(arrTemp);
       });
   });
 
@@ -689,7 +690,10 @@ app.controller('EditarVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox',
       // { field: 'unidad_medida', type:'object', displayName: 'U. MED.', width: 90, enableCellEdit: false, enableSorting: false, 
       //   cellTemplate:'<div class="ui-grid-cell-contents text-center ">'+ '{{ COL_FIELD.descripcion }}</div>' 
       // },
-      { field: 'unidad_medida', displayName: 'U. MED.', width: 90, editableCellTemplate: 'ui-grid/dropdownEditor',     editDropdownIdLabel: 'id', editDropdownValueLabel: 'descripcion', editDropdownOptionsArray: $scope.unidadMedidaOptions,cellFilter: 'griddropdown:this',cellClass:'ui-editCell text-center'},      
+      { field: 'unidad_medida', displayName: 'U. MED.', width: 90, editableCellTemplate: 'ui-grid/dropdownEditor', editDropdownValueLabel: 'descripcion',
+        cellFilter: 'griddropdownedit:this',cellClass:'ui-editCell text-center',editDropdownOptionsArray: $scope.unidadMedidaOptions
+        //, cellTemplate: '<div class="text-center ui-grid-cell-contents"> {{ COL_FIELD.descripcion }} </div>'
+      },      
       { field: 'precio_unitario', displayName: 'P. UNIT', width: 80, enableCellEdit: true, enableSorting: false, cellClass:'ui-editCell text-right' },
       { field: 'importe_sin_igv', displayName: 'IMPORTE SIN IGV', width: 120, enableCellEdit: false, enableSorting: false, cellClass:'text-right', visible: true },
       { field: 'igv', displayName: 'IGV', width: 80, enableCellEdit: false, enableSorting: false, cellClass:'text-right', visible:true },
@@ -707,7 +711,7 @@ app.controller('EditarVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox',
           { id: 2, agrupacion: 'GRUPO 2' },
           { id: 3, agrupacion: 'GRUPO 3' },
           { id: 4, agrupacion: 'GRUPO 4' }
-        ]//,cellTemplate: '<div class="ui-grid-cell-contents text-center ">'+ '{{ COL_FIELD }}</div>' 
+        ]//,cellTemplate: '<div class="ui-grid-cell-contents text-center ">'+ '{{ COL_FIELD }}</div>'  
       },
       { field: 'accion', displayName: 'ACCIÓN', width: 110, enableCellEdit: false, enableSorting: false, 
         cellTemplate:'<div class="m-xxs text-center">'+ 
@@ -761,6 +765,7 @@ app.controller('EditarVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox',
             rowEntity.igv = (0.18 * rowEntity.importe_sin_igv).toFixed($scope.fConfigSys.num_decimal_precio_key);
           }
         }
+        console.log(rowEntity,'rowEntityrowEntity',$scope.fConfigSys.num_decimal_precio_key,'$scope.fConfigSys.num_decimal_precio_key');
         $scope.calcularTotales();
         $scope.$apply();
       });
@@ -1292,10 +1297,10 @@ app.controller('EditarVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox',
     $('#temporalElemento').focus();
   }
   $scope.grabar = function() { 
-    if($scope.fData.isRegisterSuccess){
-      pinesNotifications.notify({ title: 'Advertencia.', text: 'La venta ya fue registrada', type: 'warning', delay: 3000 });
-      return false;
-    }
+    // if($scope.fData.isRegisterSuccess){
+    //   pinesNotifications.notify({ title: 'Advertencia.', text: 'La venta ya fue registrada', type: 'warning', delay: 3000 });
+    //   return false;
+    // }
     if( $scope.fData.tipo_documento_cliente.destino == 1 ){ // empresa 
       if( $scope.fData.cliente.razon_social == '' || $scope.fData.cliente.razon_social == null || $scope.fData.cliente.razon_social == undefined ){
         $scope.fData.num_documento = null;
@@ -1381,22 +1386,28 @@ app.filter('mapAgrupacion', function() {
     }
   };
 });
-
-app.filter('griddropdown', function() {
-    return function (input, context) {
-      var map = context.col.colDef.editDropdownOptionsArray;
-      var idField = context.col.colDef.editDropdownIdLabel;
-      var valueField = context.col.colDef.editDropdownValueLabel;
-      var initial = context.row.entity[context.col.field];
-      if (typeof map !== "undefined") {
-        for (var i = 0; i < map.length; i++) {
-          if (map[i][idField] == input) {
-            return map[i][valueField];
-          }
+app.filter('griddropdownedit', function() {
+  return function (input, context) { 
+    var map = context.col.colDef.editDropdownOptionsArray;
+    var idField = context.col.colDef.editDropdownIdLabel;
+    var valueField = context.col.colDef.editDropdownValueLabel;
+    var initial = context.row.entity[context.col.field]; 
+    if (typeof map !== "undefined") {
+      for (var i = 0; i < map.length; i++) {
+        if (map[i][valueField] == input.descripcion) { 
+          return map[i][valueField];
         }
-      } else if (initial) {
-        return initial;
       }
-      return input;
-    };
+    } else if (initial) {
+      return initial;
+    }
+    var objIndex = map.filter(function(obj) { 
+      return obj.id == input; 
+    }).shift(); 
+    if (typeof objIndex === "undefined") { 
+      return null;
+    }else{
+      return objIndex[valueField]; 
+    }
+  };
 });

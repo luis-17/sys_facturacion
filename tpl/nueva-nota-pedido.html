@@ -118,7 +118,7 @@
               <span class="help-block m-b-none f-10"> <a href="" class="text-info pull-right" ng-click="metodos.verPlazosPago"> VER PLAZOS DE PAGO. </a> </span> 
           	</div>
           	<div class="col-md-3 col-sm-6 col-xs-12">
-              <label class="control-label"> Colaborador </label> 
+              <label class="control-label"> Generado por: </label> 
               <label class="control-label text-info text-bold text-ellipsis"> {{ fSessionCI.nombres + ' ' + fSessionCI.apellidos }} </label> 
           	</div>
           </div>
@@ -126,18 +126,7 @@
 			</div>
 			<div class="col-xs-12" >
 				<fieldset >
-					<legend class="lead lead-sm"> Detalle de Pedido 
-						<!-- <div class="btn-group pull-right">
-              <button type="button" class="btn btn-success dropdown-toggle btn-xs" data-toggle="dropdown">
-                  <i class="fa fa-tasks"> </i>  ACCIONES <span class="caret"></span>
-              </button>
-              <ul class="dropdown-menu" role="menu">
-                  <li><a href="" ng-click='btnNuevoProducto();'><i class="fa fa-file"></i> Nuevo Producto </a></li>
-                  <li><a href="" ng-click='btnNuevoServicio();'><i class="fa fa-file"></i> Nuevo Servicio </a></li>
-                  <li><a href="" ng-click="btnBusquedaElemento();"><i class="fa fa-search"></i> Buscar </a></li>
-              </ul>
-            </div> -->
-					</legend> 
+					<legend class="lead lead-sm"> Detalle de Pedido </legend> 
 					<div class="form-group-sm pull-in clearfix"> 
 						<div class="col-md-3 col-sm-6">
               <label class="control-label"> Buscar por N° de Cotización </label>
@@ -155,18 +144,13 @@
 	                <i class="fa fa-remove"></i> No se encontró resultados 
 	            </div>
           	</div>
-          	<!-- -->
           	<div class="col-md-3 col-sm-6 col-xs-12"> 
 	            <a style="margin-top: 24px;" ng-disabled="!(fData.cliente.id)" class="btn btn-default btn-sm" ng-click="buscarCotizacionMultiple(); $event.preventDefault();" 
 	            	tabindex="320"> BÚSQUEDA MÚLTIPLE... </a> 
 	          </div> 
-	          <!-- <div class="col-md-6 col-sm-6 col-xs-12 "> 
-          		<a style="margin-top: 22px;" href="" class="btn btn-info btn-sm pull-right" ng-click="btnBusquedaCotizacionAvanzado(); $event.preventDefault();" tabindex="310"> BÚSQUEDA AVANZADA </a> 
-	          </div> -->
 					</div>
 					<div class="form-group-sm pull-in clearfix">
 						<div class="col-xs-12"> 
-	            <!-- <label class="control-label hidden"> Agregar al detalle: </label> -->
 	            <div ui-if="gridOptions.data.length>0" ui-grid="gridOptions" ui-grid-edit ui-grid-resize-columns ui-grid-auto-resize class="grid table-responsive fs-mini-grid" 
 	            	style="overflow: hidden;" ng-style="getTableHeight();"></div>
 	          </div>
@@ -176,48 +160,53 @@
 			<div class="col-xs-12" >
 				<fieldset>
 					<div class="row">
-						<div class="col-md-6 col-sm-6"> 
+						<div class="col-md-8 col-sm-8"> 
 							<div class="row">
-								<div class="col-xs-12">
+								<div class="col-sm-12">
 									<h4 class="text-info m-n"> Configuración avanzada. </h4> 
-								</div>
-								<div class="col-sm-6 col-xs-12">
-									<div class="checkbox">
-										<label>
-				              <input type="checkbox" ng-true-value="1" ng-false-value="2" ng-model="fData.incluye_tras_prov" class="" tabindex="330" /> Incluye traslado a provincia 
-				            </label>
-									</div>
-				          <div class="checkbox"> 
-				          	<label>
-				              <input type="checkbox" ng-true-value="1" ng-false-value="2" ng-model="fData.incluye_entr_dom" class="" tabindex="340" /> Incluye entrega a domicilio 
-				            </label>
-				          </div> 
-								</div>
-								<div class="col-sm-6 col-xs-12" style="margin-top: -15px;"> 
-									<div class="inline-block">
-										<label>
+									<div class="inline mr" style="vertical-align:top;">
+										<div class="checkbox">
+											<label>
+					              <input type="checkbox" ng-true-value="1" ng-false-value="2" ng-model="fData.incluye_tras_prov" class="" tabindex="330" /> Incluye traslado a provincia 
+					            </label>
+										</div>
+					          <div class="checkbox"> 
+					          	<label>
+					              <input type="checkbox" ng-true-value="1" ng-false-value="2" ng-model="fData.incluye_entr_dom" class="" tabindex="340" /> Incluye entrega a domicilio 
+					            </label>
+					          </div> 
+					        </div> 
+									<div class="inline mr mt-sm">
+										<label class="block">
 											<span> Plazo de entrega (en días) </span>
-				              <input type="text" ng-model="fData.plazo_entrega" placeholder="En días útiles" class="form-control input-xs" style="display:inline;" tabindex="350"> 
+				              <input type="text" ng-model="fData.plazo_entrega" placeholder="En días útiles" class="form-control input-xs" 
+				              	style="display:inline;width: 60px;" tabindex="350"> 
+				            </label> 
+				            <label class="block"> 
+				          		<span> Validez de oferta (en días) </span> 
+				              <input type="text" ng-model="fData.validez_oferta" placeholder="Cant. de días" class="form-control input-xs" 
+				              	style="display:inline;width: 60px;" tabindex="360"> 
 				            </label>
 									</div>
-				          <div class="inline-block"> 
-				          	<label> 
-				          		<span> Validez de oferta (en días) </span> 
-				              <input type="text" ng-model="fData.validez_oferta" placeholder="Cant. de días" class="form-control input-xs" style="display:inline;" tabindex="360"> 
-				            </label>
-				          </div> 
+				          <div class="inline mr" style="vertical-align:top;margin-left:40px;"> 
+					          <label class="radio">
+											<input type="radio" name="optionsRadios" id="optionsRadios1" value="2" ng-model="fData.modo_igv" ng-change="cambiarModo();calcularImporte();" checked tabindex="370">
+											Precios no incluye IGV
+										</label>
+										<label class="radio">
+											<input type="radio" name="optionsRadios" id="optionsRadios2" value="1" ng-model="fData.modo_igv" ng-change="cambiarModo();calcularImporte();" tabindex="380">
+											Precios incluye IGV
+										</label>
+									</div>
+								</div>
+								<div class="col-xs-12 col-md-9">
+								<div class="mr" style="vertical-align:top;"> 
+										<label> Observaciones</label>
+										<textarea class="form-control input-sm" ng-model="fData.observaciones" tabindex="385"></textarea>
+									</div>
 								</div>
 							</div>
-				    </div>
-				    <div class="col-md-2 col-sm-6" style="margin-top:15px;">
-				      <label class="radio">
-								<input type="radio" name="optionsRadios" id="optionsRadios1" value="2" ng-model="fData.modo_igv" ng-change="cambiarModo();calcularImporte();" checked tabindex="370">
-								Precios no incluye IGV
-							</label>
-							<label class="radio">
-								<input type="radio" name="optionsRadios" id="optionsRadios2" value="1" ng-model="fData.modo_igv" ng-change="cambiarModo();calcularImporte();" tabindex="380">
-								Precios incluye IGV
-							</label>
+							
 				    </div>
 		        <div class="col-md-4 col-sm-6">
 		        	<div class="row">
@@ -238,6 +227,9 @@
 		            </div>
 		          </div>
 	          </div>	
+	          <!-- <div class="col-md-12">
+	          	
+	          </div> -->
 					</div>
 				</fieldset>
 	    </div>

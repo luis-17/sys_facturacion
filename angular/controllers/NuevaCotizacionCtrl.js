@@ -209,6 +209,7 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     }
     if( !(newValue) ){
       $scope.fData.cliente = {};
+      $scope.fData.contacto = null;
       $scope.fData.classEditCliente = 'disabled';
     }
   }, true);
@@ -914,6 +915,17 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     }; 
     CaracteristicaFactory.regCaracteristicaModal(arrParams); 
   }
+  $scope.unidadMedidaOptions = [];
+  UnidadMedidaServices.sListarCbo().then(function (rpta){
+      console.log(rpta,'rpta')
+      angular.forEach(rpta.datos, function (val,index) {
+        $scope.arrTemporal = {
+          'id': val.id,
+          'descripcion': val.descripcion,
+        }
+      $scope.unidadMedidaOptions.push($scope.arrTemporal);
+      });
+  });
   // CESTA DE ELEMENTOS 
   $scope.mySelectionGrid = [];
   $scope.gridOptions = { 
@@ -935,9 +947,13 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
         }
       },
       { field: 'cantidad', displayName: 'CANT.', width: 80, enableCellEdit: true, enableSorting: false, cellClass:'ui-editCell text-center' },
-      { field: 'unidad_medida', type:'object', displayName: 'U. MED.', width: 90, enableCellEdit: false, enableSorting: false, 
-        cellTemplate:'<div class="ui-grid-cell-contents text-center ">'+ '{{ COL_FIELD.descripcion }}</div>' 
-      },
+      
+      { field: 'unidad_medida', displayName: 'U. MED.', width: 90, editableCellTemplate: 'ui-grid/dropdownEditor', 
+        editDropdownValueLabel: 'descripcion', editDropdownOptionsArray: $scope.unidadMedidaOptions,cellFilter: 'griddropdown:this',cellClass:'ui-editCell text-center'},
+
+      // { field: 'unidad_medida', type:'object', displayName: 'U. MED.', width: 90, enableCellEdit: false, enableSorting: false, 
+      //   cellTemplate:'<div class="ui-grid-cell-contents text-center ">'+ '{{ COL_FIELD.descripcion }}</div>' 
+      // },
       { field: 'precio_unitario', displayName: 'P. UNIT', width: 80, enableCellEdit: true, enableSorting: false, cellClass:'ui-editCell text-right' },
       { field: 'importe_sin_igv', displayName: 'IMPORTE SIN IGV', width: 120, enableCellEdit: false, enableSorting: false, cellClass:'text-right', visible: true },
       { field: 'igv', displayName: 'IGV', width: 80, enableCellEdit: false, enableSorting: false, cellClass:'text-right', visible:true },
@@ -1797,6 +1813,31 @@ app.filter('mapAgrupacion', function() {
       return '';
     } else {
       return agrupacionHash[input];
+    }
+  };
+});
+app.filter('griddropdown', function() {
+  return function (input, context) {
+    var map = context.col.colDef.editDropdownOptionsArray;
+    var idField = context.col.colDef.editDropdownIdLabel;
+    var valueField = context.col.colDef.editDropdownValueLabel;
+    var initial = context.row.entity[context.col.field]; 
+    if (typeof map !== "undefined") {
+      for (var i = 0; i < map.length; i++) {
+        if (map[i][valueField] == input.descripcion) { 
+          return map[i][valueField];
+        }
+      }
+    } else if (initial) {
+      return initial;
+    }
+    var objIndex = map.filter(function(obj) { 
+      return obj.id == input; 
+    }).shift(); 
+    if (typeof objIndex === "undefined") { 
+      return null;
+    }else{
+      return objIndex[valueField]; 
     }
   };
 });
