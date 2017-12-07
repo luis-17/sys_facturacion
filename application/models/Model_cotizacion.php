@@ -419,7 +419,8 @@ class Model_cotizacion extends CI_Model {
 		$data = array(
 			'idcotizacion' => $datos['idcotizacion'],
 			'idelemento' => $datos['id'],
-			'idunidadmedida' => $datos['unidad_medida']['id'],
+			//'idunidadmedida' => $datos['unidad_medida']['id'],
+			'idunidadmedida' => is_array($datos['unidad_medida']) ? $datos['unidad_medida']['id'] : $datos['unidad_medida'], 
 			'cantidad' => $datos['cantidad'],
 			'precio_unitario' => $datos['precio_unitario'],
 			'importe_con_igv' => $datos['importe_con_igv'],
@@ -475,6 +476,7 @@ class Model_cotizacion extends CI_Model {
 		$data = array( 
 			'cantidad' => $datos['cantidad'],
 			'precio_unitario' => $datos['precio_unitario'],
+			'idunidadmedida' => is_array($datos['unidad_medida']) ? $datos['unidad_medida']['id'] : $datos['unidad_medida'], 
 			'importe_con_igv' => $datos['importe_con_igv'],
 			'importe_sin_igv' => $datos['importe_sin_igv'],
 			'excluye_igv' => $datos['excluye_igv'],

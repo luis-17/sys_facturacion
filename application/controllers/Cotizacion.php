@@ -1537,6 +1537,12 @@ class Cotizacion extends CI_Controller {
 				if( empty($elemento['id']) ){
 					$elemento['id'] = @$elemento['idelemento']; 
 				}
+				if( empty($elemento['unidad_medida']) ){ 
+					$elemento['unidad_medida'] = NULL; 
+				}
+				if( empty($elemento['unidad_medida']['id']) ){ 
+					$elemento['unidad_medida'] = NULL; 
+				}
 				if( $this->model_cotizacion->m_registrar_detalle_cotizacion($elemento) ){ 
 					$arrData['message'] = 'Los datos se registraron correctamente - (no caracteristicas)'; 
 					$arrData['flag'] = 1; 
@@ -1622,8 +1628,15 @@ class Cotizacion extends CI_Controller {
     			if( empty($elemento['agrupacion']) ){ 
 					$elemento['agrupacion'] = NULL; // por defecto 
 				}
+				if( empty($elemento['unidad_medida']) ){ 
+					$elemento['unidad_medida'] = NULL; 
+				}
+				if( empty($elemento['unidad_medida']['id']) ){ 
+					$elemento['unidad_medida'] = NULL; 
+				}
     			if( empty($elemento['iddetallecotizacion']) ){
     				// agregar un detalle a cotizacion 
+    				// print_r($elemento); exit(); 
     				if($this->model_cotizacion->m_registrar_detalle_cotizacion($elemento)){
     					$arrData['message'] = 'Los datos se editaron correctamente - (no caracteristicas)'; 
 						$arrData['flag'] = 1; 

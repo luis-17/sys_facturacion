@@ -971,7 +971,8 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
         }
       },
       { field: 'cantidad', displayName: 'CANT.', width: 80, enableCellEdit: true, enableSorting: false, cellClass:'ui-editCell text-center' },
-      { field: 'unidad_medida', displayName: 'U. MED.', width: 90, editableCellTemplate: 'ui-grid/dropdownEditor',     editDropdownIdLabel: 'id', editDropdownValueLabel: 'descripcion', editDropdownOptionsArray: $scope.unidadMedidaOptions,cellFilter: 'griddropdown:this',cellClass:'ui-editCell text-center'},
+      { field: 'unidad_medida', displayName: 'U. MED.', width: 90, editableCellTemplate: 'ui-grid/dropdownEditor', 
+        editDropdownValueLabel: 'descripcion', editDropdownOptionsArray: $scope.unidadMedidaOptions,cellFilter: 'griddropdown:this',cellClass:'ui-editCell text-center'},
       { field: 'precio_unitario', displayName: 'P. UNIT', width: 80, enableCellEdit: true, enableSorting: false, cellClass:'ui-editCell text-right' },
       { field: 'importe_sin_igv', displayName: 'IMPORTE SIN IGV', width: 120, enableCellEdit: false, enableSorting: false, cellClass:'text-right', visible: true },
       { field: 'igv', displayName: 'IGV', width: 80, enableCellEdit: false, enableSorting: false, cellClass:'text-right', visible:true },
@@ -1730,20 +1731,27 @@ app.filter('mapAgrupacion', function() {
 });
 
 app.filter('griddropdown', function() {
-    return function (input, context) {
-      var map = context.col.colDef.editDropdownOptionsArray;
-      var idField = context.col.colDef.editDropdownIdLabel;
-      var valueField = context.col.colDef.editDropdownValueLabel;
-      var initial = context.row.entity[context.col.field];
-      if (typeof map !== "undefined") {
-        for (var i = 0; i < map.length; i++) {
-          if (map[i][idField] == input) {
-            return map[i][valueField];
-          }
+  return function (input, context) {
+    var map = context.col.colDef.editDropdownOptionsArray;
+    //var idField = context.col.colDef.editDropdownIdLabel;
+    var valueField = context.col.colDef.editDropdownValueLabel;
+    var initial = context.row.entity[context.col.field]; 
+    if (typeof map !== "undefined") {
+      for (var i = 0; i < map.length; i++) {
+        if (map[i][valueField] == input.descripcion) { 
+          return map[i][valueField];
         }
-      } else if (initial) {
-        return initial;
       }
-      return input;
-    };
+    } else if (initial) {
+      return initial;
+    }
+    var objIndex = map.filter(function(obj) { 
+      return obj.id == input; 
+    }).shift(); 
+    if (typeof objIndex === "undefined") { 
+      return null;
+    }else{
+      return objIndex[valueField]; 
+    }
+  };
 });
