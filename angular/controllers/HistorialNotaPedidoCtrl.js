@@ -295,7 +295,20 @@ app.controller('HistorialNotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$b
     $scope.mySelectionGrid = [];
   };
   $scope.metodos.getPaginationServerSideNPDet(true); 
-
+  $scope.btnImprimir = function() {
+    // console.log($scope.fData,'$scope.fData');
+    var arrParams = { 
+      titulo: 'NOTA DE PEDIDO',
+      datos:{
+        id: $scope.mySelectionGrid[0].idmovimiento,
+        codigo_reporte: 'NP-FNOTPED'
+      },
+      envio_correo: 'si',
+      salida: 'pdf',
+      url: angular.patchURLCI + "NotaPedido/imprimir_nota_pedido" 
+    }
+    ModalReporteFactory.getPopupReporte(arrParams);
+  }
 
   // $scope.btnImprimir = function() { 
   //   console.log($scope.mySelectionGrid[0],'$scope.mySelectionGrid[0]');

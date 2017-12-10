@@ -491,7 +491,7 @@ app.controller('EditarCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$boot
         $scope.vista = 'agregar';
         $scope.fArr.gridOptionsCR = { 
           useExternalPagination: false,
-          useExternalSorting: true,
+          useExternalSorting: false,
           enableGridMenu: false,
           enableRowSelection: true,
           enableSelectAll: false,
@@ -505,11 +505,11 @@ app.controller('EditarCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$boot
           columnDefs: [ 
             { field: 'idcaracteristica', enableSorting: false, displayName: 'ID', width: '75', enableCellEdit: false, visible: false }, 
             { field: 'orden', displayName: 'ORDEN', width: '100', enableCellEdit: false, enableColumnMenus: false, enableColumnMenu: false, 
-              enableFiltering: false, enableSorting: false, sort: { direction: uiGridConstants.ASC } }, 
-            { field: 'descripcion', enableSorting: false, displayName: 'Descripción', minWidth: 160, enableCellEdit: false }, 
-            { field: 'valor', enableSorting: false, displayName: 'Valor', minWidth: 160, cellClass:'ui-editCell', enableCellEdit: true, 
+              enableFiltering: false, enableSorting: true, sort: { direction: uiGridConstants.ASC }, type:'number' }, 
+            { field: 'descripcion', enableSorting: true, displayName: 'Descripción', minWidth: 160, enableCellEdit: false }, 
+            { field: 'valor', enableSorting: true, displayName: 'Valor', minWidth: 160, cellClass:'ui-editCell', enableCellEdit: true, 
               editableCellTemplate: '<input type="text" ui-grid-editor ng-model="MODEL_COL_FIELD" uib-typeahead="item.descripcion as item.descripcion for item in grid.appScope.getVariableAutocomplete($viewValue)" class="" >'
-            }
+            } 
           ], 
           onRegisterApi: function(gridApi) { 
             $scope.gridApi = gridApi;
@@ -699,6 +699,8 @@ app.controller('EditarCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$boot
     console.log(row,'row');
     var arrFClon = { 
       'id' : row.entity.idelemento,
+      'idelemento' : row.entity.idelemento,
+      'elemento' : row.entity.elemento,
       'descripcion' : row.entity.descripcion,
       'cantidad' : row.entity.cantidad,
       'precio_unitario' : row.entity.precio_unitario,
@@ -819,7 +821,7 @@ app.controller('EditarCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$boot
         console.log('init mee');
         $scope.fArr.gridOptionsCRDet = { 
           useExternalPagination: false,
-          useExternalSorting: true,
+          useExternalSorting: false,
           enableGridMenu: false,
           enableRowSelection: true,
           enableSelectAll: false,
@@ -832,9 +834,9 @@ app.controller('EditarCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$boot
           columnDefs: [ 
             { field: 'idcaracteristica', enableSorting: false, displayName: 'ID', width: '75', enableCellEdit: false, visible: false }, 
             { field: 'orden', displayName: 'ORDEN', width: '100', enableCellEdit: false, enableColumnMenus: false, enableColumnMenu: false, 
-              enableFiltering: false, enableSorting: false, sort: { direction: uiGridConstants.ASC } }, 
-            { field: 'descripcion', enableSorting: false, displayName: 'Descripción', minWidth: 160, enableCellEdit: false }, 
-            { field: 'valor', enableSorting: false, displayName: 'Valor', minWidth: 160, cellClass:'ui-editCell', enableCellEdit: true, 
+              enableFiltering: false, enableSorting: true, sort: { direction: uiGridConstants.ASC }, type:'number' }, 
+            { field: 'descripcion', enableSorting: true, displayName: 'Descripción', minWidth: 160, enableCellEdit: false }, 
+            { field: 'valor', enableSorting: true, displayName: 'Valor', minWidth: 160, cellClass:'ui-editCell', enableCellEdit: true, 
               editableCellTemplate: '<input type="text" ui-grid-editor ng-model="MODEL_COL_FIELD" uib-typeahead="item.descripcion as item.descripcion for item in grid.appScope.getVariableAutocomplete($viewValue)" class="" >'
             }
           ], 

@@ -429,7 +429,6 @@ class NotaPedido extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
-
 	public function imprimir_nota_pedido()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true); 
@@ -547,7 +546,7 @@ class NotaPedido extends CI_Controller {
       	$this->pdf->Cell(3,4,':',0,0,'C'); 
       	$this->pdf->SetFont('Arial','',8); 
       	$this->pdf->MultiCell(55,4,utf8_decode(strtoupper_total($fila['contacto'])));
-  //     	// $this->pdf->Cell(75,6,strtoupper(strtoupper_total(utf8_decode($fila['contacto']))));
+  		// $this->pdf->Cell(75,6,strtoupper(strtoupper_total(utf8_decode($fila['contacto']))));
       	$y3 = $this->pdf->GetY();
       	$this->pdf->SetXY(8,$y3-1); 
       	$this->pdf->SetFont('Arial','B',8); 
@@ -561,7 +560,7 @@ class NotaPedido extends CI_Controller {
       	$this->pdf->Cell(26,4,utf8_decode('DIRECCIÓN ')); 
       	$this->pdf->Cell(3,4,':',0,0,'C'); 
       	$this->pdf->SetFont('Arial','',7); 
-  //     	// $this->pdf->Cell(75,6,utf8_decode(strtoupper_total($fila['direccion_legal_ce'])));
+  		// $this->pdf->Cell(75,6,utf8_decode(strtoupper_total($fila['direccion_legal_ce'])));
       	$this->pdf->MultiCell(75,4,utf8_decode(strtoupper_total($fila['direccion_legal_ce'])));
       	$y1a = $this->pdf->GetY();
       	$this->pdf->SetXY(96,$y1a); 
@@ -569,9 +568,9 @@ class NotaPedido extends CI_Controller {
       	$this->pdf->Cell(26,4,utf8_decode('DIR. DESPACHO')); 
       	$this->pdf->Cell(3,4,':',0,0,'C'); 
       	$this->pdf->SetFont('Arial','',7); 
-  //     	// $this->pdf->Cell(75,6,strtoupper(strtoupper_total($fila['direccion_guia'])));
+  		// $this->pdf->Cell(75,6,strtoupper(strtoupper_total($fila['direccion_guia'])));
       	$this->pdf->MultiCell(75,4,utf8_decode(strtoupper_total($fila['direccion_guia'])));
-  //     	// var_dump(strlen($fila['direccion_guia']));exit();
+  		// var_dump(strlen($fila['direccion_guia']));exit();
       	$y1b = $this->pdf->GetY();
       	$this->pdf->SetXY(96,$y1b); 
       	$this->pdf->SetFont('Arial','B',8); 
@@ -579,9 +578,6 @@ class NotaPedido extends CI_Controller {
       	$this->pdf->Cell(3,6,':',0,0,'C'); 
       	$this->pdf->SetFont('Arial','',7); 
       	$this->pdf->Cell(75,6,strtoupper($fila['telefono_ce']));
-
-
-
 
 		if(strlen($fila['direccion_guia'])> 44){$sumY= 4;}else{$sumY= 0;} 
       	$this->pdf->SetXY(8,$y3+5+$sumY); 
@@ -686,11 +682,6 @@ class NotaPedido extends CI_Controller {
 	    		$rowAux = array(
 		    		'iddetallemovimiento' =>$value['iddetallemovimiento'],
 		    		'descripcion_ele' =>$value['descripcion_ele'],
-		    		// 'cantidad' =>$value['cantidad'],
-		    		// 'abreviatura_um' =>$value['abreviatura_um'],
-		    		// 'precio_unitario' =>$value['precio_unitario'],
-		    		// 'importe_con_igv' =>$value['importe_con_igv'],
-		    		// 'importe_sin_igv' =>$value['importe_sin_igv'],
 		    		'num_agrupacion' =>$value['agrupador_totalizado'],
 		    		'agrupado' => TRUE,
 		    		'detallesubitems' => array(),
@@ -866,48 +857,49 @@ class NotaPedido extends CI_Controller {
 				$this->pdf->SetY($GetYElementSelected); 
 			}
 			$this->pdf->Cell(194,0.8,'','B',1,'C',0); 
-			
 	    }
-	    $this->pdf->SetXY(8,-34); 
-	    $this->pdf->SetFont('Arial','B',9);
-	    $en_letra = ValorEnLetras($fila['total'],$fila['moneda_str_completo']);
+	    //$this->pdf->SetXY(8,-34); 
+	    
+	    //$en_letra = ValorEnLetras($fila['total'],$fila['moneda_str_completo']);
 	    // if (array_values($arrGroupBy)[0]['agrupado']==false) {
 	    // $this->pdf->Cell(140,5,'TOTAL SON: ' . utf8_decode($en_letra));
 	    // }
-	    $this->pdf->SetXY(8,-23); 
-	    $this->pdf->SetFont('Arial','',8);
-	    $bancoEmpresa = $this->model_banco_empresa_admin->m_cargar_cuentas_banco_por_filtros($fila['idempresaadmin'],$fila['moneda']);
+	    //$this->pdf->SetXY(8,-23); 
+	    //$this->pdf->SetFont('Arial','',8);
+	    //$bancoEmpresa = $this->model_banco_empresa_admin->m_cargar_cuentas_banco_por_filtros($fila['idempresaadmin'],$fila['moneda']);
  		//$this->pdf->SetTextColor(0,0,0);
-   		$this->pdf->SetFont('Arial','',9);
-	    foreach ($bancoEmpresa as $key => $value) {
-	    	$this->pdf->Cell(40,5,'Cta. Cte. '.$value['abreviatura_ba'].' '. utf8_decode($fila['moneda_str']),0,0,'L',0); 	  
-	    }
-	    $this->pdf->SetXY(8,-19); 
-	    foreach ($bancoEmpresa as $key => $value) {
-	    	$this->pdf->Cell(40,5,$value['num_cuenta'],0,0,'L',0); 	  
-	    }
-	    
+   		// $this->pdf->SetFont('Arial','',9);
+	    // foreach ($bancoEmpresa as $key => $value) {
+	    // 	$this->pdf->Cell(40,5,'Cta. Cte. '.$value['abreviatura_ba'].' '. utf8_decode($fila['moneda_str']),0,0,'L',0); 	  
+	    // }
+	    // $this->pdf->SetXY(8,-19); 
+	    // foreach ($bancoEmpresa as $key => $value) {
+	    // 	$this->pdf->Cell(40,5,$value['num_cuenta'],0,0,'L',0); 	  
+	    // }
+	    $this->pdf->SetFont('Arial','B',9);
+	    $this->pdf->SetXY(8,-40);
+	    $this->pdf->Cell(20,6,"OBSERVACIONES:"); 
 	    $this->pdf->SetXY(8,-35); 
-	 //    if (array_values($arrGroupBy)[0]['agrupado']==false) {
-	 //    $this->pdf->SetFont('Arial','',8);
-	 //    $this->pdf->SetWidths(array(138));
-	 //    // $this->pdf->TextArea(array(empty($fila['motivo_movimiento'])? '':$fila['motivo_movimiento']),0,0,FALSE,5,20);
-	 //    $this->pdf->Cell(150,20,'');
-	 //    $this->pdf->Cell(20,6,'SUBTOTAL:','LT',0,'R');
-	 //    $this->pdf->SetFont('Arial','',8);
-	 //    $this->pdf->Cell(20,6,$simbolo . number_format($fila['subtotal'],$fConfig['num_decimal_total_key'],'.',' '),'TR',0,'R');
-	 //    $this->pdf->Ln(6);
-	 //    $this->pdf->SetFont('Arial','',8);
-	 //    $this->pdf->Cell(150,6,'');
-	 //    $this->pdf->Cell(20,6,'IGV:','L',0,'R');
-	 //    $this->pdf->SetFont('Arial','',8);
-	 //    $this->pdf->Cell(20,6,$simbolo . number_format($fila['igv'],$fConfig['num_decimal_total_key'],'.',' '),'R',0,'R');
-	 //    $this->pdf->Ln(6);
-	 //    $this->pdf->SetFont('Arial','B',9);
-	 //    $this->pdf->Cell(150,8,'');
-	 //    $this->pdf->Cell(20,8,'TOTAL:','TLB',0,'R');
-	 //    $this->pdf->Cell(20,8,$simbolo . number_format($fila['total'],$fConfig['num_decimal_total_key'],'.',' '),'TRB',0,'R');
-		// }
+		$this->pdf->SetFont('Arial','',8);
+		$this->pdf->SetWidths(array(138));
+		$this->pdf->TextArea(array(empty($fila['observaciones_np'])? '':$fila['observaciones_np']),0,0,FALSE,5,20);
+
+		$this->pdf->SetXY(8,-35); 
+		$this->pdf->Cell(150,20,'');
+		$this->pdf->Cell(20,6,'SUBTOTAL:','LT',0,'R');
+		$this->pdf->SetFont('Arial','',8);
+		$this->pdf->Cell(20,6,$simbolo . number_format($fila['subtotal'],$fConfig['num_decimal_total_key'],'.',' '),'TR',0,'R');
+		$this->pdf->Ln(6);
+		$this->pdf->SetFont('Arial','',8);
+		$this->pdf->Cell(150,6,'');
+		$this->pdf->Cell(20,6,'IGV:','L',0,'R');
+		$this->pdf->SetFont('Arial','',8);
+		$this->pdf->Cell(20,6,$simbolo . number_format($fila['igv'],$fConfig['num_decimal_total_key'],'.',' '),'R',0,'R');
+		$this->pdf->Ln(6);
+		$this->pdf->SetFont('Arial','B',9);
+		$this->pdf->Cell(150,8,'');
+		$this->pdf->Cell(20,8,'TOTAL:','TLB',0,'R');
+		$this->pdf->Cell(20,8,$simbolo . number_format($fila['total'],$fConfig['num_decimal_total_key'],'.',' '),'TRB',0,'R');
 	    // $this->pdf->Cell(30,8,$simbolo . substr($fila['total_a_pagar'], 4),'TRB',0,'R');
 	    // $this->pdf->Ln(15);
 	    // $monto = new EnLetras();
@@ -1015,6 +1007,34 @@ class NotaPedido extends CI_Controller {
 		    	->set_output(json_encode($arrData));
 		    return;
     	} 
+
+    	$fConfig = obtener_parametros_configuracion(); 
+		$cantCaracteres = 6; // NP(2) + SEDE(2) + AÑO(2) 
+		if($fConfig['incluye_mes_en_codigo_np'] == 'si'){
+			$cantCaracteres += 2;
+		}
+		if($fConfig['incluye_dia_en_codigo_np'] == 'si'){
+			$cantCaracteres += 2;
+		}
+		$numCaracteres = $fConfig['cant_caracteres_correlativo_np']; 
+		$numCorrelativo = substr($allInputs['num_nota_pedido'], ($numCaracteres * -1), $numCaracteres); 
+
+		$numCorrelativoAnterior = $numCorrelativo - 1; 
+		if($numCorrelativoAnterior >= 1 ){
+			$numNPAnterior = substr($allInputs['num_nota_pedido'], 0,$cantCaracteres); 
+			$numNPAnterior .= str_pad($numCorrelativoAnterior, $numCaracteres, '0', STR_PAD_LEFT); 
+			// var_dump($numNPAnterior); exit();
+			$fNPAnterior = $this->model_nota_pedido->m_cargar_esta_nota_pedido_por_codigo($numNPAnterior); 
+			if( empty($fNPAnterior) ){ 
+				$arrData['message'] = 'El N° de Nota de Pedido <strong>'.$allInputs['num_nota_pedido'].'</strong> está errado para la empresa <strong>'.$this->sessionFactur['nombre_comercial'].'</strong>'; 
+	    		$arrData['flag'] = 0;
+	    		$this->output
+			    	->set_content_type('application/json')
+			    	->set_output(json_encode($arrData));
+			    return;
+			}
+		}
+		
     	// var_dump($allInputs); exit(); 
     	$this->db->trans_start();
     	if( $allInputs['tipo_documento_cliente']['destino'] == 1 ){ // cliente empresa 
@@ -1050,9 +1070,8 @@ class NotaPedido extends CI_Controller {
 				} 
 			}
 			// actualizar las cotizaciones a "PEDIDO" 
-			$boolEstado = 3; //PEDIDO 
 			$arrCotizaciones = array_unique($arrCotizaciones); 
-			if( $this->model_cotizacion->m_actualizar_estado_cotizaciones($arrCotizaciones,$boolEstado) ){ 
+			if( $this->model_cotizacion->m_actualizar_estado_cotizaciones_a_pedido($arrCotizaciones) ){ 
 				$arrData['message'] .= '<br/> - Se actualizó el estado de las cotizaciones seleccionadas.';  
 			}
 		} 

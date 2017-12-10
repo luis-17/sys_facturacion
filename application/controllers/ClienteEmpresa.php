@@ -71,7 +71,7 @@ class ClienteEmpresa extends CI_Controller {
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
     	$arrData['flag'] = 0;
-    	// VALIDACIONES
+    	// VALIDACIONES 
 	    /* VALIDAR SI EL RUC YA EXISTE */ 
     	$fCliente = $this->model_cliente_empresa->m_validar_cliente_empresa_num_documento($allInputs['ruc']);
     	if( !empty($fCliente) ) {

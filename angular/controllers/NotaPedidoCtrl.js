@@ -465,7 +465,7 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
           pageNumber: 1,
           firstRow: 0,
           pageSize: 100,
-          sort: uiGridConstants.ASC,
+          sort: uiGridConstants.DESC,
           sortName: null,
           search: null
         };
@@ -482,7 +482,7 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
           enableFullRowSelection: true,
           multiSelect: false,
           columnDefs: [ 
-            { field: 'id', name: 'idcontacto', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
+            { field: 'id', name: 'co.idcontacto', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
             { field: 'nombres', name: 'nombres', displayName: 'Nombre', minWidth: 120 },
             { field: 'apellidos', name: 'apellidos', displayName: 'Apellidos', minWidth: 120 },
             { field: 'razon_social', name: 'razon_social', displayName: 'Empresa', minWidth: 140 },
@@ -493,6 +493,7 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
             gridApi.selection.on.rowSelectionChanged($scope,function(row){
               $scope.mySelectionGridCO = gridApi.selection.getSelectedRows();
               $scope.fData.contacto = $scope.mySelectionGridCO[0].contacto;
+              $scope.fData.idcontacto = $scope.mySelectionGridCO[0].id;
               $scope.fData.cliente = $scope.mySelectionGridCO[0].cliente_empresa; 
               $scope.fData.num_documento = $scope.mySelectionGridCO[0].cliente_empresa.ruc; 
               $scope.fData.classEditCliente = '';
@@ -528,7 +529,7 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
             });
           }
         }; 
-
+        paginationOptionsCO.sortName = $scope.gridOptionsCO.columnDefs[0].name; 
         $scope.metodos.getPaginationServerSideCO = function(loader) { 
           if(loader){
             blockUI.start('Procesando información...'); 
@@ -1188,9 +1189,10 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
           data: [],
           columnDefs: [ 
             { field: 'id', displayName: 'ID', width: '75', enableCellEdit: false, visible: false },
-            { field: 'orden', displayName: 'ORDEN', width: '100', enableCellEdit: false },
-            { field: 'descripcion', displayName: 'Descripción', minWidth: 160, enableCellEdit: false }, 
-            { field: 'valor', displayName: 'Valor', minWidth: 160, cellClass:'ui-editCell', enableCellEdit: true, sort: { direction: uiGridConstants.ASC }, 
+            { field: 'orden', displayName: 'ORDEN', width: '100', enableCellEdit: false, sort: { direction: uiGridConstants.ASC }, type:'number',
+              enableFiltering: false, enableSorting: true, enableColumnMenus: false, enableColumnMenu: false },
+            { field: 'descripcion', enableSorting: true, displayName: 'Descripción', minWidth: 160, enableCellEdit: false }, 
+            { field: 'valor', enableSorting: true, displayName: 'Valor', minWidth: 160, cellClass:'ui-editCell', enableCellEdit: true, 
               editableCellTemplate: '<input type="text" ui-grid-editor ng-model="MODEL_COL_FIELD" uib-typeahead="item.descripcion as item.descripcion for item in grid.appScope.getVariableAutocomplete($viewValue)" class="" >'
             } 
           ], 
@@ -1272,7 +1274,7 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
     $scope.fData.total = MathFactory.redondear(total).toFixed($scope.fConfigSys.num_decimal_total_key);
   }
   $scope.calcularImporte = function (){ 
-    if( !$scope.fData.temporal.precio_unitario ){
+    if( !$scope.fData.temporal.precio_unitario ){ 
       return false; 
     }
     if(angular.isObject($scope.fData.temporal.elemento) ){ 
@@ -1360,13 +1362,13 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
     });
   }
 
-  $scope.imprimir = function() {
-    console.log($scope.fData,'$scope.fData');
+  $scope.btnImprimir = function() {
+    // console.log($scope.fData,'$scope.fData');
     var arrParams = { 
-      titulo: 'VISTA PREVIA DE NOTA PEDIDO',
+      titulo: 'NOTA DE PEDIDO',
       datos:{
         id: $scope.fData.idnotapedidoanterior,
-        codigo_reporte: 'COT-FCOT'
+        codigo_reporte: 'NP-FNOTPED'
       },
       envio_correo: 'si',
       salida: 'pdf',

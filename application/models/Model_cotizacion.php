@@ -302,13 +302,18 @@ class Model_cotizacion extends CI_Model {
 		}
 		return $this->db->get()->result_array();  
 	}
-	public function m_cargar_esta_cotizacion_por_codigo($numCoti)
+	public function m_cargar_esta_cotizacion_por_codigo($numCoti,$validate=FALSE,$numCaracteres=NULL)
 	{
 		$this->db->select('co.idcotizacion, co.num_cotizacion');
 		$this->db->from('cotizacion co');
 		$this->db->join('sede se', 'co.idsede = se.idsede');
 		$this->db->where_in('co.estado_cot',array(0,1,2,3)); // todos 
-		$this->db->where('co.num_cotizacion',$numCoti);
+		//var_dump($validate); exit();
+		if($validate){
+			$this->db->where('RIGHT(co.num_cotizacion,'.$numCaracteres.')',$numCoti); 
+		}else{
+			$this->db->where('co.num_cotizacion',$numCoti); 
+		}
 		$this->db->where('co.idempresaadmin',$this->sessionFactur['idempresaadmin']);
 		$this->db->limit(1);
 		return $this->db->get()->row_array();
@@ -441,15 +446,15 @@ class Model_cotizacion extends CI_Model {
 		);
 		return $this->db->insert('detalle_caracteristica', $data); 
 	} 
-	public function m_actualizar_estado_cotizaciones($arrCotizacion, $boolEstado)
-	{
-		$data = array(
-			'estado_cot' => $boolEstado,
-			'fecha_envio' => date('Y-m-d H:i:s')
-		);
-		$this->db->where_in('idcotizacion',$arrCotizacion); 
-		return $this->db->update('cotizacion', $data); 
-	}
+	// public function m_actualizar_estado_cotizaciones($arrCotizacion, $boolEstado)
+	// {
+	// 	$data = array(
+	// 		'estado_cot' => $boolEstado,
+	// 		'fecha_envio' => date('Y-m-d H:i:s')
+	// 	);
+	// 	$this->db->where_in('idcotizacion',$arrCotizacion); 
+	// 	return $this->db->update('cotizacion', $data); 
+	// }
 	public function m_editar_cotizacion($datos)
 	{
 		$data = array(
@@ -513,9 +518,27 @@ class Model_cotizacion extends CI_Model {
 	public function m_cambiar_estado_enviado($datos)
 	{
 		$data = array(
-			'estado_cot' => 2 // enviado 
+			'estado_cot' => 2, // enviado 
+			'fecha_envio' => date('Y-m-d H:i:s') 
 		);
 		$this->db->where('idcotizacion',$datos['idcotizacion']); 
+		return $this->db->update('cotizacion', $data); 
+	}
+	public function m_cambiar_fecha_enviado($datos)
+	{
+		$data = array( 
+			'fecha_envio' => date('Y-m-d H:i:s')
+		);
+		$this->db->where('idcotizacion',$datos['idcotizacion']); 
+		return $this->db->update('cotizacion', $data); 
+	}
+	public function m_actualizar_estado_cotizaciones_a_pedido($arrCotizacion)
+	{
+		$data = array(
+			'estado_cot' => 3, // PEDIDO  
+			'fecha_pedido' => date('Y-m-d H:i:s')
+		);
+		$this->db->where_in('idcotizacion',$arrCotizacion); 
 		return $this->db->update('cotizacion', $data); 
 	}
 } 

@@ -243,7 +243,7 @@ class Model_nota_pedido extends CI_Model {
 			cp.idclientepersona, (cp.num_documento) AS num_documento_cp, (cp.telefono_movil) AS telefono_movil_cp, (cp.telefono_fijo) AS telefono_fijo_cp, 
 			cp.idtipodocumentocliente AS cp_idtipodocumentocliente, cp.sexo, cp.email,  
 			se.idsede, se.descripcion_se, se.abreviatura_se, fp.idformapago, fp.descripcion_fp, fp.modo_fp, 
-			ct.idcontacto, ct.telefono_fijo, ct.anexo, ct.area_encargada,ea.idempresaadmin, (ea.razon_social) AS razon_social_ea, (ea.nombre_comercial) AS nombre_comercial_ea, (ea.ruc) AS ruc_ea,ea.nombre_logo, ea.direccion_legal, ea.pagina_web, (ea.telefono) AS telefono_ea',FALSE); 
+			ct.idcontacto, ct.telefono_fijo, ct.anexo, ct.area_encargada,ea.idempresaadmin, (ea.razon_social) AS razon_social_ea, (ea.nombre_comercial) AS nombre_comercial_ea, (ea.ruc) AS ruc_ea,ea.nombre_logo, ea.direccion_legal, ea.pagina_web, (ea.telefono) AS telefono_ea, np.observaciones_np',FALSE); 
 		$this->db->from('movimiento np');
 		$this->db->join('empresa_admin ea','np.idempresaadmin = ea.idempresaadmin'); 		
 		$this->db->join("cliente_empresa ce","np.idcliente = ce.idclienteempresa AND np.tipo_cliente = 'E'",'left'); 
@@ -267,6 +267,7 @@ class Model_nota_pedido extends CI_Model {
 		$this->db->join('sede se', 'np.idsede = se.idsede');
 		$this->db->where_in('np.estado_movimiento',array(0,1,2)); // solo "anulado", "registrado" y "facturado" 
 		$this->db->where('np.num_nota_pedido',$numNP);
+		$this->db->where('np.idempresaadmin',$this->sessionFactur['idempresaadmin']);
 		$this->db->where('np.tipo_movimiento',1); // 1 : nota de pedido 
 		$this->db->limit(1);
 		return $this->db->get()->row_array();
@@ -317,7 +318,8 @@ class Model_nota_pedido extends CI_Model {
 			'incluye_traslado_prov' => $datos['incluye_tras_prov'],
 			'incluye_entrega_domicilio' => $datos['incluye_entr_dom'], 
 			'plazo_entrega' => $datos['plazo_entrega'],
-			'validez_oferta' => $datos['validez_oferta'] 
+			'validez_oferta' => $datos['validez_oferta'],
+			'observaciones_np' => nl2br($datos['observaciones']) 
 		); 
 		return $this->db->insert('movimiento', $data); 
 	}

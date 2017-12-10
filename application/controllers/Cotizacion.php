@@ -100,7 +100,8 @@ class Cotizacion extends CI_Controller {
 		$fila = $this->model_cotizacion->m_cargar_cotizacion_por_id($idcotizacion);
 		$detalleLista = $this->model_cotizacion->m_cargar_detalle_cotizacion_por_id($idcotizacion);
 		$rowEstadoId = $fila['estado_cot']; 
-		if( $fila['estado_cot'] == 0 ){ // por enviar
+		$rowEstadoDescripcion = NULL; 
+		if( $fila['estado_cot'] == 0 ){ // anulado 
 			$rowEstadoDescripcion = 'ANULADO'; 
 		}
 		if( $fila['estado_cot'] == 1 ){ // por enviar
@@ -108,6 +109,9 @@ class Cotizacion extends CI_Controller {
 		}
 		if( $fila['estado_cot'] == 2 ){ // enviado
 			$rowEstadoDescripcion = 'ENVIADO'; 
+		}
+		if( $fila['estado_cot'] == 3 ){ // nota pedido
+			$rowEstadoDescripcion = 'PEDIDO'; 
 		}
 		if($fila['moneda'] == 'S'){
 			$strIdMoneda = 1; 
@@ -473,7 +477,7 @@ class Cotizacion extends CI_Controller {
 		if($fConfig['incluye_dia_en_codigo_cot'] == 'si'){
 			$numCotizacion .= date('d'); 
 		}
-		//var_dump($numCotizacion); exit();
+		
 		// OBTENER ULTIMA COTIZACION SEGÚN LOGICA DE CONFIGURACIÓN. 
 		$allInputs['config'] = $fConfig; 
 		$fCotizacion = $this->model_cotizacion->m_cargar_ultima_cotizacion_segun_config($allInputs);
@@ -486,7 +490,9 @@ class Cotizacion extends CI_Controller {
 			//var_dump($numCorrelativo); exit();
 		}
 		//var_dump($numCotizacion); exit();
-		$numCotizacion .= str_pad($numCorrelativo, $numCaracteres, '0', STR_PAD_LEFT);
+		$numCotizacion .= str_pad($numCorrelativo, $numCaracteres, '0', STR_PAD_LEFT); 
+
+		//var_dump($numCotizacion); exit();
 	 	$arrDatos['num_cotizacion'] = $numCotizacion; 
 	 	//var_dump($numCotizacion); exit();
     	$arrData['datos'] = $arrDatos;
@@ -1511,13 +1517,42 @@ class Cotizacion extends CI_Controller {
     	
     	$fCotizacion = $this->model_cotizacion->m_cargar_esta_cotizacion_por_codigo($allInputs['num_cotizacion']);
     	if( !empty($fCotizacion) ){ 
-    		$arrData['message'] = 'Ya se a registrado una cotización, usando el código <strong>'.$allInputs['num_cotizacion'].'</strong>'; 
+    		$arrData['message'] = 'Ya se a registrado una cotización, usando el N° <strong>'.$allInputs['num_cotizacion'].'</strong>'; 
     		$arrData['flag'] = 0;
     		$this->output
 		    	->set_content_type('application/json')
 		    	->set_output(json_encode($arrData));
 		    return;
     	} 
+    	$fConfig = obtener_parametros_configuracion(); 
+		$cantCaracteres = 5; // C(1) + SEDE(2) + AÑO(2) 
+		if($fConfig['incluye_mes_en_codigo_cot'] == 'si'){
+			$cantCaracteres += 2;
+		}
+		if($fConfig['incluye_dia_en_codigo_cot'] == 'si'){
+			$cantCaracteres += 2;
+		}
+		$numCaracteres = $fConfig['cant_caracteres_correlativo_cot']; 
+		$numCorrelativo = substr($allInputs['num_cotizacion'], ($numCaracteres * -1), $numCaracteres); 
+
+		$numCorrelativoAnterior = $numCorrelativo - 1; 
+		$numCorrelativoAnterior = str_pad($numCorrelativoAnterior, $numCaracteres, '0', STR_PAD_LEFT);
+		if( $numCorrelativoAnterior >= 1 ){ 
+			// $numCorrelativo = substr($fCotizacion['num_cotizacion'], ($numCaracteres * -1), $numCaracteres); 
+			// $numCotizacionAnterior = substr($allInputs['num_cotizacion'], 0,$cantCaracteres); 
+			// $numCotizacionAnterior .= str_pad($numCorrelativoAnterior, $numCaracteres, '0', STR_PAD_LEFT); 
+			$fCotizacionAnterior = $this->model_cotizacion->m_cargar_esta_cotizacion_por_codigo($numCorrelativoAnterior,TRUE,$numCaracteres); 
+			if( empty($fCotizacionAnterior) ){ 
+				$arrData['message'] = 'El N° de Cotización <strong>'.$allInputs['num_cotizacion'].'</strong> está errado para la empresa <strong>'.$this->sessionFactur['nombre_comercial'].'</strong>'; 
+	    		$arrData['flag'] = 0;
+	    		$this->output
+			    	->set_content_type('application/json')
+			    	->set_output(json_encode($arrData));
+			    return;
+			}
+		}
+		
+		//var_dump($numCorrelativoAnterior,$numCorrelativo); exit(); 
     	// var_dump($allInputs); exit(); 
     	$this->db->trans_start();
     	if( $allInputs['tipo_documento_cliente']['destino'] == 1 ){ // cliente empresa 
@@ -1602,13 +1637,17 @@ class Cotizacion extends CI_Controller {
 		    return;
     	}
     	$arrItemDetalle = array();
-    	$this->db->trans_start();
+    	$this->db->trans_start(); 
     	if( $this->model_cotizacion->m_editar_cotizacion($allInputs) ){ 
     		foreach ($allInputs['detalle'] as $key => $elemento) {
     			if( !empty($elemento['iddetallecotizacion']) ){ 
 					$arrItemDetalle[] = $elemento['iddetallecotizacion'];
 				}
     		} 
+    		// actualizamos fecha de envio 
+    		if( !($allInputs['estado_cotizacion']['id'] == $fCotizacion['estado_cot']) ){ 
+    			$this->model_cotizacion->m_cambiar_fecha_enviado($allInputs); 
+    		}
     		// ANULAR ITEMS QUE HAN SIDO QUITADOS.
     		$listaDetalle = $this->model_cotizacion->m_cargar_detalle_cotizacion_por_id($allInputs['idcotizacion']); 
     		$arrDetalleAEliminar = array();
@@ -1627,6 +1666,10 @@ class Cotizacion extends CI_Controller {
     			$elemento['idcotizacion'] = $allInputs['idcotizacion'];
     			if( empty($elemento['agrupacion']) ){ 
 					$elemento['agrupacion'] = NULL; // por defecto 
+				}
+				/* fix clon */
+				if( empty($elemento['id']) ){
+					$elemento['id'] = @$elemento['idelemento']; 
 				}
 				if( empty($elemento['unidad_medida']) ){ 
 					$elemento['unidad_medida'] = NULL; 

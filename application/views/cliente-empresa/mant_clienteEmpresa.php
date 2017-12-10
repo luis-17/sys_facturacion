@@ -27,8 +27,8 @@
 		</div>
 
 		<div class="form-group col-md-8 mb-md">
-			<label class="control-label mb-n"> Nombre Comercial: <small class="text-danger">(*)</small> </label>
-			<input type="text" class="form-control input-sm" ng-model="fData.nombre_comercial" placeholder="Ingrese nombre comercial" required tabindex="60" />
+			<label class="control-label mb-n"> Nombre Comercial: <!-- <small class="text-danger">(*)</small> --> </label>
+			<input type="text" class="form-control input-sm" ng-model="fData.nombre_comercial" placeholder="Ingrese nombre comercial" tabindex="60" />
 		</div>
 		<div class="form-group col-md-4 mb-md">
 			<label class="control-label mb-n"> Nombre Corto: <small class="text-danger">(*)</small> </label>
@@ -36,8 +36,8 @@
 		</div>
 
 		<div class="form-group col-md-8 mb-md">
-			<label class="control-label mb-n"> Dirección Legal: <small class="text-danger">(*)</small> </label>
-			<input type="text" class="form-control input-sm" required ng-model="fData.direccion_legal" required placeholder="Ingrese direción legal" tabindex="80" />
+			<label class="control-label mb-n"> Dirección Legal: <!-- <small class="text-danger">(*)</small> --> </label>
+			<input type="text" class="form-control input-sm" required ng-model="fData.direccion_legal" placeholder="Ingrese direción legal" tabindex="80" />
 		</div>
 		
 		<div class="form-group col-md-4 mb-md">

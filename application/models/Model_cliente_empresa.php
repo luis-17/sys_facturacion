@@ -77,14 +77,14 @@ class Model_cliente_empresa extends CI_Model {
 	public function m_registrar($datos)
 	{
 		$data = array(
-			'nombre_comercial' => strtoupper($datos['nombre_comercial']), 
+			'nombre_comercial' => empty($datos['nombre_comercial']) ? NULL : strtoupper($datos['nombre_comercial']), 
 			'nombre_corto' => strtoupper($datos['nombre_corto']),
 			'razon_social' => strtoupper($datos['razon_social']),	
 			'ruc' => $datos['ruc'],	
 			'representante_legal' => empty($datos['representante_legal']) ? NULL : strtoupper($datos['representante_legal']),	
 			'dni_representante_legal' => empty($datos['dni_representante_legal']) ? NULL : $datos['dni_representante_legal'],	
-			'direccion_legal' => $datos['direccion_legal'],	
-			'direccion_guia' => empty($datos['direccion_guia']) ? NULL : $datos['direccion_guia'],
+			'direccion_legal' => empty($datos['direccion_legal']) ? NULL : $datos['direccion_legal'], 
+			'direccion_guia' => empty($datos['direccion_guia']) ? NULL : $datos['direccion_guia'], 
 			'telefono' => empty($datos['telefono']) ? NULL : $datos['telefono'],
 			'idcategoriacliente' => $datos['categoria_cliente']['id'],
 			'idempresaadmin' => $this->sessionFactur['idempresaadmin'],
@@ -96,13 +96,13 @@ class Model_cliente_empresa extends CI_Model {
 	}	
 	public function m_editar($datos){
 		$data = array(
-			'nombre_comercial' => strtoupper($datos['nombre_comercial']), 
+			'nombre_comercial' => empty($datos['nombre_comercial']) ? NULL : strtoupper($datos['nombre_comercial']), 
 			'nombre_corto' => strtoupper($datos['nombre_corto']),
 			'razon_social' => strtoupper($datos['razon_social']),	
 			'ruc' => $datos['ruc'],	
 			'representante_legal' => empty($datos['representante_legal']) ? NULL : strtoupper($datos['representante_legal']),	
 			'dni_representante_legal' => empty($datos['dni_representante_legal']) ? NULL : $datos['dni_representante_legal'],	
-			'direccion_legal' => $datos['direccion_legal'],	
+			'direccion_legal' => empty($datos['direccion_legal']) ? NULL : $datos['direccion_legal'], 
 			'direccion_guia' => empty($datos['direccion_guia']) ? NULL : $datos['direccion_guia'],
 			'telefono' => empty($datos['telefono']) ? NULL : $datos['telefono'],
 			'idcategoriacliente' => $datos['categoria_cliente']['id'],

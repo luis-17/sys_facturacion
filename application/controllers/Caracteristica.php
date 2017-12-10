@@ -22,7 +22,7 @@ class Caracteristica extends CI_Controller {
 				array(
 					'id' => $row['idcaracteristica'],
 					'descripcion_car' => strtoupper($row['descripcion_car']),
-					'orden_car' => strtoupper($row['orden_car'])			
+					'orden_car' => (int)$row['orden_car']			
 				)
 			);
 		}
@@ -47,7 +47,7 @@ class Caracteristica extends CI_Controller {
 				array(
 					'idcaracteristica' => $row['idcaracteristica'], 
 					'descripcion' => strtoupper($row['descripcion_car']), 
-					'orden'=> $row['orden_car'],
+					'orden'=> (int)$row['orden_car'],
 					'valor'=> NULL 
 				)
 			);

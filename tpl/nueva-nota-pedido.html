@@ -178,14 +178,14 @@
 					        </div> 
 									<div class="inline mr mt-sm">
 										<label class="block">
-											<span> Plazo de entrega (en días) </span>
-				              <input type="text" ng-model="fData.plazo_entrega" placeholder="En días útiles" class="form-control input-xs" 
+											<input type="text" ng-model="fData.plazo_entrega" placeholder="En días útiles" class="form-control input-xs" 
 				              	style="display:inline;width: 60px;" tabindex="350"> 
+				              <span> Plazo de entrega (en días) </span>
 				            </label> 
 				            <label class="block"> 
-				          		<span> Validez de oferta (en días) </span> 
-				              <input type="text" ng-model="fData.validez_oferta" placeholder="Cant. de días" class="form-control input-xs" 
+				          		<input type="text" ng-model="fData.validez_oferta" placeholder="Cant. de días" class="form-control input-xs" 
 				              	style="display:inline;width: 60px;" tabindex="360"> 
+				              <span> Validez de oferta (en días) </span> 
 				            </label>
 									</div>
 				          <div class="inline mr" style="vertical-align:top;margin-left:40px;"> 
@@ -239,7 +239,7 @@
 	    		<i class="fa fa-save"> </i> NOTAS DE PEDIDO </button> 
 	    	<button type="button" class="btn-primary btn" ng-click="grabar(); $event.preventDefault();" ng-disabled="formNotaPedido.$invalid && !fData.isRegisterSuccess" tabindex="420"> 
 	    		<i class="fa fa-save"> </i> [F2] GRABAR </button> 
-	    	<button type="button" class="btn-success btn mr-lg" ng-click="imprimir(); $event.preventDefault();" ng-disabled="!fData.isRegisterSuccess" tabindex="430"> 
+	    	<button type="button" class="btn-success btn mr-lg" ng-click="btnImprimir(); $event.preventDefault();" ng-disabled="!fData.isRegisterSuccess" tabindex="430"> 
 	        	<i class="fa fa-print"> </i> [F4] IMPRIMIR </button> 
 	      <button type="button" class="btn-default btn" ng-click="reloadPage(); $event.preventDefault();" tabindex="440"> 
 	        	<i class="fa fa-file"> </i> [F3] NUEVO </button>

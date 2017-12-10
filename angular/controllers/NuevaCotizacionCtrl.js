@@ -729,7 +729,7 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
           pageNumber: 1,
           firstRow: 0,
           pageSize: 100,
-          sort: uiGridConstants.ASC,
+          sort: uiGridConstants.DESC,
           sortName: null,
           search: null
         };
@@ -746,7 +746,7 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
           enableFullRowSelection: true,
           multiSelect: false,
           columnDefs: [ 
-            { field: 'id', name: 'idcontacto', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
+            { field: 'id', name: 'co.idcontacto', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
             { field: 'nombres', name: 'nombres', displayName: 'Nombre', minWidth: 120 },
             { field: 'apellidos', name: 'apellidos', displayName: 'Apellidos', minWidth: 120 },
             { field: 'razon_social', name: 'razon_social', displayName: 'Empresa', minWidth: 140 },
@@ -792,7 +792,7 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
             });
           }
         }; 
-
+        paginationOptionsCO.sortName = $scope.gridOptionsCO.columnDefs[0].name; 
         $scope.metodos.getPaginationServerSideCO = function(loader) { 
           if(loader){
             blockUI.start('Procesando información...'); 
@@ -834,7 +834,7 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
         $scope.vista = 'agregar';
         $scope.fArr.gridOptionsCR = { 
           useExternalPagination: false,
-          useExternalSorting: true,
+          useExternalSorting: false,
           enableGridMenu: false,
           enableRowSelection: true,
           enableSelectAll: false,
@@ -847,10 +847,10 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
           data: $scope.fData.temporal.caracteristicas || [],
           columnDefs: [ 
             { field: 'idcaracteristica', enableSorting: false, displayName: 'ID', width: '75', enableCellEdit: false, visible: false }, 
-            { field: 'orden', displayName: 'ORDEN', width: '100', enableCellEdit: false, enableColumnMenus: false, enableColumnMenu: false, 
-              enableFiltering: false, enableSorting: false, sort: { direction: uiGridConstants.ASC } }, 
-            { field: 'descripcion', enableSorting: false, displayName: 'Descripción', minWidth: 160, enableCellEdit: false }, 
-            { field: 'valor', enableSorting: false, displayName: 'Valor', minWidth: 160, cellClass:'ui-editCell', enableCellEdit: true, 
+            { field: 'orden', displayName: 'ORDEN', width: '100', enableCellEdit: false, enableColumnMenus: false, enableColumnMenu: false, type:'number', 
+              enableFiltering: false, enableSorting: true, sort: { direction: uiGridConstants.ASC } }, 
+            { field: 'descripcion', enableSorting: true, displayName: 'Descripción', minWidth: 160, enableCellEdit: false }, 
+            { field: 'valor', displayName: 'Valor', minWidth: 160, cellClass:'ui-editCell', enableCellEdit: true, enableSorting: true, 
               editableCellTemplate: '<input type="text" ui-grid-editor ng-model="MODEL_COL_FIELD" uib-typeahead="item.descripcion as item.descripcion for item in grid.appScope.getVariableAutocomplete($viewValue)" class="" >'
             }
           ], 
@@ -1042,6 +1042,8 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     console.log(row,'row');
     var arrFClon = { 
       'id' : row.entity.id,
+      'idelemento' : row.entity.idelemento,
+      'elemento' : row.entity.elemento,
       'descripcion' : row.entity.descripcion,
       'cantidad' : row.entity.cantidad,
       'precio_unitario' : row.entity.precio_unitario,
@@ -1196,10 +1198,10 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
           data: [],
           columnDefs: [ 
             { field: 'id', enableSorting: false, displayName: 'ID', width: '75', enableCellEdit: false, visible: false }, 
-            { field: 'orden', displayName: 'ORDEN', width: '100', enableCellEdit: false, enableColumnMenus: false, enableColumnMenu: false, 
-              enableFiltering: false, enableSorting: false, sort: { direction: uiGridConstants.ASC } }, 
-            { field: 'descripcion', enableSorting: false, displayName: 'Descripción', minWidth: 160, enableCellEdit: false }, 
-            { field: 'valor', displayName: 'Valor', minWidth: 160, cellClass:'ui-editCell', enableCellEdit: true, sort: { direction: uiGridConstants.ASC }, 
+            { field: 'orden', displayName: 'ORDEN', width: '100', enableCellEdit: false, enableColumnMenus: false, enableColumnMenu: false, type:'number', 
+              enableFiltering: false, enableSorting: true, sort: { direction: uiGridConstants.ASC } }, 
+            { field: 'descripcion', enableSorting: true, displayName: 'Descripción', minWidth: 160, enableCellEdit: false }, 
+            { field: 'valor', displayName: 'Valor', minWidth: 160, cellClass:'ui-editCell', enableCellEdit: true, enableSorting: true, 
               editableCellTemplate: '<input type="text" ui-grid-editor ng-model="MODEL_COL_FIELD" uib-typeahead="item.descripcion as item.descripcion for item in grid.appScope.getVariableAutocomplete($viewValue)" class="" >'
             }             
           ], 

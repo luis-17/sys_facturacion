@@ -754,7 +754,7 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
           pageNumber: 1,
           firstRow: 0,
           pageSize: 100,
-          sort: uiGridConstants.ASC,
+          sort: uiGridConstants.DESC,
           sortName: null,
           search: null
         };
@@ -771,7 +771,7 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
           enableFullRowSelection: true,
           multiSelect: false,
           columnDefs: [ 
-            { field: 'id', name: 'idcontacto', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
+            { field: 'id', name: 'co.idcontacto', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
             { field: 'nombres', name: 'nombres', displayName: 'Nombre', minWidth: 120 },
             { field: 'apellidos', name: 'apellidos', displayName: 'Apellidos', minWidth: 120 },
             { field: 'razon_social', name: 'razon_social', displayName: 'Empresa', minWidth: 140 },
@@ -817,7 +817,7 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
             });
           }
         }; 
-
+        paginationOptionsCO.sortName = $scope.gridOptionsCO.columnDefs[0].name; 
         $scope.metodos.getPaginationServerSideCO = function(loader) { 
           if(loader){
             blockUI.start('Procesando información...'); 
@@ -870,9 +870,10 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
           data: $scope.fData.temporal.caracteristicas || [],
           columnDefs: [ 
             { field: 'id', displayName: 'ID', width: '75', enableCellEdit: false, visible: false }, 
-            { field: 'orden', displayName: 'ORDEN', width: '100', enableCellEdit: false },
-            { field: 'descripcion', displayName: 'Descripción', minWidth: 160, enableCellEdit: false }, 
-            { field: 'valor', displayName: 'Valor', minWidth: 160, cellClass:'ui-editCell', enableCellEdit: true, sort: { direction: uiGridConstants.ASC }, 
+            { field: 'orden', displayName: 'ORDEN', width: '100', enableCellEdit: false, enableColumnMenus: false, enableColumnMenu: false, type:'number', 
+              enableFiltering: false, enableSorting: true, sort: { direction: uiGridConstants.ASC } },
+            { field: 'descripcion', enableSorting: true, displayName: 'Descripción', minWidth: 160, enableCellEdit: false }, 
+            { field: 'valor', enableSorting: true, displayName: 'Valor', minWidth: 160, cellClass:'ui-editCell', enableCellEdit: true, 
               editableCellTemplate: '<input type="text" ui-grid-editor ng-model="MODEL_COL_FIELD" uib-typeahead="item.descripcion as item.descripcion for item in grid.appScope.getVariableAutocomplete($viewValue)" class="" >'
             }
           ], 
@@ -1061,6 +1062,8 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
     console.log(row,'row');
     var arrFClon = { 
       'id' : row.entity.id,
+      'idelemento' : row.entity.idelemento,
+      'elemento' : row.entity.elemento,
       'descripcion' : row.entity.descripcion,
       'cantidad' : row.entity.cantidad,
       'precio_unitario' : row.entity.precio_unitario,

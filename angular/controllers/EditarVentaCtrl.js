@@ -783,6 +783,8 @@ app.controller('EditarVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox',
     console.log(row,'row');
     var arrFClon = { 
       'id' : row.entity.idelemento,
+      'idelemento' : row.entity.idelemento,
+      'elemento' : row.entity.elemento,
       'descripcion' : row.entity.descripcion,
       'cantidad' : row.entity.cantidad,
       'precio_unitario' : row.entity.precio_unitario,
