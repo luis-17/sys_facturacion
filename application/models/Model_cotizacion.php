@@ -54,8 +54,14 @@ class Model_cotizacion extends CI_Model {
 				}
 			}
 		}
-		if( $paramPaginate['sortName'] ){
-			$this->db->order_by($paramPaginate['sortName'], $paramPaginate['sort']);
+		
+		if( $paramPaginate['sortName'] ){ 
+			$orderFlag = NULL;
+			if( $paramPaginate['sortName'] == 'cot.num_cotizacion' ){
+				$paramPaginate['sortName'] = 'RIGHT(cot.num_cotizacion,5)'; // 5 NUM CARACTERES
+				$orderFlag = FALSE; 
+			}
+			$this->db->order_by($paramPaginate['sortName'], $paramPaginate['sort'],$orderFlag);
 		}
 		if( $paramPaginate['firstRow'] || $paramPaginate['pageSize'] ){
 			$this->db->limit($paramPaginate['pageSize'],$paramPaginate['firstRow'] );
@@ -94,7 +100,7 @@ class Model_cotizacion extends CI_Model {
 		if( $this->sessionFactur['key_tu'] == 'key_vendedor' ){
 			$this->db->where('col.idcolaborador', $this->sessionFactur['idcolaborador']);
 		}
-		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
+		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){ 
 			foreach ($paramPaginate['searchColumn'] as $key => $value) {
 				if(! empty($value)){
 					$this->db->like($key, $value, FALSE);
