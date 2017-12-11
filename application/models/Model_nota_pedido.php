@@ -7,6 +7,7 @@ class Model_nota_pedido extends CI_Model {
 	public function m_cargar_nota_pedido($paramPaginate,$paramDatos)
 	{
 		$this->db->select("CONCAT(COALESCE(col.nombres,''), ' ', COALESCE(col.apellidos,'')) As colaborador",FALSE); 
+		$this->db->select("CONCAT(COALESCE(col_cot.nombres,''), ' ', COALESCE(col_cot.apellidos,'')) As colaborador_cot",FALSE); 
 		$this->db->select("CONCAT(COALESCE(cp.nombres,''), ' ', COALESCE(cp.apellidos,''), ' ', COALESCE(ce.razon_social,'')) As cliente_persona_empresa",FALSE);
 		$this->db->select("CONCAT(cp.nombres, ' ', cp.apellidos) As cliente_persona",FALSE);
 		$this->db->select('np.idmovimiento, np.num_nota_pedido, np.fecha_registro, np.dir_movimiento, np.tipo_movimiento, np.fecha_emision, np.tipo_cliente, incluye_traslado_prov, incluye_entrega_domicilio, np.moneda, np.modo_igv, np.subtotal, np.igv, np.total, np.estado_movimiento, np.plazo_entrega, np.validez_oferta, 
@@ -17,6 +18,7 @@ class Model_nota_pedido extends CI_Model {
 		$this->db->from('movimiento np'); // nota de pedido 
 		$this->db->join('usuario us','np.idusuarionp = us.idusuario'); 
 		$this->db->join('colaborador col','us.idusuario = col.idusuario'); 
+		$this->db->join('colaborador col_cot','np.idcolaboradorcotnp = col_cot.idcolaborador','left'); 
 		$this->db->join('empresa_admin ea','np.idempresaadmin = ea.idempresaadmin'); 
 		$this->db->join("cliente_empresa ce","np.idcliente = ce.idclienteempresa AND np.tipo_cliente = 'E'",'left'); 
 		$this->db->join("cliente_persona cp","np.idcliente = cp.idclientepersona AND np.tipo_cliente = 'P'",'left'); 
@@ -48,9 +50,17 @@ class Model_nota_pedido extends CI_Model {
 				}
 			}
 		}
-		if( $paramPaginate['sortName'] ){
-			$this->db->order_by($paramPaginate['sortName'], $paramPaginate['sort']);
+		if( $paramPaginate['sortName'] ){ 
+			$orderFlag = NULL;
+			if( $paramPaginate['sortName'] == 'np.num_nota_pedido' ){
+				$paramPaginate['sortName'] = 'RIGHT(np.num_nota_pedido,5)'; // 5 NUM CARACTERES
+				$orderFlag = FALSE; 
+			}
+			$this->db->order_by($paramPaginate['sortName'], $paramPaginate['sort'],$orderFlag);
 		}
+		// if( $paramPaginate['sortName'] ){
+		// 	$this->db->order_by($paramPaginate['sortName'], $paramPaginate['sort']);
+		// }
 		if( $paramPaginate['firstRow'] || $paramPaginate['pageSize'] ){
 			$this->db->limit($paramPaginate['pageSize'],$paramPaginate['firstRow'] );
 		}
@@ -241,7 +251,7 @@ class Model_nota_pedido extends CI_Model {
 			ce.representante_legal AS representante_legal_ce, ce.dni_representante_legal AS dni_representante_legal_ce, ce.nombre_corto, 
 			ce.idtipodocumentocliente AS ce_idtipodocumentocliente, ce.telefono AS telefono_ce,ce.direccion_guia, ce.direccion_legal AS direccion_legal_ce, 
 			cp.idclientepersona, (cp.num_documento) AS num_documento_cp, (cp.telefono_movil) AS telefono_movil_cp, (cp.telefono_fijo) AS telefono_fijo_cp, 
-			cp.idtipodocumentocliente AS cp_idtipodocumentocliente, cp.sexo, cp.email,  
+			cp.idtipodocumentocliente AS cp_idtipodocumentocliente, cp.sexo, cp.email, col.idcolaborador, col.nombres, col.apellidos, 
 			se.idsede, se.descripcion_se, se.abreviatura_se, fp.idformapago, fp.descripcion_fp, fp.modo_fp, 
 			ct.idcontacto, ct.telefono_fijo, ct.anexo, ct.area_encargada,ea.idempresaadmin, (ea.razon_social) AS razon_social_ea, (ea.nombre_comercial) AS nombre_comercial_ea, (ea.ruc) AS ruc_ea,ea.nombre_logo, ea.direccion_legal, ea.pagina_web, (ea.telefono) AS telefono_ea, np.observaciones_np',FALSE); 
 		$this->db->from('movimiento np');
@@ -253,6 +263,7 @@ class Model_nota_pedido extends CI_Model {
 		$this->db->join('sede se', 'np.idsede = se.idsede');
 		$this->db->join('forma_pago fp','np.idformapago = fp.idformapago'); 
 		$this->db->join('contacto ct','np.idcontacto = ct.idcontacto','left'); 
+		$this->db->join('colaborador col','np.idcolaboradorcotnp = col.idcolaborador','left'); 
 		$this->db->where_in('np.estado_movimiento',array(0,1,2)); // solo "anulado", "registrado" y "facturado" 
 		$this->db->where('np.idmovimiento',$idnotapedido);
 		$this->db->where('np.tipo_movimiento',1); // 1 : nota de pedido 
@@ -302,6 +313,7 @@ class Model_nota_pedido extends CI_Model {
 			'tipo_cliente' => $datos['tipo_cliente'],
 			'idcliente' => $datos['cliente']['id'],
 			'idusuarionp' => $this->sessionFactur['idusuario'],
+			'idcolaboradorcotnp' => $datos['vendedor']['idvendedor'], 
 			'dir_movimiento' => 'E',
 			'tipo_movimiento' => 1, // 1: nota de pedido 
 			'idempresaadmin' => $this->sessionFactur['idempresaadmin'],
@@ -319,7 +331,7 @@ class Model_nota_pedido extends CI_Model {
 			'incluye_entrega_domicilio' => $datos['incluye_entr_dom'], 
 			'plazo_entrega' => $datos['plazo_entrega'],
 			'validez_oferta' => $datos['validez_oferta'],
-			'observaciones_np' => nl2br($datos['observaciones']) 
+			'observaciones_np' => $datos['observaciones'] 
 		); 
 		return $this->db->insert('movimiento', $data); 
 	}

@@ -44,17 +44,10 @@
 							<label class="control-label text-ellipsis"> Contacto. </label> 
 							<div class="input-group"> 
 								<input type="text" class="form-control input-sm" ng-model="fData.contacto" placeholder="Contacto" readonly="readonly" tabindex="140" /> 
-              	<!-- <input type="text" ng-model="fData.contacto" class="form-control input-sm "
-									placeholder="Busque Contacto" typeahead-loading="loadingCT" uib-typeahead="item as item.contacto for item in getContactoAutocomplete($viewValue)"
-	            		typeahead-on-select="getSelectedContacto($item, $model, $label)" typeahead-min-length="2" autocomplete ="off" ng-blur="validateContacto();" tabindex="140"/>  -->
 	            	<span class="input-group-btn">
 	                <button class="btn btn-default btn-sm" type="button" ng-click="btnBusquedaContacto();" tabindex="150"><i class="fa fa-search"></i> </button>
 	              </span>
 	            </div>
-	            <!-- <i ng-show="loadingCT" class="fa fa-refresh"></i>
-	            <div ng-show="noResultsCT" class="text-danger">
-	                <i class="fa fa-remove"></i> No se encontró resultados 
-	            </div> -->
 						</div> 
 						<div class="col-md-6" ng-show="fData.tipo_documento_cliente.destino == 1"> 
           		<label class="control-label"> Teléfono/Anexo </label>
@@ -88,18 +81,22 @@
             </div>
 					</legend>
 					<div class="form-group-sm pull-in clearfix " > 
-						<div class="col-md-4 col-sm-6 col-xs-12">
+						<div class="col-md-3 col-sm-6 col-xs-12">
 							<label class="control-label"> Sede </label>
               <select class="form-control input-sm" ng-model="fData.sede" ng-options="item as item.descripcion for item in fArr.listaSedes" 
               	tabindex="190" ng-change="metodos.generarNumeroNP(true);"> </select> 
           	</div>
-          	<div class="col-md-4 col-sm-6 col-xs-12">
+          	<div class="col-md-3 col-sm-6 col-xs-12">
               <label class="control-label"> Fecha de Creación </label> 
               <input disabled type="text" class="form-control input-sm" ng-model="fData.fecha_registro" tabindex="200" input-mask mask-options="{alias: 'dd-mm-yyyy'}" />
           	</div>
-          	<div class="col-md-4 col-sm-6 col-xs-12">
+          	<div class="col-md-3 col-sm-6 col-xs-12">
               <label class="control-label"> Fecha de Emisión </label> 
               <input type="text" class="form-control input-sm" ng-model="fData.fecha_emision" tabindex="210" input-mask mask-options="{alias: 'dd-mm-yyyy'}" />
+          	</div>
+          	<div class="col-md-3 col-sm-6 col-xs-12"> 
+              <label class="control-label"> Vendedor: </label> 
+              <label class="control-label text-info text-bold text-ellipsis"> {{ fData.vendedor.nombres + ' ' + fData.vendedor.apellidos }} </label> 
           	</div>
           </div>
           <div class="form-group pull-in clearfix mb-n"> 

@@ -51,6 +51,7 @@ class NotaPedido extends CI_Controller {
 					'fecha_emision' => darFormatoDMY($row['fecha_emision']),
 					'cliente' => trim($row['cliente_persona_empresa']),
 					'colaborador' => strtoupper($row['colaborador']),
+					'colaborador_cot' => strtoupper($row['colaborador_cot']),
 					'moneda' => $strMoneda,
 					'plazo_entrega' => $row['plazo_entrega'].' días útiles', 
 					'validez_oferta' => $row['validez_oferta'].' días útiles', 
@@ -165,8 +166,6 @@ class NotaPedido extends CI_Controller {
 			    ->set_output(json_encode($arrData));
 		    return;
 		}
-		
-
 		$rowEstadoId = $fila['estado_movimiento']; 
 		if( $fila['estado_movimiento'] == 0 ){ // anulado
 			$rowEstadoDescripcion = 'ANULADO'; 
@@ -649,6 +648,13 @@ class NotaPedido extends CI_Controller {
       	$this->pdf->SetFont('Arial','',8); 
       	$this->pdf->Cell(75,6,$strIncluyeIGV); 
 
+      	$this->pdf->SetXY(96,$y4+11); 
+      	$this->pdf->SetFont('Arial','B',8); 
+      	$this->pdf->Cell(26,6,utf8_decode('VENDEDOR ')); 
+      	$this->pdf->Cell(3,6,':',0,0,'C'); 
+      	$this->pdf->SetFont('Arial','',8); 
+      	$this->pdf->Cell(75,6,$fila['nombres'].' '.$fila['apellidos']); 
+
       	$this->pdf->SetXY(8,$y5+13); 
       	$this->pdf->Cell(100,6,utf8_decode('Tenemos el agrado de presentar la siguiente nota pedido: ')); 
 
@@ -919,7 +925,6 @@ class NotaPedido extends CI_Controller {
 	        ->set_content_type('application/json')
 	        ->set_output(json_encode($arrData));
 	}
-
 	public function registrar()
 	{
 		ini_set('xdebug.var_display_max_depth', 5);
@@ -981,6 +986,14 @@ class NotaPedido extends CI_Controller {
     	}
     	if( empty($allInputs['num_nota_pedido']) ){ 
     		$arrData['message'] = 'No se ha generado un COD. DE NOTA DE PEDIDO. Genere la NOTA DE PEDIDO.';
+    		$arrData['flag'] = 0;
+    		$this->output
+		    	->set_content_type('application/json')
+		    	->set_output(json_encode($arrData));
+		    return;
+    	}
+    	if( empty($allInputs['vendedor']['idvendedor']) ){ 
+    		$arrData['message'] = 'No se ha asignado al vendedor en la cotización.';
     		$arrData['flag'] = 0;
     		$this->output
 		    	->set_content_type('application/json')

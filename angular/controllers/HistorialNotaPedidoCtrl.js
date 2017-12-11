@@ -106,7 +106,8 @@ app.controller('HistorialNotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$b
       { field: 'fecha_emision', name: 'np.fecha_emision', displayName: 'F. Emisión', minWidth: 100, enableFiltering: false},
       { field: 'fecha_registro', name: 'np.fecha_registro', displayName: 'F. Registro', minWidth: 100, enableFiltering: false, visible: false },
       { field: 'cliente', name: 'cliente_persona_empresa', displayName: 'Cliente', minWidth: 180 },
-      { field: 'colaborador', name: 'colaborador', displayName: 'Colaborador', minWidth: 160 },
+      { field: 'colaborador_cot', name: 'colaborador_cot', displayName: 'Asignado a:', minWidth: 160 },
+      { field: 'colaborador', name: 'colaborador', displayName: 'Generado por:', minWidth: 160, visible: false },
       { field: 'usuario', name: 'us.username', displayName: 'Usuario', minWidth: 160, visible: false },
       { field: 'forma_pago', name: 'fp.descripcion_fp', displayName: 'Forma de Pago', minWidth: 120 },
       { field: 'sede', name: 'se.descripcion_se', displayName: 'Sede', minWidth: 105 },
@@ -152,13 +153,13 @@ app.controller('HistorialNotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$b
           'np.idmovimiento' : grid.columns[1].filters[0].term,
           'np.num_nota_pedido' : grid.columns[2].filters[0].term,
           "CONCAT(COALESCE(cp.nombres,''), ' ', COALESCE(cp.apellidos,''), ' ', COALESCE(ce.razon_social,''))" : grid.columns[5].filters[0].term,
-          "us.username" : grid.columns[6].filters[0].term, 
-          'fp.descripcion_fp' : grid.columns[7].filters[0].term, 
-          'se.descripcion_se' : grid.columns[8].filters[0].term,
-          'np.moneda' : grid.columns[9].filters[0].term,
-          'np.subtotal' : grid.columns[10].filters[0].term,
-          'np.igv' : grid.columns[11].filters[0].term,
-          'np.total' : grid.columns[12].filters[0].term
+          "us.username" : grid.columns[8].filters[0].term, 
+          'fp.descripcion_fp' : grid.columns[9].filters[0].term, 
+          'se.descripcion_se' : grid.columns[10].filters[0].term,
+          'np.moneda' : grid.columns[11].filters[0].term,
+          'np.subtotal' : grid.columns[12].filters[0].term,
+          'np.igv' : grid.columns[13].filters[0].term,
+          'np.total' : grid.columns[14].filters[0].term
         }
         $scope.metodos.getPaginationServerSide();
       });
@@ -215,12 +216,13 @@ app.controller('HistorialNotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$b
       { field: 'num_nota_pedido', name: 'np.num_nota_pedido', displayName: 'COD. NOTA PEDIDO', width: '120' },
       { field: 'fecha_emision', name: 'np.fecha_emision', displayName: 'F. Emisión', minWidth: 100, enableFiltering: false,  sort: { direction: uiGridConstants.DESC} },
       { field: 'fecha_registro', name: 'np.fecha_registro', displayName: 'F. Registro', minWidth: 100, enableFiltering: false, visible: false },
-      { field: 'cliente', name: 'cliente_persona_empresa', displayName: 'Cliente', minWidth: 180 },  
+      { field: 'cliente', name: 'cliente_persona_empresa', displayName: 'Cliente', minWidth: 240 },  
       { field: 'usuario', name: 'us.username', displayName: 'Usuario', minWidth: 160, visible: false },
       { field: 'sede', name: 'se.descripcion_se', displayName: 'Sede', minWidth: 105 },
-      { field: 'categoria_elemento', type: 'object', name: 'cael.descripcion_cael', displayName: 'Categoria Elemento', minWidth: 160, enableColumnMenus: false, enableColumnMenu: false,cellTemplate:'<div class="ui-grid-cell-contents text-center ">'+'<label class="label bg-primary block" style="background-color:{{COL_FIELD.color}}">{{ COL_FIELD.descripcion }}</label></div>' 
+      { field: 'categoria_elemento', type: 'object', name: 'cael.descripcion_cael', displayName: 'Categoria Elemento', minWidth: 160, enableColumnMenus: false, visible: false, 
+        enableColumnMenu: false,cellTemplate:'<div class="ui-grid-cell-contents text-center ">'+'<label class="label bg-primary block" style="background-color:{{COL_FIELD.color}}">{{ COL_FIELD.descripcion }}</label></div>' 
       },  
-      { field: 'elemento', name: 'ele.descripcion_ele', displayName: 'Elemento', minWidth: 160 },          
+      { field: 'elemento', name: 'ele.descripcion_ele', displayName: 'Elemento', minWidth: 220 },          
       { field: 'precio_unitario', name: 'npd.precio_unitario', displayName: 'P. Unitario', minWidth: 90 }, 
       { field: 'cantidad', name: 'npd.cantidad', displayName: 'Cantidad', minWidth: 90 },
       { field: 'importe_con_igv', name: 'npd.importe_con_igv', displayName: 'Importe', minWidth: 90 }, 

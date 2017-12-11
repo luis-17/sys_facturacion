@@ -270,10 +270,10 @@ class Model_cotizacion extends CI_Model {
 			ce.direccion_guia, (ce.direccion_legal) AS direccion_legal_ce, 
 			cp.idclientepersona, (cp.num_documento) AS num_documento_cp, (cp.telefono_movil) AS telefono_movil_cp, (cp.telefono_fijo) AS telefono_fijo_cp, 
 			cp.idtipodocumentocliente AS cp_idtipodocumentocliente, 
-			se.idsede, se.descripcion_se, se.abreviatura_se, 
+			se.idsede, se.descripcion_se, se.abreviatura_se, col.idcolaborador, col.nombres, col.apellidos, 
 			fp.idformapago, fp.descripcion_fp, fp.modo_fp, ct.idcontacto, ct.telefono_fijo, ct.anexo, ct.area_encargada', FALSE); 
 		$this->db->select("CONCAT(COALESCE(ct.nombres,''), ' ', COALESCE(ct.apellidos,'')) AS contacto",FALSE);
-		$this->db->from('cotizacion cot'); 
+		$this->db->from('cotizacion cot');  
 		$this->db->join('usuario us','cot.idusuarioregistro = us.idusuario'); 
 		$this->db->join('empresa_admin ea','cot.idempresaadmin = ea.idempresaadmin'); 
 		$this->db->join("cliente_empresa ce","cot.idcliente = ce.idclienteempresa AND cot.tipo_cliente = 'E'",'left'); 
@@ -281,6 +281,7 @@ class Model_cotizacion extends CI_Model {
 		$this->db->join("cliente_persona cp","cot.idcliente = cp.idclientepersona AND cot.tipo_cliente = 'P'",'left'); 
 		$this->db->join("tipo_documento_cliente tdc_cp","cp.idtipodocumentocliente = tdc_cp.idtipodocumentocliente",'left'); 
 		$this->db->join('sede se','cot.idsede = se.idsede'); 
+		$this->db->join('colaborador col','cot.idcolaborador = col.idcolaborador'); 
 		$this->db->join('forma_pago fp','cot.idformapago = fp.idformapago'); 
 		$this->db->join('contacto ct','cot.idcontacto = ct.idcontacto','left'); 
 		if( !empty($filtro['searchText']) ){

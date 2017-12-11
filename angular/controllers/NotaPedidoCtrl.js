@@ -618,7 +618,7 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
     if(iddetallecotizacion){
       model.iddetallecotizacion = iddetallecotizacion;
     }
-    console.log(model,'modelmodelmodel')
+    // console.log(model,'modelmodelmodel')
     CotizacionServices.sListarDetalleEstaCotizacion(model).then(function(rpta) { 
       if( rpta.flag == 1 ){ 
         angular.forEach(rpta.datos, function(val,key) { 
@@ -641,10 +641,14 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
           // console.log($scope.gridOptions.data,'$scope.gridOptions.data');
         }); 
         $scope.calcularTotales(); 
-      }/*else if( rpta.flag == 1 ){
-
-      }*/
+      } 
     });
+    // llenar info de vendedor 
+    $scope.fData.vendedor = { 
+        'idvendedor' : model.idcolaborador, 
+        'nombres' : model.nombres, 
+        'apellidos' : model.apellidos 
+    };
   }
   $scope.validateNumCot = function() { 
     if( angular.isObject( $scope.fData.num_cotizacion ) ){
@@ -1361,7 +1365,6 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
       pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 3000 });
     });
   }
-
   $scope.btnImprimir = function() {
     // console.log($scope.fData,'$scope.fData');
     var arrParams = { 
@@ -1376,7 +1379,6 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
     }
     ModalReporteFactory.getPopupReporte(arrParams);
   }
-
 }]);
 
 

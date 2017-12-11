@@ -548,7 +548,7 @@ class Cotizacion extends CI_Controller {
 					'telefono_movil'=> $row['telefono_movil_cp'], 
 					'num_documento'=> $row['num_documento_cp'] 
 				);
-			}
+			} 
 			array_push($arrListado, 
 				array(
 					//cotizacion 
@@ -577,8 +577,12 @@ class Cotizacion extends CI_Controller {
 					'plazo_entrega'=> $row['plazo_entrega'],
 					'validez_oferta'=> $row['validez_oferta'],
 					'modo_igv'=> $row['modo_igv'],
+					// colaborador 
+					'idcolaborador'=> $row['idcolaborador'],
+					'nombres'=> $row['nombres'],
+					'apellidos'=> $row['apellidos'],
 					//cliente 
-					'cliente'=> $arrCliente, 
+					'cliente'=> $arrCliente 
 				)
 			);
 		}
