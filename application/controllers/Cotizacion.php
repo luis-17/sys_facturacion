@@ -265,6 +265,7 @@ class Cotizacion extends CI_Controller {
 			$arrAux2 = array(
 				'iddetallecaracteristica'=> $row['iddetallecaracteristica'],
 				'idcaracteristica'=> $row['idcaracteristica'],
+				'id'=> $row['idcaracteristica'],
 				'orden'=> $row['orden_car'],
 				'descripcion'=> $row['descripcion_car'],
 				'valor'=> $row['valor']
@@ -282,6 +283,7 @@ class Cotizacion extends CI_Controller {
 			$arrAux = array(
 				'iddetallecaracteristica'=> NULL,
 				'idcaracteristica'=> $row['idcaracteristica'],
+				'id'=> $row['idcaracteristica'],
 				'orden'=> $row['orden_car'],
 				'descripcion'=> $row['descripcion_car'],
 				'valor'=> NULL 
@@ -1590,6 +1592,10 @@ class Cotizacion extends CI_Controller {
 						foreach ($elemento['caracteristicas'] as $keyCa => $caracteristica) { 
 							if( !empty($caracteristica['valor']) ){ 
 								$caracteristica['iddetallecotizacion'] = $arrData['iddetallecotizacion']; 
+								/* fix clon */
+								if( empty($caracteristica['idcaracteristica']) ){ 
+									$caracteristica['idcaracteristica'] = @$caracteristica['id']; 
+								}
 								if( $this->model_cotizacion->m_registrar_detalle_caracteristica_cotizacion($caracteristica) ){ 
 									$arrData['message'] = 'Los datos se registraron correctamente'; 
 									$arrData['flag'] = 1; 
@@ -1692,6 +1698,10 @@ class Cotizacion extends CI_Controller {
 							foreach ($elemento['caracteristicas'] as $keyCa => $caracteristica) { 
 								if( !empty($caracteristica['valor']) ){ 
 									$caracteristica['iddetallecotizacion'] = $arrData['iddetallecotizacion']; 
+									/* fix clon */
+									if( empty($caracteristica['idcaracteristica']) ){ 
+										$caracteristica['idcaracteristica'] = @$caracteristica['id']; 
+									}
 									if( $this->model_cotizacion->m_registrar_detalle_caracteristica_cotizacion($caracteristica) ){ 
 										$arrData['message'] = 'Los datos se editaron correctamente'; 
 										$arrData['flag'] = 1; 
@@ -1727,7 +1737,11 @@ class Cotizacion extends CI_Controller {
 								}else{ 
 									if( !empty($caracteristica['valor']) ){ 
 										$caracteristica['iddetallecotizacion'] = $elemento['iddetallecotizacion'];
-										if( $this->model_cotizacion->m_registrar_detalle_caracteristica_cotizacion($caracteristica) ){
+										/* fix clon */
+										if( empty($caracteristica['idcaracteristica']) ){ 
+											$caracteristica['idcaracteristica'] = @$caracteristica['id']; 
+										}
+										if( $this->model_cotizacion->m_registrar_detalle_caracteristica_cotizacion($caracteristica) ){ 
 											$arrData['message'] = 'Los datos se editaron correctamente'; 
 											$arrData['flag'] = 1; 
 											$fVariable = $this->model_variable_car->m_buscar_variable($caracteristica); 

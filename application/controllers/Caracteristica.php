@@ -46,6 +46,7 @@ class Caracteristica extends CI_Controller {
 			array_push($arrListado,
 				array(
 					'idcaracteristica' => $row['idcaracteristica'], 
+					'id' => $row['idcaracteristica'],
 					'descripcion' => strtoupper($row['descripcion_car']), 
 					'orden'=> (int)$row['orden_car'],
 					'valor'=> NULL 

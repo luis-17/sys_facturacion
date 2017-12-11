@@ -233,6 +233,8 @@ class Model_nota_pedido extends CI_Model {
 		// $this->db->where('ea.idempresaadmin', $this->sessionFactur['idempresaadmin']); // empresa session agrupador 
 		$this->db->where('np.tipo_movimiento', 1); // nota de pedido 
 		$this->db->order_by('dm.iddetallemovimiento','ASC');
+		$this->db->order_by('c.orden_car','ASC');
+		$this->db->order_by('c.descripcion_car','ASC');
 		//$this->db->where_in('np.estado_movimiento', array(1,2)); // 1: registrado 2:facturado  
 		return $this->db->get()->result_array();
 	}

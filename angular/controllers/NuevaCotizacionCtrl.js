@@ -941,7 +941,7 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     columnDefs: [
       { field: 'idelemento', displayName: 'COD.', width: 50, enableCellEdit: false, enableSorting: false },
       { field: 'descripcion', displayName: 'DESCRIPCION', minWidth: 130, enableCellEdit: false, enableSorting: false,
-        cellTemplate:'<div class="ui-grid-cell-contents "> <a class="text-info block" href="" ng-click="grid.appScope.btnGestionCaracteristicasDetalle(row)">'+ '{{ COL_FIELD }}</a></div>', 
+        cellTemplate:'<div class="ui-grid-cell-contents "> <a class="text-info block" href="" ng-click="grid.appScope.btnGestionCaracteristicasDetalle(row,grid.renderContainers.body.visibleRowCache.indexOf(row))">'+ '{{ COL_FIELD }}</a></div>', 
         cellTooltip: function( row, col ) {
           return row.entity.descripcion;
         }
@@ -976,7 +976,7 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
       { field: 'accion', displayName: 'ACCIÓN', width: 110, enableCellEdit: false, enableSorting: false, 
         cellTemplate:'<div class="m-xxs text-center">'+ 
           '<button uib-tooltip="Clonar" tooltip-placement="left" type="button" class="btn btn-xs btn-gray mr-xs" ng-click="grid.appScope.btnClonarFila(row)"> <i class="fa fa-plus"></i> </button>' + 
-          '<button uib-tooltip="Ver Características" tooltip-placement="left" type="button" class="btn btn-xs btn-info mr-xs" ng-click="grid.appScope.btnGestionCaracteristicasDetalle(row)"> <i class="fa fa-eye"></i> </button>' +
+          '<button uib-tooltip="Ver Características" tooltip-placement="left" type="button" class="btn btn-xs btn-info mr-xs" ng-click="grid.appScope.btnGestionCaracteristicasDetalle(row,grid.renderContainers.body.visibleRowCache.indexOf(row))"> <i class="fa fa-eye"></i> </button>' +
           '<button uib-tooltip="Quitar" tooltip-placement="left" type="button" class="btn btn-xs btn-danger" ng-click="grid.appScope.btnQuitarDeLaCesta(row)"> <i class="fa fa-trash"></i> </button>' + 
           '</div>' 
       } // uib-tooltip
@@ -1143,8 +1143,8 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     // $scope.fData.temporal.caracteristicas = null;
     // console.log($scope.fData.classValid,'$scope.fData.classValid');
   }
-  $scope.btnGestionCaracteristicasDetalle = function(row) { 
-    console.log(row,'row');
+  $scope.btnGestionCaracteristicasDetalle = function(row,indice) { 
+    console.log(row,'row',indice,'indiceew');
     blockUI.start('Procesando información...'); 
     $uibModal.open({ 
       templateUrl: angular.patchURLCI+'Caracteristica/ver_popup_agregar_caracteristica',
@@ -1209,7 +1209,6 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
             $scope.gridApi = gridApi; 
           }
         }; 
-
         var myCallbackCaract = function() { 
           console.log(row.entity.caracteristicas,'row.entity.caracteristicas');
           angular.forEach(row.entity.caracteristicas, function(val,key) { 
@@ -1224,15 +1223,16 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
           });
           // $scope.fArr.gridOptionsCRDet.data = row.entity.caracteristicas;
         }
-
-        if( !(row.entity.caracteristicas) ){
+        //console.log(row.entity.caracteristicas,'row.entity.caracteristicas');
+        if( !(row.entity.caracteristicas) ){ 
           $scope.metodos.getPaginationServerSideCR(true,myCallbackCaract); 
-        }else{
+        }else{ 
           myCallbackCaract();
-        }
-
-        //var rowCaracteristicas = row.caracteristicas;         
-        $scope.cancel = function () {
+        } 
+        //var rowCaracteristicas = row.caracteristicas; 
+        $scope.cancel = function () { 
+          $scope.gridOptions.data[indice].caracteristicas = $scope.fArr.gridOptionsCRDet.data; 
+          console.log($scope.gridOptions.data[indice].caracteristicas,'$scope.gridOptions.data[indice].caracteristicas')
           $uibModalInstance.dismiss('cancel');
         } 
       }
