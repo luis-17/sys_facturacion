@@ -106,7 +106,7 @@ app.controller('HistorialNotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$b
       { field: 'fecha_emision', name: 'np.fecha_emision', displayName: 'F. Emisión', minWidth: 100, enableFiltering: false},
       { field: 'fecha_registro', name: 'np.fecha_registro', displayName: 'F. Registro', minWidth: 100, enableFiltering: false, visible: false },
       { field: 'cliente', name: 'cliente_persona_empresa', displayName: 'Cliente', minWidth: 180 },
-      { field: 'colaborador_cot', name: 'colaborador_cot', displayName: 'Asignado a:', minWidth: 160 },
+      { field: 'colaborador_cot', name: 'colaborador_cot', displayName: 'Asesor de Venta', minWidth: 160 },
       { field: 'colaborador', name: 'colaborador', displayName: 'Generado por:', minWidth: 160, visible: false },
       { field: 'usuario', name: 'us.username', displayName: 'Usuario', minWidth: 160, visible: false },
       { field: 'forma_pago', name: 'fp.descripcion_fp', displayName: 'Forma de Pago', minWidth: 120 },
@@ -311,19 +311,29 @@ app.controller('HistorialNotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$b
     }
     ModalReporteFactory.getPopupReporte(arrParams);
   }
-
-  // $scope.btnImprimir = function() { 
-  //   console.log($scope.mySelectionGrid[0],'$scope.mySelectionGrid[0]');
-  //   var arrParams = { 
-  //     titulo: 'VISTA PREVIA DE COTIZACIÓN',
-  //     datos:{
-  //       id: $scope.mySelectionGrid[0].idcotizacion,
-  //       codigo_reporte: 'COT-FCOT'
-  //     },
-  //     envio_correo: 'si',
-  //     salida: 'pdf',
-  //     url: angular.patchURLCI + "NotaPedido/imprimir_cotizacion" 
-  //   }
-  //   ModalReporteFactory.getPopupReporte(arrParams);
-  // }
+  $scope.btnAnular = function() {
+    var pMensaje = '¿Realmente desea anular la nota de pedido?';
+    $bootbox.confirm(pMensaje, function(result) { 
+      if(result){
+        var arrParams = { 
+          idnotapedido: $scope.mySelectionGrid[0].idmovimiento 
+        };
+        blockUI.start('Procesando información...');
+        NotaPedidoServices.sAnular(arrParams).then(function (rpta) {
+          if(rpta.flag == 1){
+            var pTitle = 'OK!';
+            var pType = 'success';
+            $scope.metodos.getPaginationServerSide(true);
+          }else if(rpta.flag == 0){
+            var pTitle = 'Error!';
+            var pType = 'danger';
+          }else{
+            alert('Error inesperado');
+          }
+          pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2500 });
+          blockUI.stop(); 
+        });
+      }
+    });
+  }
 }]); 

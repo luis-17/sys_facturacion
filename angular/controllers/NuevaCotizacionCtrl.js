@@ -249,6 +249,14 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
       if( rpta.flag == 1 ){
         $scope.fData.cliente = rpta.datos.cliente; 
         $scope.fData.classEditCliente = '';
+
+        // actualizamos vendedor / colaborador 
+        var objIndex = $scope.fArr.listaColaboradores.filter(function(obj) { 
+          return obj.id == rpta.datos.cliente.colaborador.id; 
+        }).shift(); 
+        $scope.fData.colaborador = objIndex; 
+
+        //$scope.metodos.listaColaboradores(myCallbackCol); 
         pinesNotifications.notify({ title: 'OK!', text: rpta.message, type: 'success', delay: 2500 });
       }else{
         $scope.fData.cliente = {}; 
@@ -308,6 +316,13 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
               $scope.fData.cliente = $scope.mySelectionGridBC[0]; //console.log($scope.fData.Proveedor);
               $scope.fData.num_documento = $scope.mySelectionGridBC[0].num_documento; 
               $scope.fData.classEditCliente = '';
+
+              // actualizamos vendedor / colaborador 
+              var objIndex = $scope.fArr.listaColaboradores.filter(function(obj) { 
+                return obj.id == $scope.mySelectionGridBC[0].colaborador.id; 
+              }).shift(); 
+              $scope.fData.colaborador = objIndex; 
+
               $uibModalInstance.dismiss('cancel');
               // $timeout(function() {
               //   $('#temporalElemento').focus(); //console.log('focus me',$('#temporalElemento'));
@@ -694,6 +709,11 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
 
     $scope.fData.cliente.telefono_contacto = model.telefono_fijo; 
     $scope.fData.cliente.anexo_contacto = model.anexo; 
+    // actualizamos vendedor / colaborador 
+    var objIndex = $scope.fArr.listaColaboradores.filter(function(obj) { 
+      return obj.id == model.colaborador.id; 
+    }).shift(); 
+    $scope.fData.colaborador = objIndex; 
   }
 
   $scope.validateContacto = function() { 
@@ -760,6 +780,11 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
               $scope.fData.cliente = $scope.mySelectionGridCO[0].cliente_empresa; 
               $scope.fData.num_documento = $scope.mySelectionGridCO[0].cliente_empresa.ruc; 
               $scope.fData.classEditCliente = '';
+              // actualizamos vendedor / colaborador 
+              var objIndex = $scope.fArr.listaColaboradores.filter(function(obj) { 
+                return obj.id == $scope.mySelectionGridCO[0].cliente_empresa.colaborador.id; 
+              }).shift(); 
+              $scope.fData.colaborador = objIndex; 
               $uibModalInstance.dismiss('cancel');
             });
             $scope.gridApi.core.on.sortChanged($scope, function(grid, sortColumns) {

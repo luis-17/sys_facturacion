@@ -73,7 +73,7 @@ class Model_colaborador extends CI_Model {
 		return $fData;
 	}	
 	public function m_cargar_colaborador_cbo(){
-		$this->db->select("co.idcolaborador, CONCAT(co.nombres, ' ', co.apellidos) As colaborador",FALSE);
+		$this->db->select("co.idcolaborador, CONCAT(COALESCE(co.nombres,''), ' ', COALESCE(co.apellidos,'')) As colaborador",FALSE);
 		$this->db->from('colaborador co');
 		$this->db->join('usuario us', 'co.idusuario = us.idusuario AND us.estado_us = 1','left'); 
 		$this->db->join('tipo_usuario tu', 'us.idtipousuario = tu.idtipousuario','left');
@@ -89,8 +89,8 @@ class Model_colaborador extends CI_Model {
 		$data = array(
 			'idusuario' => $datos['idusuario'],
 			'nombres' => strtoupper_total($datos['nombres']),
-			'apellidos' => strtoupper_total($datos['apellidos']),
-			'num_documento'=> $datos['num_documento'],
+			'apellidos' => empty($datos['apellidos']) ? NULL : strtoupper_total($datos['apellidos']),
+			'num_documento'=> empty($datos['num_documento']) ? NULL : $datos['num_documento'],
 			'telefono'=> empty($datos['telefono']) ? NULL : $datos['telefono'],
 			'email' => empty($datos['email'])? NULL : strtoupper_total($datos['email']), 
 			'fecha_nacimiento' => empty($datos['fecha_nacimiento'])? NULL : darFormatoYMD($datos['fecha_nacimiento']), 
@@ -113,8 +113,8 @@ class Model_colaborador extends CI_Model {
 		$data = array(
 			// 'idusuario' => $datos['idusuario'],
 			'nombres' => strtoupper_total($datos['nombres']),
-			'apellidos' => strtoupper_total($datos['apellidos']),
-			'num_documento'=> $datos['num_documento'],
+			'apellidos' => empty($datos['apellidos']) ? NULL : strtoupper_total($datos['apellidos']),
+			'num_documento'=> empty($datos['num_documento']) ? NULL : $datos['num_documento'],
 			'telefono'=> empty($datos['telefono']) ? NULL : $datos['telefono'],
 			'email' => empty($datos['email'])? NULL : strtoupper_total($datos['email']), 
 			'fecha_nacimiento' => empty($datos['fecha_nacimiento'])? NULL : darFormatoYMD($datos['fecha_nacimiento']), 	

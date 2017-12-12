@@ -8,16 +8,16 @@
 			<input type="text" class="form-control input-sm" ng-model="fData.nombres" placeholder="Ingrese nombres" required tabindex="100" />
 		</div>
     	<div class="form-group col-md-6 mb-md">
-			<label class="control-label mb-n"> Apellidos: <small class="text-danger">(*)</small> </label>
-			<input type="text" class="form-control input-sm" ng-model="fData.apellidos" placeholder="Ingrese apellidos" required tabindex="110" />
+			<label class="control-label mb-n"> Apellidos: <!-- <small class="text-danger">(*)</small> --> </label>
+			<input type="text" class="form-control input-sm" ng-model="fData.apellidos" placeholder="Ingrese apellidos" tabindex="110" />
 		</div>
 		<div class="form-group col-md-3 mb-md">
 			<label class="control-label mb-n"> Fecha de Nac.: </label>
 			<input type="tel" class="form-control input-sm" ng-model="fData.fecha_nacimiento" tabindex="120" input-mask mask-options="{alias: 'dd-mm-yyyy'}" />
 		</div>
 		<div class="form-group col-md-3 mb-md">
-			<label class="control-label mb-n"> N° Documento: <small class="text-danger">(*)</small> </label>
-			<input type="text" class="form-control input-sm" ng-model="fData.num_documento" placeholder="Ingrese n° número documento" required tabindex="130" />		
+			<label class="control-label mb-n"> N° Documento: <!-- <small class="text-danger">(*)</small> --> </label>
+			<input type="text" class="form-control input-sm" ng-model="fData.num_documento" placeholder="Ingrese n° número documento" tabindex="130" />		
 		</div>	
 		<div class="form-group col-md-6 mb-md">
 			<label class="control-label mb-n"> Teléfono: </label>

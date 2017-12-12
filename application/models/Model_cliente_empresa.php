@@ -6,7 +6,14 @@ class Model_cliente_empresa extends CI_Model {
 	}
 	public function m_cargar_cliente_empresa($paramPaginate=FALSE){
 		// var_dump($paramDatosCo);
-		$this->db->select("co.idcolaborador, CONCAT(co.nombres, ' ', co.apellidos) As colaborador",FALSE);
+		$this->db->select("(SELECT CONCAT(COALESCE(con.nombres,''), ' ', COALESCE(con.apellidos,'')) 
+			FROM contacto con 
+			WHERE con.estado_co = 1 
+			AND con.idclienteempresa = ce.idclienteempresa 
+			ORDER BY con.idcontacto 
+			LIMIT 1 
+		) AS primer_contacto",FALSE);
+		$this->db->select("co.idcolaborador, CONCAT(COALESCE(co.nombres,''), ' ', COALESCE(co.apellidos,'')) As colaborador",FALSE);
 		$this->db->select('ce.idclienteempresa, ce.nombre_comercial, ce.nombre_corto, ce.razon_social, ce.ruc, ce.representante_legal, ce.dni_representante_legal, 
 			ce.direccion_legal, ce.direccion_guia, ce.telefono, 
 			cc.idcategoriacliente, cc.descripcion_cc');

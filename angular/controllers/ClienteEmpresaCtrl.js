@@ -36,13 +36,15 @@ app.controller('ClienteEmpresaCtrl', ['$scope', '$filter', '$uibModal', '$bootbo
 	    enableFullRowSelection: true,
 	    multiSelect: false,
 	    columnDefs: [ 
-	      { field: 'id', name: 'idclienteempresa', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
+	      { field: 'id', name: 'idclienteempresa', displayName: 'ID', width: '70',  sort: { direction: uiGridConstants.DESC} },
 	      { field: 'nombre_comercial', name: 'nombre_comercial', displayName: 'Nombre Comercial', minWidth: 140 },
 	      { field: 'razon_social', name: 'razon_social', displayName: 'Razón Social', minWidth: 160 },
-	      { field: 'ruc', name: 'ruc', displayName: 'RUC', minWidth: 100 },
-	      { field: 'representante_legal', name: 'representante_legal', displayName: 'Rep. Legal', minWidth: 180 },
+	      { field: 'ruc', name: 'ruc', displayName: 'RUC', minWidth: 80 },
+	      { field: 'representante_legal', name: 'representante_legal', displayName: 'Rep. Legal', minWidth: 180, visible:false },
 	      { field: 'direccion_legal', name: 'direccion_legal', displayName: 'Dirección Legal', minWidth: 180 },
-	      { field: 'telefono', name: 'telefono', displayName: 'Teléfono', minWidth: 90 },
+	      { field: 'primer_contacto', name: 'primer_contacto', displayName: '1er Contacto', minWidth: 130, enableFiltering: false },
+	      { field: 'telefono', name: 'telefono', displayName: 'Teléfono', minWidth: 80 },
+	      { field: 'colaborador_str', name: 'colaborador', displayName: 'Asesor de Venta', minWidth: 120 },
 	      { field: 'categoria_cliente', type: 'object', name: 'categoria_cliente', displayName: 'Categoria', minWidth: 100, enableColumnMenus: false, enableColumnMenu: false, 
 	          cellTemplate:'<div class="ui-grid-cell-contents text-center ">'+ 
 	            '<label class="label bg-primary block">{{ COL_FIELD.descripcion }}</label></div>' 
@@ -85,7 +87,8 @@ app.controller('ClienteEmpresaCtrl', ['$scope', '$filter', '$uibModal', '$bootbo
 	          'ce.representante_legal' : grid.columns[5].filters[0].term,
 	          'ce.direccion_legal' : grid.columns[6].filters[0].term,
 	          'ce.telefono' : grid.columns[7].filters[0].term,
-	          'cc.descripcion_cc' : grid.columns[8].filters[0].term 
+	          'co.nombres' : grid.columns[8].filters[0].term,
+	          'cc.descripcion_cc' : grid.columns[9].filters[0].term 
 	        }
 	        $scope.metodos.getPaginationServerSide();
 	      });

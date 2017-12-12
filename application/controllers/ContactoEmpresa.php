@@ -136,7 +136,11 @@ class ContactoEmpresa extends CI_Controller {
 					'telefono_movil' => $row['telefono_movil'],
 					'anexo' => $row['anexo'],
 					'area_encargada' => $row['area_encargada'],
-					'idclienteempresa' => $row['idclienteempresa']
+					'idclienteempresa' => $row['idclienteempresa'],
+					'colaborador' => array(
+						'id'=> $row['idcolaborador'],
+						'colaborador'=> $row['colaborador']
+					)
 				)
 			);
 		}

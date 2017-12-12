@@ -38,12 +38,14 @@ class ClienteEmpresa extends CI_Controller {
 						'id'=> $row['idcolaborador'],
 						'descripcion'=> $row['colaborador']
 					),
+					'colaborador_str' => $row['colaborador'],
 					'ruc' => $row['ruc'],
 					'representante_legal' => $row['representante_legal'],
 					'dni_representante_legal' => $row['dni_representante_legal'],
 					'direccion_legal' => $row['direccion_legal'],
 					'direccion_guia' => $row['direccion_guia'],
-					'telefono' => $row['telefono']
+					'telefono' => $row['telefono'],
+					'primer_contacto'=> strtoupper($row['primer_contacto'])
 				)
 			);
 		}

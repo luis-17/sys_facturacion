@@ -24,11 +24,11 @@ class Model_nota_pedido extends CI_Model {
 		$this->db->join("cliente_persona cp","np.idcliente = cp.idclientepersona AND np.tipo_cliente = 'P'",'left'); 
 		$this->db->join('sede se','np.idsede = se.idsede'); 
 		$this->db->join('forma_pago fp','np.idformapago = fp.idformapago'); 
-		if( !empty($paramDatos['cliente']) ){
-			if( $paramDatos['cliente']['tipo_cliente'] == 'ce' ){
+		if( !empty($paramDatos['cliente']) ){ 
+			if( $paramDatos['cliente']['tipo_cliente'] == 'ce' ){ 
 				$this->db->where('ce.idclienteempresa',$paramDatos['cliente']['id']);
 			}
-			if( $paramDatos['cliente']['tipo_cliente'] == 'cp' ){
+			if( $paramDatos['cliente']['tipo_cliente'] == 'cp' ){ 
 				$this->db->where('cp.idclientepersona',$paramDatos['cliente']['id']);
 			}
 		}
@@ -42,7 +42,7 @@ class Model_nota_pedido extends CI_Model {
 		}
 		$this->db->where('ea.idempresaadmin', $this->sessionFactur['idempresaadmin']); // empresa session 
 		$this->db->where('np.tipo_movimiento', 1); // nota de pedido 
-		$this->db->where_in('np.estado_movimiento', array(1,2)); // 1: registrado 2:facturado  
+		$this->db->where_in('np.estado_movimiento', array(1,2,0)); // 1: registrado 2:facturado 0:anulado 
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
 			foreach ($paramPaginate['searchColumn'] as $key => $value) {
 				if(! empty($value)){
@@ -275,7 +275,16 @@ class Model_nota_pedido extends CI_Model {
 		$this->db->limit(1);
 		return $this->db->get()->row_array();
 	}
-	
+	public function m_validar_nota_pedido($idnotapedido)
+	{
+		$this->db->select('np.idmovimiento, np.num_nota_pedido, np.estado_movimiento'); 
+		$this->db->from('movimiento np');
+		$this->db->where_in('np.estado_movimiento',array(0,1,2)); // solo "anulado", "registrado" y "facturado" 
+		$this->db->where('np.idmovimiento',$idnotapedido);
+		$this->db->where('np.tipo_movimiento',1); // 1 : nota de pedido 
+		$this->db->limit(1);
+		return $this->db->get()->row_array();
+	}
 	public function m_cargar_esta_nota_pedido_por_codigo($numNP) 
 	{
 		$this->db->select('np.idmovimiento, np.num_nota_pedido');
@@ -372,6 +381,15 @@ class Model_nota_pedido extends CI_Model {
 		$data = array(
 			'estado_movimiento' => 2, // facturado 
 			'fecha_facturacion' => date('Y-m-d H:i:s') 
+		);
+		$this->db->where('idmovimiento',$datos['idnotapedido']); 
+		return $this->db->update('movimiento', $data); 
+	}
+	public function m_anular($datos)
+	{
+		$data = array(
+			'estado_movimiento' => 0, // anulado  
+			'fecha_anulacion' => date('Y-m-d H:i:s') 
 		);
 		$this->db->where('idmovimiento',$datos['idnotapedido']); 
 		return $this->db->update('movimiento', $data); 

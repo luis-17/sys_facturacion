@@ -108,7 +108,7 @@ app.controller('HistorialCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$b
       { field: 'fecha_emision', name: 'cot.fecha_emision', displayName: 'F. Emisión', minWidth: 100, enableFiltering: false },
       { field: 'fecha_registro', name: 'cot.fecha_registro', displayName: 'F. Registro', minWidth: 100, enableFiltering: false, visible: false },
       { field: 'cliente', name: 'cliente_persona_empresa', displayName: 'Cliente', minWidth: 180 },
-      { field: 'colaborador', name: 'col.colaborador', displayName: 'Asignado a:', minWidth: 160 },
+      { field: 'colaborador', name: 'col.colaborador', displayName: 'Asesor de Venta', minWidth: 160 },
       { field: 'colaborador_reg', name: 'colaborador_reg', displayName: 'Generado por:', minWidth: 160, visible: false },
       { field: 'plazo_entrega', name: 'cot.plazo_entrega', displayName: 'Plazo de Entrega', minWidth: 120 },
       { field: 'validez_oferta', name: 'cot.validez_oferta', displayName: 'Validez Oferta', minWidth: 120, visible: false },

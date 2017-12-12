@@ -131,7 +131,7 @@
           	</div> -->
           	<div class="col-md-3 col-sm-12" > 
               <label class="control-label text-ellipsis"> Colaborador </label> 
-              <select class="form-control input-sm" ng-disabled="!(fSessionCI.key_tu == 'key_root' || fSessionCI.key_tu == 'key_superadmin' || fSessionCI.key_tu == 'key_admin')" ng-model="fData.colaborador" 
+              <select class="form-control input-sm" ng-disabled="fConfigSys.amarre_cliente_vendedor == 1" ng-model="fData.colaborador" 
               	ng-options="item as item.descripcion for item in fArr.listaColaboradores" tabindex="230" > </select> 
           	</div>
           </div>

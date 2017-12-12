@@ -25,6 +25,11 @@ class NotaPedido extends CI_Controller {
 		$arrListado = array(); 
 		foreach ($lista as $row) { 
 			$objEstado = array();
+			if( $row['estado_movimiento'] == 0 ){ // ANULADO 
+				$objEstado['claseIcon'] = 'fa-ban';
+				$objEstado['claseLabel'] = 'label-danger';
+				$objEstado['labelText'] = 'ANULADO';
+			}
 			if( $row['estado_movimiento'] == 1 ){ // REGISTRADO 
 				$objEstado['claseIcon'] = 'fa-file-archive-o';
 				$objEstado['claseLabel'] = 'label-info';
@@ -1088,6 +1093,29 @@ class NotaPedido extends CI_Controller {
 			}
 		} 
 		$this->db->trans_complete();
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
+	public function anular()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$arrData['message'] = 'No se pudo anular los datos';
+    	$arrData['flag'] = 0;
+    	// validar que no sea una nota pedido facturada 
+    	$fNP = $this->model_nota_pedido->m_validar_nota_pedido($allInputs['idnotapedido']);
+    	if( $fNP['estado_movimiento'] == 2 ){ // facturado  
+    		$arrData['message'] = 'Esta nota de pedido ya ha sido facturada. Operación rechazada'; 
+    		$arrData['flag'] = 0;
+    		$this->output
+		    	->set_content_type('application/json')
+		    	->set_output(json_encode($arrData));
+		    return;
+    	} 
+		if( $this->model_nota_pedido->m_anular($allInputs) ){ 
+			$arrData['message'] = 'Se anularon los datos correctamente';
+    		$arrData['flag'] = 1;
+		}
 		$this->output
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));

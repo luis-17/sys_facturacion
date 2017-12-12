@@ -641,18 +641,24 @@ class Cotizacion extends CI_Controller {
 
 	    $this->pdf->SetTextColor(95,95,95);
 	    $this->pdf->SetFont('Arial','B',9);
-        $this->pdf->SetXY(8,21);
+        $this->pdf->SetXY(8,19);
         $this->pdf->MultiCell( 120,6,utf8_decode( $fila['razon_social_ea'] ) ); 
         $this->pdf->SetFont('Arial','',8);
-        $this->pdf->SetXY(8,25);
+        $this->pdf->SetXY(8,22);
         $this->pdf->MultiCell( 120,6,utf8_decode( $fila['direccion_legal'] ),0,'L' );
-        $this->pdf->SetXY(8,29);
+
+        $this->pdf->SetXY(8,26);
+        $this->pdf->MultiCell( 120,6,'RUC: ',0,'L' ); 
+        $this->pdf->SetXY(36,26);
+        $this->pdf->MultiCell( 120,6,$fila['ruc_ea'],0,'L' ); 
+
+        $this->pdf->SetXY(8,30);
         $this->pdf->MultiCell( 120,6,'Sitio Web: ',0,'L' ); 
-        $this->pdf->SetXY(36,29);
+        $this->pdf->SetXY(36,30);
         $this->pdf->MultiCell( 120,6,utf8_decode(strtolower($fila['pagina_web']) ),0,'L' );
-        $this->pdf->SetXY(8,33);
+        $this->pdf->SetXY(8,34);
         $this->pdf->MultiCell( 120,6,utf8_decode('Teléfono: '),0,'L' );
-	    $this->pdf->SetXY(36,33);
+	    $this->pdf->SetXY(36,34);
 	    $this->pdf->MultiCell( 120,6,utf8_decode( $fila['telefono_ea'] ),0,'L' );
 
         $this->pdf->SetTextColor(0,0,0);
@@ -1097,7 +1103,6 @@ class Cotizacion extends CI_Controller {
 	        ->set_content_type('application/json')
 	        ->set_output(json_encode($arrData));
 	}
-
 	public function imprimir_cotizacion_vista()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true); 
@@ -1141,15 +1146,22 @@ class Cotizacion extends CI_Controller {
 
 	    $this->pdf->SetTextColor(95,95,95);
 	    $this->pdf->SetFont('Arial','B',9);
-        $this->pdf->SetXY(8,21);
+        $this->pdf->SetXY(8,18);
         $this->pdf->MultiCell( 120,6,utf8_decode( $datosEmpresa['razon_social'] ) ); 
         $this->pdf->SetFont('Arial','',8);
-        $this->pdf->SetXY(8,25);
+        $this->pdf->SetXY(8,22);
         $this->pdf->MultiCell( 120,6,utf8_decode( $datosEmpresa['direccion_legal'] ),0,'L' );
+
+        $this->pdf->SetXY(8,29);
+        $this->pdf->MultiCell( 120,6,'RUC: ',0,'L' ); 
+        $this->pdf->SetXY(36,29);
+        $this->pdf->MultiCell( 120,6,$datosEmpresa['ruc'],0,'L' ); 
+
         $this->pdf->SetXY(8,29);
         $this->pdf->MultiCell( 120,6,'Sitio Web: ',0,'L' ); 
         $this->pdf->SetXY(36,29);
         $this->pdf->MultiCell( 120,6,utf8_decode(strtolower($datosEmpresa['pagina_web']) ),0,'L' );
+
         $this->pdf->SetXY(8,33);
         $this->pdf->MultiCell( 120,6,utf8_decode('Teléfono: '),0,'L' );
 	    $this->pdf->SetXY(36,33);
@@ -1435,7 +1447,6 @@ class Cotizacion extends CI_Controller {
 	        ->set_content_type('application/json')
 	        ->set_output(json_encode($arrData));
 	}
-
 	public function registrar()
 	{
 		ini_set('xdebug.var_display_max_depth', 5);
