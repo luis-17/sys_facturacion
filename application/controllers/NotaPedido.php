@@ -431,9 +431,6 @@ class NotaPedido extends CI_Controller {
 	public function imprimir_nota_pedido()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true); 
-		// var_dump($allInputs);exit();d
-
-
 	    // RECUPERACIÓN DE DATOS 
 	    $fConfig = obtener_parametros_configuracion();
 	    $fila = $this->model_nota_pedido->m_cargar_nota_pedido_por_id($allInputs['id']);	 
@@ -604,7 +601,7 @@ class NotaPedido extends CI_Controller {
       	$this->pdf->Cell(38,4,'ASESOR DE VENTA '); 
       	$this->pdf->Cell(3,4,':',0,0,'C'); 
       	$this->pdf->SetFont('Arial','',8); 
-      	$this->pdf->MultiCell(45,4,strtoupper(strtoupper_total($this->sessionFactur['nombres'] .' '. $this->sessionFactur['apellidos'])));
+      	$this->pdf->MultiCell(45,4,strtoupper(strtoupper_total($fila['nombres'].' '.$fila['apellidos'])));
       	$y5 = $this->pdf->GetY();
       	$this->pdf->SetXY(8,$y5-1); 
       	$this->pdf->SetFont('Arial','B',8); 
@@ -650,10 +647,10 @@ class NotaPedido extends CI_Controller {
 
       	$this->pdf->SetXY(96,$y4+11); 
       	$this->pdf->SetFont('Arial','B',8); 
-      	$this->pdf->Cell(26,6,utf8_decode('VENDEDOR ')); 
+      	$this->pdf->Cell(26,6,utf8_decode('GENERADO POR: ')); 
       	$this->pdf->Cell(3,6,':',0,0,'C'); 
       	$this->pdf->SetFont('Arial','',8); 
-      	$this->pdf->Cell(75,6,$fila['nombres'].' '.$fila['apellidos']); 
+      	$this->pdf->Cell(75,6,$fila['nombres_gen'].' '.$fila['apellidos_gen']); 
 
       	$this->pdf->SetXY(8,$y5+13); 
       	$this->pdf->Cell(100,6,utf8_decode('Tenemos el agrado de presentar la siguiente nota pedido: ')); 
@@ -927,16 +924,15 @@ class NotaPedido extends CI_Controller {
 	}
 	public function registrar()
 	{
-		ini_set('xdebug.var_display_max_depth', 5);
-	    ini_set('xdebug.var_display_max_children', 256);
+		ini_set('xdebug.var_display_max_depth', 5); 
+	    ini_set('xdebug.var_display_max_children', 256); 
 	    ini_set('xdebug.var_display_max_data', 1024); 
 
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true); 
 		// print_r($allInputs); exit(); 
 		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
     	$arrData['flag'] = 0;
-		/* VALIDACIONES */
-
+		/* VALIDACIONES */ 
 		if( $allInputs['isRegisterSuccess'] === TRUE ){ 
     		$arrData['message'] = 'Ya se registró esta nota de pedido.';
     		$arrData['flag'] = 0;
@@ -945,7 +941,7 @@ class NotaPedido extends CI_Controller {
 			    ->set_output(json_encode($arrData));
 		    return;
     	}
-		if( count($allInputs['detalle']) < 1){
+		if( count($allInputs['detalle']) < 1){ 
     		$arrData['message'] = 'No se ha agregado ningún elemento';
     		$arrData['flag'] = 0;
     		$this->output
@@ -953,7 +949,7 @@ class NotaPedido extends CI_Controller {
 			    ->set_output(json_encode($arrData));
 		    return;
     	}
-    	if( empty($allInputs['sede']['id']) ){
+    	if( empty($allInputs['sede']['id']) ){ 
     		$arrData['message'] = 'Debe tener asignado una sede para poder registrar los datos';
     		$arrData['flag'] = 0;
     		$this->output
@@ -961,7 +957,7 @@ class NotaPedido extends CI_Controller {
 			    ->set_output(json_encode($arrData));
 		    return;
     	}
-    	if( $allInputs['total'] == 'NaN' || empty($allInputs['total']) ){
+    	if( $allInputs['total'] == 'NaN' || empty($allInputs['total']) ){ 
     		$arrData['message'] = 'No se puedo calcular el precio total de venta. Corrija los montos e intente nuevamente.';
     		$arrData['flag'] = 0;
     		$this->output
@@ -1073,6 +1069,9 @@ class NotaPedido extends CI_Controller {
 						foreach ($elemento['caracteristicas'] as $keyCa => $caracteristica) { 
 							if( !empty($caracteristica['valor']) ){ 
 								$caracteristica['iddetallenotapedido'] = $arrData['iddetallenotapedido']; 
+								// if(  ){
+
+								// }
 								if( $this->model_nota_pedido->m_registrar_detalle_caracteristica_nota_pedido($caracteristica) ){ 
 									$arrData['message'] = 'Los datos se registraron correctamente'; 
 									$arrData['flag'] = 1; 

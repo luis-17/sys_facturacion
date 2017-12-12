@@ -254,6 +254,7 @@ class Model_nota_pedido extends CI_Model {
 			ce.idtipodocumentocliente AS ce_idtipodocumentocliente, ce.telefono AS telefono_ce,ce.direccion_guia, ce.direccion_legal AS direccion_legal_ce, 
 			cp.idclientepersona, (cp.num_documento) AS num_documento_cp, (cp.telefono_movil) AS telefono_movil_cp, (cp.telefono_fijo) AS telefono_fijo_cp, 
 			cp.idtipodocumentocliente AS cp_idtipodocumentocliente, cp.sexo, cp.email, col.idcolaborador, col.nombres, col.apellidos, 
+			(col_gen.nombres) AS nombres_gen, (col_gen.apellidos) AS apellidos_gen, 
 			se.idsede, se.descripcion_se, se.abreviatura_se, fp.idformapago, fp.descripcion_fp, fp.modo_fp, 
 			ct.idcontacto, ct.telefono_fijo, ct.anexo, ct.area_encargada,ea.idempresaadmin, (ea.razon_social) AS razon_social_ea, (ea.nombre_comercial) AS nombre_comercial_ea, (ea.ruc) AS ruc_ea,ea.nombre_logo, ea.direccion_legal, ea.pagina_web, (ea.telefono) AS telefono_ea, np.observaciones_np',FALSE); 
 		$this->db->from('movimiento np');
@@ -266,6 +267,8 @@ class Model_nota_pedido extends CI_Model {
 		$this->db->join('forma_pago fp','np.idformapago = fp.idformapago'); 
 		$this->db->join('contacto ct','np.idcontacto = ct.idcontacto','left'); 
 		$this->db->join('colaborador col','np.idcolaboradorcotnp = col.idcolaborador','left'); 
+		$this->db->join('usuario us','np.idusuarionp = us.idusuario'); 
+		$this->db->join('colaborador col_gen','us.idusuario = col_gen.idusuario'); 
 		$this->db->where_in('np.estado_movimiento',array(0,1,2)); // solo "anulado", "registrado" y "facturado" 
 		$this->db->where('np.idmovimiento',$idnotapedido);
 		$this->db->where('np.tipo_movimiento',1); // 1 : nota de pedido 
