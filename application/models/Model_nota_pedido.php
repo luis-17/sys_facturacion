@@ -10,7 +10,7 @@ class Model_nota_pedido extends CI_Model {
 		$this->db->select("CONCAT(COALESCE(col_cot.nombres,''), ' ', COALESCE(col_cot.apellidos,'')) As colaborador_cot",FALSE); 
 		$this->db->select("CONCAT(COALESCE(cp.nombres,''), ' ', COALESCE(cp.apellidos,''), ' ', COALESCE(ce.razon_social,'')) As cliente_persona_empresa",FALSE);
 		$this->db->select("CONCAT(cp.nombres, ' ', cp.apellidos) As cliente_persona",FALSE);
-		$this->db->select('np.idmovimiento, np.num_nota_pedido, np.fecha_registro, np.dir_movimiento, np.tipo_movimiento, np.fecha_emision, np.tipo_cliente, incluye_traslado_prov, incluye_entrega_domicilio, np.moneda, np.modo_igv, np.subtotal, np.igv, np.total, np.estado_movimiento, np.plazo_entrega, np.validez_oferta, 
+		$this->db->select('np.idmovimiento, np.num_nota_pedido, np.fecha_registro, np.dir_movimiento, np.tipo_movimiento, np.fecha_emision, np.tipo_cliente, incluye_traslado_prov, incluye_entrega_domicilio, np.moneda, np.modo_igv, np.subtotal, np.igv, np.total, np.estado_movimiento, np.plazo_entrega, np.validez_oferta, np.observaciones_np, 
 			col.idcolaborador, (col.num_documento) AS num_documento_col, us.idusuario, us.username, 
 			ea.idempresaadmin, (ea.razon_social) AS razon_social_ea, (ea.nombre_comercial) AS nombre_comercial_ea, (ea.ruc) AS ruc_ea, 
 			ce.idclienteempresa, (ce.razon_social) AS razon_social_ce, (ce.nombre_comercial) AS nombre_comercial_ce, (ce.ruc) AS ruc_ce, 
@@ -232,6 +232,7 @@ class Model_nota_pedido extends CI_Model {
 		$this->db->where('np.idmovimiento', $idnotapedido); 
 		// $this->db->where('ea.idempresaadmin', $this->sessionFactur['idempresaadmin']); // empresa session agrupador 
 		$this->db->where('np.tipo_movimiento', 1); // nota de pedido 
+		$this->db->where('dm.estado_dmov', 1); // nota de pedido 
 		$this->db->order_by('dm.iddetallemovimiento','ASC');
 		$this->db->order_by('c.orden_car','ASC');
 		$this->db->order_by('c.descripcion_car','ASC');
@@ -376,5 +377,24 @@ class Model_nota_pedido extends CI_Model {
 		$this->db->where('idmovimiento',$datos['idnotapedido']); 
 		return $this->db->update('movimiento', $data); 
 	}
+
+	public function m_actualizar_nota_pedido($datos)
+	{
+		// var_dump($datos);exit();
+		$data = array(
+			'estado_dmov' => 2, 
+		);
+		$this->db->where('iddetallemovimiento ',$datos['iddetallenotapedido']); 
+		return $this->db->update('detalle_movimiento', $data); 
+	}
+	public function m_editar($datos)
+	{
+		$data = array(
+			'observaciones_np' => strtoupper($datos['observaciones'])
+		);
+		$this->db->where('idmovimiento',$datos['idmovimiento']);
+		return $this->db->update('detalle_movimiento ', $data); 
+	}
+
 } 
 ?>

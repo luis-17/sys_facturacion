@@ -658,6 +658,11 @@ class Venta extends CI_Controller {
 						} 
 					}
 				} 
+				//ACTUALIZAR ESTADO USADO
+				if( !empty( $allInputs['idnotapedido'] ) ){
+					if( $this->model_nota_pedido->m_actualizar_nota_pedido($elemento) ){		
+					}
+				}
 			}
 			// ACTUALIZAR NUMERO DE SERIE 
 			$arrDataSC = array( 
@@ -674,9 +679,12 @@ class Venta extends CI_Controller {
 				$arrDataNPV = array(
 					'idnotapedido'=> $allInputs['idnotapedido'] 
 				);
-				if( $this->model_nota_pedido->m_actualizar_nota_pedido_a_venta($arrDataNPV) ){
+				$detPedido = $this->model_nota_pedido->m_cargar_detalle_nota_pedido_por_id($allInputs['idnotapedido']); 
+				if(empty($detPedido)){ 
+					if( $this->model_nota_pedido->m_actualizar_nota_pedido_a_venta($arrDataNPV) ){
 					$arrData['message'] .= '<br /> - Se actualizó el estado de la nota de pedido correctamente'; 
 					$arrData['flag'] = 1; 
+					}
 				}
 			}
 			
