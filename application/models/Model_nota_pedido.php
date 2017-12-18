@@ -213,13 +213,12 @@ class Model_nota_pedido extends CI_Model {
 		$fData = $this->db->get()->row_array();
 		return $fData; 
 	}
-	public function m_cargar_detalle_nota_pedido_por_id($idnotapedido)
+	public function m_cargar_detalle_nota_pedido_por_id($idnotapedido) 
 	{
 		$this->db->select('dm.iddetallemovimiento, np.idmovimiento, np.num_nota_pedido, np.fecha_registro, np.subtotal, np.igv, np.total, np.estado_movimiento, np.idempresaadmin, 
 			dm.cantidad, dm.precio_unitario, dm.importe_con_igv, dm.importe_sin_igv, 
 			dm.excluye_igv, dm.igv_detalle, dm.agrupador_totalizado, um.idunidadmedida, um.descripcion_um, um.abreviatura_um, 
 			ele.idelemento, ele.descripcion_ele, ele.tipo_elemento, c.idcaracteristica, c.orden_car, c.descripcion_car, dc.iddetallecaracteristica,dc.valor', FALSE); 
-
 		$this->db->from('movimiento np'); // nota de pedido 
 		$this->db->join('detalle_movimiento dm','np.idmovimiento = dm.idmovimiento');
 		$this->db->join('elemento ele','dm.idelemento = ele.idelemento');
@@ -239,6 +238,18 @@ class Model_nota_pedido extends CI_Model {
 		//$this->db->where_in('np.estado_movimiento', array(1,2)); // 1: registrado 2:facturado  
 		return $this->db->get()->result_array();
 	}
+
+	public function m_verificar_existe_item_nota_pedido($iddetallemovimiento,$idnotapedido){
+		$this->db->select('dm.iddetallemovimiento, np.idmovimiento', FALSE); 
+		$this->db->from('movimiento np'); // nota de pedido 
+		$this->db->join('detalle_movimiento dm','np.idmovimiento = dm.idmovimiento');
+		$this->db->where('np.idmovimiento', $idnotapedido); 
+		$this->db->where('dm.iddetallemovimiento', $iddetallemovimiento); 
+		$this->db->where('np.tipo_movimiento', 1); // nota de pedido 
+		$this->db->where('dm.estado_dmov', 1); // nota de pedido 
+		return $this->db->get()->row_array();
+	}
+
 	public function m_cargar_nota_pedido_por_id($idnotapedido) // moneda idtipodocumentocliente
 	{
 		$this->db->select("CONCAT(COALESCE(cp.nombres,''), ' ', COALESCE(cp.apellidos,''), ' ', COALESCE(ce.razon_social,'')) As cliente_persona_empresa",FALSE);

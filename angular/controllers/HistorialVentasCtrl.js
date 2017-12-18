@@ -304,6 +304,32 @@ app.controller('HistorialVentasCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     $scope.mySelectionGrid = [];
   };
   $scope.metodos.getPaginationServerSideVEDet(true);   
+
+  $scope.btnAnular = function() {
+    var pMensaje = '¿Realmente desea anular la venta?';
+    $bootbox.confirm(pMensaje, function(result) { 
+      if(result){
+        var arrParams = { 
+          idventa: $scope.mySelectionGrid[0].idmovimiento 
+        };
+        blockUI.start('Procesando información...');
+        VentaServices.sAnular(arrParams).then(function (rpta) {
+          if(rpta.flag == 1){
+            var pTitle = 'OK!';
+            var pType = 'success';
+            $scope.metodos.getPaginationServerSide(true);
+          }else if(rpta.flag == 0){
+            var pTitle = 'Error!';
+            var pType = 'danger';
+          }else{
+            alert('Error inesperado');
+          }
+          pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2500 });
+          blockUI.stop(); 
+        });
+      }
+    });
+  }  
   // $scope.btnImprimir = function() { 
   //   console.log($scope.mySelectionGrid[0],'$scope.mySelectionGrid[0]');
   //   var arrParams = { 

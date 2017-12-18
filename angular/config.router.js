@@ -326,7 +326,14 @@ angular.module('app')
               'angular/controllers/TipoDocumentoMovCtrl.js',
               'angular/controllers/SerieCtrl.js'
             ]) 
-          })                                                                             
+          })   
+          .state('app.categoria-cliente', {
+            url: '/categoria-cliente',
+            templateUrl: 'tpl/categoria-cliente.html',
+            resolve: load([
+              'angular/controllers/CategoriaClienteCtrl.js'
+            ]) 
+          })                                                                                    
           .state('lockme', {
               url: '/lockme',
               templateUrl: 'tpl/page_lockme.html'

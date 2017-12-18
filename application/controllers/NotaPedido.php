@@ -315,7 +315,7 @@ class NotaPedido extends CI_Controller {
 				'unidad_medida' => array( 
 					'id'=> $row['idunidadmedida'],
 					'descripcion'=> $row['descripcion_um'] 
-				),
+				),			
 				//'agrupacion' => (int)$row['agrupador_totalizado'],
 				'caracteristicas' => array() 
 			);

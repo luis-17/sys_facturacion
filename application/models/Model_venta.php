@@ -377,7 +377,7 @@ class Model_venta extends CI_Model {
 	}
 	public function m_editar_venta($datos)
 	{
-			// var_dump($datos);exit();
+		// var_dump($datos);exit();
 		$data = array(
 			'fecha_emision'=> darFormatoYMD($datos['fecha_emision']),
 			'idtipodocumentomov' => $datos['tipo_documento_mov']['id'], 
@@ -430,6 +430,15 @@ class Model_venta extends CI_Model {
 		$this->db->where('iddetallemovimiento',$datos['iddetallemovimiento']); 
 		return $this->db->update('detalle_movimiento', $data); 
 	}	
+	public function m_anular($datos)
+	{
+		$data = array(
+			'estado_movimiento' => 0, // anulado 
+			'fecha_anulacion' => date('Y-m-d H:i:s')
+		);
+		$this->db->where('idmovimiento',$datos['idventa']); 
+		return $this->db->update('movimiento', $data); 
+	}
 
 
 } 
