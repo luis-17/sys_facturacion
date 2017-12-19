@@ -71,7 +71,8 @@ class NotaPedido extends CI_Controller {
 					'subtotal' => $row['subtotal'], 
 					'igv' => $row['igv'], 
 					'total' => $row['total'], 
-					'estado' => $objEstado 
+					'estado' => $objEstado,
+					'observaciones' => $row['observaciones_np'], 
 				)
 			);
 		}
@@ -140,7 +141,7 @@ class NotaPedido extends CI_Controller {
 					'cantidad' => $row['cantidad'], 
 					'precio_unitario' => $row['precio_unitario'], 
 					'importe_con_igv' => $row['importe_con_igv'],				
-					'estado' => $objEstado 
+					'estado' => $objEstado, 
 				)
 			);
 		}
@@ -319,7 +320,7 @@ class NotaPedido extends CI_Controller {
 				'unidad_medida' => array( 
 					'id'=> $row['idunidadmedida'],
 					'descripcion'=> $row['descripcion_um'] 
-				),
+				),			
 				//'agrupacion' => (int)$row['agrupador_totalizado'],
 				'caracteristicas' => array() 
 			);
@@ -387,6 +388,10 @@ class NotaPedido extends CI_Controller {
 	{
 		$this->load->view('nota-pedido/busq_nota_pedido_popup'); 
 	}
+    public function ver_popup_editar_nota_pedido()
+	{
+		$this->load->view('nota-pedido/editar_nota_pedido_popup'); 
+	}	
 	public function generar_numero_nota_pedido() 
 	{ 
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true); 
@@ -1116,6 +1121,19 @@ class NotaPedido extends CI_Controller {
 			$arrData['message'] = 'Se anularon los datos correctamente';
     		$arrData['flag'] = 1;
 		}
+	}
+	public function editar()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		// var_dump($allInputs);exit();
+		$arrData['message'] = 'Error al editar los datos, inténtelo nuevamente';
+    	$arrData['flag'] = 0;  	
+    	$this->db->trans_start();
+		if($this->model_nota_pedido->m_editar($allInputs)) { // edicion de elemento
+			$arrData['message'] = 'Se editaron los datos correctamente';
+			$arrData['flag'] = 1;
+		}
+		$this->db->trans_complete();
 		$this->output
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));

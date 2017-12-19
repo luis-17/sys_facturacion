@@ -187,8 +187,7 @@ app.controller('HistorialNotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$b
     $scope.mySelectionGrid = [];
   };
   $scope.metodos.getPaginationServerSide(true); 
-
-
+  
   // ** grid detalle nota pedido
   var paginationOptionsNPDet = { 
     pageNumber: 1,
@@ -335,5 +334,48 @@ app.controller('HistorialNotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$b
         });
       }
     });
+  }
+  $scope.btnEditar = function() {
+      blockUI.start('Abriendo formulario...');
+      $uibModal.open({ 
+        templateUrl: angular.patchURLCI+'NotaPedido/ver_popup_editar_nota_pedido',
+        size: 'md',
+        backdrop: 'static',
+        keyboard:false,
+        scope: $scope,
+        controller: function ($scope, $uibModalInstance) { 
+          blockUI.stop(); 
+          if( $scope.mySelectionGrid.length == 1 ){ 
+            $scope.fData = $scope.mySelectionGrid[0];
+              console.log($scope.fData,'$scope.fData');
+          }else{
+            alert('Seleccione una sola fila');
+          }
+          $scope.titleForm = 'Editar Nota pedido';
+          $scope.cancel = function () {
+            $uibModalInstance.dismiss('cancel');
+          }     
+          $scope.aceptar = function () { 
+            blockUI.start('Procesando información...');
+            NotaPedidoServices.sEditar($scope.fData).then(function (rpta) {
+              if(rpta.flag == 1){
+                var pTitle = 'OK!';
+                var pType = 'success';
+                $uibModalInstance.dismiss('cancel');
+                if(typeof $scope.metodos.getPaginationServerSide == 'function'){
+                  $scope.metodos.getPaginationServerSide(true);
+                }
+              }else if(rpta.flag == 0){
+                var pTitle = 'Error!';
+                var pType = 'danger';
+              }else{
+                alert('Error inesperado');
+              }
+              blockUI.stop(); 
+              pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2500 });
+            });
+          } 
+        }
+      });
   }
 }]); 

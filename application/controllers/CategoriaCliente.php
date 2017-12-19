@@ -23,8 +23,7 @@ class CategoriaCliente extends CI_Controller {
 			array_push($arrListado,
 				array(
 					'idcategoriacliente' => $row['idcategoriacliente'],
-					'descripcion_cc' => strtoupper($row['descripcion_cc']),
-					'estado_cc' => $row['estado_cc']
+					'descripcion_cc' => strtoupper($row['descripcion_cc']),			
 				)
 			);
 		}
@@ -40,6 +39,58 @@ class CategoriaCliente extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
+
+	public function ver_popup_formulario()
+	{
+		$this->load->view('categoria-cliente/mant_categoriaCliente');
+	}	
+
+	public function registrar()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
+    	$arrData['flag'] = 0;
+    	// VALIDACIONES   	
+    	$this->db->trans_start();
+		if($this->model_categoria_cliente->m_registrar($allInputs)) { 
+			$arrData['message'] = 'Se registraron los datos correctamente';
+			$arrData['flag'] = 1;
+		}
+		$this->db->trans_complete();
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
+
+	public function editar()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$arrData['message'] = 'Error al editar los datos, inténtelo nuevamente';
+    	$arrData['flag'] = 0;     	
+    	$this->db->trans_start();
+		if($this->model_categoria_cliente->m_editar($allInputs)) { 
+			$arrData['message'] = 'Se editaron los datos correctamente';
+			$arrData['flag'] = 1;
+		}
+		$this->db->trans_complete();
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
+
+	public function anular()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$arrData['message'] = 'No se pudo anular los datos';
+    	$arrData['flag'] = 0;
+		if( $this->model_categoria_cliente->m_anular($allInputs) ){ 
+			$arrData['message'] = 'Se anularon los datos correctamente';
+    		$arrData['flag'] = 1;
+		}
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}	
 
 	 public function listar_categoria_cliente_cbo(){
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);

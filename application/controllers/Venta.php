@@ -578,6 +578,19 @@ class Venta extends CI_Controller {
 		    	->set_output(json_encode($arrData));
 		    return;
     	}
+
+    	foreach ($allInputs['detalle'] as $key => $row) {
+    		$aaa =$this->model_nota_pedido->m_verificar_existe_item_nota_pedido($row['iddetallenotapedido'],$row['idnotapedido']) ;
+    		if(empty($aaa) ){
+				$arrData['message'] = 'No se puede registrar la venta porque ya hay items que ya han sido usados';
+				$arrData['message'] .= '<br /> - Vuelva cargar nuevamente'; 
+	    		$arrData['flag'] = 0;
+	    		$this->output
+				    ->set_content_type('application/json')
+				    ->set_output(json_encode($arrData));
+			    return;
+    		}	
+    	}
     	// if( $allInputs['tipo_documento_cliente']['destino_str'] == 'ce' ){ // si es cliente empresa 
     	// 	if( empty($allInputs['contacto']['id']) ){ 
 	    // 		$arrData['message'] = 'No se ha asociado un CONTACTO válido. Asocie el CONTACTO.';
@@ -658,6 +671,11 @@ class Venta extends CI_Controller {
 						} 
 					}
 				} 
+				//ACTUALIZAR ESTADO USADO
+				if( !empty( $allInputs['idnotapedido'] ) ){
+					if( $this->model_nota_pedido->m_actualizar_nota_pedido($elemento) ){		
+					}
+				}
 			}
 			// ACTUALIZAR NUMERO DE SERIE 
 			$arrDataSC = array( 
@@ -674,12 +692,14 @@ class Venta extends CI_Controller {
 				$arrDataNPV = array(
 					'idnotapedido'=> $allInputs['idnotapedido'] 
 				);
-				if( $this->model_nota_pedido->m_actualizar_nota_pedido_a_venta($arrDataNPV) ){
+				$detPedido = $this->model_nota_pedido->m_cargar_detalle_nota_pedido_por_id($allInputs['idnotapedido']); 
+				if(empty($detPedido)){ 
+					if( $this->model_nota_pedido->m_actualizar_nota_pedido_a_venta($arrDataNPV) ){
 					$arrData['message'] .= '<br /> - Se actualizó el estado de la nota de pedido correctamente'; 
 					$arrData['flag'] = 1; 
+					}
 				}
-			}
-			
+			}			
 		} 
 		$this->db->trans_complete();
 		$this->output
@@ -815,6 +835,42 @@ class Venta extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
+
+	public function anular()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$arrData['message'] = 'No se pudo anular los datos';
+    	$arrData['flag'] = 0;
+    	// var_dump($allInputs);exit();
+    	// validar que no sea una cotización enviada 
+    	$fVenta = $this->model_venta->m_cargar_esta_venta_por_id_simple($allInputs['idventa']);
+
+    	if( $fVenta['estado_movimiento'] == 2 ){ // enviado 
+    		$arrData['message'] = 'Esta Venta ya ha sido enviada como Nota de Pedido. No se puede modificar.'; 
+    		$arrData['flag'] = 0;
+    		$this->output
+		    	->set_content_type('application/json')
+		    	->set_output(json_encode($arrData));
+		    return;
+    	} 
+    	// validar que no sea una venta anulada 
+    	if( $fVenta['estado_movimiento'] == 0 ){ // anulado 
+    		$arrData['message'] = 'Esta Venta ya ha sido anulada anteriormente. No se puede modificar.'; 
+    		$arrData['flag'] = 0;
+    		$this->output
+		    	->set_content_type('application/json')
+		    	->set_output(json_encode($arrData));
+		    return;
+    	}
+
+		if( $this->model_venta->m_anular($allInputs) ){ 
+			$arrData['message'] = 'Se anularon los datos correctamente';
+    		$arrData['flag'] = 1;
+		}
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}	
 
 	public function imprimir_venta()
 	{
