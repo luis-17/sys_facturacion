@@ -238,7 +238,7 @@ class NotaPedido extends CI_Controller {
 			)
 		); 
 		if( $fila['tipo_cliente'] === 'E' ){ // empresa 
-			$arrListado['num_documento'] = $fila['ruc_ce'];
+			$arrListado['num_documento'] = $fila['num_documento_persona_empresa'];
 			$arrListado['cliente'] = array(
 				'id' => $fila['idclienteempresa'],
 				'idclienteempresa' => $fila['idclienteempresa'],
@@ -257,8 +257,8 @@ class NotaPedido extends CI_Controller {
 				// 	'id'=> $fila['idcolaborador'],
 				// 	'descripcion'=> $fila['colaborador']
 				// ),
-				'ruc' => $fila['ruc_ce'],
-				'num_documento' => $fila['ruc_ce'],
+				'ruc' => $fila['num_documento_persona_empresa'],
+				'num_documento' => $fila['num_documento_persona_empresa'],
 				'representante_legal' => $fila['representante_legal_ce'],
 				'dni_representante_legal' => $fila['dni_representante_legal_ce'],
 				'direccion_legal' => $fila['direccion_legal_ce'],
@@ -266,7 +266,7 @@ class NotaPedido extends CI_Controller {
 			);
 		}
 		if( $fila['tipo_cliente'] === 'P' ){ // PERSONA 
-			$arrListado['num_documento'] = $fila['num_documento'];
+			$arrListado['num_documento'] = $fila['num_documento_persona_empresa'];
 			if( $fila['sexo'] == 'M' ){
 				$fila['desc_sexo'] = 'MASCULINO';
 			}
@@ -280,7 +280,7 @@ class NotaPedido extends CI_Controller {
 				'apellidos' => strtoupper($fila['apellidos']),
 				'cliente' => strtoupper($fila['nombres'].' '.$fila['apellidos']),
 				'tipo_cliente' => 'cp',
-				'num_documento' => $fila['num_documento'],
+				'num_documento' => $fila['num_documento_persona_empresa'],
 				// 'categoria_cliente' => array(
 				// 	'id'=> $fila['idcategoriacliente'],
 				// 	'descripcion'=> $fila['descripcion_cc'] telefono_contacto
