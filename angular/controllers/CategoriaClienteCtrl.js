@@ -114,7 +114,7 @@ app.controller('CategoriaClienteCtrl', ['$scope', '$filter', '$uibModal', '$boot
       $bootbox.confirm(pMensaje, function(result) {
         if(result){
           var arrParams = {
-            id: $scope.mySelectionGrid[0].id 
+            idcategoriacliente: $scope.mySelectionGrid[0].idcategoriacliente 
           };
           blockUI.start('Procesando información...');
           CategoriaClienteServices.sAnular(arrParams).then(function (rpta) {
