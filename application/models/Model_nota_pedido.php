@@ -297,6 +297,17 @@ class Model_nota_pedido extends CI_Model {
 		$this->db->limit(1);
 		return $this->db->get()->row_array();
 	}
+	public function m_validar_caracteristicas_repetidas($idcaracteristica,$iddetalle)
+	{
+		$this->db->select('dc.iddetallecaracteristica');
+		$this->db->from('detalle_caracteristica dc');
+		$this->db->where('dc.idcaracteristica',$idcaracteristica);
+		$this->db->where('dc.iddetalle',$iddetalle);
+		$this->db->where('dc.tipo_detalle','NP');
+		$this->db->where('dc.estado_dcar',1);
+		$this->db->limit(1);
+		return $this->db->get()->row_array();
+	}
 	public function m_cargar_esta_nota_pedido_por_codigo($numNP) 
 	{
 		$this->db->select('np.idmovimiento, np.num_nota_pedido');
@@ -357,7 +368,7 @@ class Model_nota_pedido extends CI_Model {
 			'incluye_entrega_domicilio' => $datos['incluye_entr_dom'], 
 			'plazo_entrega' => $datos['plazo_entrega'],
 			'validez_oferta' => $datos['validez_oferta'],
-			'observaciones_np' => $datos['observaciones'] 
+			'observaciones_np' => empty($datos['observaciones']) ? NULL : $datos['observaciones']
 		); 
 		return $this->db->insert('movimiento', $data); 
 	}
@@ -419,7 +430,7 @@ class Model_nota_pedido extends CI_Model {
 	public function m_editar($datos)
 	{
 		$data = array(
-			'observaciones_np' => strtoupper($datos['observaciones'])
+			'observaciones_np' => empty($datos['observaciones']) ? NULL : strtoupper($datos['observaciones'])
 		);
 		$this->db->where('idmovimiento',$datos['idmovimiento']);
 		return $this->db->update('detalle_movimiento ', $data); 

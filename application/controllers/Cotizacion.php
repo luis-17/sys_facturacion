@@ -1607,16 +1607,21 @@ class Cotizacion extends CI_Controller {
 								if( empty($caracteristica['idcaracteristica']) ){ 
 									$caracteristica['idcaracteristica'] = @$caracteristica['id']; 
 								}
-								if( $this->model_cotizacion->m_registrar_detalle_caracteristica_cotizacion($caracteristica) ){ 
-									$arrData['message'] = 'Los datos se registraron correctamente'; 
-									$arrData['flag'] = 1; 
-									$fVariable = $this->model_variable_car->m_buscar_variable($caracteristica); 
-									if( empty($fVariable) ){ 
-										// GRABAR COMO UNA VARIABLE 
-										$caracteristica['descripcion_vcar'] = $caracteristica['valor'];
-										$this->model_variable_car->m_registrar($caracteristica); 
-									}
-								} 
+								// NO GRABAR CARACTERISTICAS REPETIDAS EN COTIZACION 
+								$fDetCarac = $this->model_cotizacion->m_validar_caracteristicas_repetidas($caracteristica['idcaracteristica'],$caracteristica['iddetallecotizacion']);
+								if( empty($fDetCarac) ){
+									if( $this->model_cotizacion->m_registrar_detalle_caracteristica_cotizacion($caracteristica) ){ 
+										$arrData['message'] = 'Los datos se registraron correctamente'; 
+										$arrData['flag'] = 1; 
+										$fVariable = $this->model_variable_car->m_buscar_variable($caracteristica); 
+										if( empty($fVariable) ){ 
+											// GRABAR COMO UNA VARIABLE 
+											$caracteristica['descripcion_vcar'] = $caracteristica['valor'];
+											$this->model_variable_car->m_registrar($caracteristica); 
+										}
+									} 
+								}
+								
 							} 
 						} 
 					}
@@ -1713,15 +1718,19 @@ class Cotizacion extends CI_Controller {
 									if( empty($caracteristica['idcaracteristica']) ){ 
 										$caracteristica['idcaracteristica'] = @$caracteristica['id']; 
 									}
-									if( $this->model_cotizacion->m_registrar_detalle_caracteristica_cotizacion($caracteristica) ){ 
-										$arrData['message'] = 'Los datos se editaron correctamente'; 
-										$arrData['flag'] = 1; 
-										$fVariable = $this->model_variable_car->m_buscar_variable($caracteristica); 
-										if( empty($fVariable) ){ 
-											// GRABAR COMO UNA VARIABLE 
-											$caracteristica['descripcion_vcar'] = $caracteristica['valor'];
-											$this->model_variable_car->m_registrar($caracteristica); 
-										}
+									// NO GRABAR CARACTERISTICAS REPETIDAS EN COTIZACION 
+									$fDetCarac = $this->model_cotizacion->m_validar_caracteristicas_repetidas($caracteristica['idcaracteristica'],$caracteristica['iddetallecotizacion']);
+									if( empty($fDetCarac) ){
+										if( $this->model_cotizacion->m_registrar_detalle_caracteristica_cotizacion($caracteristica) ){ 
+											$arrData['message'] = 'Los datos se editaron correctamente'; 
+											$arrData['flag'] = 1; 
+											$fVariable = $this->model_variable_car->m_buscar_variable($caracteristica); 
+											if( empty($fVariable) ){ 
+												// GRABAR COMO UNA VARIABLE 
+												$caracteristica['descripcion_vcar'] = $caracteristica['valor'];
+												$this->model_variable_car->m_registrar($caracteristica); 
+											}
+										} 
 									} 
 								} 
 							} 
@@ -1752,14 +1761,18 @@ class Cotizacion extends CI_Controller {
 										if( empty($caracteristica['idcaracteristica']) ){ 
 											$caracteristica['idcaracteristica'] = @$caracteristica['id']; 
 										}
-										if( $this->model_cotizacion->m_registrar_detalle_caracteristica_cotizacion($caracteristica) ){ 
-											$arrData['message'] = 'Los datos se editaron correctamente'; 
-											$arrData['flag'] = 1; 
-											$fVariable = $this->model_variable_car->m_buscar_variable($caracteristica); 
-											if( empty($fVariable) ){ 
-												// GRABAR COMO UNA VARIABLE 
-												$caracteristica['descripcion_vcar'] = $caracteristica['valor'];
-												$this->model_variable_car->m_registrar($caracteristica); 
+										// NO GRABAR CARACTERISTICAS REPETIDAS EN COTIZACION 
+										$fDetCarac = $this->model_cotizacion->m_validar_caracteristicas_repetidas($caracteristica['idcaracteristica'],$caracteristica['iddetallecotizacion']);
+										if( empty($fDetCarac) ){
+											if( $this->model_cotizacion->m_registrar_detalle_caracteristica_cotizacion($caracteristica) ){ 
+												$arrData['message'] = 'Los datos se editaron correctamente'; 
+												$arrData['flag'] = 1; 
+												$fVariable = $this->model_variable_car->m_buscar_variable($caracteristica); 
+												if( empty($fVariable) ){ 
+													// GRABAR COMO UNA VARIABLE 
+													$caracteristica['descripcion_vcar'] = $caracteristica['valor'];
+													$this->model_variable_car->m_registrar($caracteristica); 
+												}
 											}
 										}
 									}

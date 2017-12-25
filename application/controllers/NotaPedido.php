@@ -1079,13 +1079,14 @@ class NotaPedido extends CI_Controller {
 						foreach ($elemento['caracteristicas'] as $keyCa => $caracteristica) { 
 							if( !empty($caracteristica['valor']) ){ 
 								$caracteristica['iddetallenotapedido'] = $arrData['iddetallenotapedido']; 
-								// if(  ){
-
-								// }
-								if( $this->model_nota_pedido->m_registrar_detalle_caracteristica_nota_pedido($caracteristica) ){ 
-									$arrData['message'] = 'Los datos se registraron correctamente'; 
-									$arrData['flag'] = 1; 
-								} 
+								// NO GRABAR CARACTERISTICAS REPETIDAS EN NOTA PEDIDO
+								$fDetCarac = $this->model_nota_pedido->m_validar_caracteristicas_repetidas($caracteristica['idcaracteristica'],$caracteristica['iddetallenotapedido']);
+								if( empty($fDetCarac) ){
+									if( $this->model_nota_pedido->m_registrar_detalle_caracteristica_nota_pedido($caracteristica) ){ 
+										$arrData['message'] = 'Los datos se registraron correctamente'; 
+										$arrData['flag'] = 1; 
+									} 
+								}
 							} 
 						} 
 					}
@@ -1121,6 +1122,9 @@ class NotaPedido extends CI_Controller {
 			$arrData['message'] = 'Se anularon los datos correctamente';
     		$arrData['flag'] = 1;
 		}
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
 	}
 	public function editar()
 	{

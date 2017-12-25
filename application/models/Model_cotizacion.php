@@ -309,6 +309,17 @@ class Model_cotizacion extends CI_Model {
 		}
 		return $this->db->get()->result_array();  
 	}
+	public function m_validar_caracteristicas_repetidas($idcaracteristica,$iddetalle)
+	{
+		$this->db->select('dc.iddetallecaracteristica');
+		$this->db->from('detalle_caracteristica dc');
+		$this->db->where('dc.idcaracteristica',$idcaracteristica);
+		$this->db->where('dc.iddetalle',$iddetalle);
+		$this->db->where('dc.tipo_detalle','C');
+		$this->db->where('dc.estado_dcar',1);
+		$this->db->limit(1);
+		return $this->db->get()->row_array();
+	}
 	public function m_cargar_esta_cotizacion_por_codigo($numCoti,$validate=FALSE,$numCaracteres=NULL)
 	{
 		$this->db->select('co.idcotizacion, co.num_cotizacion');
