@@ -1620,8 +1620,7 @@ class Cotizacion extends CI_Controller {
 											$this->model_variable_car->m_registrar($caracteristica); 
 										}
 									} 
-								}
-								
+								} 
 							} 
 						} 
 					}
@@ -1744,16 +1743,22 @@ class Cotizacion extends CI_Controller {
 						if( !empty($elemento['caracteristicas']) ){ 
 							foreach ($elemento['caracteristicas'] as $keyCa => $caracteristica) { 
 								if( !empty($caracteristica['iddetallecaracteristica']) ){ 
-									if( $this->model_cotizacion->m_editar_detalle_caracteristica_cotizacion($caracteristica) ){ 
-										$arrData['message'] = 'Los datos se editaron correctamente'; 
-										//$arrData['flag'] = 1; 
-										$fVariable = $this->model_variable_car->m_buscar_variable($caracteristica); 
-										if( empty($fVariable) ){ 
-											// GRABAR COMO UNA VARIABLE 
-											$caracteristica['descripcion_vcar'] = $caracteristica['valor'];
-											$this->model_variable_car->m_registrar($caracteristica); 
-										}
-									} 
+									// ELIMINAMOS VACIOS 
+									if( empty($caracteristica['valor']) ){ 
+										$this->model_cotizacion->m_eliminar_detalle_caracteristica_cotizacion($caracteristica);  
+									}else{
+										if( $this->model_cotizacion->m_editar_detalle_caracteristica_cotizacion($caracteristica) ){ 
+											$arrData['message'] = 'Los datos se editaron correctamente'; 
+											//$arrData['flag'] = 1; 
+											$fVariable = $this->model_variable_car->m_buscar_variable($caracteristica); 
+											if( empty($fVariable) ){ 
+												// GRABAR COMO UNA VARIABLE 
+												$caracteristica['descripcion_vcar'] = $caracteristica['valor'];
+												$this->model_variable_car->m_registrar($caracteristica); 
+											}
+										} 
+									}
+									
 								}else{ 
 									if( !empty($caracteristica['valor']) ){ 
 										$caracteristica['iddetallecotizacion'] = $elemento['iddetallecotizacion'];

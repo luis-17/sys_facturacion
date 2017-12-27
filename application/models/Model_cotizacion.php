@@ -517,6 +517,11 @@ class Model_cotizacion extends CI_Model {
 		$this->db->where('iddetallecaracteristica',$datos['iddetallecaracteristica']); 
 		return $this->db->update('detalle_caracteristica', $data); 
 	}
+	public function m_eliminar_detalle_caracteristica_cotizacion($datos)
+	{
+		$this->db->where('iddetallecaracteristica',$datos['iddetallecaracteristica']);
+		return $this->db->delete('detalle_caracteristica');
+	}
 	public function m_anular($datos)
 	{
 		$data = array(
