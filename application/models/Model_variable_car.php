@@ -76,11 +76,8 @@ class Model_variable_car extends CI_Model {
 
 	public function m_anular($datos)
 	{
-		$data = array( 
-			'estado_vcar' => 0
-		);
-		$this->db->where('idvariablecar',$datos['id']); 
-		return $this->db->update('variable_car', $data); 
+		$this->db->where('idvariablecar',$datos['id']);
+		return $this->db->delete('variable_car');
 	}
 	public function m_cargar_esta_variable_car($datos)
 	{	
