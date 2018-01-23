@@ -116,7 +116,7 @@ class ContactoEmpresa extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
-	public function listar_contacto_empresa_autocomplete()
+	public function listar_contacto_empresa_autocomplete() // tipo_cliente
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);	
 		$allInputs['limite'] = 15;
@@ -130,6 +130,7 @@ class ContactoEmpresa extends CI_Controller {
 					'contacto' => strtoupper($row['contacto']),
 					'ruc' => $row['ruc'],
 					'razon_social' => strtoupper($row['razon_social']),
+					'cliente' => strtoupper($row['razon_social']),
 					'representante_legal' => strtoupper($row['representante_legal']),
 					'dni_representante_legal' => $row['dni_representante_legal'],
 					'telefono_fijo' => $row['telefono_fijo'],
@@ -137,6 +138,7 @@ class ContactoEmpresa extends CI_Controller {
 					'anexo' => $row['anexo'],
 					'area_encargada' => $row['area_encargada'],
 					'idclienteempresa' => $row['idclienteempresa'],
+					'tipo_cliente' => 'ce', // empresa
 					'colaborador' => array(
 						'id'=> $row['idcolaborador'],
 						'colaborador'=> $row['colaborador']

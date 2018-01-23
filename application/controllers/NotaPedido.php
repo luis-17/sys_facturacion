@@ -496,7 +496,7 @@ class NotaPedido extends CI_Controller {
         if( @$this->estado == 1 ){ 
           $this->SetFont('Arial','B',50);
           $this->SetTextColor(255,192,203);
-          $this->RotatedText(70,190,'A N U L A D O',45);  
+          $this->RotatedText(70,190,'A N U L A D O',45); 
         } 
       	
       	$this->pdf->SetXY(8,40);

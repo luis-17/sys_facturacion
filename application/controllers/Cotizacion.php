@@ -924,7 +924,8 @@ class Cotizacion extends CI_Controller {
 	    $exonerado = 0;
 	    $fill = TRUE;
 	    $this->pdf->SetDrawColor($r_sec,$g_sec,$b_sec); // gris fill 
-	    $this->pdf->SetLineWidth(.1);
+	    $this->pdf->SetLineWidth(.1); 
+	    $this->pdf->SetTopMargin(200); 
 	    foreach ($arrGroupBy as $key => $value) { 
 	    	if( $value['agrupado'] === FALSE ){ 
 		    	if( $fila['modo_igv'] == 1){ 
@@ -1044,45 +1045,53 @@ class Cotizacion extends CI_Controller {
 			$this->pdf->Cell(194,0.8,'','B',1,'C',0); 
 			
 	    }
-	    $this->pdf->SetXY(8,-34); 
+	    //$this->pdf->SetXY(8,-34);
+	    $this->pdf->SetY(-34); 
 	    $this->pdf->SetFont('Arial','B',9);
-	    $en_letra = ValorEnLetras($fila['total'],$fila['moneda_str_completo']);
+	    
 	    if (array_values($arrGroupBy)[0]['agrupado']==false) {
-	    $this->pdf->Cell(140,5,'TOTAL SON: ' . utf8_decode($en_letra));
+	    	$en_letra = ValorEnLetras($fila['total'],$fila['moneda_str_completo']);
+	    	$this->pdf->Cell(140,5,'TOTAL SON: ' . utf8_decode($en_letra));
 	    }
-	    $this->pdf->SetXY(8,-23); 
+	    //$this->pdf->SetXY(8,-23);
+	    if( $this->pdf->PageNo() > 1 ){
+	    	$this->pdf->SetY(-36);
+	    }else{  
+			$this->pdf->Ln(9); 
+	    }
 	    $this->pdf->SetFont('Arial','',8);
 	    $bancoEmpresa = $this->model_banco_empresa_admin->m_cargar_cuentas_banco_por_filtros($fila['idempresaadmin'],$fila['moneda']);
- 		//$this->pdf->SetTextColor(0,0,0);
    		$this->pdf->SetFont('Arial','',9);
 	    foreach ($bancoEmpresa as $key => $value) {
 	    	$this->pdf->Cell(40,5,'Cta. Cte. '.$value['abreviatura_ba'].' '. utf8_decode($fila['moneda_str']),0,0,'L',0); 	  
 	    }
-	    $this->pdf->SetXY(8,-19); 
+	    //$this->pdf->SetXY(8,-19); 
+	    //$this->pdf->SetY(-30); 
+	    $this->pdf->Ln(); 
 	    foreach ($bancoEmpresa as $key => $value) {
-	    	$this->pdf->Cell(40,5,$value['num_cuenta'],0,0,'L',0); 	  
+	    	$this->pdf->Cell(40,5,$value['num_cuenta'],0,0,'L',0); 
 	    }
 	    
 	    $this->pdf->SetXY(8,-35); 
-	    if (array_values($arrGroupBy)[0]['agrupado']==false) {
-	    $this->pdf->SetFont('Arial','',8);
-	    $this->pdf->SetWidths(array(138));
-	    // $this->pdf->TextArea(array(empty($fila['motivo_movimiento'])? '':$fila['motivo_movimiento']),0,0,FALSE,5,20);
-	    $this->pdf->Cell(150,20,'');
-	    $this->pdf->Cell(20,6,'SUBTOTAL:','LT',0,'R');
-	    $this->pdf->SetFont('Arial','',8);
-	    $this->pdf->Cell(20,6,$simbolo . number_format($fila['subtotal'],$fConfig['num_decimal_total_key'],'.',' '),'TR',0,'R');
-	    $this->pdf->Ln(6);
-	    $this->pdf->SetFont('Arial','',8);
-	    $this->pdf->Cell(150,6,'');
-	    $this->pdf->Cell(20,6,'IGV:','L',0,'R');
-	    $this->pdf->SetFont('Arial','',8);
-	    $this->pdf->Cell(20,6,$simbolo . number_format($fila['igv'],$fConfig['num_decimal_total_key'],'.',' '),'R',0,'R');
-	    $this->pdf->Ln(6);
-	    $this->pdf->SetFont('Arial','B',9);
-	    $this->pdf->Cell(150,8,'');
-	    $this->pdf->Cell(20,8,'TOTAL:','TLB',0,'R');
-	    $this->pdf->Cell(20,8,$simbolo . number_format($fila['total'],$fConfig['num_decimal_total_key'],'.',' '),'TRB',0,'R');
+	    if (array_values($arrGroupBy)[0]['agrupado']==false) { 
+		    $this->pdf->SetFont('Arial','',8);
+		    $this->pdf->SetWidths(array(138));
+		    // $this->pdf->TextArea(array(empty($fila['motivo_movimiento'])? '':$fila['motivo_movimiento']),0,0,FALSE,5,20);
+		    $this->pdf->Cell(150,20,'');
+		    $this->pdf->Cell(20,6,'SUBTOTAL:','LT',0,'R');
+		    $this->pdf->SetFont('Arial','',8);
+		    $this->pdf->Cell(20,6,$simbolo . number_format($fila['subtotal'],$fConfig['num_decimal_total_key'],'.',' '),'TR',0,'R');
+		    $this->pdf->Ln(6);
+		    $this->pdf->SetFont('Arial','',8);
+		    $this->pdf->Cell(150,6,'');
+		    $this->pdf->Cell(20,6,'IGV:','L',0,'R');
+		    $this->pdf->SetFont('Arial','',8);
+		    $this->pdf->Cell(20,6,$simbolo . number_format($fila['igv'],$fConfig['num_decimal_total_key'],'.',' '),'R',0,'R');
+		    $this->pdf->Ln(6);
+		    $this->pdf->SetFont('Arial','B',9);
+		    $this->pdf->Cell(150,8,'');
+		    $this->pdf->Cell(20,8,'TOTAL:','TLB',0,'R');
+		    $this->pdf->Cell(20,8,$simbolo . number_format($fila['total'],$fConfig['num_decimal_total_key'],'.',' '),'TRB',0,'R');
 		}
 	    // $this->pdf->Cell(30,8,$simbolo . substr($fila['total_a_pagar'], 4),'TRB',0,'R');
 	    // $this->pdf->Ln(15);
@@ -1696,10 +1705,7 @@ class Cotizacion extends CI_Controller {
 				if( empty($elemento['id']) ){
 					$elemento['id'] = @$elemento['idelemento']; 
 				}
-				if( empty($elemento['unidad_medida']) ){ 
-					$elemento['unidad_medida'] = NULL; 
-				}
-				if( empty($elemento['unidad_medida']['id']) ){ 
+				if( empty($elemento['unidad_medida']['id']) && empty($elemento['unidad_medida']) ){ 
 					$elemento['unidad_medida'] = NULL; 
 				}
     			if( empty($elemento['iddetallecotizacion']) ){

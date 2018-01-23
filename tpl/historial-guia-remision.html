@@ -1,14 +1,14 @@
-<div class="" ng-controller="HistorialVentasCtrl">
+<div class="" ng-controller="HistorialGuiaRemisionCtrl">
   <div class="bg-light lter b-b wrapper-md">
-    <div class="m-n font-thin h3"> Historial de Ventas </div>
+    <div class="m-n font-thin h3"> Historial de Guias </div>
   </div>
   <div class="nav-tabs-alt" >
     <ul class="nav nav-tabs nav-justified">
       <li class="active">
-        <a data-target="#venta" role="tab" data-toggle="tab"> VENTAS </a>
+        <a data-target="#guia-remision" role="tab" data-toggle="tab"> COTIZACIONES </a>
       </li>
       <li >
-        <a data-target="#det-venta" role="tab" data-toggle="tab"> DETALLE DE VENTAS </a>
+        <a data-target="#det-guia-remision" role="tab" ng-click="metodos.getPaginationServerSideCotDet(true);" data-toggle="tab"> DETALLE DE COTIZACIONES </a>
       </li>
     </ul>
   </div>
@@ -16,18 +16,11 @@
     <div class="cell scrollable hover">
       <div class="cell-inner">
         <div class="tab-content">
-          <div class="tab-pane active" id="venta">
+          <div class="tab-pane active" id="guia-remision">
             <div class="wrapper-md">
               <div class="row">
                 <div class="col-xs-12"> 
                   <div class="form-group mb-n"> 
-                    <div class="inline w-sm mr" > 
-                      <label class="control-label text-ellipsis"> Sede </label> 
-                      <div class="input-group block clearfix"> 
-                        <select class="form-control input-sm" ng-model="fBusqueda.sede" ng-options="item as item.descripcion for item in fArr.listaSedes" 
-                          ng-change="metodos.getPaginationServerSide(true);" > </select> 
-                      </div>
-                    </div>
                     <div class="inline w-md mr-xs"> 
                       <label class="control-label text-ellipsis"> Desde </label> 
                       <div class="input-group block clearfix"> 
@@ -47,7 +40,7 @@
                     <div class="inline w-sm mr" > 
                       <label class="control-label text-ellipsis"> Estados </label> 
                       <div class="input-group block clearfix"> 
-                        <select class="form-control input-sm" ng-model="fBusqueda.estado_ve" ng-options="item as item.descripcion for item in fArr.listaEstadosVE" 
+                        <select class="form-control input-sm" ng-model="fBusqueda.estado_guia_remision" ng-options="item as item.descripcion for item in fArr.listaEstadosGuiaRemision" 
                           ng-change="metodos.getPaginationServerSide(true);" > </select> 
                       </div>
                     </div>
@@ -62,33 +55,32 @@
                   <div class="form-group mb-n text-right">
                     <button type="button" class="btn m-b-xs btn-info pull-left btn-xs" ng-click="btnBuscar();"> 
                       <i class="fa fa-search"> </i> Buscar </button>
-                    <button type="button" class="btn m-b-xs btn-success btn-xs" ng-click="goToUrl('/app/nueva-venta'); $event.preventDefault();"> 
+                    <button type="button" class="btn m-b-xs btn-success btn-xs" ng-click="goToUrl('/app/nueva-guia-remision'); $event.preventDefault();"> 
                       <i class="fa fa-file-text"></i> Nuevo </button>
-                    <!--  -->
                     <button type="button" ng-if="mySelectionGrid.length == 1" ng-click="btnImprimirHTML();" class="btn m-b-xs btn-info btn-xs"> 
                       <i class="fa fa-print"></i> Imprimir </button>
-                    <a ng-if="mySelectionGrid.length == 1 && mySelectionGrid[0].estado_movimiento == 1" class="btn m-b-xs btn-warning btn-xs" ui-sref="app.editar-venta({identify: mySelectionGrid[0].identify_trunc })" > 
+                    <a ng-if="mySelectionGrid.length == 1 && mySelectionGrid[0].estado_gr == 1" class="btn m-b-xs btn-warning btn-xs" ui-sref="app.editar-guia-remision({identify: mySelectionGrid[0].identify_trunc })" > 
                       <i class="fa fa-edit"></i> Editar </a> 
-                    <button type="button" ng-if="mySelectionGrid.length == 1 && mySelectionGrid[0].estado_movimiento == 1" ng-click="btnAnular();" class="btn m-b-xs btn-danger btn-xs"> 
+                    <button type="button" ng-if="mySelectionGrid.length == 1 && mySelectionGrid[0].estado_gr == 1" ng-click="btnAnular();" class="btn m-b-xs btn-danger btn-xs"> 
                       <i class="fa fa-trash-o"></i> Anular </button>
                   </div>
                 </div>
                 <div class="col-xs-12">
-                  <div ui-grid="gridOptionsVE" ui-grid-pagination ui-grid-selection ui-grid-resize-columns ui-grid-auto-resize class="grid table-responsive fs-mini-grid"></div>
+                  <div ui-grid="gridOptionsGR" ui-grid-pagination ui-grid-selection ui-grid-resize-columns ui-grid-auto-resize class="grid table-responsive fs-mini-grid"></div>
                 </div>
               </div>
             </div>
           </div>
-          <div class="tab-pane" id="det-venta">
+          <div class="tab-pane" id="det-guia-remision">
             <div class="wrapper-md">
               <div class="row">
-                <div class="col-xs-12"> 
+                <!-- <div class="col-xs-12"> 
                   <div class="form-group mb-n"> 
                     <div class="inline w-sm mr" > 
                       <label class="control-label text-ellipsis"> Sede </label> 
                       <div class="input-group block clearfix"> 
                         <select class="form-control input-sm" ng-model="fBusqueda.sede" ng-options="item as item.descripcion for item in fArr.listaSedes" 
-                          ng-change="metodos.getPaginationServerSideVEDet(true);" > </select> 
+                          ng-change="metodos.getPaginationServerSideCotDet(true);" > </select> 
                       </div>
                     </div>
                     <div class="inline w-md mr-xs"> 
@@ -108,43 +100,43 @@
                       </div> 
                     </div>
                     <div class="inline w-sm mr" > 
-                      <label class="control-label text-ellipsis"> Estados </label> 
+                      <label class="control-label text-ellipsis"> Estados de Cotización </label> 
                       <div class="input-group block clearfix"> 
-                        <select class="form-control input-sm" ng-model="fBusqueda.estado_ve" ng-options="item as item.descripcion for item in fArr.listaEstadosVE" 
-                          ng-change="metodos.getPaginationServerSideVEDet(true);" > </select> 
+                        <select class="form-control input-sm" ng-model="fBusqueda.estado_grizacion" ng-options="item as item.descripcion for item in fArr.listaEstadosCotizacion" 
+                          ng-change="metodos.getPaginationServerSideCotDet(true);" > </select> 
                       </div>
                     </div>
                     <div class="inline w-sm mr" > 
                       <label class="control-label text-ellipsis"> Categoria Elemento </label> 
                       <div class="input-group block clearfix"> 
                         <select class="form-control input-sm" ng-model="fBusqueda.categoria_elemento" ng-options="item as item.descripcion for item in fArr.listaCategoriasElemento" 
-                          ng-change="metodos.getPaginationServerSideVEDet(true);" > </select> 
+                          ng-change="metodos.getPaginationServerSideCotDet(true);" > </select> 
                       </div>
-                    </div> 
+                    </div>                    
                     <div class="inline w-xs mr" > 
                       <label class="control-label text-ellipsis">  </label> 
                       <div class="input-group block clearfix"> 
-                        <button type="button" class="btn btn-info btn-sm" style="position:absolute;" ng-click="metodos.getPaginationServerSideVEDet(true);"> PROCESAR </button> 
+                        <button type="button" class="btn btn-info btn-sm" style="position:absolute;" ng-click="metodos.getPaginationServerSideCotDet(true);"> PROCESAR </button> 
                       </div>
                     </div>
                   </div>
                   <div class="line line-dashed b-b line-sm"></div>
                   <div class="form-group mb-n text-right">
-                    <button type="button" class="btn m-b-xs btn-info pull-left btn-xs" ng-click="btnBuscarVEDet();"> 
+                    <button type="button" class="btn m-b-xs btn-info pull-left btn-xs" ng-click="btnBuscarCotDet();"> 
                       <i class="fa fa-search"> </i> Buscar </button>
-                    <button type="button" class="btn m-b-xs btn-success btn-xs" ng-click="goToUrl('/app/nueva-venta'); $event.preventDefault();"> 
+                    <button type="button" class="btn m-b-xs btn-success btn-xs" ng-click="goToUrl('/app/nueva-cotizacion'); $event.preventDefault();"> 
                       <i class="fa fa-file-text"></i> Nuevo </button>
-                    <!-- <button type="button" ng-if="mySelectionGrid.length == 1" ng-click="btnImprimirHTML();" class="btn m-b-xs btn-info btn-xs"> 
-                      <i class="fa fa-print"></i> Imprimir </button> -->
-                    <!-- <button type="button" ng-if="mySelectionGrid.length == 1" ng-click="btnEditar();" class="btn m-b-xs btn-warning btn-xs"> 
-                      <i class="fa fa-edit"></i> Editar </button> -->
+                    <button type="button" ng-if="mySelectionGrid.length == 1" ng-click="btnImprimir();" class="btn m-b-xs btn-info btn-xs"> 
+                      <i class="fa fa-print"></i> Imprimir </button>
+                    <button type="button" ng-if="mySelectionGrid.length == 1" ng-click="btnEditar();" class="btn m-b-xs btn-warning btn-xs"> 
+                      <i class="fa fa-edit"></i> Editar </button>
                     <button type="button" ng-if="mySelectionGrid.length == 1" ng-click="btnAnular();" class="btn m-b-xs btn-danger btn-xs"> 
                       <i class="fa fa-trash-o"></i> Anular </button>
                   </div>
                 </div>
                 <div class="col-xs-12">
-                  <div ui-grid="gridOptionsVEDet" ui-grid-pagination ui-grid-selection ui-grid-resize-columns ui-grid-auto-resize class="grid table-responsive fs-mini-grid"></div>
-                </div>
+                  <div ui-grid="gridOptionsCotDet" ui-grid-pagination ui-grid-selection ui-grid-resize-columns ui-grid-auto-resize class="grid table-responsive fs-mini-grid"></div>
+                </div> -->
               </div>
             </div>
           </div>

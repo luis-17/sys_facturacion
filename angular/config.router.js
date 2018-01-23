@@ -198,6 +198,59 @@ angular.module('app')
               'angular/controllers/VariableCarCtrl.js'  
             ])
           })
+          .state('app.nueva-guia-remision', {
+            url: '/nueva-guia-remision',
+            templateUrl: 'tpl/nueva-guia-remision.html',
+            resolve: load([
+              'angular/controllers/NuevaGuiaRemisionCtrl.js',
+              'angular/controllers/NuevaVentaCtrl.js',
+              'angular/controllers/ClienteEmpresaCtrl.js',
+              'angular/controllers/ClientePersonaCtrl.js',
+              'angular/controllers/ElementoCtrl.js',
+              'angular/controllers/ProductoCtrl.js',
+              'angular/controllers/ServicioCtrl.js',
+              'angular/controllers/ClienteCtrl.js',
+              'angular/controllers/ColaboradorCtrl.js',
+              'angular/controllers/CategoriaClienteCtrl.js',
+              'angular/controllers/CategoriaElementoCtrl.js',
+              'angular/controllers/CaracteristicaCtrl.js',
+              'angular/controllers/TipoDocumentoClienteCtrl.js',
+              'angular/controllers/TipoDocumentoMovCtrl.js',
+              'angular/controllers/MotivoTrasladoCtrl.js',
+              'angular/controllers/SedeCtrl.js',
+              'angular/controllers/SerieCtrl.js',
+              'angular/controllers/UnidadMedidaCtrl.js',
+              'angular/controllers/ContactoEmpresaCtrl.js',
+              'angular/controllers/VariableCarCtrl.js' 
+            ])
+          })
+          .state('app.editar-guia-remision', {
+            url: '/editar-guia-remision/:identify',
+            templateUrl: 'tpl/editar-guia-remision.html',
+            resolve: load([
+              'angular/controllers/EditarGuiaRemisionCtrl.js',
+              'angular/controllers/NuevaGuiaRemisionCtrl.js',
+              'angular/controllers/NuevaVentaCtrl.js',
+              'angular/controllers/ClienteEmpresaCtrl.js',
+              'angular/controllers/ClientePersonaCtrl.js',
+              'angular/controllers/ElementoCtrl.js',
+              'angular/controllers/ProductoCtrl.js',
+              'angular/controllers/ServicioCtrl.js',
+              'angular/controllers/ClienteCtrl.js',
+              'angular/controllers/ColaboradorCtrl.js',
+              'angular/controllers/CategoriaClienteCtrl.js',
+              'angular/controllers/CategoriaElementoCtrl.js',
+              'angular/controllers/CaracteristicaCtrl.js',
+              'angular/controllers/TipoDocumentoClienteCtrl.js',
+              'angular/controllers/TipoDocumentoMovCtrl.js',
+              'angular/controllers/MotivoTrasladoCtrl.js',
+              'angular/controllers/SedeCtrl.js',
+              'angular/controllers/SerieCtrl.js',
+              'angular/controllers/UnidadMedidaCtrl.js',
+              'angular/controllers/ContactoEmpresaCtrl.js',
+              'angular/controllers/VariableCarCtrl.js' 
+            ])
+          })
           .state('app.historial-ventas', { 
             url: '/historial-ventas',
             templateUrl: 'tpl/historial-ventas.html',
@@ -206,6 +259,16 @@ angular.module('app')
               'angular/controllers/NuevaVentaCtrl.js', 
               'angular/controllers/SedeCtrl.js',
               'angular/controllers/CategoriaElementoCtrl.js'
+            ])
+          })
+          .state('app.historial-guia-remision', { 
+            url: '/historial-guia-remision',
+            templateUrl: 'tpl/historial-guia-remision.html',
+            resolve: load([
+              'angular/controllers/HistorialGuiaRemisionCtrl.js', 
+              'angular/controllers/NuevaGuiaRemisionCtrl.js'
+              //'angular/controllers/SedeCtrl.js',
+              //'angular/controllers/CategoriaElementoCtrl.js'
             ])
           })
           .state('app.producto', {

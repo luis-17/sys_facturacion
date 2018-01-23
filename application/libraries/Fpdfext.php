@@ -4,12 +4,14 @@
 
     //Extendemos la clase Pdf de la clase fpdf para que herede todas sus variables y funciones. . 
     class Fpdfext extends FPDF { 
-      public function __construct() {
-        parent::__construct();
+      public function __construct($orientation='P', $unit='mm', $size='A4') {
+        parent::__construct($orientation, $unit, $size);
       }
       var $widths;
       var $aligns;
       var $angle=0;
+      var $tituloAbr;
+      var $imagenCab;
 
       public function setModeReport($modeReport){
         $this->modeReport = $modeReport;
@@ -340,19 +342,31 @@
           return $nl;
       }
       public function Header(){
-        // var_dump($this->tituloAbr); exit(); SetMargins
+        // var_dump( $this->tituloAbr ); exit(); //SetMargins 
+        if( $this->tituloAbr == 'VEN-COMPR' ){
+          //$this->SetAutoPageBreak(TRUE,25); 
+          // $this->SetFont('Arial','',6);
+          // $this->MultiCell(120,6,'USUARIO: ');
+          return; 
+        }
+
         $this->SetAutoPageBreak(TRUE,25);
         $ci2 =& get_instance(); 
         $this->SetFont('Arial','',6);
         $this->SetXY(-70,0);
         $this->MultiCell(120,6,'USUARIO: '.strtoupper($ci2->sessionFactur['username']).utf8_decode('    /   FECHA DE IMPRESIÓN: ').date('Y-m-d H:i:s')); 
         $this->Image($this->getImagenCab(),4,4,50); 
+        if( $this->PageNo() > 1 ){
+          $this->SetY(26);
+        }
         
       }
        // El pie del pdf
       public function Footer(){
         $ci2 =& get_instance();
-
+        if( $this->PageNo() > 1 ){
+          // $this->SetY(0);
+        }
       }
       function RotatedText($x, $y, $txt, $angle){
           //Text rotated around its origin

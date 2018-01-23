@@ -56,30 +56,11 @@ app.controller('EditarVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox',
   $scope.fData = {}; // contiene todas las variables de formulario 
   $scope.fArr = {}; // contiene todos los arrays generados por las funciones 
   
-  $scope.fData.classEditCliente = 'disabled';
-  // $scope.fData.fecha_registro = $filter('date')(moment().toDate(),'dd-MM-yyyy'); 
-  // $scope.fData.fecha_emision = $filter('date')(moment().toDate(),'dd-MM-yyyy'); 
-  // $scope.fData.num_serie_correlativo = '[ ............... ]'; 
-
-  // if(angular.isUndefined($scope.fConfigSys.precio_incluye_igv_ve) || $scope.fConfigSys.precio_incluye_igv_ve === null){ 
-  //   //console.log('entre');
-  //   $scope.$parent.getConfiguracionSys();
-  // }
-
-  // $timeout(function() { 
-  //   $scope.fData.modo_igv = parseInt($scope.fConfigSys.precio_incluye_igv_ve); // INCLUYE IGV dinamico 
-  //   $scope.fData.incluye_entr_dom = parseInt($scope.fConfigSys.incluye_entrega_dom_ve);  // dinamico 
-  // }, 500); 
-
-  // $scope.fData.plazo_entrega = 5;
-  // $scope.fData.validez_oferta = 10;
-  // $scope.fData.incluye_tras_prov = 2; // no 
+  $scope.fData.classEditCliente = 'disabled'; 
   
   $scope.fData.idventaanterior = null;
   $scope.fData.isRegisterSuccess = false;
-  $scope.fData.temporal = {};
-  // $scope.fData.temporal.cantidad = 1;
-  // $scope.fData.temporal.caracteristicas = null; 
+  $scope.fData.temporal = {}; 
   $scope.metodos.listaCategoriasCliente = function(myCallback) {
     var myCallback = myCallback || function() { };
     CategoriaClienteServices.sListarCbo().then(function(rpta) {

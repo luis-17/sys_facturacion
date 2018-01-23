@@ -6,9 +6,10 @@ class Model_venta extends CI_Model {
 	}
 	public function m_cargar_ventas($paramPaginate,$paramDatos)
 	{
-		$this->db->select("CONCAT(COALESCE(col.nombres,''), ' ', COALESCE(col.apellidos,'')) As colaborador",FALSE);
-		$this->db->select("CONCAT(COALESCE(cp.nombres,''), ' ', COALESCE(cp.apellidos,''), ' ', COALESCE(ce.razon_social,'')) As cliente_persona_empresa",FALSE);
-		$this->db->select("CONCAT(cp.nombres, ' ', cp.apellidos) As cliente_persona",FALSE);
+		$this->db->select("CONCAT(COALESCE(col.nombres,''), ' ', COALESCE(col.apellidos,'')) AS colaborador_gen",FALSE);
+		$this->db->select("CONCAT(COALESCE(col_asig.nombres,''), ' ', COALESCE(col_asig.apellidos,'')) AS colaborador_asig",FALSE);
+		$this->db->select("CONCAT(COALESCE(cp.nombres,''), ' ', COALESCE(cp.apellidos,''), ' ', COALESCE(ce.razon_social,'')) AS cliente_persona_empresa",FALSE);
+		$this->db->select("CONCAT(cp.nombres, ' ', cp.apellidos) AS cliente_persona",FALSE);
 		$this->db->select('ve.idmovimiento, ve.fecha_registro, ve.fecha_emision, ve.fecha_vencimiento, ve.fecha_ultimo_pago, ve.numero_serie, ve.numero_correlativo, 
 			ve.tipo_cliente, ve.plazo_entrega, ve.numero_orden_compra, ve.incluye_entrega_domicilio, ve.validez_oferta, ve.moneda, ve.modo_igv, ve.subtotal, 
 			ve.igv, ve.total, ve.estado_movimiento, tdm.idtipodocumentomov, tdm.descripcion_tdm, 
@@ -21,6 +22,7 @@ class Model_venta extends CI_Model {
 		$this->db->join('tipo_documento_mov tdm','ve.idtipodocumentomov = tdm.idtipodocumentomov'); 
 		$this->db->join('usuario us','ve.idusuarioventa = us.idusuario'); 
 		$this->db->join('colaborador col','us.idusuario = col.idusuario'); 
+		$this->db->join('colaborador col_asig','ve.idcolaboradorv = col_asig.idcolaborador','left'); 
 		$this->db->join('empresa_admin ea','ve.idempresaadmin = ea.idempresaadmin'); 
 		$this->db->join("cliente_empresa ce","ve.idcliente = ce.idclienteempresa AND ve.tipo_cliente = 'E'",'left'); 
 		$this->db->join("cliente_persona cp","ve.idcliente = cp.idclientepersona AND ve.tipo_cliente = 'P'",'left'); 
@@ -65,6 +67,7 @@ class Model_venta extends CI_Model {
 		$this->db->join('tipo_documento_mov tdm','ve.idtipodocumentomov = tdm.idtipodocumentomov'); 
 		$this->db->join('usuario us','ve.idusuarioventa = us.idusuario'); 
 		$this->db->join('colaborador col','us.idusuario = col.idusuario'); 
+		$this->db->join('colaborador col_asig','ve.idcolaboradorv = col_asig.idcolaborador','left'); 
 		$this->db->join('empresa_admin ea','ve.idempresaadmin = ea.idempresaadmin'); 
 		$this->db->join("cliente_empresa ce","ve.idcliente = ce.idclienteempresa AND ve.tipo_cliente = 'E'",'left'); 
 		$this->db->join("cliente_persona cp","ve.idcliente = cp.idclientepersona AND ve.tipo_cliente = 'P'",'left'); 
@@ -253,20 +256,23 @@ class Model_venta extends CI_Model {
 	}
 	public function m_cargar_venta_por_id($idmovimiento)
 	{
-		$this->db->select("CONCAT(COALESCE(ct.nombres,''), ' ', COALESCE(ct.apellidos,'')) AS contacto",FALSE);
+		$this->db->select("CONCAT(COALESCE(col_asig.nombres,''), ' ', COALESCE(col_asig.apellidos,'')) AS colaborador_asig",FALSE);
+		$this->db->select("CONCAT(COALESCE(ct.nombres,''), ' ', COALESCE(ct.apellidos,'')) AS contacto",FALSE); 
 		$this->db->select("TRIM(CONCAT(COALESCE(cp.nombres,''), ' ', COALESCE(cp.apellidos,''), ' ', COALESCE(ce.razon_social,''))) AS cliente_persona_empresa",FALSE);
 		$this->db->select("TRIM(CONCAT(COALESCE(cp.email,''), ' ', COALESCE(ct.email,''))) AS email_persona_empresa",FALSE);
 		$this->db->select("TRIM(CONCAT(COALESCE(tdc_ce.idtipodocumentocliente,''), ' ', COALESCE(tdc_cp.idtipodocumentocliente,''))) AS idtipodocumentocliente",FALSE);
 		$this->db->select("TRIM(CONCAT(COALESCE(tdc_ce.abreviatura_tdc,''), ' ', COALESCE(tdc_cp.abreviatura_tdc,''))) AS tipo_documento_abv",FALSE);
 		$this->db->select("TRIM(CONCAT(COALESCE(ce.ruc,''), ' ', COALESCE(cp.num_documento,''))) AS num_documento_persona_empresa",FALSE);
 		$this->db->select("CONCAT(cp.nombres, ' ', cp.apellidos) AS cliente_persona",FALSE);
-		$this->db->select('	ve.idmovimiento,ve.num_nota_pedido,ve.fecha_registro,ve.fecha_emision,ve.tipo_cliente,ve.plazo_entrega,ve.incluye_traslado_prov,ve.incluye_entrega_domicilio,ve.validez_oferta,
-			ve.moneda,ve.modo_igv,ve.subtotal,ve.igv,ve.total,ve.estado_movimiento, ve.numero_correlativo, 
+		$this->db->select('ve.idmovimiento,ve.num_nota_pedido,ve.fecha_registro,ve.fecha_emision,ve.tipo_cliente,ve.plazo_entrega,ve.incluye_traslado_prov,ve.incluye_entrega_domicilio,ve.validez_oferta,
+			ve.moneda,ve.modo_igv,ve.subtotal,ve.igv,ve.total,ve.estado_movimiento, ve.numero_serie, ve.numero_correlativo, ve.numero_orden_compra, 
 			us.idusuario,	us.username,ea.idempresaadmin,(ea.razon_social) AS razon_social_ea,(ea.nombre_comercial) AS nombre_comercial_ea,(ea.ruc) AS ruc_ea,	ea.nombre_logo,ea.direccion_legal, 
-			ea.pagina_web,(ea.telefono) AS telefono_ea,ce.idclienteempresa,(ce.razon_social) AS razon_social_ce,(ce.nombre_comercial) AS nombre_comercial_ce,(ce.ruc) AS ruc_ce,(ce.telefono) AS telefono_ce,	ce.direccion_guia,(ce.direccion_legal) AS direccion_legal_ce,ce.nombre_corto,ce.representante_legal,ce.dni_representante_legal,ce.direccion_legal AS direccion_legal_ce,cp.idclientepersona,(cp.num_documento) AS num_documento_cp,se.idsede,se.descripcion_se,se.abreviatura_se,fp.idformapago,fp.descripcion_fp,fp.modo_fp,ct.idcontacto,ct.anexo,ct.telefono_fijo,tdm.idtipodocumentomov,tdm.descripcion_tdm,s.idserie,s.numero_serie', FALSE); 
+			ea.pagina_web,(ea.telefono) AS telefono_ea,ce.idclienteempresa,(ce.razon_social) AS razon_social_ce,(ce.nombre_comercial) AS nombre_comercial_ce,(ce.ruc) AS ruc_ce,(ce.telefono) AS telefono_ce,	ce.direccion_guia,(ce.direccion_legal) AS direccion_legal_ce,ce.nombre_corto,ce.representante_legal,ce.dni_representante_legal,cp.idclientepersona,(cp.num_documento) AS num_documento_cp,se.idsede,se.descripcion_se,se.abreviatura_se,fp.idformapago,fp.descripcion_fp,fp.modo_fp,ct.idcontacto,ct.anexo,ct.telefono_fijo,
+				tdm.idtipodocumentomov,tdm.descripcion_tdm, s.idserie', FALSE); 
 		$this->db->from('movimiento ve'); 
 		$this->db->join('tipo_documento_mov tdm','ve.idtipodocumentomov = tdm.idtipodocumentomov'); 
 		$this->db->join('usuario us','ve.idusuarioventa = us.idusuario'); 
+		$this->db->join('colaborador col_asig','ve.idcolaboradorv = col_asig.idcolaborador','left'); 
 		$this->db->join('empresa_admin ea','ve.idempresaadmin = ea.idempresaadmin'); 
 		$this->db->join("cliente_empresa ce","ve.idcliente = ce.idclienteempresa AND ve.tipo_cliente = 'E'",'left'); 
 		$this->db->join("tipo_documento_cliente tdc_ce","ce.idtipodocumentocliente = tdc_ce.idtipodocumentocliente",'left'); 
@@ -275,6 +281,7 @@ class Model_venta extends CI_Model {
 		$this->db->join('sede se','ve.idsede = se.idsede'); 
 		$this->db->join('forma_pago fp','ve.idformapago = fp.idformapago'); 
 		$this->db->join('contacto ct','ve.idcontacto = ct.idcontacto','left'); 
+
 		$this->db->join('serie s','s.idempresaadmin = ea.idempresaadmin','left'); 
 		$this->db->where_in( 've.idmovimiento', array($idmovimiento) ); 
 		$this->db->limit(1);
@@ -312,6 +319,7 @@ class Model_venta extends CI_Model {
 			'idcliente' => $datos['cliente']['id'],
 			'idaperturacaja' => empty($datos['idaperturacaja']) ? NULL : $datos['idaperturacaja'],
 			'idusuarioventa' => $this->sessionFactur['idusuario'],
+			'idcolaboradorv' => $datos['colaborador']['id'],
 			'dir_movimiento' => 'E',
 			'tipo_movimiento' => 2,
 			'idtipodocumentomov' => $datos['tipo_documento_mov']['id'],
@@ -381,6 +389,7 @@ class Model_venta extends CI_Model {
 		$data = array(
 			'fecha_emision'=> darFormatoYMD($datos['fecha_emision']),
 			'idtipodocumentomov' => $datos['tipo_documento_mov']['id'], 
+			'numero_orden_compra' => $datos['orden_compra'],
 			// 'estado_cot' => $datos['estado_cotizacion']['id'], 
 			'idsede'=> $datos['sede']['id'],
 			'plazo_entrega'=> $datos['plazo_entrega'],

@@ -106,7 +106,8 @@ app.controller('HistorialVentasCtrl', ['$scope', '$filter', '$uibModal', '$bootb
       { field: 'fecha_emision', name: 've.fecha_emision', displayName: 'F. Emisión', minWidth: 100, enableFiltering: false },
       { field: 'fecha_registro', name: 've.fecha_registro', displayName: 'F. Registro', minWidth: 100, enableFiltering: false, visible: false },
       { field: 'cliente', name: 'cliente_persona_empresa', displayName: 'Cliente', minWidth: 180 },
-      { field: 'colaborador', name: 'colaborador', displayName: 'Colaborador', minWidth: 160 },
+      { field: 'colaborador_asig', name: 'colaborador_asig', displayName: 'Asesor de Venta', minWidth: 160 },
+      { field: 'colaborador_gen', name: 'colaborador_gen', displayName: 'Generado por:', minWidth: 160, visible: false },
       { field: 'usuario', name: 'us.username', displayName: 'Usuario', minWidth: 160, visible: false },
       { field: 'forma_pago', name: 'fp.descripcion_fp', displayName: 'Forma de Pago', minWidth: 100 },
       { field: 'sede', name: 'se.descripcion_se', displayName: 'Sede', minWidth: 100 },
@@ -154,14 +155,15 @@ app.controller('HistorialVentasCtrl', ['$scope', '$filter', '$uibModal', '$bootb
           've.numero_serie' : grid.columns[3].filters[0].term,
           've.numero_correlativo' : grid.columns[4].filters[0].term,
           "CONCAT(COALESCE(cp.nombres,''), ' ', COALESCE(cp.apellidos,''), ' ', COALESCE(ce.razon_social,''))" : grid.columns[7].filters[0].term,
-          "CONCAT(col.nombres, ' ', col.apellidos)" : grid.columns[8].filters[0].term,
-          "us.username" : grid.columns[9].filters[0].term, 
-          'fp.descripcion_fp' : grid.columns[10].filters[0].term, 
-          'se.descripcion_se' : grid.columns[11].filters[0].term, 
-          've.moneda' : grid.columns[12].filters[0].term, 
-          've.subtotal' : grid.columns[13].filters[0].term, 
-          've.igv' : grid.columns[14].filters[0].term, 
-          've.total' : grid.columns[15].filters[0].term 
+          "CONCAT(col_asig.nombres, ' ', col_asig.apellidos)" : grid.columns[8].filters[0].term,
+          "CONCAT(col.nombres, ' ', col.apellidos)" : grid.columns[9].filters[0].term,
+          "us.username" : grid.columns[10].filters[0].term, 
+          'fp.descripcion_fp' : grid.columns[11].filters[0].term, 
+          'se.descripcion_se' : grid.columns[12].filters[0].term, 
+          've.moneda' : grid.columns[13].filters[0].term, 
+          've.subtotal' : grid.columns[14].filters[0].term, 
+          've.igv' : grid.columns[15].filters[0].term, 
+          've.total' : grid.columns[16].filters[0].term 
         } 
         $scope.metodos.getPaginationServerSide(); 
       });
@@ -330,18 +332,42 @@ app.controller('HistorialVentasCtrl', ['$scope', '$filter', '$uibModal', '$bootb
       }
     });
   }  
-  // $scope.btnImprimir = function() { 
-  //   console.log($scope.mySelectionGrid[0],'$scope.mySelectionGrid[0]');
-  //   var arrParams = { 
-  //     titulo: 'VISTA PREVIA DE COTIZACIÓN',
-  //     datos:{
-  //       id: $scope.mySelectionGrid[0].idcotizacion,
-  //       codigo_reporte: 'COT-FCOT'
-  //     },
-  //     envio_correo: 'si',
-  //     salida: 'pdf',
-  //     url: angular.patchURLCI + "NotaPedido/imprimir_cotizacion" 
-  //   }
-  //   ModalReporteFactory.getPopupReporte(arrParams);
-  // }
+  $scope.btnImprimirHTML = function() { 
+    var arrParams = {
+      id: $scope.mySelectionGrid[0].idmovimiento, 
+      codigo_reporte: 'VEN-COMPR' 
+    }
+    VentaServices.sImprimirComprobanteHTML(arrParams).then(function (rpta) { 
+      if(rpta.flag == 1){
+        var printContents = rpta.html;
+        // var popupWin = window.open('', 'windowName', 'width=1270,height=847');
+        var popupWin = window.open('', 'windowName', 'width=1270,height=847');
+        popupWin.document.open()
+        popupWin.document.write('<html><head><link rel="stylesheet" type="text/css" href="assets/css/stylePrint.css" /></head><body onload="window.print()">' + printContents + '</html>');
+        popupWin.document.close();
+      }else { 
+        if(rpta.flag == 0) { // ALGO SALIÓ MAL
+          var pTitle = 'Error';
+          var pText = 'No se pudo realizar la impresión. Contacte con el Area de Sistemas.';
+          var pType = 'warning';
+        }
+        
+        pinesNotifications.notify({ title: pTitle, text: pText, type: pType, delay: 3500 });
+      }
+    });
+  }
+  $scope.btnImprimir = function() { 
+    // console.log($scope.mySelectionGrid[0],'$scope.mySelectionGrid[0]');
+    var arrParams = { 
+      titulo: 'VISTA PREVIA DE IMPRESIÓN',
+      datos:{
+        id: $scope.mySelectionGrid[0].idmovimiento, 
+        codigo_reporte: 'VEN-COMPR' 
+      },
+      envio_correo: 'no',
+      salida: 'pdf',
+      url: angular.patchURLCI + "Venta/imprimir_comprobante_venta" 
+    }
+    ModalReporteFactory.getPopupReporte(arrParams);
+  }
 }]); 
