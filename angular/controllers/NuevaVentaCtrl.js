@@ -1661,7 +1661,7 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
         pTitle = 'OK!';
         pType = 'success'; 
         $scope.fData.isRegisterSuccess = true;
-        $scope.fData.idventaanterior = rpta.idventa;
+        $scope.fData.idventaanterior = rpta.idmovimiento;
         console.log($scope.fData.idventaanterior,'$scope.fData.idventaanterior');
       }else if(rpta.flag == 0){
         var pTitle = 'Advertencia!';

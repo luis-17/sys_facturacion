@@ -1351,8 +1351,28 @@ app.controller('NuevaGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$boo
       pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 3000 });
     });
   }
-  $scope.btnImprimirHTML = function() {
-    
+  $scope.btnImprimirHTML = function() { 
+    var arrParams = {
+      id: $scope.fData.idguiaanterior, 
+      codigo_reporte: 'GR-COMPR' 
+    } 
+    GuiaRemisionServices.sImprimirComprobanteHTML(arrParams).then(function (rpta) { 
+      if(rpta.flag == 1){
+        var printContents = rpta.html; 
+        var popupWin = window.open('', 'windowName', 'width=1270,height=847'); 
+        popupWin.document.open()
+        popupWin.document.write('<html><head><link rel="stylesheet" type="text/css" href="assets/css/stylePrint.css" /></head><body onload="window.print()">' + printContents + '</html>');
+        popupWin.document.close();
+      }else { 
+        if(rpta.flag == 0) { // ALGO SALIÓ MAL
+          var pTitle = 'Error';
+          var pText = 'No se pudo realizar la impresión. Contacte con el Area de Sistemas.';
+          var pType = 'warning';
+        }
+        
+        pinesNotifications.notify({ title: pTitle, text: pText, type: pType, delay: 3500 });
+      }
+    });
   }
 
 }]);
@@ -1363,6 +1383,7 @@ app.service("GuiaRemisionServices",function($http, $q, handleBehavior) {
         sListarDetalleEstaGuiaRemision: sListarDetalleEstaGuiaRemision, 
         sListarHistorialGuiaRemision: sListarHistorialGuiaRemision,
         sListarHistorialDetalleGuiaRemision: sListarHistorialDetalleGuiaRemision,
+        sImprimirComprobanteHTML: sImprimirComprobanteHTML,
         sRegistrar: sRegistrar,
         sEditar: sEditar,
         sAnular: sAnular
@@ -1395,6 +1416,14 @@ app.service("GuiaRemisionServices",function($http, $q, handleBehavior) {
       var request = $http({
             method : "post",
             url : angular.patchURLCI+"GuiaRemision/listar_detalle_guias_remision_historial",
+            data : datos
+      });
+      return (request.then(handleBehavior.success,handleBehavior.error));
+    }
+    function sImprimirComprobanteHTML(datos) {
+      var request = $http({
+            method : "post",
+            url : angular.patchURLCI+"GuiaRemision/imprimir_comprobante_guia_remision_html",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));

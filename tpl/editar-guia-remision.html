@@ -29,7 +29,7 @@
 						</div>
           </div>
           <div class="form-group pull-in clearfix mb-n"> 
-          	<div class="col-md-6" ng-show="fData.tipo_documento_cliente.destino == 1"> 
+          	<!-- <div class="col-md-6" ng-show="fData.tipo_documento_cliente.destino == 1"> 
 							<label class="control-label text-ellipsis"> Contacto. </label> 
 							<div class="input-group"> 
               	<input type="text" ng-model="fData.contacto" class="form-control input-sm "
@@ -43,7 +43,7 @@
 	            <div ng-show="noResultsCT" class="text-danger">
 	                <i class="fa fa-remove"></i> No se encontró resultados 
 	            </div>
-						</div> 
+						</div>  -->
 						<div class="col-md-6" ng-show="fData.tipo_documento_cliente.destino == 1"> 
           		<label class="control-label"> Teléfono/Anexo </label>
 							<div class="input-group-btn">
@@ -82,7 +82,7 @@
           	</div>
           	<div class="col-md-3 col-sm-12">
               <label class="control-label text-ellipsis"> Serie Doc. </label> 
-              <select class="form-control input-sm" ng-model="fData.serie" ng-options="item as item.descripcion for item in fArr.listaSeries" 
+              <select disabled class="form-control input-sm" ng-model="fData.serie" ng-options="item as item.descripcion for item in fArr.listaSeries" 
               	tabindex="230" ng-change="metodos.generarSerieCorrelativo(true);" > </select> 
           	</div> 
           	<div class="col-md-3 col-sm-12">
@@ -242,8 +242,8 @@
 			</div>
 	    <div class="line line-dashed b-b line-lg pull-in"></div>
 	    <div class="col-xs-12 text-right" >
-	    	<button type="button" class="btn-info btn pull-left" ng-click="goToUrl('/app/historial-guia'); $event.preventDefault();" tabindex="415"> 
-	    		<i class="fa fa-save"> </i> GUIAS DE REMISICÓN </button> 
+	    	<button type="button" class="btn-info btn pull-left" ng-click="goToUrl('/app/historial-guia-remision'); $event.preventDefault();" tabindex="415"> 
+	    		<i class="fa fa-save"> </i> GUIAS DE REMISIÓN </button> 
 	    	<button type="button" class="btn-primary btn" ng-click="grabar(); $event.preventDefault();" ng-disabled="formGuiaRemision.$invalid && !fData.isRegisterSuccess" tabindex="420"> 
 	    		<i class="fa fa-save"> </i> [F2] GRABAR </button> 
 	    	<button type="button" class="btn-success btn " ng-click="btnImprimirHTML(); $event.preventDefault();" ng-disabled="!fData.isRegisterSuccess" tabindex="430"> 

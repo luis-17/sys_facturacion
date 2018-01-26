@@ -135,6 +135,16 @@ class Model_guia_remision extends CI_Model {
 		$fData = $this->db->get()->row_array();
 		return $fData; 
 	}
+	public function m_cargar_esta_guia_remision_por_id_simple($idguiaremision)
+	{ 
+		$this->db->select('gr.idguiaremision, gr.fecha_emision, gr.estado_gr', FALSE); 
+		$this->db->from('guia_remision gr'); 
+		$this->db->join('colaborador col','gr.idcolaborador = col.idcolaborador'); 
+		$this->db->where_in('gr.idguiaremision', array($idguiaremision)); 
+		$this->db->limit(1); 
+		$fData = $this->db->get()->row_array(); 
+		return $fData; 
+	}
 	public function m_cargar_detalle_guia_remision_por_id($idguiaremision)
 	{
 		$this->db->select('dgr.idguiaremisiondetalle, gr.idguiaremision, gr.fecha_registro, gr.estado_gr, gr.idempresaadmin, 
@@ -146,9 +156,7 @@ class Model_guia_remision extends CI_Model {
 		$this->db->join('unidad_medida um','dgr.idunidadmedida = um.idunidadmedida','left'); 
 		$this->db->join("detalle_caracteristica dc","dc.iddetalle = dgr.idguiaremisiondetalle AND dc.tipo_detalle = 'GR'",'left'); 
 		$this->db->join('caracteristica c','dc.idcaracteristica = c.idcaracteristica','left'); 
-		if( $idguiaremision ){ 
-			$this->db->where('gr.idguiaremision',$idguiaremision); 
-		}
+		$this->db->where('gr.idguiaremision',$idguiaremision); 
 		$this->db->where_in('dgr.estado_grd', array(1)); // habilitado 
 		$this->db->order_by('dgr.idguiaremisiondetalle','ASC');
 		$this->db->order_by('c.orden_car','ASC');
@@ -165,6 +173,17 @@ class Model_guia_remision extends CI_Model {
 		$this->db->limit(1);
 		$fData = $this->db->get()->row_array();
 		return $fData;
+	}
+	public function m_validar_caracteristicas_repetidas($idcaracteristica,$iddetalle)
+	{
+		$this->db->select('dc.iddetallecaracteristica');
+		$this->db->from('detalle_caracteristica dc');
+		$this->db->where('dc.idcaracteristica',$idcaracteristica);
+		$this->db->where('dc.iddetalle',$iddetalle);
+		$this->db->where('dc.tipo_detalle','GR');
+		$this->db->where('dc.estado_dcar',1);
+		$this->db->limit(1);
+		return $this->db->get()->row_array();
 	}
 	public function m_registrar($datos)
 	{
@@ -184,7 +203,7 @@ class Model_guia_remision extends CI_Model {
 			'punto_llegada'=> empty($datos['punto_llegada']) ? NULL : $datos['punto_llegada'],
 			'fecha_emision' => darFormatoYMD($datos['fecha_emision']),
 			'fecha_inicio_traslado'=> empty($datos['fecha_inicio_traslado']) ? NULL : darFormatoYMD($datos['fecha_inicio_traslado']),
-			'idusuarioreg' => $this->sessionFactur['idusuario'],
+			'idusuarioregistro' => $this->sessionFactur['idusuario'],
 			'costo_minimo'=> empty($datos['costo_minimo']) ? NULL : $datos['costo_minimo'], 
 			'motivo_otros'=> empty($datos['motivo_otros']) ? NULL : $datos['motivo_otros'], // aún no se implementa, sera NULL por ahora 
 			'numero_guia'=> empty($datos['numero_guia']) ? NULL : $datos['numero_guia'], 
@@ -205,7 +224,7 @@ class Model_guia_remision extends CI_Model {
 			'idelemento' => $datos['id'],
 			'idunidadmedida' => is_array($datos['unidad_medida']) ? $datos['unidad_medida']['id'] : $datos['unidad_medida'], 
 			'cantidad' => $datos['cantidad'],
-			'num_paquetes'=> $datos['num_paquetes']
+			'num_paquetes'=> empty($datos['num_paquetes']) ? NULL : $datos['num_paquetes'] 
 		); 
 		return $this->db->insert('guia_remision_detalle', $data); 
 	}
@@ -218,6 +237,64 @@ class Model_guia_remision extends CI_Model {
 			'valor' => strtoupper($datos['valor'])
 		);
 		return $this->db->insert('detalle_caracteristica', $data); 
+	}
+	public function m_editar_detalle_caracteristica_gr($datos)
+	{
+		$data = array( 
+			'valor' => strtoupper($datos['valor'])
+		);
+		$this->db->where('iddetallecaracteristica',$datos['iddetallecaracteristica']);
+		return $this->db->update('detalle_caracteristica', $data); 
+	}
+	public function m_editar($datos)
+	{
+		$data = array( 
+			'idmovimiento' => empty($datos['idmovimiento']) ? NULL : $datos['idmovimiento'], 
+			'idmotivotraslado'=> $datos['motivo_traslado']['id'],
+			'marca_transporte'=> empty($datos['marca_unidad']) ? NULL : $datos['marca_unidad'],
+			'placa_transporte'=> empty($datos['placa_unidad']) ? NULL : $datos['placa_unidad'],
+			'num_constancia_inscripcion'=> empty($datos['cert_inscripcion']) ? NULL : $datos['cert_inscripcion'],
+			'num_licencia_conducir'=> empty($datos['num_licencia_conducir']) ? NULL : $datos['num_licencia_conducir'],
+			'punto_partida'=> empty($datos['punto_partida']) ? NULL : $datos['punto_partida'],
+			'punto_llegada'=> empty($datos['punto_llegada']) ? NULL : $datos['punto_llegada'],
+			'fecha_emision' => darFormatoYMD($datos['fecha_emision']),
+			'fecha_inicio_traslado'=> empty($datos['fecha_inicio_traslado']) ? NULL : darFormatoYMD($datos['fecha_inicio_traslado']),
+			'costo_minimo'=> empty($datos['costo_minimo']) ? NULL : $datos['costo_minimo'], 
+			'peso_total'=> empty($datos['peso_total']) ? NULL : $datos['peso_total'], 
+			'idcolaborador' => $datos['colaborador']['id'],
+			'numero_orden_compra' => empty($datos['orden_compra']) ? NULL : $datos['orden_compra'],
+			'nombres_razon_social_trans'=> empty($datos['nombres_razon_social_trans']) ? NULL : $datos['nombres_razon_social_trans'],
+			'domicilio_trans'=> empty($datos['domicilio_trans']) ? NULL : $datos['domicilio_trans'],
+			'ruc_trans'=> empty($datos['ruc_dni_trans']) ? NULL : $datos['ruc_dni_trans']
+		); 
+		$this->db->where('idguiaremision',$datos['idguiaremision']);
+		return $this->db->update('guia_remision', $data); 
+	}
+	public function m_editar_detalle($datos)
+	{
+		$data = array( 
+			'idunidadmedida' => is_array($datos['unidad_medida']) ? $datos['unidad_medida']['id'] : $datos['unidad_medida'], 
+			'cantidad' => $datos['cantidad'],
+			'num_paquetes'=> empty($datos['num_paquetes']) ? NULL : $datos['num_paquetes'] 
+		);
+		$this->db->where('idguiaremisiondetalle',$datos['idguiaremisiondetalle']); 
+		return $this->db->update('guia_remision_detalle', $data); 
+	}
+	public function m_anular($datos)
+	{
+		$data = array(
+			'estado_gr' => 0 // anulado 
+		);
+		$this->db->where('idguiaremision',$datos['idguiaremision']); 
+		return $this->db->update('guia_remision', $data); 
+	}
+	public function m_anular_guia_remision_detalle($datos)
+	{
+		$data = array(
+			'estado_grd' => 0 // anulado 
+		);
+		$this->db->where('idguiaremisiondetalle',$datos['idguiaremisiondetalle']); 
+		return $this->db->update('guia_remision_detalle', $data); 
 	}
 }
 ?>

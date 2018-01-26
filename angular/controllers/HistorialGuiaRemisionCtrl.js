@@ -186,7 +186,27 @@ app.controller('HistorialGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '
   };
   $scope.metodos.getPaginationServerSide(true); 
   $scope.btnImprimirHTML = function() { 
-    
+    var arrParams = {
+      id: $scope.mySelectionGrid[0].idguiaremision, 
+      codigo_reporte: 'GR-COMPR' 
+    } 
+    GuiaRemisionServices.sImprimirComprobanteHTML(arrParams).then(function (rpta) { 
+      if(rpta.flag == 1){
+        var printContents = rpta.html; 
+        var popupWin = window.open('', 'windowName', 'width=1270,height=847'); 
+        popupWin.document.open()
+        popupWin.document.write('<html><head><link rel="stylesheet" type="text/css" href="assets/css/stylePrint.css" /></head><body onload="window.print()">' + printContents + '</html>');
+        popupWin.document.close();
+      }else { 
+        if(rpta.flag == 0) { // ALGO SALIÓ MAL
+          var pTitle = 'Error';
+          var pText = 'No se pudo realizar la impresión. Contacte con el Area de Sistemas.';
+          var pType = 'warning';
+        }
+        
+        pinesNotifications.notify({ title: pTitle, text: pText, type: pType, delay: 3500 });
+      }
+    });
   }
   $scope.btnAnular = function() {
     var pMensaje = '¿Realmente desea anular la guia de remisión?';

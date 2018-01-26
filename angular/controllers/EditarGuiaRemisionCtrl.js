@@ -103,7 +103,7 @@ app.controller('EditarGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$bo
   $scope.fArr.listaTiposDocumentoMov = [
     {'id' : 6, 'descripcion' : 'GUIA DE REMISIÓN'} 
   ]; 
-  $scope.fData.tipo_documento_mov = $scope.fArr.listaTiposDocumentoMov[0];
+  
 
   // TIPOS DE DOCUMENTO CLIENTE
   $scope.metodos.listaTiposDocumentoCliente = function(myCallback) { 
@@ -150,7 +150,7 @@ app.controller('EditarGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$bo
     });
   };
 
-  // UNIDADES DE MEDIDA // tipo_documento_mov
+  // UNIDADES DE MEDIDA 
   $scope.metodos.listaUnidadMedida = function(myCallback) { 
     var myCallback = myCallback || function() { };
     UnidadMedidaServices.sListarCbo().then(function(rpta) { 
@@ -196,7 +196,8 @@ app.controller('EditarGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$bo
 
         // bindings 
         $timeout(function() {
-          $scope.gridOptions.data = rpta.detalle;
+          $scope.gridOptions.data = rpta.detalle; 
+          console.log($scope.gridOptions.data,'$scope.gridOptions.data');
         }, 200);
 
         // colaborador 
@@ -216,6 +217,9 @@ app.controller('EditarGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$bo
           $scope.fData.tipo_documento_cliente = objIndex; 
         }
         $scope.metodos.listaTiposDocumentoCliente(myCallBackTD); 
+
+        // tipo documento comprobante 
+        $scope.fData.tipo_documento_mov = $scope.fArr.listaTiposDocumentoMov[0];
 
         // motivo de traslado 
         var myCallBackMT = function() { 
@@ -251,16 +255,16 @@ app.controller('EditarGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$bo
   }, 500);
 
   // WATCHERS 
-  $scope.$watch('fData.num_documento', function(newValue,oldValue){ 
-    if( oldValue == newValue ){
-      return false; 
-    }
-    if( !(newValue) ){
-      $scope.fData.cliente = {};
-      $scope.fData.contacto = null;
-      $scope.fData.classEditCliente = 'disabled';
-    }
-  }, true); 
+  // $scope.$watch('fData.num_documento', function(newValue,oldValue){ 
+  //   if( oldValue == newValue ){
+  //     return false; 
+  //   }
+  //   if( !(newValue) ){
+  //     $scope.fData.cliente = {};
+  //     $scope.fData.contacto = null;
+  //     $scope.fData.classEditCliente = 'disabled';
+  //   }
+  // }, true); 
 
   // NUEVO PRODUCTO 
   $scope.btnNuevoProducto = function() {
@@ -450,175 +454,175 @@ app.controller('EditarGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$bo
   }
 
   // NUEVO CONTACTO 
-  $scope.btnNuevoContacto = function() { 
-    var arrParams = {
-        'metodos': $scope.metodos,
-        'fArr': $scope.fArr 
-    }
-    ContactoEmpresaFactory.regContactoModal(arrParams); 
-  }
+  // $scope.btnNuevoContacto = function() { 
+  //   var arrParams = {
+  //       'metodos': $scope.metodos,
+  //       'fArr': $scope.fArr 
+  //   }
+  //   ContactoEmpresaFactory.regContactoModal(arrParams); 
+  // }
 
-  $scope.getContactoAutocomplete = function (value) { 
-    var params = {
-      searchText: value, 
-      searchColumn: "contacto",
-      sensor: false,
-      datos: $scope.fData
-    }
-    return ContactoEmpresaServices.sListarContactoAutoComplete(params).then(function(rpta) { 
-      $scope.noResultsCT = false;
-      if( rpta.flag === 0 ){
-        $scope.noResultsCT = true;
-      }
-      return rpta.datos;
-    });
-  } 
+  // $scope.getContactoAutocomplete = function (value) { 
+  //   var params = {
+  //     searchText: value, 
+  //     searchColumn: "contacto",
+  //     sensor: false,
+  //     datos: $scope.fData
+  //   }
+  //   return ContactoEmpresaServices.sListarContactoAutoComplete(params).then(function(rpta) { 
+  //     $scope.noResultsCT = false;
+  //     if( rpta.flag === 0 ){
+  //       $scope.noResultsCT = true;
+  //     }
+  //     return rpta.datos;
+  //   });
+  // } 
 
-  $scope.getSelectedContacto = function (item, model) { 
-    $scope.fData.num_documento = model.ruc;
-    $scope.fData.cliente.id = model.idclienteempresa;
-    $scope.fData.cliente.tipo_cliente = 'ce'; // empresa 
-    $scope.fData.cliente.descripcion = model.razon_social;
-    $scope.fData.cliente.razon_social = model.razon_social;
-    $scope.fData.cliente.representante_legal = model.representante_legal;
-    $scope.fData.cliente.dni_representante_legal = model.dni_representante_legal; 
+  // $scope.getSelectedContacto = function (item, model) { 
+  //   $scope.fData.num_documento = model.ruc;
+  //   $scope.fData.cliente.id = model.idclienteempresa;
+  //   $scope.fData.cliente.tipo_cliente = 'ce'; // empresa 
+  //   $scope.fData.cliente.descripcion = model.razon_social;
+  //   $scope.fData.cliente.razon_social = model.razon_social;
+  //   $scope.fData.cliente.representante_legal = model.representante_legal;
+  //   $scope.fData.cliente.dni_representante_legal = model.dni_representante_legal; 
 
-    $scope.fData.cliente.telefono_contacto = model.telefono_fijo; 
-    $scope.fData.cliente.anexo_contacto = model.anexo; 
-    // actualizamos vendedor / colaborador 
-    var objIndex = $scope.fArr.listaColaboradores.filter(function(obj) { 
-      return obj.id == model.colaborador.id; 
-    }).shift(); 
-    $scope.fData.colaborador = objIndex; 
-  }
+  //   $scope.fData.cliente.telefono_contacto = model.telefono_fijo; 
+  //   $scope.fData.cliente.anexo_contacto = model.anexo; 
+  //   // actualizamos vendedor / colaborador 
+  //   var objIndex = $scope.fArr.listaColaboradores.filter(function(obj) { 
+  //     return obj.id == model.colaborador.id; 
+  //   }).shift(); 
+  //   $scope.fData.colaborador = objIndex; 
+  // }
 
-  $scope.validateContacto = function() { 
-    if( angular.isObject( $scope.fData.contacto ) ){
-      $scope.fData.classValid = ' input-success-border';
-      $scope.noResultsCT = false;
-    }else{
-      if( $scope.fData.temporal.elemento ){
-        $scope.fData.classValid = ' input-danger-border';
-        $scope.noResultsCT = true;
-      }else{
-        $scope.fData.classValid = ' input-normal-border';
-        $scope.noResultsCT = false;
-      }      
-    }
-  }  
+  // $scope.validateContacto = function() { 
+  //   if( angular.isObject( $scope.fData.contacto ) ){
+  //     $scope.fData.classValid = ' input-success-border';
+  //     $scope.noResultsCT = false;
+  //   }else{
+  //     if( $scope.fData.temporal.elemento ){
+  //       $scope.fData.classValid = ' input-danger-border';
+  //       $scope.noResultsCT = true;
+  //     }else{
+  //       $scope.fData.classValid = ' input-normal-border';
+  //       $scope.noResultsCT = false;
+  //     }      
+  //   }
+  // }  
 
   // BUSCAR Contactos  
-  $scope.btnBusquedaContacto = function() { 
-    blockUI.start('Procesando información...'); 
-    $uibModal.open({ 
-      templateUrl: angular.patchURLCI+'ContactoEmpresa/ver_popup_busqueda_contacto',
-      size: 'md',
-      backdrop: 'static',
-      keyboard:false,
-      scope: $scope,
-      controller: function ($scope, $uibModalInstance) { 
-        blockUI.stop(); 
-        $scope.fBusqueda = {};
+  // $scope.btnBusquedaContacto = function() { 
+  //   blockUI.start('Procesando información...'); 
+  //   $uibModal.open({ 
+  //     templateUrl: angular.patchURLCI+'ContactoEmpresa/ver_popup_busqueda_contacto',
+  //     size: 'md',
+  //     backdrop: 'static',
+  //     keyboard:false,
+  //     scope: $scope,
+  //     controller: function ($scope, $uibModalInstance) { 
+  //       blockUI.stop(); 
+  //       $scope.fBusqueda = {};
 
-        $scope.titleForm = 'Búsqueda de Contactos'; 
-        var paginationOptionsCO = {
-          pageNumber: 1,
-          firstRow: 0,
-          pageSize: 100,
-          sort: uiGridConstants.DESC,
-          sortName: null,
-          search: null
-        };
-        $scope.mySelectionGridCO = [];
-        $scope.gridOptionsCO = {
-          paginationPageSizes: [100, 500, 1000, 10000],
-          paginationPageSize: 100,
-          useExternalPagination: true,
-          useExternalSorting: true,
-          enableGridMenu: true,
-          enableRowSelection: true,
-          enableSelectAll: false,
-          enableFiltering: true,
-          enableFullRowSelection: true,
-          multiSelect: false,
-          columnDefs: [ 
-            { field: 'id', name: 'co.idcontacto', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
-            { field: 'nombres', name: 'nombres', displayName: 'Nombre', minWidth: 120 },
-            { field: 'apellidos', name: 'apellidos', displayName: 'Apellidos', minWidth: 120 },
-            { field: 'razon_social', name: 'razon_social', displayName: 'Empresa', minWidth: 140 },
-            { field: 'ruc', name: 'ruc', displayName: 'RUC', minWidth: 80 } 
-          ],
-          onRegisterApi: function(gridApi) { // gridComboOptions
-            $scope.gridApi = gridApi;
-            gridApi.selection.on.rowSelectionChanged($scope,function(row){
-              $scope.mySelectionGridCO = gridApi.selection.getSelectedRows();
-              $scope.fData.contacto = $scope.mySelectionGridCO[0];
-              $scope.fData.cliente = $scope.mySelectionGridCO[0].cliente_empresa; 
-              $scope.fData.num_documento = $scope.mySelectionGridCO[0].cliente_empresa.ruc; 
-              $scope.fData.classEditCliente = '';
-              // actualizamos vendedor / colaborador 
-              var objIndex = $scope.fArr.listaColaboradores.filter(function(obj) { 
-                return obj.id == $scope.mySelectionGridCO[0].cliente_empresa.colaborador.id; 
-              }).shift(); 
-              $scope.fData.colaborador = objIndex; 
-              $uibModalInstance.dismiss('cancel');
-            });
-            $scope.gridApi.core.on.sortChanged($scope, function(grid, sortColumns) {
-              if (sortColumns.length == 0) {
-                paginationOptionsCO.sort = null;
-                paginationOptionsCO.sortName = null;
-              } else {
-                paginationOptionsCO.sort = sortColumns[0].sort.direction;
-                paginationOptionsCO.sortName = sortColumns[0].name;
-              }
-              $scope.metodos.getPaginationServerSideCO(true);
-            });
-            gridApi.pagination.on.paginationChanged($scope, function (newPage, pageSize) {
-              paginationOptionsCO.pageNumber = newPage;
-              paginationOptionsCO.pageSize = pageSize;
-              paginationOptionsCO.firstRow = (paginationOptionsCO.pageNumber - 1) * paginationOptionsCO.pageSize;
-              $scope.metodos.getPaginationServerSideCO(true);
-            });
-            $scope.gridApi.core.on.filterChanged( $scope, function(grid, searchColumns) {
-              var grid = this.grid;
-              paginationOptionsCO.search = true;
-              paginationOptionsCO.searchColumn = { 
-                'co.idcontacto' : grid.columns[1].filters[0].term,
-                'co.nombres' : grid.columns[2].filters[0].term,
-                'co.apellidos' : grid.columns[3].filters[0].term,
-                'ce.razon_social' : grid.columns[4].filters[0].term,
-                'ce.ruc' : grid.columns[5].filters[0].term
-              }; 
-              $scope.metodos.getPaginationServerSideCO();
-            });
-          }
-        }; 
-        paginationOptionsCO.sortName = $scope.gridOptionsCO.columnDefs[0].name; 
-        $scope.metodos.getPaginationServerSideCO = function(loader) { 
-          if(loader){
-            blockUI.start('Procesando información...'); 
-          }
-          var arrParams = {
-            paginate : paginationOptionsCO,
-            datos: $scope.fData 
-          }; 
-          ContactoEmpresaServices.sListarContactoBusqueda(arrParams).then(function (rpta) {
-            $scope.gridOptionsCO.totalItems = rpta.paginate.totalRows;
-            $scope.gridOptionsCO.data = rpta.datos;
-            if(loader){
-              blockUI.stop(); 
-            }
-          });
-          $scope.mySelectionClienteGrid = [];  
-        }
-        $scope.metodos.getPaginationServerSideCO(true); 
-        $scope.cancel = function () {
-          $uibModalInstance.dismiss('cancel');
-        }
+  //       $scope.titleForm = 'Búsqueda de Contactos'; 
+  //       var paginationOptionsCO = {
+  //         pageNumber: 1,
+  //         firstRow: 0,
+  //         pageSize: 100,
+  //         sort: uiGridConstants.DESC,
+  //         sortName: null,
+  //         search: null
+  //       };
+  //       $scope.mySelectionGridCO = [];
+  //       $scope.gridOptionsCO = {
+  //         paginationPageSizes: [100, 500, 1000, 10000],
+  //         paginationPageSize: 100,
+  //         useExternalPagination: true,
+  //         useExternalSorting: true,
+  //         enableGridMenu: true,
+  //         enableRowSelection: true,
+  //         enableSelectAll: false,
+  //         enableFiltering: true,
+  //         enableFullRowSelection: true,
+  //         multiSelect: false,
+  //         columnDefs: [ 
+  //           { field: 'id', name: 'co.idcontacto', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
+  //           { field: 'nombres', name: 'nombres', displayName: 'Nombre', minWidth: 120 },
+  //           { field: 'apellidos', name: 'apellidos', displayName: 'Apellidos', minWidth: 120 },
+  //           { field: 'razon_social', name: 'razon_social', displayName: 'Empresa', minWidth: 140 },
+  //           { field: 'ruc', name: 'ruc', displayName: 'RUC', minWidth: 80 } 
+  //         ],
+  //         onRegisterApi: function(gridApi) { // gridComboOptions
+  //           $scope.gridApi = gridApi;
+  //           gridApi.selection.on.rowSelectionChanged($scope,function(row){
+  //             $scope.mySelectionGridCO = gridApi.selection.getSelectedRows();
+  //             $scope.fData.contacto = $scope.mySelectionGridCO[0];
+  //             $scope.fData.cliente = $scope.mySelectionGridCO[0].cliente_empresa; 
+  //             $scope.fData.num_documento = $scope.mySelectionGridCO[0].cliente_empresa.ruc; 
+  //             $scope.fData.classEditCliente = '';
+  //             // actualizamos vendedor / colaborador 
+  //             var objIndex = $scope.fArr.listaColaboradores.filter(function(obj) { 
+  //               return obj.id == $scope.mySelectionGridCO[0].cliente_empresa.colaborador.id; 
+  //             }).shift(); 
+  //             $scope.fData.colaborador = objIndex; 
+  //             $uibModalInstance.dismiss('cancel');
+  //           });
+  //           $scope.gridApi.core.on.sortChanged($scope, function(grid, sortColumns) {
+  //             if (sortColumns.length == 0) {
+  //               paginationOptionsCO.sort = null;
+  //               paginationOptionsCO.sortName = null;
+  //             } else {
+  //               paginationOptionsCO.sort = sortColumns[0].sort.direction;
+  //               paginationOptionsCO.sortName = sortColumns[0].name;
+  //             }
+  //             $scope.metodos.getPaginationServerSideCO(true);
+  //           });
+  //           gridApi.pagination.on.paginationChanged($scope, function (newPage, pageSize) {
+  //             paginationOptionsCO.pageNumber = newPage;
+  //             paginationOptionsCO.pageSize = pageSize;
+  //             paginationOptionsCO.firstRow = (paginationOptionsCO.pageNumber - 1) * paginationOptionsCO.pageSize;
+  //             $scope.metodos.getPaginationServerSideCO(true);
+  //           });
+  //           $scope.gridApi.core.on.filterChanged( $scope, function(grid, searchColumns) {
+  //             var grid = this.grid;
+  //             paginationOptionsCO.search = true;
+  //             paginationOptionsCO.searchColumn = { 
+  //               'co.idcontacto' : grid.columns[1].filters[0].term,
+  //               'co.nombres' : grid.columns[2].filters[0].term,
+  //               'co.apellidos' : grid.columns[3].filters[0].term,
+  //               'ce.razon_social' : grid.columns[4].filters[0].term,
+  //               'ce.ruc' : grid.columns[5].filters[0].term
+  //             }; 
+  //             $scope.metodos.getPaginationServerSideCO();
+  //           });
+  //         }
+  //       }; 
+  //       paginationOptionsCO.sortName = $scope.gridOptionsCO.columnDefs[0].name; 
+  //       $scope.metodos.getPaginationServerSideCO = function(loader) { 
+  //         if(loader){
+  //           blockUI.start('Procesando información...'); 
+  //         }
+  //         var arrParams = {
+  //           paginate : paginationOptionsCO,
+  //           datos: $scope.fData 
+  //         }; 
+  //         ContactoEmpresaServices.sListarContactoBusqueda(arrParams).then(function (rpta) {
+  //           $scope.gridOptionsCO.totalItems = rpta.paginate.totalRows;
+  //           $scope.gridOptionsCO.data = rpta.datos;
+  //           if(loader){
+  //             blockUI.stop(); 
+  //           }
+  //         });
+  //         $scope.mySelectionClienteGrid = [];  
+  //       }
+  //       $scope.metodos.getPaginationServerSideCO(true); 
+  //       $scope.cancel = function () {
+  //         $uibModalInstance.dismiss('cancel');
+  //       }
         
-      }
-    });  
-  }
+  //     }
+  //   });  
+  // }
   // GESTIÓN DE CARACTERÍSTICAS 
   $scope.btnGestionCaracteristicas = function() {
     blockUI.start('Procesando información...'); 
@@ -832,7 +836,7 @@ app.controller('EditarGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$bo
       $scope.gridOptions.data = [];
     }
     $scope.gridOptions.data.push($scope.arrTemporal);
-    $scope.calcularTotales(); 
+    
     $scope.fData.temporal = {
       cantidad: 1,
       descripcion: null,
@@ -846,7 +850,7 @@ app.controller('EditarGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$bo
     // console.log($scope.fData.classValid,'$scope.fData.classValid');
   }
   $scope.btnGestionCaracteristicasDetalle = function(row,indice) { 
-    console.log(row,'row',indice,'indiceew');
+    //console.log(row,'row',indice,'indiceew');
     blockUI.start('Procesando información...'); 
     $uibModal.open({ 
       templateUrl: angular.patchURLCI+'Caracteristica/ver_popup_agregar_caracteristica',
@@ -911,19 +915,19 @@ app.controller('EditarGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$bo
             $scope.gridApi = gridApi; 
           }
         }; 
-        var myCallbackCaract = function() { 
-          console.log(row.entity.caracteristicas,'row.entity.caracteristicas');
-          angular.forEach(row.entity.caracteristicas, function(val,key) { 
-            console.log(val,'val');
-            var arrFilaTemp = { 
-              'id' : val.id,
-              'orden' : val.orden,
-              'descripcion' : val.descripcion,
-              'valor' : val.valor
-            };
-            $scope.fArr.gridOptionsCRDet.data.push(arrFilaTemp);
-          });
-          // $scope.fArr.gridOptionsCRDet.data = row.entity.caracteristicas;
+        // var myCallbackCaract = function() { 
+        //   angular.forEach(row.entity.caracteristicas, function(val,key) { 
+        //     var arrFilaTemp = { 
+        //       'id' : val.id,
+        //       'orden' : val.orden,
+        //       'descripcion' : val.descripcion,
+        //       'valor' : val.valor
+        //     };
+        //     $scope.fArr.gridOptionsCRDet.data.push(arrFilaTemp);
+        //   });
+        // }
+        var myCallbackCaract = function() {
+          $scope.fArr.gridOptionsCRDet.data = row.entity.caracteristicas;
         }
         //console.log(row.entity.caracteristicas,'row.entity.caracteristicas');
         if( !(row.entity.caracteristicas) ){ 
@@ -934,7 +938,7 @@ app.controller('EditarGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$bo
         //var rowCaracteristicas = row.caracteristicas; 
         $scope.cancel = function () { 
           $scope.gridOptions.data[indice].caracteristicas = $scope.fArr.gridOptionsCRDet.data; 
-          console.log($scope.gridOptions.data[indice].caracteristicas,'$scope.gridOptions.data[indice].caracteristicas')
+          //console.log($scope.gridOptions.data[indice].caracteristicas,'$scope.gridOptions.data[indice].caracteristicas')
           $uibModalInstance.dismiss('cancel');
         } 
       }
@@ -1133,13 +1137,13 @@ app.controller('EditarGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$bo
       return false; 
     }
     blockUI.start('Ejecutando proceso...');
-    GuiaRemisionServices.sRegistrar($scope.fData).then(function (rpta) { 
+    GuiaRemisionServices.sEditar($scope.fData).then(function (rpta) { 
       blockUI.stop();
       if(rpta.flag == 1){
         pTitle = 'OK!';
         pType = 'success'; 
-        $scope.fData.isRegisterSuccess = true;
-        $scope.fData.idguiaanterior = rpta.idguiaremision;
+        //$scope.fData.isRegisterSuccess = true;
+        //$scope.fData.idguiaanterior = rpta.idguiaremision;
       }else if(rpta.flag == 0){
         var pTitle = 'Advertencia!';
         var pType = 'warning';
@@ -1149,8 +1153,28 @@ app.controller('EditarGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$bo
       pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 3000 });
     });
   }
-  $scope.btnImprimirHTML = function() {
-    
+  $scope.btnImprimirHTML = function() { 
+    var arrParams = {
+      id: $scope.fData.idguiaremision, 
+      codigo_reporte: 'GR-COMPR' 
+    } 
+    GuiaRemisionServices.sImprimirComprobanteHTML(arrParams).then(function (rpta) { 
+      if(rpta.flag == 1){
+        var printContents = rpta.html; 
+        var popupWin = window.open('', 'windowName', 'width=1270,height=847'); 
+        popupWin.document.open()
+        popupWin.document.write('<html><head><link rel="stylesheet" type="text/css" href="assets/css/stylePrint.css" /></head><body onload="window.print()">' + printContents + '</html>');
+        popupWin.document.close();
+      }else { 
+        if(rpta.flag == 0) { // ALGO SALIÓ MAL
+          var pTitle = 'Error';
+          var pText = 'No se pudo realizar la impresión. Contacte con el Area de Sistemas.';
+          var pType = 'warning';
+        }
+        
+        pinesNotifications.notify({ title: pTitle, text: pText, type: pType, delay: 3500 });
+      }
+    });
   }
 
 }]);

@@ -6,7 +6,7 @@ class GuiaRemision extends CI_Controller {
     {
         parent::__construct(); 
         $this->load->helper(array('fechas','otros','pdf','contable','config')); 
-        $this->load->model(array('model_guia_remision','model_variable_car','model_serie', 'model_configuracion','model_caracteristica')); 
+        $this->load->model(array('model_guia_remision','model_variable_car','model_serie', 'model_configuracion','model_caracteristica','model_motivo_traslado')); 
         $this->load->library('excel');
     	$this->load->library('Fpdfext');
         //cache
@@ -219,7 +219,7 @@ class GuiaRemision extends CI_Controller {
 		}
 		foreach ($detalleLista as $key => $row) { 
 			$arrAux2 = array(
-				'iddetallecaracteristica'=> $row['iddetallecaracteristica'],
+				'iddetallecaracteristica'=> $row['iddetallecaracteristica'], 
 				'idcaracteristica'=> $row['idcaracteristica'],
 				'id'=> $row['idcaracteristica'],
 				'orden'=> $row['orden_car'],
@@ -413,93 +413,98 @@ class GuiaRemision extends CI_Controller {
 	    ini_set('xdebug.var_display_max_children', 256);
 	    ini_set('xdebug.var_display_max_data', 1024);
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true); 
-		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
+		$arrData['message'] = 'Error al editar los datos, inténtelo nuevamente';
     	$arrData['flag'] = 0;
     	// var_dump($allInputs); exit(); 
 		/* VALIDACIONES */
 		//validar que no sea una venta enviada 
-    	$fVenta = $this->model_venta->m_cargar_esta_venta_por_id_simple($allInputs['idmovimiento']);
-    	// var_dump($fVenta);exit();
-    	if( $fVenta['estado_movimiento'] == 2 ){ // enviado 
-    		$arrData['message'] = 'Esta Venta ya ha sido enviada como Nota de Pedido. No se puede modificar.'; 
-    		$arrData['flag'] = 0;
-    		$this->output
-		    	->set_content_type('application/json')
-		    	->set_output(json_encode($arrData));
-		    return;
-    	} 
+    	$fGuia = $this->model_guia_remision->m_cargar_esta_guia_remision_por_id_simple($allInputs['idguiaremision']);
     	// validar que no sea una venta anulada 
-    	if( $fVenta['estado_movimiento'] == 0 ){ // anulado 
-    		$arrData['message'] = 'Esta Venta ya ha sido anulada anteriormente. No se puede modificar.'; 
+    	if( $fGuia['estado_gr'] == 0 ){ // anulado 
+    		$arrData['message'] = 'Esta Guia de Remisión ya ha sido anulada anteriormente. No se puede modificar.'; 
     		$arrData['flag'] = 0;
     		$this->output
 		    	->set_content_type('application/json')
 		    	->set_output(json_encode($arrData));
 		    return;
     	}
-    	// var_dump($allInputs);exit();
     	$arrItemDetalle = array();
     	$this->db->trans_start();
-    	if( $this->model_venta->m_editar_venta($allInputs) ){ 
+    	if( $this->model_guia_remision->m_editar($allInputs) ){ 
     		foreach ($allInputs['detalle'] as $key => $elemento) {
-    			if( !empty($elemento['iddetallemovimiento']) ){ 
-					$arrItemDetalle[] = $elemento['iddetallemovimiento'];
+    			if( !empty($elemento['idguiaremisiondetalle']) ){ 
+					$arrItemDetalle[] = $elemento['idguiaremisiondetalle'];
 				}
     		} 
     		// ANULAR ITEMS QUE HAN SIDO QUITADOS.
-    		$listaDetalle = $this->model_venta->m_cargar_detalle_venta_por_id($allInputs['idmovimiento']); 
+    		$listaDetalle = $this->model_guia_remision->m_cargar_detalle_guia_remision_por_id($allInputs['idguiaremision']); 
     		$arrDetalleAEliminar = array();
     		foreach ($listaDetalle as $key => $row) {
-    			if( !(in_array($row['iddetallemovimiento'],$arrItemDetalle)) ){
-    				$arrDetalleAEliminar[] = $row['iddetallemovimiento']; 
+    			if( !(in_array($row['idguiaremisiondetalle'],$arrItemDetalle)) ){
+    				$arrDetalleAEliminar[] = $row['idguiaremisiondetalle']; 
     			}
     		}
     		foreach ($arrDetalleAEliminar as $key => $val) { 
     			$arrDatos = array(
-    				'iddetallemovimiento'=> $val 
+    				'idguiaremisiondetalle'=> $val 
     			);
-    			$this->model_venta->m_anular_venta_detalle($arrDatos); 
+    			$this->model_guia_remision->m_anular_guia_remision_detalle($arrDatos); 
     		}
     		foreach ($allInputs['detalle'] as $key => $elemento) { 
-    			$elemento['idmovimiento'] = $allInputs['idmovimiento'];
-    			if( empty($elemento['agrupacion']) ){ 
-					$elemento['agrupacion'] = NULL; // por defecto 
+    			$elemento['idguiaremision'] = $allInputs['idguiaremision'];
+    			/* fix clon */
+				if( empty($elemento['id']) ){
+					$elemento['id'] = @$elemento['idelemento']; 
 				}
-    			if( empty($elemento['iddetallemovimiento']) ){
-    				// agregar un detalle a venta 
-    				if($this->model_venta->m_registrar_detalle_venta($elemento)){
+				if( empty($elemento['unidad_medida']['id']) && empty($elemento['unidad_medida']) ){ 
+					$elemento['unidad_medida'] = NULL; 
+				}
+    			if( empty($elemento['idguiaremisiondetalle']) ){
+    				// agregar un detalle a guia 
+    				if($this->model_guia_remision->m_registrar_detalle($elemento)){
     					$arrData['message'] = 'Los datos se editaron correctamente - (no caracteristicas)'; 
 						$arrData['flag'] = 1; 
-						$arrData['iddetallemovimiento'] = GetLastId('iddetallemovimiento','detalle_movimiento');
+						$arrData['idguiaremisiondetalle'] = GetLastId('idguiaremisiondetalle','guia_remision_detalle');
 
 						if( !empty($elemento['caracteristicas']) ){ 
 							foreach ($elemento['caracteristicas'] as $keyCa => $caracteristica) { 
 								if( !empty($caracteristica['valor']) ){ 
-									$caracteristica['iddetalleventa'] = $arrData['iddetallemovimiento']; 
-									if( $this->model_venta->m_registrar_detalle_caracteristica_venta($caracteristica) ){ 
-										$arrData['message'] = 'Los datos se editaron correctamente'; 
-										$arrData['flag'] = 1; 
-										$fVariable = $this->model_variable_car->m_buscar_variable($caracteristica); 
-										if( empty($fVariable) ){ 
-											// GRABAR COMO UNA VARIABLE 
-											$caracteristica['descripcion_vcar'] = $caracteristica['valor'];
-											$this->model_variable_car->m_registrar($caracteristica); 
-										}
-									} 
+									$caracteristica['idguiaremisiondetalle'] = $arrData['idguiaremisiondetalle']; 
+									/* fix clon */
+									if( empty($caracteristica['idcaracteristica']) ){ 
+										$caracteristica['idcaracteristica'] = @$caracteristica['id']; 
+									}
+									// NO GRABAR CARACTERISTICAS REPETIDAS EN GUIA  
+									$fDetCarac = $this->model_guia_remision->m_validar_caracteristicas_repetidas($caracteristica['idcaracteristica'],$caracteristica['idguiaremisiondetalle']);
+									if( empty($fDetCarac) ){
+										if( $this->model_guia_remision->m_registrar_detalle_caracteristica_gr($caracteristica) ){ 
+											$arrData['message'] = 'Los datos se agregaron correctamente'; 
+											$arrData['flag'] = 1; 
+											$fVariable = $this->model_variable_car->m_buscar_variable($caracteristica); 
+											if( empty($fVariable) ){ 
+												// GRABAR COMO UNA VARIABLE 
+												$caracteristica['descripcion_vcar'] = $caracteristica['valor'];
+												$this->model_variable_car->m_registrar($caracteristica); 
+											}
+										} 
+									}
 								} 
 							} 
 						}
     				}
     			}else{ 
-    				// editar detalle de venta 
+    				// editar detalle de guia 
     				
-					if( $this->model_venta->m_editar_venta_detalle($elemento) ){ 
+					if( $this->model_guia_remision->m_editar_detalle($elemento) ){ 
 						$arrData['message'] = 'Los datos se editaron correctamente - (no caracteristicas)'; 
 						$arrData['flag'] = 1; 
 						if( !empty($elemento['caracteristicas']) ){ 
 							foreach ($elemento['caracteristicas'] as $keyCa => $caracteristica) { 
+								//var_dump($caracteristica['iddetallecaracteristica']); exit();
+								//print_r($caracteristica);
 								if( !empty($caracteristica['iddetallecaracteristica']) ){ 
-									if( $this->model_venta->m_editar_detalle_caracteristica_venta($caracteristica) ){ 
+									//print_r($caracteristica); 
+									if( $this->model_guia_remision->m_editar_detalle_caracteristica_gr($caracteristica) ){ 
 										$arrData['message'] = 'Los datos se editaron correctamente'; 
 										//$arrData['flag'] = 1; 
 										$fVariable = $this->model_variable_car->m_buscar_variable($caracteristica); 
@@ -511,15 +516,23 @@ class GuiaRemision extends CI_Controller {
 									} 
 								}else{ 
 									if( !empty($caracteristica['valor']) ){ 
-										$caracteristica['iddetalleventa'] = $elemento['iddetallemovimiento'];
-										if( $this->model_venta->m_registrar_detalle_caracteristica_venta($caracteristica) ){
-											$arrData['message'] = 'Los datos se editaron correctamente'; 
-											$arrData['flag'] = 1; 
-											$fVariable = $this->model_variable_car->m_buscar_variable($caracteristica); 
-											if( empty($fVariable) ){ 
-												// GRABAR COMO UNA VARIABLE 
-												$caracteristica['descripcion_vcar'] = $caracteristica['valor'];
-												$this->model_variable_car->m_registrar($caracteristica); 
+										$caracteristica['idguiaremisiondetalle'] = $elemento['idguiaremisiondetalle'];
+										/* fix clon */
+										if( empty($caracteristica['idcaracteristica']) ){ 
+											$caracteristica['idcaracteristica'] = @$caracteristica['id']; 
+										}
+										// NO GRABAR CARACTERISTICAS REPETIDAS EN GUIA  
+										$fDetCarac = $this->model_guia_remision->m_validar_caracteristicas_repetidas($caracteristica['idcaracteristica'],$caracteristica['idguiaremisiondetalle']);
+										if( empty($fDetCarac) ){
+											if( $this->model_guia_remision->m_registrar_detalle_caracteristica_gr($caracteristica) ){ 
+												$arrData['message'] = 'Los datos se editaron correctamente'; 
+												$arrData['flag'] = 1; 
+												$fVariable = $this->model_variable_car->m_buscar_variable($caracteristica); 
+												if( empty($fVariable) ){ 
+													// GRABAR COMO UNA VARIABLE 
+													$caracteristica['descripcion_vcar'] = $caracteristica['valor'];
+													$this->model_variable_car->m_registrar($caracteristica); 
+												}
 											}
 										}
 									}
@@ -540,22 +553,12 @@ class GuiaRemision extends CI_Controller {
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		$arrData['message'] = 'No se pudo anular los datos';
-    	$arrData['flag'] = 0;
-    	// var_dump($allInputs);exit();
-    	// validar que no sea una cotización enviada 
-    	$fVenta = $this->model_venta->m_cargar_esta_venta_por_id_simple($allInputs['idventa']);
-
-    	if( $fVenta['estado_movimiento'] == 2 ){ // enviado 
-    		$arrData['message'] = 'Esta Venta ya ha sido enviada como Nota de Pedido. No se puede modificar.'; 
-    		$arrData['flag'] = 0;
-    		$this->output
-		    	->set_content_type('application/json')
-		    	->set_output(json_encode($arrData));
-		    return;
-    	} 
-    	// validar que no sea una venta anulada 
-    	if( $fVenta['estado_movimiento'] == 0 ){ // anulado 
-    		$arrData['message'] = 'Esta Venta ya ha sido anulada anteriormente. No se puede modificar.'; 
+    	$arrData['flag'] = 0; 
+    	
+    	$fGuia = $this->model_guia_remision->m_cargar_esta_guia_remision_por_id_simple($allInputs['idguiaremision']);
+		// validar que no sea una guia anulada 
+    	if( $fGuia['estado_gr'] == 0 ){ // anulado 
+    		$arrData['message'] = 'Esta Guía de Remisión ya ha sido anulada anteriormente. No se puede anular.'; 
     		$arrData['flag'] = 0;
     		$this->output
 		    	->set_content_type('application/json')
@@ -563,7 +566,7 @@ class GuiaRemision extends CI_Controller {
 		    return;
     	}
 
-		if( $this->model_venta->m_anular($allInputs) ){ 
+		if( $this->model_guia_remision->m_anular($allInputs) ){ 
 			$arrData['message'] = 'Se anularon los datos correctamente';
     		$arrData['flag'] = 1;
 		}
@@ -571,36 +574,31 @@ class GuiaRemision extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
-	public function imprimir_guia_remision_html()
+	public function imprimir_comprobante_guia_remision_html() 
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true); 
 		$fConfig = obtener_parametros_configuracion();
- 		$fila = $this->model_venta->m_cargar_venta_por_id($allInputs['id']); 
- 		$detalleLista = $this->model_venta->m_cargar_detalle_venta_por_id($allInputs['id']); 
+ 		$fila = $this->model_guia_remision->m_cargar_guia_remision_por_id($allInputs['id']); 
+ 		$detalleLista = $this->model_guia_remision->m_cargar_detalle_guia_remision_por_id($allInputs['id']); 
  		// PREPARACIÓN DE DATA: 
  		$arrListadoDetalle = array(); 
  		foreach ($detalleLista as $key => $row) { 
 			$arrAux = array( 
-				'iddetallemovimiento' => $row['iddetallemovimiento'],
-				'idmovimiento' => $row['idmovimiento'],
+				'idguiaremisiondetalle' => $row['idguiaremisiondetalle'], 
+				'idguiaremision' => $row['idguiaremision'], 
 				'idelemento' => $row['idelemento'], 
 				'elemento' => $row['descripcion_ele'], 
 				'descripcion' => $row['descripcion_ele'], 
 				'cantidad' => $row['cantidad'], 
-				'precio_unitario' => number_format($row['precio_unitario'],$fConfig['num_decimal_precio_key'],'.',''), 
-				'importe_con_igv' => number_format($row['importe_con_igv'],$fConfig['num_decimal_total_key'],'.',''), 
-				'importe_sin_igv' => number_format($row['importe_sin_igv'],$fConfig['num_decimal_total_key'],'.',''), 
-				'excluye_igv' => $row['excluye_igv'], 
-				'igv_detalle' => number_format($row['igv_detalle'],$fConfig['num_decimal_total_key'],'.',''), // agrupacion
-				'igv' => $row['igv_detalle'], 
+				'num_paquetes' => $row['num_paquetes'], 
 				'unidad_medida' => array( 
-					'id'=> $row['idunidadmedida'],
-					'descripcion'=> $row['descripcion_um'],
+					'id'=> $row['idunidadmedida'], 
+					'descripcion'=> $row['descripcion_um'], 
 					'abreviatura'=> $row['abreviatura_um'] 
 				),
 				'caracteristicas' => array() 
 			);
-			$arrListadoDetalle[$row['iddetallemovimiento']] = $arrAux; 
+			$arrListadoDetalle[$row['idguiaremisiondetalle']] = $arrAux; 
 		}
 		foreach ($detalleLista as $key => $row) { 
 			$arrAux2 = array(
@@ -611,8 +609,8 @@ class GuiaRemision extends CI_Controller {
 				'valor'=> $row['valor']
 			);
 			if( !empty($row['iddetallecaracteristica']) ){ 
-				$arrListadoDetalle[$row['iddetallemovimiento']]['caracteristicas'][$row['iddetallecaracteristica']] = $arrAux2; 
-				$arrListadoDetalle[$row['iddetallemovimiento']]['caracteristicas'] = array_values($arrListadoDetalle[$row['iddetallemovimiento']]['caracteristicas']);
+				$arrListadoDetalle[$row['idguiaremisiondetalle']]['caracteristicas'][$row['iddetallecaracteristica']] = $arrAux2; 
+				$arrListadoDetalle[$row['idguiaremisiondetalle']]['caracteristicas'] = array_values($arrListadoDetalle[$row['idguiaremisiondetalle']]['caracteristicas']);
 			}
 
 		} 
@@ -685,11 +683,11 @@ class GuiaRemision extends CI_Controller {
 	    	$htmlData .= utf8_decode(strtoupper_total($fila['cliente_persona_empresa']));
 	    	$htmlData .= '</div>';
 
-	    	// set position direccion 
-	    	$posX_direccion = '30mm';
-	    	$posY_direccion = '39mm';
-	    	$htmlData .= '<div class="item" style="top:'.$posY_direccion.';left:'.$posX_direccion.';">';
-	    	$htmlData .= utf8_decode(strtoupper_total($fila['direccion_legal_ce']));
+	    	// set position punto de llegada  
+	    	$posX_puntoLlegada = '30mm';
+	    	$posY_puntoLlegada = '39mm';
+	    	$htmlData .= '<div class="item" style="top:'.$posY_puntoLlegada.';left:'.$posX_puntoLlegada.';">';
+	    	$htmlData .= utf8_decode(strtoupper_total($fila['punto_llegada']));
 	    	$htmlData .= '</div>';
 
 	    	// set position RUC  
@@ -699,11 +697,25 @@ class GuiaRemision extends CI_Controller {
 	    	$htmlData .= utf8_decode(strtoupper_total($fila['num_documento_persona_empresa']));
 	    	$htmlData .= '</div>';
 
-	    	// set position fecha 
-	    	$posX_fecha = '30mm';
-	    	$posY_fecha = '56mm';
-	    	$htmlData .= '<div class="item" style="top:'.$posY_fecha.';left:'.$posX_fecha.';">';
+	    	// set position fecha inicio traslado  
+	    	$posX_fechaInicioTraslado = '145mm';
+	    	$posY_fechaInicioTraslado = '18mm';
+	    	$htmlData .= '<div class="item" style="top:'.$posY_fechaInicioTraslado.';left:'.$posX_fechaInicioTraslado.';">';
+	    	$htmlData .= formatoFechaReporte3($fila['fecha_inicio_traslado']);
+	    	$htmlData .= '</div>';
+
+	    	// set position fecha emision 
+	    	$posX_fechaEmision = '145mm';
+	    	$posY_fechaEmision = '22mm';
+	    	$htmlData .= '<div class="item" style="top:'.$posY_fechaEmision.';left:'.$posX_fechaEmision.';">';
 	    	$htmlData .= formatoFechaReporte3($fila['fecha_emision']);
+	    	$htmlData .= '</div>';
+
+	    	// set position punto de partida  
+	    	$posX_puntoPartida = '30mm';
+	    	$posY_puntoPartida = '56mm';
+	    	$htmlData .= '<div class="item" style="top:'.$posY_puntoPartida.';left:'.$posX_puntoPartida.';">';
+	    	$htmlData .= $fila['punto_partida'];
 	    	$htmlData .= '</div>';
 
 	    	// set position telefono 
@@ -720,27 +732,29 @@ class GuiaRemision extends CI_Controller {
 	    	$htmlData .= utf8_decode(strtoupper_total($fila['numero_orden_compra']));
 	    	$htmlData .= '</div>';
 
-	    	// set Condición de Pago 
-	    	$posX_condicionPago = '234mm';
-	    	$posY_condicionPago = '47mm';
-	    	$htmlData .= '<div class="item" style="top:'.$posY_condicionPago.';left:'.$posX_condicionPago.';">';
-	    	$htmlData .= utf8_decode(strtoupper_total($fila['descripcion_fp']));
+	    	// set costo min. traslado
+	    	$posX_costoMinTraslado = '234mm';
+	    	$posY_costoMinTraslado = '51.5mm';
+	    	$htmlData .= '<div class="item" style="top:'.$posY_costoMinTraslado.';left:'.$posX_costoMinTraslado.';">';
+	    	$htmlData .= utf8_decode($fila['costo_minimo']);
+	    	$htmlData .= '</div>';
+
+	    	// set peso total 
+	    	$posX_pesoTotal = '234mm';
+	    	$posY_pesoTotal = '47mm';
+	    	$htmlData .= '<div class="item" style="top:'.$posY_pesoTotal.';left:'.$posX_pesoTotal.';">';
+	    	$htmlData .= utf8_decode($fila['peso_total']);
 	    	$htmlData .= '</div>';
 
 	    	// set Vendedor 
 	    	$posX_vendedor = '234mm';
 	    	$posY_vendedor = '56mm';
 	    	$htmlData .= '<div class="item" style="top:'.$posY_vendedor.';left:'.$posX_vendedor.';">';
-	    	$htmlData .= utf8_decode(strtoupper_total($fila['colaborador_asig'])); 
+	    	$htmlData .= utf8_decode(strtoupper_total($fila['colaborador'])); 
 	    	$htmlData .= '</div>';
 
-			// $arrData['html'] = $htmlData;
-			// $this->output
-			//     ->set_content_type('application/json')
-			//     ->set_output(json_encode($arrData));
-			// return;
 	    	/* DETALLE DE ITEMS */
-	    	$arrCol = array('60','64','845','130','130'); // ancho de las columnas 
+	    	$arrCol = array('60','64','975','130'); // ancho de las columnas 
 	    	$posX_detalle = '0mm';
 	    	$posY_detalle = '69mm';
 	    	$htmlData .= '<div class="item" style="top:'.$posY_detalle.';left:'.$posX_detalle.';">';
@@ -759,85 +773,111 @@ class GuiaRemision extends CI_Controller {
 				    	$htmlData .= '</div>';
 
 				    	$htmlData .= '<div class="item-detalle" style="width:'. $arrCol[3] .'px;">';
-				    	$htmlData .= $row['precio_unitario'];
+				    	$htmlData .= $row['num_paquetes'];
 				    	$htmlData .= '</div>';
 
-				    	$htmlData .= '<div class="item-detalle" style="width:'. $arrCol[4] .'px;">';
-				    	$htmlData .= $row['importe_sin_igv'];
-				    	$htmlData .= '</div>'; 
 			    	$htmlData .= '</div>';
 		    	}
 		    $htmlData .= '</div>'; 
 
-		    $strMoneda = NULL;
-		    $strSimbolo = NULL;
-		    if( $fila['moneda']=='S' ){
-		    	$strMoneda = ' SOLES';
-		    	$strSimbolo = 'S/. ';
-		    }
-		    if( $fila['moneda']=='D' ){
-		    	$strMoneda = ' DÓLARES';
-		    	$strSimbolo = 'US$ ';
-		    }
+		    // $strMoneda = NULL;
+		    // $strSimbolo = NULL;
+		    // if( $fila['moneda']=='S' ){
+		    // 	$strMoneda = ' SOLES';
+		    // 	$strSimbolo = 'S/. ';
+		    // }
+		    // if( $fila['moneda']=='D' ){
+		    // 	$strMoneda = ' DÓLARES';
+		    // 	$strSimbolo = 'US$ ';
+		    // }
 
 		    // set número de cuenta 
-		    $bancoEmpresa = $this->model_banco_empresa_admin->m_cargar_cuentas_banco_por_filtros($fila['idempresaadmin'],$fila['moneda']); 
-		    $posX_numCuenta = '2mm'; 
-	    	$posY_numCuenta = '168.5mm'; 
-	    	$htmlData .= '<div class="item" style="top:'.$posY_numCuenta.';left:'.$posX_numCuenta.';">';
-		    	$htmlData .= '<div class="rowdt compressed">'; 
-		    	foreach ($bancoEmpresa as $keyBEA => $rowBEA) { 
-		    		$htmlData .= '<div class="item-detalle" style="width:200px;">';
-			    	$htmlData .= 'Cta. Cte. '.$rowBEA['abreviatura_ba'].' '. utf8_decode($strMoneda);
-			    	$htmlData .= '</div>';  
-			    }
-			    $htmlData .= '</div>';
-		    	$htmlData .= '<div class="rowdt compressed">'; 
-		    	foreach ($bancoEmpresa as $keyBEA => $rowBEA) { 
-		    		$htmlData .= '<div class="item-detalle" style="width:200px;">';
-			    	$htmlData .= $rowBEA['num_cuenta'];
-			    	$htmlData .= '</div>';  
-			    }
-			    $htmlData .= '</div>';
-	    	$htmlData .= '</div>';
+		    // $bancoEmpresa = $this->model_banco_empresa_admin->m_cargar_cuentas_banco_por_filtros($fila['idempresaadmin'],$fila['moneda']); 
+		    // $posX_numCuenta = '2mm'; 
+	    	// $posY_numCuenta = '168.5mm'; 
+	    	// $htmlData .= '<div class="item" style="top:'.$posY_numCuenta.';left:'.$posX_numCuenta.';">';
+		    // 	$htmlData .= '<div class="rowdt compressed">'; 
+		    // 	foreach ($bancoEmpresa as $keyBEA => $rowBEA) { 
+		    // 		$htmlData .= '<div class="item-detalle" style="width:200px;">';
+			   //  	$htmlData .= 'Cta. Cte. '.$rowBEA['abreviatura_ba'].' '. utf8_decode($strMoneda);
+			   //  	$htmlData .= '</div>';  
+			   //  }
+			   //  $htmlData .= '</div>';
+		    // 	$htmlData .= '<div class="rowdt compressed">'; 
+		    // 	foreach ($bancoEmpresa as $keyBEA => $rowBEA) { 
+		    // 		$htmlData .= '<div class="item-detalle" style="width:200px;">';
+			   //  	$htmlData .= $rowBEA['num_cuenta'];
+			   //  	$htmlData .= '</div>';  
+			   //  }
+			   //  $htmlData .= '</div>';
+	    	// $htmlData .= '</div>';
 
 
 		    // set Monto en letras 
 		    
-		    $en_letra = ValorEnLetras($fila['total'],$strMoneda);
-	    	$posX_montoEnLetras = '12mm';
-	    	$posY_montoEnLetras = '178.5mm';
-	    	$htmlData .= '<div class="item" style="top:'.$posY_montoEnLetras.';left:'.$posX_montoEnLetras.';">';
-	    	$htmlData .= $en_letra; 
+		    // $en_letra = ValorEnLetras($fila['total'],$strMoneda);
+	    	// $posX_montoEnLetras = '12mm';
+	    	// $posY_montoEnLetras = '178.5mm';
+	    	// $htmlData .= '<div class="item" style="top:'.$posY_montoEnLetras.';left:'.$posX_montoEnLetras.';">';
+	    	// $htmlData .= $en_letra; 
+	    	// $htmlData .= '</div>';
+
+		    // set motivo de traslado 
+		    $listaMotivoTraslado = $this->model_motivo_traslado->m_cargar_motivo_traslado_cbo(); 
+		    foreach ($listaMotivoTraslado as $key => $row) { 
+		    	if($row['idmotivotraslado'] == $fila['idmotivotraslado'] ){ 
+		    		$posX_montoEnLetras = $row['posicion_guia_x'].'mm';
+			    	$posY_montoEnLetras = $row['posicion_guia_y'].'mm';
+			    	$htmlData .= '<div class="item" style="top:'.$posY_montoEnLetras.';left:'.$posX_montoEnLetras.';">';
+			    	$htmlData .= 'X'; 
+			    	$htmlData .= '</div>';
+		    	}
+		    	
+		    }
+			
+			// set nombres transp
+	    	$posX_nombresTrans = '112mm';
+	    	$posY_nombresTrans = '180.5mm';
+	    	$htmlData .= '<div class="item" style="top:'.$posY_nombresTrans.';left:'.$posX_nombresTrans.';">';
+	    	$htmlData .= $fila['nombres_razon_social_trans']; 
 	    	$htmlData .= '</div>';
 
-	    	// set subtotal
-	    	$posX_subTotal = '296mm';
-	    	$posY_subTotal = '185.5mm';
-	    	$htmlData .= '<div class="item" style="top:'.$posY_subTotal.';left:'.$posX_subTotal.';">';
-	    	$htmlData .= $strSimbolo.$fila['subtotal']; 
+	    	// set domiclio transp 
+	    	$posX_domicilioTrans = '112mm';
+	    	$posY_domicilioTrans = '185mm';
+	    	$htmlData .= '<div class="item" style="top:'.$posY_domicilioTrans.';left:'.$posX_domicilioTrans.';">';
+	    	$htmlData .= $fila['domicilio_trans']; 
 	    	$htmlData .= '</div>';
 
-	    	// set % IGV
-	    	$posX_IGV = '282mm';
-	    	$posY_IGV = '190.5mm';
-	    	$htmlData .= '<div class="item" style="top:'.$posY_IGV.';left:'.$posX_IGV.';">';
-	    	$htmlData .= '18%'; 
+	    	// set ruc  
+	    	$posX_rucTrans = '112mm';
+	    	$posY_rucTrans = '189mm';
+	    	$htmlData .= '<div class="item" style="top:'.$posY_rucTrans.';left:'.$posX_rucTrans.';">';
+	    	$htmlData .= $fila['ruc_trans']; 
 	    	$htmlData .= '</div>';
 
-	    	// set IGV
-	    	$posX_IGV = '296mm';
-	    	$posY_IGV = '190.5mm';
-	    	$htmlData .= '<div class="item" style="top:'.$posY_IGV.';left:'.$posX_IGV.';">';
-	    	$htmlData .= $strSimbolo.$fila['igv']; 
+	    	// set marca y placa 
+	    	$posX_marcaPlaca = '260mm';
+	    	$posY_marcaPlaca = '180.5mm';
+	    	$htmlData .= '<div class="item" style="top:'.$posY_marcaPlaca.';left:'.$posX_marcaPlaca.';">';
+	    	$htmlData .= $fila['marca_transporte'].' '.$fila['placa_transporte']; 
 	    	$htmlData .= '</div>';
 
-	    	// set total
-	    	$posX_montoTotal = '296mm';
-	    	$posY_montoTotal = '195mm';
-	    	$htmlData .= '<div class="item" style="top:'.$posY_montoTotal.';left:'.$posX_montoTotal.';">';
-	    	$htmlData .= $strSimbolo.$fila['total']; 
+	    	// set cert. inscripcion
+	    	$posX_certInscripcion = '260mm';
+	    	$posY_certInscripcion = '185mm';
+	    	$htmlData .= '<div class="item" style="top:'.$posY_certInscripcion.';left:'.$posX_certInscripcion.';">';
+	    	$htmlData .= $fila['num_constancia_inscripcion']; 
 	    	$htmlData .= '</div>';
+
+	    	// set lic. conducir 
+	    	$posX_licConducir = '260mm';
+	    	$posY_licConducir = '189.5mm';
+	    	$htmlData .= '<div class="item" style="top:'.$posY_licConducir.';left:'.$posX_licConducir.';">';
+	    	$htmlData .= $fila['num_licencia_conducir']; 
+	    	$htmlData .= '</div>';
+
+	    	
 
 		$htmlData .= '</div>';
 		$arrData['flag'] = 1;
