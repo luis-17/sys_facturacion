@@ -162,9 +162,10 @@ class NotaPedido extends CI_Controller {
     	$allInputs = json_decode(trim($this->input->raw_input_stream),true); 
 		$fConfig = obtener_parametros_configuracion();
 		$idnotapedido = $allInputs['identify']; 
+		$flagAll = @$allInputs['flag_all']; 
 		$fila = $this->model_nota_pedido->m_cargar_nota_pedido_por_id($idnotapedido);
 		$detalleLista = $this->model_nota_pedido->m_cargar_detalle_nota_pedido_por_id($idnotapedido); 
-		if( $fila['estado_movimiento'] == 2 ){ // facturado 
+		if( $fila['estado_movimiento'] == 2 && !($flagAll) ){ // facturado 
 			$arrData['message'] = 'La nota de pedido ya ha sido facturada con anterioridad.'; 
 			$arrData['flag'] = 2; 
 			$this->output
@@ -388,6 +389,10 @@ class NotaPedido extends CI_Controller {
 	{
 		$this->load->view('nota-pedido/busq_nota_pedido_popup'); 
 	}
+    public function ver_popup_busqueda_nota_pedido_chico()
+	{
+		$this->load->view('nota-pedido/busq_nota_pedido_chico_popup'); 
+	}
     public function ver_popup_editar_nota_pedido()
 	{
 		$this->load->view('nota-pedido/editar_nota_pedido_popup'); 
@@ -437,6 +442,69 @@ class NotaPedido extends CI_Controller {
 		$this->output
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
+	}
+	public function buscar_numero_nota_pedido_autocomplete()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true); 
+		$lista = $this->model_nota_pedido->m_cargar_numero_nota_pedido_autocomplete($allInputs); 
+		$hayStock = true;
+		$arrListado = array();
+		foreach ($lista as $row) { 
+			if($row['moneda'] == 'S'){
+				$strIdMoneda = 1; 
+				$strDescripcion = 'S/.';
+				$strMoneda = $row['moneda'];
+			}
+			if($row['moneda'] == 'D'){
+				$strIdMoneda = 2; 
+				$strDescripcion = 'US$'; 
+				$strMoneda = $row['moneda']; 
+			}
+			$objEstado = array();
+			if( $row['estado_movimiento'] == 1 ){ // REGISTRADO 
+				$objEstado['claseIcon'] = 'fa-file-archive-o';
+				$objEstado['claseLabel'] = 'text-info';
+				$objEstado['labelText'] = 'REGISTRADO';
+			}
+			if( $row['estado_movimiento'] == 2 ){ // FACTURADO 
+				$objEstado['claseIcon'] = 'fa-send';
+				$objEstado['claseLabel'] = 'text-success';
+				$objEstado['labelText'] = 'FACTURADO';
+			}
+			array_push($arrListado, 
+				array( 
+					'idmovimiento'=> $row['idmovimiento'],
+					'num_nota_pedido'=> $row['num_nota_pedido'], 
+					'cliente' => $row['cliente_persona_empresa'],
+					'fecha_emision' => darFormatoDMY($row['fecha_emision']),
+					'email' => $row['email_persona_empresa'],
+					'subtotal' => $row['subtotal'],
+					'igv'=> $row['igv'], 
+					'total'=> $row['total'], 
+					'moneda'=> array( 
+						'id'=> $strIdMoneda,
+						'descripcion'=> $strDescripcion,
+						'str_moneda'=> $strMoneda
+					), 
+					'estado' => $objEstado 
+				)
+			);
+		}
+		
+    	$arrData['datos'] = $arrListado;
+    	$arrData['message'] = '';
+    	$arrData['flag'] = 1;
+		if(empty($lista)){
+			$arrData['flag'] = 0;
+		}else{
+			if( @$allInputs['limit'] == 1 && @$lista[0]['estado_cot'] == 3 /*pedido*/ ){ 
+				$arrData['flag'] = 3;
+			}
+		}
+		
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData)); 
 	}
 	public function imprimir_nota_pedido()
 	{

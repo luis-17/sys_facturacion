@@ -147,35 +147,6 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
   }
   $scope.metodos.listaFormaPago(myCallback); 
 
-  // TIPOS DE ELEMENTO 
-  // $scope.fArr.listaTipoElemento = [ 
-  //   {'id' : 'P', 'descripcion' : 'PRODUCTO'},
-  //   {'id' : 'S', 'descripcion' : 'SERVICIO'}
-  // ]; 
-  // CATEGORIAS DE ELEMENTOS 
-  // $scope.metodos.listaCategoriasElemento = function(myCallback) {
-  //   var myCallback = myCallback || function() { };
-  //   CategoriaElementoServices.sListarCbo().then(function(rpta) {
-  //     $scope.fArr.listaCategoriasElemento = rpta.datos; 
-  //     myCallback();
-  //   });
-  // };
-
-  // UNIDADES DE MEDIDA 
-  // $scope.metodos.listaUnidadMedida = function(myCallback) { 
-  //   var myCallback = myCallback || function() { };
-  //   UnidadMedidaServices.sListarCbo().then(function(rpta) { 
-  //     if( rpta.flag == 1){
-  //       $scope.fArr.listaUnidadMedida = rpta.datos; 
-  //       myCallback();
-  //     } 
-  //   });
-  // }
-  // var myCallback = function() { 
-  //   $scope.fData.temporal.unidad_medida = $scope.fArr.listaUnidadMedida[0]; 
-  // }
-  // $scope.metodos.listaUnidadMedida(myCallback); 
-
   //WATCHERS 
   $scope.$watch('fData.num_documento', function(newValue,oldValue){ 
     if( oldValue == newValue ){
@@ -1138,7 +1109,6 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
      };
   };
   $scope.btnGestionCaracteristicasDetalle = function(row) { 
-    console.log(row,'row');
     blockUI.start('Procesando información...'); 
     $uibModal.open({ 
       templateUrl: angular.patchURLCI+'Caracteristica/ver_popup_agregar_caracteristica',
@@ -1385,6 +1355,7 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
 app.service("NotaPedidoServices",function($http, $q, handleBehavior) { 
     return({
         sGenerarNumeroNotaPedido: sGenerarNumeroNotaPedido,
+        sBuscarNumNPAutocomplete: sBuscarNumNPAutocomplete,
         sListarHistorialNotaPedidos: sListarHistorialNotaPedidos,
         sListarHistorialDetalleNotaPedidos: sListarHistorialDetalleNotaPedidos,
         sObtenerEstaNotaPedido: sObtenerEstaNotaPedido,
@@ -1396,6 +1367,14 @@ app.service("NotaPedidoServices",function($http, $q, handleBehavior) {
       var request = $http({
             method : "post",
             url : angular.patchURLCI+"NotaPedido/generar_numero_nota_pedido",
+            data : datos
+      });
+      return (request.then(handleBehavior.success,handleBehavior.error));
+    }
+    function sBuscarNumNPAutocomplete(datos) {
+      var request = $http({
+            method : "post",
+            url : angular.patchURLCI+"NotaPedido/buscar_numero_nota_pedido_autocomplete",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));

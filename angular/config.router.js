@@ -221,7 +221,8 @@ angular.module('app')
               'angular/controllers/SerieCtrl.js',
               'angular/controllers/UnidadMedidaCtrl.js',
               'angular/controllers/ContactoEmpresaCtrl.js',
-              'angular/controllers/VariableCarCtrl.js' 
+              'angular/controllers/VariableCarCtrl.js',
+              'angular/controllers/NotaPedidoCtrl.js'  
             ])
           })
           .state('app.editar-guia-remision', {

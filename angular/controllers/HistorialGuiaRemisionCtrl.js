@@ -102,7 +102,7 @@ app.controller('HistorialGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '
     enableFullRowSelection: true,
     multiSelect: false, 
     columnDefs: [ 
-      { field: 'idguiaremision', name: 'gr.idguiaremision', displayName: 'ID', width: '75', visible: false },
+      { field: 'idguiaremision', name: 'gr.idguiaremision', displayName: 'ID', width: '75', visible: false,  sort: { direction: uiGridConstants.DESC} },
       { field: 'serie', name: 'gr.numero_serie', displayName: 'SERIE', width: 60 },
       { field: 'correlativo', name: 'gr.numero_correlativo', displayName: 'CORRELATIVO', width: 100 },
       { field: 'fecha_emision', name: 'gr.fecha_emision', displayName: 'F. Emisión', minWidth: 100, enableFiltering: false },
@@ -163,7 +163,7 @@ app.controller('HistorialGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '
       });
     }
   };
-  paginationOptions.sortName = $scope.gridOptionsGR.columnDefs[1].name; 
+  paginationOptions.sortName = $scope.gridOptionsGR.columnDefs[0].name; 
   $scope.metodos.getPaginationServerSide = function(loader) { 
     if( loader ){
       blockUI.start('Procesando información...');

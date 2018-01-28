@@ -24,6 +24,7 @@ app.controller('NuevaGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$boo
     'CaracteristicaServices',
     'ContactoEmpresaServices',
     'VariableCarServices',
+    'NotaPedidoServices',
 	function($scope, $filter, $uibModal, $bootbox, $log, $timeout, pinesNotifications, uiGridConstants, blockUI, 
     ClientePersonaFactory,
     ClienteEmpresaFactory,
@@ -49,13 +50,15 @@ app.controller('NuevaGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$boo
     ElementoServices,
     CaracteristicaServices,
     ContactoEmpresaServices,
-    VariableCarServices
+    VariableCarServices,
+    NotaPedidoServices
 ) {
   
   $scope.metodos = {}; // contiene todas las funciones 
   $scope.fData = {}; // contiene todas las variables de formulario 
 	$scope.fArr = {}; // contiene todos los arrays generados por las funciones 
-  
+  $scope.fArr.fNotaPedido = {};
+  $scope.fArr.fNotaPedidoTemp = {};
   $scope.fData.classEditCliente = 'disabled';
   $scope.fData.fecha_emision = $filter('date')(moment().toDate(),'dd-MM-yyyy'); 
   $scope.fData.fecha_inicio_traslado = $filter('date')(moment().toDate(),'dd-MM-yyyy'); 
@@ -1047,6 +1050,119 @@ app.controller('NuevaGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$boo
     // $scope.fData.temporal.caracteristicas = null;
     // console.log($scope.fData.classValid,'$scope.fData.classValid');
   }
+  $scope.agregarItemDesdeNotaPedido = function() { 
+    blockUI.start('Procesando información...'); 
+    $uibModal.open({ 
+      templateUrl: angular.patchURLCI+'NotaPedido/ver_popup_busqueda_nota_pedido_chico',
+      size: 'md',
+      backdrop: 'static',
+      keyboard:false,
+      scope: $scope,
+      controller: function ($scope, $uibModalInstance) { 
+        blockUI.stop(); 
+        $scope.titleForm = 'Selección de Nota de Pedido'; 
+        $scope.fArr.fNotaPedidoTemp = {};
+
+        // BUSCAR NUM NOTA DE PEDIDO  
+        $scope.getNumNPAutocomplete = function (value) { 
+          var params = {
+            searchText: value, 
+            searchColumn: "num_nota_pedido",
+            sensor: false
+          }
+          return NotaPedidoServices.sBuscarNumNPAutocomplete(params).then(function(rpta) { 
+            $scope.noResultsNP = false;
+            if( rpta.flag === 0 ){
+              $scope.noResultsNP = true;
+            }
+            return rpta.datos;
+          });
+        } 
+        $scope.getSelectedNP = function (item, model) { 
+          console.log(model,'modelddd');
+          $scope.fArr.fNotaPedidoTemp.cliente = model.cliente;
+          $scope.fArr.fNotaPedidoTemp.fecha_emision = model.fecha_emision;
+          $scope.fArr.fNotaPedidoTemp.total = model.total;
+          $scope.fArr.fNotaPedidoTemp.estado = model.estado;
+          $scope.fArr.fNotaPedidoTemp.idmovimiento = model.idmovimiento;
+          $scope.fArr.fNotaPedidoTemp.num_nota_pedido = model.num_nota_pedido;
+        }
+        $scope.$watch('num_nota_pedido_popup', function(newValue,oldValue){
+          if( oldValue == newValue ){
+            return false; 
+          }
+          if( !(newValue) ){
+            $scope.fArr.fNotaPedidoTemp = {}; 
+          }
+        },false);
+        $scope.validateNumNP = function() { 
+          if( angular.isObject( $scope.fData.num_cotizacion ) ){
+            $('#temporalNumNP').addClass('input-success-border');
+            $('#temporalNumNP').removeClass('input-normal-border');
+            $('#temporalNumNP').removeClass('input-danger-border');
+            $scope.noResultsNP = false;
+          }else{
+            if( $scope.fData.temporal.elemento ){ 
+              $('#temporalNumNP').removeClass('input-success-border');
+              $('#temporalNumNP').removeClass('input-normal-border');
+              $('#temporalNumNP').addClass('input-danger-border');
+              $scope.noResultsNP = true;
+            }else{
+              $('#temporalNumNP').removeClass('input-success-border');
+              $('#temporalNumNP').removeClass('input-danger-border');
+              $('#temporalNumNP').addClass('input-normal-border');
+              $scope.noResultsNP = false;
+            }      
+          }
+        } 
+        $scope.seleccionarNP = function() { 
+          if( !($scope.fArr.fNotaPedidoTemp.idmovimiento) ){ 
+            $('#temporalNumNP').focus();
+            pinesNotifications.notify({ title: 'Advertencia.', text: 'Ingrese una nota de pedido', type: 'warning', delay: 2000 });
+            return false;
+          }
+          var arrParams = {
+            'identify': $scope.fArr.fNotaPedidoTemp.idmovimiento,
+            'flag_all': true   
+          };
+          NotaPedidoServices.sObtenerEstaNotaPedido(arrParams).then(function(rpta) { 
+            if( rpta.flag == 1 || rpta.flag == 2 ){ // normal 
+              $timeout(function() { 
+                // llenar info de cliente 
+                $scope.fData.cliente = rpta.datos.cliente; 
+                $scope.fData.num_documento = rpta.datos.num_documento; 
+                $scope.fData.contacto = rpta.datos.contacto; 
+                $scope.fData.idcontacto = rpta.datos.idcontacto; 
+                $scope.fData.idnotapedido = rpta.datos.idnotapedido; 
+                // tipo documento cliente 
+                var myCallBackTD = function() { 
+                  var objIndex = $scope.fArr.listaTiposDocumentoCliente.filter(function(obj) { 
+                    return obj.id == rpta.datos.tipo_documento_cliente.id; 
+                  }).shift(); 
+                  $scope.fData.tipo_documento_cliente = objIndex; 
+                  //console.log(objIndex,'objIndex');
+                }
+                $scope.metodos.listaTiposDocumentoCliente(myCallBackTD); 
+                // llenar detalle 
+                $scope.gridOptions.data = rpta.detalle; 
+              }, 200);
+              pinesNotifications.notify({ title: 'OK!', text: 'Se cargó la nota de pedido.', type: 'success', delay: 3000 }); 
+              $uibModalInstance.dismiss('cancel');
+            }
+            blockUI.stop(); 
+          });
+          
+
+          
+
+          $uibModalInstance.dismiss('cancel'); 
+        } 
+        $scope.cancel = function () {
+          $uibModalInstance.dismiss('cancel');
+        } 
+      }
+    });
+  }
   $scope.btnGestionCaracteristicasDetalle = function(row,indice) { 
     console.log(row,'row',indice,'indiceew');
     blockUI.start('Procesando información...'); 
@@ -1114,7 +1230,7 @@ app.controller('NuevaGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$boo
           }
         }; 
         var myCallbackCaract = function() { 
-          console.log(row.entity.caracteristicas,'row.entity.caracteristicas');
+          //console.log(row.entity.caracteristicas,'row.entity.caracteristicas');
           angular.forEach(row.entity.caracteristicas, function(val,key) { 
             console.log(val,'val');
             var arrFilaTemp = { 
@@ -1142,6 +1258,7 @@ app.controller('NuevaGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$boo
       }
     });
   }
+  
   $scope.btnQuitarDeLaCesta = function (row) { 
     var index = $scope.gridOptions.data.indexOf(row.entity); 
     $scope.gridOptions.data.splice(index,1);

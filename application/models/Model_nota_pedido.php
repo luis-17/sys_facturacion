@@ -238,6 +238,25 @@ class Model_nota_pedido extends CI_Model {
 		//$this->db->where_in('np.estado_movimiento', array(1,2)); // 1: registrado 2:facturado  
 		return $this->db->get()->result_array();
 	}
+	public function m_cargar_numero_nota_pedido_autocomplete($filtro)
+	{
+		$this->db->select("TRIM(CONCAT(COALESCE(cp.nombres,''), ' ', COALESCE(cp.apellidos,''), ' ', COALESCE(ce.razon_social,''))) AS cliente_persona_empresa",FALSE);
+		$this->db->select("TRIM(CONCAT(COALESCE(cp.email,''), ' ', COALESCE(ct.email,''))) AS email_persona_empresa",FALSE);
+		$this->db->select('np.idmovimiento, np.num_nota_pedido, np.fecha_registro, np.fecha_emision, np.moneda, np.modo_igv, np.subtotal, np.igv, np.total, np.estado_movimiento', FALSE); 
+		$this->db->from('movimiento np');  
+		$this->db->join('usuario us','np.idusuarionp = us.idusuario'); 
+		$this->db->join('empresa_admin ea','np.idempresaadmin = ea.idempresaadmin'); 
+		$this->db->join("cliente_empresa ce","np.idcliente = ce.idclienteempresa AND np.tipo_cliente = 'E'",'left'); 
+		$this->db->join("cliente_persona cp","np.idcliente = cp.idclientepersona AND np.tipo_cliente = 'P'",'left'); 
+		$this->db->join('contacto ct','np.idcontacto = ct.idcontacto','left'); 
+		$this->db->where('ea.idempresaadmin',$this->sessionFactur['idempresaadmin']);
+		$this->db->where('tipo_movimiento',1); // 1: nota de pedido 
+		if( !empty($filtro['searchText']) ){
+			$this->db->like('np.num_nota_pedido', $filtro['searchText']); 
+		}
+		$this->db->limit(20);
+		return $this->db->get()->result_array(); 
+	}
 
 	public function m_verificar_existe_item_nota_pedido($iddetallemovimiento,$idnotapedido){
 		$this->db->select('dm.iddetallemovimiento, np.idmovimiento', FALSE); 

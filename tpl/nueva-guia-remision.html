@@ -172,13 +172,10 @@
               <label class="control-label"> N° Paquetes. </label>
               <input id="temporalCantidad" type="text" class="form-control input-sm" ng-model="fData.temporal.num_paquetes" tabindex="290" placeholder="N° de Paquetes" /> 
           	</div> 
-          	<div class="col-md-2 col-sm-6 col-xs-12"> 
+          	<div class="col-md-3 col-sm-6 col-xs-12"> 
           		<div style="margin-top: 22px;" class="btn-group" style="min-width: 100%">
-		            <a href="" class="btn btn-info btn-sm" ng-click="agregarItem(); $event.preventDefault();" tabindex="300">AGREGAR</a> 
-		            <!--<a href="" class="btn btn-info btn-sm dropdown-toggle" tabindex="310" data-toggle="dropdown"><span class="caret"></span></a>
-	               <ul class="dropdown-menu sm" role="menu" style="padding:0;">
-	                  <li><a ng-click="btnClonar(); $event.preventDefault();" class="btn btn-info-alt" href="" tabindex="320">CLONAR</a></li>
-	              </ul> -->
+		            <a href="" class="btn btn-info btn-sm mr" ng-click="agregarItem(); $event.preventDefault();" tabindex="300">AGREGAR</a> 
+		            <a href="" class="btn btn-info btn-sm" ng-click="agregarItemDesdeNotaPedido(); $event.preventDefault();" tabindex="300"> DESDE NOTA DE PEDIDO</a> 
 	            </div>
 	          </div>
 					</div>
