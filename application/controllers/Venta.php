@@ -230,7 +230,7 @@ class Venta extends CI_Controller {
 		}
 		if($fila['moneda'] == 'S'){
 			$strIdMoneda = 1; 
-			$strDescripcion = 'S/.';
+			$strDescripcion = 'S/';
 			$strMoneda = $fila['moneda'];
 		}
 		if($fila['moneda'] == 'D'){
@@ -399,6 +399,7 @@ class Venta extends CI_Controller {
 			$arrAux = array(
 				'iddetallecaracteristica'=> NULL,
 				'idcaracteristica'=> $row['idcaracteristica'],
+				'id'=> $row['idcaracteristica'],
 				'orden'=> $row['orden_car'],
 				'descripcion'=> $row['descripcion_car'],
 				'valor'=> NULL 
@@ -1148,7 +1149,7 @@ class Venta extends CI_Controller {
 		    $strSimbolo = NULL;
 		    if( $fila['moneda']=='S' ){
 		    	$strMoneda = ' SOLES';
-		    	$strSimbolo = 'S/. ';
+		    	$strSimbolo = 'S/ ';
 		    }
 		    if( $fila['moneda']=='D' ){
 		    	$strMoneda = ' DÓLARES';

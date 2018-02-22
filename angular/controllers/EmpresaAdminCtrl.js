@@ -158,7 +158,7 @@ app.controller('EmpresaAdminCtrl', ['$scope', '$filter', '$uibModal', '$bootbox'
           };
           //TIPOS DE MONEDA
           $scope.fArr.listaMoneda = [ 
-            {'id' : 'S', 'descripcion' : 'S/.'},
+            {'id' : 'S', 'descripcion' : 'S/'},
             {'id' : 'D', 'descripcion' : 'US$'}
           ]; 
           $scope.metodos.listaBanco = function(myCallback) {

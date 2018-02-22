@@ -95,6 +95,17 @@ app.controller('TipoDocumentoMovCtrl', ['$scope', '$filter', '$uibModal', '$boot
       });
     }
     $scope.metodos.listaTipoDocumentoMovFormat(); 
+    $scope.btnFormatoImpresion = function() {
+      var arrParams = {
+        'metodos': $scope.metodos,
+        'mySelectionGrid': $scope.mySelectionGrid,
+        'fArr': $scope.fArr 
+      };
+      arrParams.myCallbackFI = function() { 
+        $scope.$parent.reloadPage(); 
+      };
+      TipoDocumentoMovFactory.formatoImpresionModal(arrParams); 
+    }
     // MAS ACCIONES
     $scope.btnNuevo = function() { 
       var arrParams = {
@@ -117,6 +128,16 @@ app.controller('TipoDocumentoMovCtrl', ['$scope', '$filter', '$uibModal', '$boot
       };
       TipoDocumentoMovFactory.editTipoDocumentoModal(arrParams); 
     }
+    $scope.btnNuevaSerie = function() { 
+      var arrParams = { 
+        'metodos': $scope.metodos,
+        'fArr': $scope.fArr
+      }; 
+      arrParams.myCallbackSerie = function() { 
+        $scope.$parent.reloadPage(); 
+      }
+      SerieFactory.regSerieModal(arrParams); 
+    };
     $scope.btnAnular = function() { 
       var pMensaje = '¿Realmente desea anular el registro?';
       $bootbox.confirm(pMensaje, function(result) {
@@ -142,23 +163,14 @@ app.controller('TipoDocumentoMovCtrl', ['$scope', '$filter', '$uibModal', '$boot
         }
       });
     }
-
-    $scope.btnNuevaSerie = function() { 
-      var arrParams = { 
-        'metodos': $scope.metodos,
-        'fArr': $scope.fArr
-      }; 
-      arrParams.myCallbackSerie = function() { 
-        $scope.$parent.reloadPage(); 
-      }
-      SerieFactory.regSerieModal(arrParams); 
-    };
 }]);
 
 app.service("TipoDocumentoMovServices",function($http, $q, handleBehavior) {
     return({
         sListarParaGrilla: sListarParaGrilla,
+        sListarFormatoImpresion: sListarFormatoImpresion,
         sListarTipoDocParaVentaCbo: sListarTipoDocParaVentaCbo,
+        sEditarFormatoImpresion: sEditarFormatoImpresion,
         sRegistrar: sRegistrar,
         sEditar: sEditar,
         sAnular: sAnular
@@ -171,10 +183,26 @@ app.service("TipoDocumentoMovServices",function($http, $q, handleBehavior) {
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
     }
+    function sListarFormatoImpresion(datos) {
+      var request = $http({
+            method : "post",
+            url : angular.patchURLCI+"TipoDocumentoMov/listar_formato_impresion",
+            data : datos
+      });
+      return (request.then(handleBehavior.success,handleBehavior.error));
+    }
     function sListarTipoDocParaVentaCbo(datos) {
       var request = $http({
             method : "post",
             url : angular.patchURLCI+"TipoDocumentoMov/listar_tipo_documento_mov_para_venta_cbo",
+            data : datos
+      });
+      return (request.then(handleBehavior.success,handleBehavior.error));
+    }
+    function sEditarFormatoImpresion(datos) {
+      var request = $http({
+            method : "post",
+            url : angular.patchURLCI+"TipoDocumentoMov/editar_formato_impresion",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
@@ -205,7 +233,7 @@ app.service("TipoDocumentoMovServices",function($http, $q, handleBehavior) {
     }      
 });
 
-app.factory("TipoDocumentoMovFactory", function($uibModal, pinesNotifications, blockUI, TipoDocumentoMovServices) { 
+app.factory("TipoDocumentoMovFactory", function($uibModal, pinesNotifications, blockUI, TipoDocumentoMovServices, uiGridConstants) { 
   var interfaz = {
     regTipoDocumentoMovModal: function (arrParams) {
       blockUI.start('Abriendo formulario...');
@@ -301,8 +329,118 @@ app.factory("TipoDocumentoMovFactory", function($uibModal, pinesNotifications, b
           }
         }
       });
+    },
+    formatoImpresionModal: function(arrParams) {
+      blockUI.start('Abriendo configuración...');
+      $uibModal.open({ 
+        templateUrl: angular.patchURLCI+'TipoDocumentoMov/ver_popup_formato_impresion',
+        size: 'md',
+        backdrop: 'static',
+        keyboard:false,
+        controller: function ($scope, $uibModalInstance, arrParams) { 
+          blockUI.stop(); 
+          $scope.fData = {};
+          $scope.metodos = arrParams.metodos;
+          $scope.fArr = arrParams.fArr; 
+          if( arrParams.mySelectionGrid.length == 1 ){ 
+            $scope.fData = arrParams.mySelectionGrid[0];
+          }else{
+            alert('Seleccione una sola fila');
+          }
+          $scope.titleForm = 'Configuración de Formato de Impresión';
+          $scope.fArr.gridOptionsFI = { 
+            useExternalPagination: false,
+            useExternalSorting: false,
+            enableGridMenu: false,
+            enableRowSelection: true,
+            enableSelectAll: false,
+            enableFiltering: false,
+            enableFullRowSelection: false,
+            enableCellEditOnFocus: true,
+            enableColumnMenus: false, 
+            enableColumnMenu: false,
+            multiSelect: false, 
+            columnDefs: [ 
+              { field: 'idtdconfigdetalle', name: 'tcd.idtdconfigdetalle', displayName: 'ID', width: 75, sort: { direction: uiGridConstants.ASC}, enableCellEdit: false 
+              },
+              { field: 'descripcion', name: 'descripcion_elemento', displayName: 'Descripción', width: 250, enableCellEdit: false }, 
+              { field: 'valor_x', name: 'valor_x', displayName: 'Pos. X', width: 80, enableCellEdit: true, cellClass:'ui-editCell' },
+              { field: 'valor_y', name: 'valor_y', displayName: 'Pos. Y', width: 80, enableCellEdit: true, cellClass:'ui-editCell' },
+              { field: 'visible', name: 'visible', displayName: 'Visible', width: 80, enableCellEdit: true, cellClass:'ui-editCell', 
+                editableCellTemplate: 'ui-grid/dropdownEditor', 
+                cellFilter: 'mapVisible', editDropdownValueLabel: 'visible', editDropdownOptionsArray: [
+                  { id: 1, visible: 'SI' },
+                  { id: 2, visible: 'NO' }
+                ],cellTemplate: '<div class="text-center ui-grid-cell-contents" ng-if="COL_FIELD == 1"> SI </div><div class="text-center" ng-if="COL_FIELD == 2"> NO </div>' }
+            ], 
+            onRegisterApi: function(gridApi) { 
+              $scope.gridApi = gridApi;
+              gridApi.edit.on.afterCellEdit($scope,function (rowEntity, colDef, newValue, oldValue){ 
+                var arrEditCell = {
+                  'campo' : colDef.field,
+                  'nuevo_valor' : newValue,
+                  'idtdconfigdetalle' : rowEntity.idtdconfigdetalle 
+                }
+                TipoDocumentoMovServices.sEditarFormatoImpresion(arrEditCell).then(function (rpta) { 
+                  if(rpta.flag == 1){
+                    pTitle = 'OK!';
+                    pType = 'success'; 
+                  }else if(rpta.flag == 0){
+                    var pTitle = 'Error!';
+                    var pType = 'danger';
+                  }else{
+                    alert('Error inesperado');
+                  }
+                  $scope.metodos.getPaginationServerSideFI();
+                  //$scope.fData = {};
+                  pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 1000 });
+                });
+                $scope.$apply();
+              });
+            }
+          }; 
+          $scope.metodos.getPaginationServerSideFI = function(loader) { 
+            if(loader){
+              blockUI.start('Procesando información...'); 
+            }
+            var arrParamsAux = {
+              'idtipodocumentomov': $scope.fData.idtipodocumentomov 
+            }; 
+            TipoDocumentoMovServices.sListarFormatoImpresion(arrParamsAux).then(function (rpta) { 
+              $scope.fArr.gridOptionsFI.data = rpta.datos.detalle;
+              // $scope.fData.
+              if(loader){
+                blockUI.stop(); 
+              }
+            });
+          }
+          $scope.metodos.getPaginationServerSideFI(); 
+          $scope.cancel = function () {
+            $uibModalInstance.dismiss('cancel');
+          }
+        },
+        resolve: {
+          arrParams: function() {
+            return arrParams;
+          }
+        }
+      });
     }
   }
   return interfaz;
-})
+}); 
+
+app.filter('mapVisible', function() { 
+  var visibleHash = { 
+    1: 'SI',
+    2: 'NO'
+  };
+  return function(input) {
+    if (!input){
+      return '';
+    } else {
+      return visibleHash[input];
+    }
+  };
+});
 

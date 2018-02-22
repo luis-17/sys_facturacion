@@ -69,6 +69,24 @@ class Model_tipo_documento_mov extends CI_Model {
 		$this->db->where('tdm.para_venta', 1); // form venta  
 		return $this->db->get()->result_array();
 	}
+	public function m_cargar_configuracion_td($datos)
+	{
+		$this->db->select("tdm.idtipodocumentomov, tdm.descripcion_tdm, tdm.key_tdm, tdc.idtipodocumentoconfig, tdc.tamanio_fuente, tdc.tipo_fuente, tdc.unidad_medida");
+		$this->db->from('tipo_documento_config tdc');
+		$this->db->join('tipo_documento_mov tdm','tdc.idtipodocumentomov = tdm.idtipodocumentomov'); 
+		$this->db->where('tdc.idtipodocumentomov', $datos['idtipodocumentomov']); 
+		$this->db->limit(1); 
+		return $this->db->get()->row_array();
+	}
+	public function m_cargar_configuracion_detalle_td($datos)
+	{
+		$this->db->select("tdc.idtipodocumentoconfig, tdc.tamanio_fuente, tdc.tipo_fuente, tdc.unidad_medida, tcd.idtdconfigdetalle, tcd.descripcion_elemento, 
+			tcd.key_config_detalle, tcd.valor_x, tcd.valor_y, tcd.visible");
+		$this->db->from('tipo_documento_config tdc');
+		$this->db->join('td_config_detalle tcd','tdc.idtipodocumentoconfig = tcd.idtipodocumentoconfig'); 
+		$this->db->where('tdc.idtipodocumentoconfig', $datos['idtipodocumentoconfig']); 
+		return $this->db->get()->result_array();
+	}
 	public function m_registrar($datos)
 	{
 		$data = array(
@@ -79,7 +97,14 @@ class Model_tipo_documento_mov extends CI_Model {
 		);
 		return $this->db->insert('tipo_documento_mov', $data); 
 	}
-
+	public function m_editar_formato_impresion($datos)
+	{
+		$data = array(
+			$datos['campo'] => $datos['nuevo_valor']
+		);
+		$this->db->where('idtdconfigdetalle',$datos['idtdconfigdetalle']);
+		return $this->db->update('td_config_detalle', $data); 
+	}
 	public function m_editar($datos)
 	{
 		$data = array(

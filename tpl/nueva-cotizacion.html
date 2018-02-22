@@ -130,9 +130,13 @@
               <label class="control-label text-info text-bold text-ellipsis"> {{ fSessionCI.nombres + ' ' + fSessionCI.apellidos }} </label> 
           	</div> -->
           	<div class="col-md-3 col-sm-12" > 
-              <label class="control-label text-ellipsis"> Colaborador </label> 
+              <label class="control-label text-ellipsis"> Vendedor </label> 
               <select class="form-control input-sm" ng-disabled="fConfigSys.amarre_cliente_vendedor == 1" ng-model="fData.colaborador" 
               	ng-options="item as item.descripcion for item in fArr.listaColaboradores" tabindex="230" > </select> 
+          	</div>
+          	<div class="col-md-3 col-sm-6 col-xs-12">
+              <label class="control-label"> Generado por: </label> 
+              <label class="control-label text-info text-bold text-ellipsis"> {{ fSessionCI.nombres + ' ' + fSessionCI.apellidos }} </label> 
           	</div>
           </div>
 	    	</fieldset>

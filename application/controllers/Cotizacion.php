@@ -115,7 +115,7 @@ class Cotizacion extends CI_Controller {
 		}
 		if($fila['moneda'] == 'S'){
 			$strIdMoneda = 1; 
-			$strDescripcion = 'S/.';
+			$strDescripcion = 'S/';
 			$strMoneda = $fila['moneda'];
 		}
 		if($fila['moneda'] == 'D'){
@@ -516,7 +516,7 @@ class Cotizacion extends CI_Controller {
 		foreach ($lista as $row) { 
 			if($row['moneda'] == 'S'){
 				$strIdMoneda = 1; 
-				$strDescripcion = 'S/.';
+				$strDescripcion = 'S/';
 				$strMoneda = $row['moneda'];
 			}
 			if($row['moneda'] == 'D'){
@@ -615,7 +615,7 @@ class Cotizacion extends CI_Controller {
 	    $simbolo = NULL;
 	    if($fila['moneda'] == 'S'){
 	    	$fila['moneda_str'] = 'SOLES';
-	    	$simbolo = 'S/. ';
+	    	$simbolo = 'S/ ';
 	    	$fila['moneda_str_completo'] = 'SOLES';
 	    }
 	    if($fila['moneda'] == 'D'){
@@ -952,6 +952,7 @@ class Cotizacion extends CI_Controller {
 				)
 			);
 			if( $value['agrupado'] === FALSE ){ 
+				$posPreCellY = $this->pdf->GetY();
 				$this->pdf->Row( 
 			      array(
 			        $i,
@@ -963,8 +964,11 @@ class Cotizacion extends CI_Controller {
 			      ),
 			      FALSE, 0, FALSE, 4, FALSE, FALSE, FALSE, FALSE, $arrItemDetalle['fontSize'] 
 			    );
+			    $h = $this->pdf->GetY()-$posPreCellY; 
+			    $this->pdf->CheckPageBreak($h);
 			}
 			if( $value['agrupado'] === TRUE ){ 
+				$posPreCellY = $this->pdf->GetY();
 				$this->pdf->Row( 
 			      array(
 			        $i,
@@ -978,6 +982,8 @@ class Cotizacion extends CI_Controller {
 			    );
 			    $GetYElement = $this->pdf->GetY()-2; 
 			    $GetXElement = $this->pdf->GetX() + 110; 
+			    $h = $this->pdf->GetY()-$posPreCellY; 
+			    $this->pdf->CheckPageBreak($h);
 			}
 		    
 		    $i++;
@@ -1000,7 +1006,10 @@ class Cotizacion extends CI_Controller {
 						array('family'=> NULL, 'weight'=> NULL, 'size'=> 6 )
 					)
 				);
+				$posPreCellY = $this->pdf->GetY();
 				$this->pdf->Row( $arrCaracts['data'],FALSE,'0',FALSE,3,FALSE,FALSE,FALSE,FALSE,$arrCaracts['fontSize'] ); 
+				$h = $this->pdf->GetY()-$posPreCellY; 
+				$this->pdf->CheckPageBreak($h);
 			}
 			$GetYElementCaracts = $this->pdf->GetY(); 
 			if( $value['agrupado'] === TRUE ){ 
@@ -1029,8 +1038,11 @@ class Cotizacion extends CI_Controller {
 							array('family'=> NULL, 'weight'=> NULL, 'size'=> 9 )
 						)
 					);
+					$posPreCellY = $this->pdf->GetY();
 					$this->pdf->Row( $arrCaracts['data'],FALSE,'0',FALSE,6,FALSE,FALSE,FALSE,FALSE,$arrCaracts['fontSize'] ); 
-				} 
+					$h = $this->pdf->GetY()-$posPreCellY; 
+				    	$this->pdf->CheckPageBreak($h);
+					} 
 			}
 			$GetYElementSubItems = $this->pdf->GetY(); 
 			if( $value['agrupado'] === TRUE ){ 
@@ -1054,11 +1066,11 @@ class Cotizacion extends CI_Controller {
 	    	$this->pdf->Cell(140,5,'TOTAL SON: ' . utf8_decode($en_letra));
 	    }
 	    //$this->pdf->SetXY(8,-23);
-	    if( $this->pdf->PageNo() > 1 ){
-	    	$this->pdf->SetY(-36);
-	    }else{  
+	    //if( $this->pdf->PageNo() > 1 ){
+	    	//$this->pdf->SetY(-36);
+	    //}else{  
 			$this->pdf->Ln(9); 
-	    }
+	    //}
 	    $this->pdf->SetFont('Arial','',8);
 	    $bancoEmpresa = $this->model_banco_empresa_admin->m_cargar_cuentas_banco_por_filtros($fila['idempresaadmin'],$fila['moneda']);
    		$this->pdf->SetFont('Arial','',9);
@@ -1130,7 +1142,7 @@ class Cotizacion extends CI_Controller {
 	    $simbolo = NULL;
 	    if($moneda['str_moneda'] == 'S'){
 	    	$moneda['moneda_str'] = 'SOLES';
-	    	$simbolo = 'S/. ';
+	    	$simbolo = 'S/ ';
 	    	$moneda['moneda_str_completo'] = 'SOLES';
 	    }
 	    if($moneda['str_moneda'] == 'D'){
@@ -1576,10 +1588,7 @@ class Cotizacion extends CI_Controller {
 			    	->set_output(json_encode($arrData));
 			    return;
 			}
-		}
-		
-		//var_dump($numCorrelativoAnterior,$numCorrelativo); exit(); 
-    	// var_dump($allInputs); exit(); 
+		} 
     	$this->db->trans_start();
     	if( $allInputs['tipo_documento_cliente']['destino'] == 1 ){ // cliente empresa 
     		$allInputs['tipo_cliente'] = 'E'; // empresa 

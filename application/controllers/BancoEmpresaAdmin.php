@@ -27,7 +27,7 @@ class BancoEmpresaAdmin extends CI_Controller {
 		$arrListado = array();
 		foreach ($lista as $row) { 
 			if( $row['moneda'] == 'S' ){
-				$row['desc_moneda'] = 'S/.';
+				$row['desc_moneda'] = 'S/';
 			}
 			if( $row['moneda'] == 'D' ){
 				$row['desc_moneda'] = 'US$';

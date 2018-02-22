@@ -89,7 +89,7 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
 
   // TIPOS DE MONEDA 
   $scope.fArr.listaMoneda = [
-    {'id' : 1, 'descripcion' : 'S/.', 'str_moneda' : 'S'},
+    {'id' : 1, 'descripcion' : 'S/', 'str_moneda' : 'S'},
     {'id' : 2, 'descripcion' : 'US$', 'str_moneda' : 'D'}
   ];
   $scope.fData.moneda = $scope.fArr.listaMoneda[0];

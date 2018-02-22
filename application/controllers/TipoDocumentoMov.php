@@ -52,7 +52,38 @@ class TipoDocumentoMov extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
-
+	public function listar_formato_impresion()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true); 
+		$fila = $this->model_tipo_documento_mov->m_cargar_configuracion_td($allInputs);
+		$allInputs['idtipodocumentoconfig'] = $fila['idtipodocumentoconfig']; 
+		$lista = $this->model_tipo_documento_mov->m_cargar_configuracion_detalle_td($allInputs);
+		$arrListado = $fila;
+		$arrListado['detalle'] = array();
+		foreach ($lista as $key => $row) { 
+			$arrAux = array(
+				'idtdconfigdetalle' => $row['idtdconfigdetalle'],
+				'descripcion' => $row['descripcion_elemento'],
+				'valor_x' => $row['valor_x'],
+				'valor_y' => $row['valor_y'],
+				'visible' => (int)$row['visible']
+			);
+			$arrListado['detalle'][] = $arrAux; 
+		} 
+    	$arrData['datos'] = $arrListado;
+    	$arrData['message'] = '';
+    	$arrData['flag'] = 1;
+		if(empty($lista)){
+			$arrData['flag'] = 0;
+		}
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
+	public function ver_popup_formato_impresion()
+	{
+		$this->load->view('tipo-documento-mov/popup_formato_impresion');
+	}
 	public function ver_popup_formulario()
 	{
 		$this->load->view('tipo-documento-mov/mant_tipoDocumentoMov');
@@ -110,12 +141,29 @@ class TipoDocumentoMov extends CI_Controller {
 	public function editar()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
-		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
+		$arrData['message'] = 'Error al editar los datos, inténtelo nuevamente';
     	$arrData['flag'] = 0;
     	// VALIDACIONES
     	
     	$this->db->trans_start();
-		if($this->model_tipo_documento_mov->m_editar($allInputs)) { // edicion de elemento
+		if($this->model_tipo_documento_mov->m_editar($allInputs)) { 
+			$arrData['message'] = 'Se editaron los datos correctamente';
+			$arrData['flag'] = 1;
+		}
+		$this->db->trans_complete();
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
+	public function editar_formato_impresion()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$arrData['message'] = 'Error al editar los datos, inténtelo nuevamente';
+    	$arrData['flag'] = 0;
+    	// VALIDACIONES
+    	// print_r($allInputs); exit(); 
+    	$this->db->trans_start();
+		if($this->model_tipo_documento_mov->m_editar_formato_impresion($allInputs)) { 
 			$arrData['message'] = 'Se editaron los datos correctamente';
 			$arrData['flag'] = 1;
 		}

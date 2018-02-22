@@ -8,8 +8,11 @@
 				<i class="fa fa-search"> </i> Buscar </button>
 	        <button class="btn m-b-xs btn-dark btn-xs" ng-click="btnNuevaSerie();" >
 	        	<i class="fa fa-plus"></i> Nueva Serie </button>
+	        <button class="btn m-b-xs btn-dark btn-xs" ng-click="btnFormatoImpresion();" ng-if="mySelectionGrid.length == 1"> 
+	        	<i class="fa fa-file-text"></i> FORMATO DE IMPRESIÓN </button> 
 	        <button class="btn m-b-xs btn-success btn-xs" ng-click="btnNuevo();">
 	        	<i class="fa fa-file-text"></i> Nuevo </button>	
+	        
 	        <button ng-if="mySelectionGrid.length == 1" ng-click="btnEditar();" class="btn m-b-xs btn-warning btn-xs"> 
 	        	<i class="fa fa-edit"></i> Editar </button>
 	        <button ng-if="mySelectionGrid.length == 1" ng-click="btnAnular();" class="btn m-b-xs btn-danger btn-xs">

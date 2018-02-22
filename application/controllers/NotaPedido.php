@@ -40,6 +40,7 @@ class NotaPedido extends CI_Controller {
 				$objEstado['claseLabel'] = 'label-success';
 				$objEstado['labelText'] = 'FACTURADO';
 			}
+			$objEstado['valor'] = $row['estado_movimiento'];
 			$strCliente = NULL; 
 			$strMoneda = NULL;
 			if( $row['moneda'] == 'S' ){ 
@@ -161,9 +162,13 @@ class NotaPedido extends CI_Controller {
 
     	$allInputs = json_decode(trim($this->input->raw_input_stream),true); 
 		$fConfig = obtener_parametros_configuracion();
+		$arrData['flag'] = 1; 
 		$idnotapedido = $allInputs['identify']; 
 		$flagAll = @$allInputs['flag_all']; 
 		$fila = $this->model_nota_pedido->m_cargar_nota_pedido_por_id($idnotapedido);
+		// print_r($fila['estado_movimiento']); 
+		// print_r($fila['estado_movimiento']);
+		// exit();
 		$detalleLista = $this->model_nota_pedido->m_cargar_detalle_nota_pedido_por_id($idnotapedido); 
 		if( $fila['estado_movimiento'] == 2 && !($flagAll) ){ // facturado 
 			$arrData['message'] = 'La nota de pedido ya ha sido facturada con anterioridad.'; 
@@ -185,7 +190,7 @@ class NotaPedido extends CI_Controller {
 		}
 		if($fila['moneda'] == 'S'){
 			$strIdMoneda = 1; 
-			$strDescripcion = 'S/.';
+			$strDescripcion = 'S/';
 			$strMoneda = $fila['moneda'];
 		}
 		if($fila['moneda'] == 'D'){
@@ -349,6 +354,7 @@ class NotaPedido extends CI_Controller {
 			$arrAux = array(
 				'iddetallecaracteristica'=> NULL,
 				'idcaracteristica'=> $row['idcaracteristica'],
+				'id'=> $row['idcaracteristica'],
 				'orden'=> $row['orden_car'],
 				'descripcion'=> $row['descripcion_car'],
 				'valor'=> NULL 
@@ -377,7 +383,7 @@ class NotaPedido extends CI_Controller {
 		$arrData['datos'] = $arrListado; 
 		$arrData['detalle'] = $arrListadoDetalle; 
 
-		$arrData['flag'] = 1; 
+		
 		if(empty($fila)){ 
 			$arrData['flag'] = 0; 
 		} 
@@ -452,7 +458,7 @@ class NotaPedido extends CI_Controller {
 		foreach ($lista as $row) { 
 			if($row['moneda'] == 'S'){
 				$strIdMoneda = 1; 
-				$strDescripcion = 'S/.';
+				$strDescripcion = 'S/';
 				$strMoneda = $row['moneda'];
 			}
 			if($row['moneda'] == 'D'){
@@ -516,7 +522,7 @@ class NotaPedido extends CI_Controller {
 	    $simbolo = NULL;
 	    if($fila['moneda'] == 'S'){
 	    	$fila['moneda_str'] = 'SOLES';
-	    	$simbolo = 'S/. ';
+	    	$simbolo = 'S/ ';
 	    	$fila['moneda_str_completo'] = 'SOLES';
 	    }
 	    if($fila['moneda'] == 'D'){
@@ -1000,7 +1006,7 @@ class NotaPedido extends CI_Controller {
 	        ->set_content_type('application/json')
 	        ->set_output(json_encode($arrData));
 	}
-	public function registrar()
+	public function registrar() 
 	{
 		ini_set('xdebug.var_display_max_depth', 5); 
 	    ini_set('xdebug.var_display_max_children', 256); 
@@ -1067,7 +1073,7 @@ class NotaPedido extends CI_Controller {
 		    return;
     	}
     	if( empty($allInputs['vendedor']['idvendedor']) ){ 
-    		$arrData['message'] = 'No se ha asignado al vendedor en la cotización.';
+    		$arrData['message'] = 'No se ha asignado al vendedor.';
     		$arrData['flag'] = 0;
     		$this->output
 		    	->set_content_type('application/json')

@@ -287,8 +287,10 @@
       public function CheckPageBreak($h)
       {
           //If the height h would cause an overflow, add a new page immediately
-          if($this->GetY()+$h>$this->PageBreakTrigger)
-              $this->AddPage($this->CurOrientation);
+          if($this->GetY()+$h>$this->PageBreakTrigger){
+            $this->AddPage($this->CurOrientation);
+          }
+              
       }
 
       public function NbLines($w,$txt)
@@ -350,7 +352,7 @@
           return; 
         }
 
-        $this->SetAutoPageBreak(TRUE,25);
+        //$this->SetAutoPageBreak(TRUE,25);
         $ci2 =& get_instance(); 
         $this->SetFont('Arial','',6);
         $this->SetXY(-70,0);
