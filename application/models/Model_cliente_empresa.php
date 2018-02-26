@@ -15,7 +15,7 @@ class Model_cliente_empresa extends CI_Model {
 		) AS primer_contacto",FALSE);
 		$this->db->select("co.idcolaborador, CONCAT(COALESCE(co.nombres,''), ' ', COALESCE(co.apellidos,'')) As colaborador",FALSE);
 		$this->db->select('ce.idclienteempresa, ce.nombre_comercial, ce.nombre_corto, ce.razon_social, ce.ruc, ce.representante_legal, ce.dni_representante_legal, 
-			ce.direccion_legal, ce.direccion_guia, ce.telefono, 
+			ce.direccion_legal, ce.direccion_guia, ce.direccion_guia_2, ce.telefono, 
 			cc.idcategoriacliente, cc.descripcion_cc');
 		$this->db->from('cliente_empresa ce');
 		$this->db->join('categoria_cliente cc', 'ce.idcategoriacliente = cc.idcategoriacliente');
@@ -57,13 +57,21 @@ class Model_cliente_empresa extends CI_Model {
 	{
 		$this->db->select("co.idcolaborador, CONCAT(co.nombres, ' ', co.apellidos) As colaborador",FALSE);
 		$this->db->select('ce.idclienteempresa, ce.nombre_comercial, ce.razon_social, ce.ruc, ce.representante_legal, ce.dni_representante_legal, 
-			ce.direccion_legal, ce.direccion_guia, ce.telefono,
+			ce.direccion_legal, ce.direccion_guia, ce.direccion_guia_2, ce.telefono,
 			cc.idcategoriacliente, cc.descripcion_cc');
 		$this->db->from('cliente_empresa ce');
 		$this->db->join('categoria_cliente cc', 'ce.idcategoriacliente = cc.idcategoriacliente');
 		$this->db->join('colaborador co', 'ce.idcolaborador = co.idcolaborador','left');
 		$this->db->where('ce.estado_ce', 1); // activo  
 		$this->db->where('ce.ruc', $datos['num_documento']);
+		$this->db->limit(1);
+		return $this->db->get()->row_array();
+	}
+	public function m_cargar_puntos_de_llegada($datos)
+	{
+		$this->db->select('ce.idclienteempresa, ce.direccion_legal, ce.direccion_guia, ce.direccion_guia_2');
+		$this->db->from('cliente_empresa ce');
+		$this->db->where('ce.idclienteempresa', $datos['idclienteempresa']);
 		$this->db->limit(1);
 		return $this->db->get()->row_array();
 	}
@@ -92,6 +100,7 @@ class Model_cliente_empresa extends CI_Model {
 			'dni_representante_legal' => empty($datos['dni_representante_legal']) ? NULL : $datos['dni_representante_legal'],	
 			'direccion_legal' => empty($datos['direccion_legal']) ? NULL : $datos['direccion_legal'], 
 			'direccion_guia' => empty($datos['direccion_guia']) ? NULL : $datos['direccion_guia'], 
+			'direccion_guia_2' => empty($datos['direccion_guia_2']) ? NULL : $datos['direccion_guia_2'], 
 			'telefono' => empty($datos['telefono']) ? NULL : $datos['telefono'],
 			'idcategoriacliente' => $datos['categoria_cliente']['id'],
 			'idempresaadmin' => $this->sessionFactur['idempresaadmin'],
@@ -111,6 +120,7 @@ class Model_cliente_empresa extends CI_Model {
 			'dni_representante_legal' => empty($datos['dni_representante_legal']) ? NULL : $datos['dni_representante_legal'],	
 			'direccion_legal' => empty($datos['direccion_legal']) ? NULL : $datos['direccion_legal'], 
 			'direccion_guia' => empty($datos['direccion_guia']) ? NULL : $datos['direccion_guia'],
+			'direccion_guia_2' => empty($datos['direccion_guia_2']) ? NULL : $datos['direccion_guia_2'], 
 			'telefono' => empty($datos['telefono']) ? NULL : $datos['telefono'],
 			'idcategoriacliente' => $datos['categoria_cliente']['id'],
 			'idcolaborador' => empty($datos['colaborador']['id']) ? NULL : $datos['colaborador']['id'], 

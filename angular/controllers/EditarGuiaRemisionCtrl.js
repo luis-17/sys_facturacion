@@ -175,11 +175,32 @@ app.controller('EditarGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$bo
       } 
     });
   }
-  // var myCallback = function() { 
-  //   $scope.fData.serie = $scope.fArr.listaSeries[0]; 
-  //   $scope.metodos.generarSerieCorrelativo();
-  // }
-  // $scope.metodos.listaSeries(myCallback); 
+  // punto de partida 
+  $scope.metodos.listaPuntosDePartida = function(myCallbackPP) { 
+    var myCallbackPP = myCallbackPP || function() { };
+    SedeServices.sListarDireccionCbo().then(function(rpta) {
+      if( rpta.flag == 1 ){
+        $scope.fArr.listaPuntosDePartida = rpta.datos; 
+        myCallbackPP();
+      }
+    });
+  };
+  $scope.metodos.listaPuntosDePartida(null);
+
+  // punto de llegada 
+  $scope.metodos.listaPuntosDeLlegada = function(myCallbackPLL,idclienteempresa) { 
+    var myCallbackPLL = myCallbackPLL || function() { }; 
+    var arrParams = {
+      'idclienteempresa': idclienteempresa 
+    }; 
+    ClienteEmpresaServices.sListarPuntosLlegada(arrParams).then(function(rpta) {
+      if( rpta.flag == 1 ){
+        $scope.fArr.listaPuntosDeLlegada = rpta.datos; 
+      }
+      myCallbackPLL();
+    });
+  };
+  
 
   // OBTENER DATOS DE LA GUÍA DE REMISIÓN 
   $scope.obtenerDatosGuiaRemision = function() { 
@@ -197,8 +218,9 @@ app.controller('EditarGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$bo
         // bindings 
         $timeout(function() {
           $scope.gridOptions.data = rpta.detalle; 
-          console.log($scope.gridOptions.data,'$scope.gridOptions.data');
         }, 200);
+        // punto de llegada 
+        $scope.metodos.listaPuntosDeLlegada(null,$scope.fData.cliente.idclienteempresa); 
 
         // colaborador 
         var myCallbackCol = function() { 
@@ -239,7 +261,15 @@ app.controller('EditarGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$bo
         }
         $scope.metodos.listaSeries(myCallBackSE); 
 
-        //pinesNotifications.notify({ title: 'OK!', text: rpta.message, type: 'success', delay: 2500 });
+        // punto de partida 
+        // var myCallbackPP = function() { 
+        //   // var objIndex = $scope.fArr.listaPuntosDePartida.filter(function(obj) { 
+        //   //   return obj.descripcion == $scope.fData.num_serie;
+        //   // }).shift(); 
+        //   $scope.fData.punto_partida = $scope.fData.num_serie; 
+        // }
+        
+
       }else{
         // $scope.fData.cliente = {}; 
         // ABRIMOS EL MODAL DE BUSQUEDA DE CLIENTE 

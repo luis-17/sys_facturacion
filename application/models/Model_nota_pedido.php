@@ -269,7 +269,7 @@ class Model_nota_pedido extends CI_Model {
 		return $this->db->get()->row_array();
 	}
 
-	public function m_cargar_nota_pedido_por_id($idnotapedido) // moneda idtipodocumentocliente ruc_ce
+	public function m_cargar_nota_pedido_por_id($idnotapedido) // moneda idtipodocumentocliente ruc_ce idcolaboradorcotnp
 	{
 		$this->db->select("CONCAT(COALESCE(cp.nombres,''), ' ', COALESCE(cp.apellidos,''), ' ', COALESCE(ce.razon_social,'')) As cliente_persona_empresa",FALSE);
 		$this->db->select("CONCAT(cp.nombres, ' ', cp.apellidos) As cliente_persona",FALSE);

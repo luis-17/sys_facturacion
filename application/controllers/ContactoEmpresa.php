@@ -35,6 +35,7 @@ class ContactoEmpresa extends CI_Controller {
 					'nombre_comercial' => strtoupper($row['nombre_comercial']),
 					'telefono_movil' => $row['telefono_movil'],
 					'email' => $row['email'],
+					'idclienteempresa'=> $row['idclienteempresa'],
 					'cliente_empresa' => array(
 						'id'=> $row['idclienteempresa'],
 						'descripcion'=> strtoupper($row['nombre_comercial'])				

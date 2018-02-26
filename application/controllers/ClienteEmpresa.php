@@ -14,7 +14,7 @@ class ClienteEmpresa extends CI_Controller {
 		$this->sessionFactur = @$this->session->userdata('sess_fact_'.substr(base_url(),-20,7));
 		date_default_timezone_set("America/Lima");
 		//if(!@$this->user) redirect ('inicio/login');
-		//$permisos = cargar_permisos_del_usuario($this->user->idusuario);
+		//$permisos = cargar_permisos_del_usuario($this->user->idusuario); 
 	}
 	public function listar_cliente_empresa()
 	{ 
@@ -27,6 +27,7 @@ class ClienteEmpresa extends CI_Controller {
 			array_push($arrListado,
 				array(
 					'id' => trim($row['idclienteempresa']),
+					'idclienteempresa' => trim($row['idclienteempresa']),
 					'nombre_comercial' => strtoupper($row['nombre_comercial']),
 					'nombre_corto' => strtoupper($row['nombre_corto']),
 					'razon_social' => strtoupper($row['razon_social']),
@@ -44,6 +45,7 @@ class ClienteEmpresa extends CI_Controller {
 					'dni_representante_legal' => $row['dni_representante_legal'],
 					'direccion_legal' => $row['direccion_legal'],
 					'direccion_guia' => $row['direccion_guia'],
+					'direccion_guia_2' => $row['direccion_guia_2'],
 					'telefono' => $row['telefono'],
 					'primer_contacto'=> strtoupper($row['primer_contacto'])
 				)
@@ -54,6 +56,34 @@ class ClienteEmpresa extends CI_Controller {
     	$arrData['message'] = '';
     	$arrData['flag'] = 1;
 		if(empty($lista)){
+			$arrData['flag'] = 0;
+		}
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
+	public function listar_puntos_llegada_cbo()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$fClienteEmpresa = $this->model_cliente_empresa->m_cargar_puntos_de_llegada($allInputs); 
+		$arrListado = array(
+			array(
+				'id'=> 1,
+				'descripcion'=> strtoupper($fClienteEmpresa['direccion_legal']) 
+			),
+			array(
+				'id'=> 2,
+				'descripcion'=> strtoupper($fClienteEmpresa['direccion_guia']) 
+			),
+			array(
+				'id'=> 3,
+				'descripcion'=> strtoupper($fClienteEmpresa['direccion_guia_2']) 
+			)
+		);
+    	$arrData['datos'] = $arrListado; 
+    	$arrData['message'] = '';
+    	$arrData['flag'] = 1;
+		if(empty($fClienteEmpresa)){ 
 			$arrData['flag'] = 0;
 		}
 		$this->output
@@ -133,7 +163,6 @@ class ClienteEmpresa extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
-
 	public function listar_cliente_cbo(){
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		$lista = $this->model_cliente_empresa->m_cargar_cliente_empresa_cbo();
@@ -157,7 +186,6 @@ class ClienteEmpresa extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
-
 	public function listar_cliente_empresa_autocomplete()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
@@ -185,5 +213,4 @@ class ClienteEmpresa extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData)); 
 	}
-
 }

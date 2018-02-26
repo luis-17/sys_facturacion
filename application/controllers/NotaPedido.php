@@ -206,6 +206,7 @@ class NotaPedido extends CI_Controller {
 			),
 			'idnotapedido'=> $fila['idmovimiento'],
 			'num_nota_pedido'=> $fila['num_nota_pedido'],
+			'idcolaborador'=> $fila['idcolaborador'], // colaborador asignado a la NP 
 			'sede'=> array(
 				'id'=> $fila['idsede'],
 				'descripcion'=> strtoupper($fila['descripcion_se']),

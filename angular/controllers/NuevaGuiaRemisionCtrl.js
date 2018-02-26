@@ -60,9 +60,9 @@ app.controller('NuevaGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$boo
   $scope.fArr.fNotaPedido = {};
   $scope.fArr.fNotaPedidoTemp = {};
   $scope.fData.classEditCliente = 'disabled';
+  $scope.fData.punto_llegada_disabled = true;
   $scope.fData.fecha_emision = $filter('date')(moment().toDate(),'dd-MM-yyyy'); 
   $scope.fData.fecha_inicio_traslado = $filter('date')(moment().toDate(),'dd-MM-yyyy'); 
-
 
   $scope.fData.idguiaanterior = null;
   $scope.fData.isRegisterSuccess = false;
@@ -89,11 +89,45 @@ app.controller('NuevaGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$boo
       return obj.id == $scope.fSessionCI.idcolaborador; 
     }).shift(); 
     $scope.fData.colaborador = objIndex; 
-  }
-  // var myCallbackCol = function() { 
-  //   $scope.fData.colaborador = $scope.fArr.listaColaboradores[0]; 
-  // }
+  } 
   $scope.metodos.listaColaboradores(myCallbackCol); 
+  // puntos de partida 
+  $scope.metodos.listaPuntosDePartida = function(myCallbackPP) { 
+    var myCallbackPP = myCallbackPP || function() { 
+      $scope.fData.punto_partida = $scope.fArr.listaPuntosDePartida[0].descripcion;
+    }; 
+    SedeServices.sListarDireccionCbo().then(function(rpta) {
+      if( rpta.flag == 1 ){
+        $scope.fArr.listaPuntosDePartida = rpta.datos; 
+        myCallbackPP();
+      }
+    });
+  };
+  $scope.metodos.listaPuntosDePartida(null);
+
+
+  // puntos de llegada 
+  $scope.metodos.listaPuntosDeLlegada = function(myCallbackPLL,idclienteempresa) { 
+    if( !(idclienteempresa) ){ 
+      $scope.fData.punto_llegada_disabled = true;
+      return false; 
+    }
+    var myCallbackPLL = myCallbackPLL || function() { 
+      $scope.fData.punto_llegada = $scope.fArr.listaPuntosDeLlegada[0].descripcion;
+    }; 
+    var arrParams = {
+      'idclienteempresa': idclienteempresa 
+    }; 
+    ClienteEmpresaServices.sListarPuntosLlegada(arrParams).then(function(rpta) {
+      if( rpta.flag == 1 ){
+        $scope.fData.punto_llegada_disabled = false;
+        $scope.fArr.listaPuntosDeLlegada = rpta.datos; 
+      }
+      myCallbackPLL();
+    });
+  };
+  $scope.metodos.listaPuntosDeLlegada(null,null); 
+
   // sexos 
   $scope.fArr.listaSexo = [ 
     { id:'M', descripcion:'MASCULINO' },
@@ -242,8 +276,15 @@ app.controller('NuevaGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$boo
           return obj.id == rpta.datos.cliente.colaborador.id; 
         }).shift(); 
         $scope.fData.colaborador = objIndex; 
+        // cargar puntos de llegada 
+        // var myCallbackPLL = function() { 
+        //   var objIndex = $scope.fArr.listaPuntosDeLlegada.filter(function(obj) { 
+        //     return obj.id == rpta.datos.idclienteempresa; 
+        //   }).shift(); 
+        //   $scope.fData.colaborador = objIndex; 
+        // } 
+        $scope.metodos.listaPuntosDeLlegada(null, rpta.datos.cliente.idclienteempresa); 
 
-        //$scope.metodos.listaColaboradores(myCallbackCol); 
         pinesNotifications.notify({ title: 'OK!', text: rpta.message, type: 'success', delay: 2500 });
       }else{
         $scope.fData.cliente = {}; 
@@ -309,6 +350,9 @@ app.controller('NuevaGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$boo
                 return obj.id == $scope.mySelectionGridBC[0].colaborador.id; 
               }).shift(); 
               $scope.fData.colaborador = objIndex; 
+
+              // cargar direcciones: 
+              $scope.metodos.listaPuntosDeLlegada(null, $scope.mySelectionGridBC[0].idclienteempresa); 
 
               $uibModalInstance.dismiss('cancel');
               // $timeout(function() {
@@ -653,7 +697,6 @@ app.controller('NuevaGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$boo
       }
     });
   }
-
   // NUEVO CONTACTO 
   $scope.btnNuevoContacto = function() { 
     var arrParams = {
@@ -695,6 +738,8 @@ app.controller('NuevaGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$boo
       return obj.id == model.colaborador.id; 
     }).shift(); 
     $scope.fData.colaborador = objIndex; 
+    // cargar direcciones: 
+    $scope.metodos.listaPuntosDeLlegada(null, model.idclienteempresa); 
   }
 
   $scope.validateContacto = function() { 
@@ -766,6 +811,8 @@ app.controller('NuevaGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$boo
                 return obj.id == $scope.mySelectionGridCO[0].cliente_empresa.colaborador.id; 
               }).shift(); 
               $scope.fData.colaborador = objIndex; 
+              // cargar direcciones: 
+              $scope.metodos.listaPuntosDeLlegada(null, $scope.mySelectionGridCO[0].idclienteempresa); 
               $uibModalInstance.dismiss('cancel');
             });
             $scope.gridApi.core.on.sortChanged($scope, function(grid, sortColumns) {
@@ -1167,9 +1214,16 @@ app.controller('NuevaGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$boo
                           return obj.id == rpta.datos.tipo_documento_cliente.id; 
                         }).shift(); 
                         $scope.fData.tipo_documento_cliente = objIndex; 
-                        //console.log(objIndex,'objIndex');
                       }
+                      // vendedor asignado desde NP 
+                      var objIndex = $scope.fArr.listaColaboradores.filter(function(obj) { 
+                        return obj.id == rpta.datos.idcolaborador; 
+                      }).shift(); 
+                      $scope.fData.colaborador = objIndex; 
+
                       $scope.metodos.listaTiposDocumentoCliente(myCallBackTD); 
+                      // cargar direcciones: 
+                      $scope.metodos.listaPuntosDeLlegada(null, rpta.datos.cliente.idclienteempresa); 
                       // llenar detalle 
                       $scope.gridOptions.data = rpta.detalle; 
                     }, 200);

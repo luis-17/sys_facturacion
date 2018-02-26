@@ -29,21 +29,6 @@
 						</div>
           </div>
           <div class="form-group pull-in clearfix mb-n"> 
-          	<!-- <div class="col-md-6" ng-show="fData.tipo_documento_cliente.destino == 1"> 
-							<label class="control-label text-ellipsis"> Contacto. </label> 
-							<div class="input-group"> 
-              	<input type="text" ng-model="fData.contacto" class="form-control input-sm "
-									placeholder="Busque Contacto" typeahead-loading="loadingCT" uib-typeahead="item as item.contacto for item in getContactoAutocomplete($viewValue)" readonly="readonly" 
-	            		typeahead-on-select="getSelectedContacto($item, $model, $label)" typeahead-min-length="2" autocomplete ="off" ng-blur="validateContacto();" tabindex="140"/> 
-	            	<span class="input-group-btn">
-	                <button class="btn btn-default btn-sm" type="button" ng-click="btnBusquedaContacto();" tabindex="150"><i class="fa fa-search"></i> </button>
-	              </span>
-	            </div>
-	            <i ng-show="loadingCT" class="fa fa-refresh"></i>
-	            <div ng-show="noResultsCT" class="text-danger">
-	                <i class="fa fa-remove"></i> No se encontró resultados 
-	            </div>
-						</div>  -->
 						<div class="col-md-6" ng-show="fData.tipo_documento_cliente.destino == 1"> 
           		<label class="control-label"> Teléfono/Anexo </label>
 							<div class="input-group-btn">
@@ -90,19 +75,20 @@
               <input type="text" class="form-control input-sm" ng-model="fData.fecha_emision" tabindex="210" input-mask mask-options="{alias: 'dd-mm-yyyy'}" />
           	</div> 
           	<div class="col-md-3 col-sm-12">
-              <label class="control-label text-ellipsis"> Motivo de Traslado </label> 
-              <select class="form-control input-sm" ng-model="fData.motivo_traslado" ng-options="item as item.descripcion for item in fArr.listaMotivosTraslado" 
-              	tabindex="230" > </select> 
+              <label class="control-label text-ellipsis"> Fecha de Inicio de Traslado </label> 
+              <input type="text" class="form-control input-sm" ng-model="fData.fecha_inicio_traslado" tabindex="210" input-mask mask-options="{alias: 'dd-mm-yyyy'}" />
           	</div>
           </div>
           <div class="form-group pull-in clearfix mb-n"> 
-						<div class="col-md-3 col-sm-12">
+          	<div class="col-md-3 col-sm-12">
               <label class="control-label text-ellipsis"> Punto de Partida</label> 
-              <input type="text" class="form-control input-sm" ng-model="fData.punto_partida" tabindex="230" placeholder="Punto de partida" />
-          	</div>
+              <select class="form-control input-sm" ng-model="fData.punto_partida" 
+              	ng-options="item.descripcion as item.descripcion for item in fArr.listaPuntosDePartida" tabindex="220" > </select> 
+          	</div> 
           	<div class="col-md-3 col-sm-12">
               <label class="control-label text-ellipsis"> Punto de Llegada </label> 
-              <input type="text" class="form-control input-sm" ng-model="fData.punto_llegada" tabindex="230" placeholder="Punto de llegada" />
+              <select class="form-control input-sm" ng-model="fData.punto_llegada" ng-disabled="fData.punto_llegada_disabled" 
+              	ng-options="item.descripcion as item.descripcion for item in fArr.listaPuntosDeLlegada" tabindex="230" > </select> 
           	</div>
           	<div class="col-md-3 col-sm-12" > 
               <label class="control-label text-ellipsis"> Colaborador </label> 
@@ -202,10 +188,6 @@
               <label class="control-label text-ellipsis"> N° Cert. Inscripción </label> 
               <input type="text" class="form-control input-sm" ng-model="fData.cert_inscripcion" tabindex="230" placeholder="N° de Certificado de Inscripción" />
           	</div> 
-          	<div class="col-md-3 col-sm-12">
-              <label class="control-label text-ellipsis"> Fecha de Inicio de Traslado </label> 
-              <input type="text" class="form-control input-sm" ng-model="fData.fecha_inicio_traslado" tabindex="210" input-mask mask-options="{alias: 'dd-mm-yyyy'}" />
-          	</div>
           </div>
 	    	</fieldset>
 			</div>
@@ -214,30 +196,37 @@
 					<legend class="lead lead-sm"> Otros datos </legend> 
 					<div class="form-group-sm pull-in clearfix"> 
 						<div class="col-md-3 col-sm-12">
+              <label class="control-label text-ellipsis"> Motivo de Traslado </label> 
+              <select class="form-control input-sm" ng-model="fData.motivo_traslado" ng-options="item as item.descripcion for item in fArr.listaMotivosTraslado" 
+              	tabindex="226" > </select> 
+          	</div>
+          	<div class="col-md-3 col-sm-12">
+              <label class="control-label text-ellipsis"> Orden de Compra </label> 
+              <input type="text" class="form-control input-sm" ng-model="fData.orden_compra" tabindex="228" placeholder="N° de Orden de Compra" />
+          	</div>
+						<div class="col-md-3 col-sm-12">
 			        <label class="control-label text-ellipsis"> Marca de Unidad</label> 
 			        <input type="text" class="form-control input-sm" ng-model="fData.marca_unidad" tabindex="230" placeholder="Marca" />
 			    	</div>
 			    	<div class="col-md-3 col-sm-12">
 			        <label class="control-label text-ellipsis"> Placa de Unidad</label> 
-			        <input type="text" class="form-control input-sm" ng-model="fData.placa_unidad" tabindex="230" placeholder="Placa" />
+			        <input type="text" class="form-control input-sm" ng-model="fData.placa_unidad" tabindex="235" placeholder="Placa" />
 			    	</div>
 			    	<div class="col-md-3 col-sm-12">
 			        <label class="control-label text-ellipsis"> Peso Total </label> 
-			        <input type="text" class="form-control input-sm" ng-model="fData.peso_total" tabindex="230" placeholder="Peso total" />
+			        <input type="text" class="form-control input-sm" ng-model="fData.peso_total" tabindex="240" placeholder="Peso total" />
 			    	</div>
 			    	<div class="col-md-3 col-sm-12">
 			        <label class="control-label text-ellipsis"> Costo Mínimo </label> 
-			        <input type="text" class="form-control input-sm" ng-model="fData.costo_minimo" tabindex="230" placeholder="Costo Mínimo de Traslado" />
-			    	</div>
-			    </div> 
-			    <div class="form-group pull-in clearfix">
-			    	<div class="col-xs-12">
+			        <input type="text" class="form-control input-sm" ng-model="fData.costo_minimo" tabindex="250" placeholder="Costo Mínimo de Traslado" />
+			    	</div> 
+			    	<div class="col-sm-6">
 			        <label class="control-label text-ellipsis text-info"> Asociar a un comprobante </label> 
 			        <input type="button" class="btn btn-sm btn-default" ng-click="btnAsociarComprobante();" tabindex="230" value="Buscar Comprobante..." /> 
 			        <label ng-if="fData.idmovimiento" class="inline-block text-default text-bold"> 
 			        	Se a seleccionado: {{ fData.tipo_documento_venta }} N° {{ fData.num_serie_venta }} - {{ fData.num_correlativo_venta }} </label>
 			    	</div>
-			    </div>
+			    </div> 
 			  </fieldset>
 			</div>
 	    <div class="line line-dashed b-b line-lg pull-in"></div>

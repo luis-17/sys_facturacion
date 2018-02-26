@@ -140,10 +140,11 @@ app.controller('SedeCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$log'
     }
 }]);
 
-app.service("SedeServices",function($http, $q, handleBehavior) {
+app.service("SedeServices",function($http, $q, handleBehavior) { 
     return({
         sListar: sListar,
         sListarCbo: sListarCbo,
+        sListarDireccionCbo: sListarDireccionCbo,
         sRegistrar: sRegistrar,
         sEditar: sEditar,
         sAnular: sAnular
@@ -160,6 +161,14 @@ app.service("SedeServices",function($http, $q, handleBehavior) {
       var request = $http({
             method : "post",
             url : angular.patchURLCI+"Sede/listar_sedes_cbo",
+            data : datos
+      });
+      return (request.then(handleBehavior.success,handleBehavior.error));
+    }
+    function sListarDireccionCbo(datos) {
+      var request = $http({
+            method : "post",
+            url : angular.patchURLCI+"Sede/listar_sedes_direccion_cbo",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));

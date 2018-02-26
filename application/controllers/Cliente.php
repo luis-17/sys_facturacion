@@ -31,6 +31,7 @@ class Cliente extends CI_Controller {
 		if( $allInputs['tipo_documento']['destino'] == 1 ){ // empresa razon_social
 			$fCliente = $this->model_cliente_empresa->m_buscar_cliente_empresa($allInputs);
 			$fCliente['id'] = @$fCliente['idclienteempresa'];
+			$fCliente['idclienteempresa'] = @$fCliente['idclienteempresa'];
 			$fCliente['descripcion'] = strtoupper(@$fCliente['razon_social']);
 			$fCliente['tipo_cliente'] = 'ce';
 		}

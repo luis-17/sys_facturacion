@@ -388,6 +388,7 @@ app.controller('ClienteEmpresaCtrl', ['$scope', '$filter', '$uibModal', '$bootbo
 app.service("ClienteEmpresaServices",function($http, $q, handleBehavior) {
     return({
         sListar: sListar,
+        sListarPuntosLlegada: sListarPuntosLlegada,
         sRegistrar: sRegistrar,
         sEditar: sEditar,
         sAnular: sAnular 
@@ -396,6 +397,14 @@ app.service("ClienteEmpresaServices",function($http, $q, handleBehavior) {
       var request = $http({
             method : "post",
             url : angular.patchURLCI+"ClienteEmpresa/listar_cliente_empresa",
+            data : datos
+      });
+      return (request.then(handleBehavior.success,handleBehavior.error));
+    }
+    function sListarPuntosLlegada(datos) {
+    	var request = $http({
+            method : "post",
+            url : angular.patchURLCI+"ClienteEmpresa/listar_puntos_llegada_cbo",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
