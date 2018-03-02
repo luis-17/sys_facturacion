@@ -695,8 +695,7 @@ class GuiaRemision extends CI_Controller {
 		    	$htmlData .= '<div class="item" style="font-size:14px;top:'.$posY_serieCorrelativo.';left:'.$posX_serieCorrelativo.';">';
 		    	$htmlData .= utf8_decode(strtoupper_total($fila['numero_serie'])).'   -   ';
 		    	$htmlData .= '</div>';
-    		}
-	    	
+    		} 
 
 	    	// set numero correlativo 
 	    	if( $configTD['detalle']['num_correlativo_key']['visible'] == 1 ){ 
@@ -768,8 +767,7 @@ class GuiaRemision extends CI_Controller {
 		    	$htmlData .= '<div class="item" style="top:'.$posY_fechaInicioTraslado.';left:'.$posX_fechaInicioTraslado.';">';
 		    	$htmlData .= formatoFechaReporte3($fila['fecha_inicio_traslado']);
 		    	$htmlData .= '</div>';
-	    	}
-	    	
+	    	} 
 
 	    	// set position fecha emision 
 	    	if( $configTD['detalle']['fecha_emision_key']['visible'] == 1 ){ 
@@ -778,8 +776,7 @@ class GuiaRemision extends CI_Controller {
 		    	$htmlData .= '<div class="item" style="top:'.$posY_fechaEmision.';left:'.$posX_fechaEmision.';">';
 		    	$htmlData .= formatoFechaReporte3($fila['fecha_emision']);
 		    	$htmlData .= '</div>';
-		    }
-
+		    } 
 
 	    	// set peso total 
 	    	if( $configTD['detalle']['peso_total_key']['visible'] == 1 ){ 
@@ -788,8 +785,7 @@ class GuiaRemision extends CI_Controller {
 		    	$htmlData .= '<div class="item" style="top:'.$posY_pesoTotal.';left:'.$posX_pesoTotal.';">';
 		    	$htmlData .= utf8_decode($fila['peso_total']);
 		    	$htmlData .= '</div>';
-	    	}
-	    	
+	    	} 
 
 	    	// set costo min. traslado
 	    	if( $configTD['detalle']['costo_min_key']['visible'] == 1 ){ 
@@ -836,49 +832,7 @@ class GuiaRemision extends CI_Controller {
 				    	$htmlData .= '</div>';
 			    	}
 			    $htmlData .= '</div>'; 
-			}
-
-		    // $strMoneda = NULL;
-		    // $strSimbolo = NULL;
-		    // if( $fila['moneda']=='S' ){
-		    // 	$strMoneda = ' SOLES';
-		    // 	$strSimbolo = 'S/ ';
-		    // }
-		    // if( $fila['moneda']=='D' ){
-		    // 	$strMoneda = ' DÓLARES';
-		    // 	$strSimbolo = 'US$ ';
-		    // }
-
-		    // set número de cuenta 
-		    // $bancoEmpresa = $this->model_banco_empresa_admin->m_cargar_cuentas_banco_por_filtros($fila['idempresaadmin'],$fila['moneda']); 
-		    // $posX_numCuenta = '2mm'; 
-	    	// $posY_numCuenta = '168.5mm'; 
-	    	// $htmlData .= '<div class="item" style="top:'.$posY_numCuenta.';left:'.$posX_numCuenta.';">';
-		    // 	$htmlData .= '<div class="rowdt compressed">'; 
-		    // 	foreach ($bancoEmpresa as $keyBEA => $rowBEA) { 
-		    // 		$htmlData .= '<div class="item-detalle" style="width:200px;">';
-			   //  	$htmlData .= 'Cta. Cte. '.$rowBEA['abreviatura_ba'].' '. utf8_decode($strMoneda);
-			   //  	$htmlData .= '</div>';  
-			   //  }
-			   //  $htmlData .= '</div>';
-		    // 	$htmlData .= '<div class="rowdt compressed">'; 
-		    // 	foreach ($bancoEmpresa as $keyBEA => $rowBEA) { 
-		    // 		$htmlData .= '<div class="item-detalle" style="width:200px;">';
-			   //  	$htmlData .= $rowBEA['num_cuenta'];
-			   //  	$htmlData .= '</div>';  
-			   //  }
-			   //  $htmlData .= '</div>';
-	    	// $htmlData .= '</div>';
-
-
-		    // set Monto en letras 
-		    
-		    // $en_letra = ValorEnLetras($fila['total'],$strMoneda);
-	    	// $posX_montoEnLetras = '12mm';
-	    	// $posY_montoEnLetras = '178.5mm';
-	    	// $htmlData .= '<div class="item" style="top:'.$posY_montoEnLetras.';left:'.$posX_montoEnLetras.';">';
-	    	// $htmlData .= $en_letra; 
-	    	// $htmlData .= '</div>';
+			} 
 
 		    // set motivo de traslado 
 		    $listaMotivoTraslado = $this->model_motivo_traslado->m_cargar_motivo_traslado_cbo(); 
@@ -928,7 +882,6 @@ class GuiaRemision extends CI_Controller {
 		    	$htmlData .= $fila['marca_transporte'].' '.$fila['placa_transporte']; 
 		    	$htmlData .= '</div>';
 	    	}
-	    	
 
 	    	// set cert. inscripcion
 	    	if( $configTD['detalle']['cert_inscripcion_key']['visible'] == 1 ){ 

@@ -7,7 +7,7 @@ class Venta extends CI_Controller {
         parent::__construct(); 
         $this->load->helper(array('fechas','otros','pdf','contable','config')); 
         $this->load->model(array('model_venta','model_categoria_cliente','model_cliente_persona','model_cliente_empresa','model_configuracion',
-        	'model_variable_car','model_banco_empresa_admin','model_serie','model_nota_pedido','model_caracteristica')); 
+        	'model_variable_car','model_banco_empresa_admin','model_serie','model_nota_pedido','model_caracteristica','model_tipo_documento_mov')); 
         $this->load->library('excel');
     	$this->load->library('Fpdfext');
         //cache
@@ -884,8 +884,6 @@ class Venta extends CI_Controller {
 	    $fConfig = obtener_parametros_configuracion();
 	    $fila = $this->model_venta->m_cargar_venta_por_id($allInputs['id']); 
 
-	    //$this->pdf = new Fpdfext('L','in',array(9,8)); 
-	    //$this->pdf = new Fpdfext('L','cm',array(23.5,21)); 
 	    $this->pdf = new Fpdfext('L','mm',array(235,210)); 
 		$this->pdf->setTituloAbr($allInputs['codigo_reporte']); 
 		$this->pdf->SetAutoPageBreak(TRUE,0); 
@@ -953,6 +951,19 @@ class Venta extends CI_Controller {
 		$fConfig = obtener_parametros_configuracion();
  		$fila = $this->model_venta->m_cargar_venta_por_id($allInputs['id']); 
  		$detalleLista = $this->model_venta->m_cargar_detalle_venta_por_id($allInputs['id']); 
+ 		$allInputs['idtipodocumentomov'] = $fila['idtipodocumentomov']; 
+ 		$unidadMedidaPos = 'mm'; // UNIDAD DE MEDIDA DE POSICIÓN. 
+ 		$configTD = $this->model_tipo_documento_mov->m_cargar_configuracion_td($allInputs); // CONFIGURACION DE comprobante 
+ 		//var_dump($allInputs['idtipodocumentomov']); 
+ 		//var_dump($configTD); exit(); 
+ 		$auxDetConfig = $this->model_tipo_documento_mov->m_cargar_configuracion_detalle_td($configTD); 
+ 		foreach ($auxDetConfig as $key => $row) {
+ 			$configTD['detalle'][$row['key_config_detalle']] = array(
+ 				'x'=> $row['valor_x'],
+ 				'y'=> $row['valor_y'],
+ 				'visible'=> $row['visible']
+ 			);
+ 		}
  		// PREPARACIÓN DE DATA: 
  		$arrListadoDetalle = array(); 
  		foreach ($detalleLista as $key => $row) { 
@@ -1012,11 +1023,14 @@ class Venta extends CI_Controller {
 
     			.general{
     				letter-spacing:5px;
-				   	width: 1270px;
-				   	height: 1000px;
-				   	font-size:10px; 
-				   	font-family: sans-serif;
+				   	font-size:'.$configTD['tamanio_fuente'].$configTD['unidad_medida'].'; 
+				   	font-family: '.$configTD['tipo_fuente'].';
     			}
+			}
+			.general{
+				letter-spacing:5px;
+			   	font-size:'.$configTD['tamanio_fuente'].$configTD['unidad_medida'].'; 
+			   	font-family: '.$configTD['tipo_fuente'].';
 			}
 			/** { outline: 2px dotted red }
 			* * { outline: 2px dotted green }
@@ -1026,11 +1040,6 @@ class Venta extends CI_Controller {
 			* * * * * * { outline: 1px solid green }
 			* * * * * * * { outline: 1px solid orange }
 			* * * * * * * * { outline: 1px solid blue }*/
-			.general{
-				letter-spacing:4px;
-			   	font-size:10px; 
-			   	font-family: sans-serif;
-			}
 			.item{
 				position: absolute;
 				display: block;
@@ -1041,75 +1050,101 @@ class Venta extends CI_Controller {
 				vertical-align: middle;
 			}
 			body { margin: 0; padding: 0; }
-			.rowdt { width: 100%; text-align:left;font-size: 8px;margin-bottom: 8px; }
+			.rowdt { width: 100%; text-align:left;font-size: '.$configTD['tamanio_fuente'].$configTD['unidad_medida'].';margin-bottom: 8px; }
 			.rowdt.compressed { margin-bottom:0; }
-			.hidden{ visibility: hidden; }
+			.hidden{ visibility: hidden; } 
     	</style>';
 
     	$htmlData .= '<div class="general">'; 
+    		// set serie correlativo 
+    		if( $configTD['detalle']['serie_correlativo_key']['visible'] == 1 ){ 
+				$posX_serieCorrelativo = $configTD['detalle']['serie_correlativo_key']['x'].$unidadMedidaPos; 
+		    	$posY_serieCorrelativo = $configTD['detalle']['serie_correlativo_key']['y'].$unidadMedidaPos; 
+		    	$htmlData .= '<div class="item" style="font-size:14px;top:'.$posY_serieCorrelativo.';left:'.$posX_serieCorrelativo.';">';
+		    	$htmlData .= utf8_decode(strtoupper_total($fila['numero_serie'])).'   -   ';
+		    	$htmlData .= '</div>';
+    		} 
+
 	    	// set numero correlativo 
-	    	$posX_numCorrelativo = '266mm'; 
-	    	$posY_numCorrelativo = '33mm'; 
-	    	$htmlData .= '<div class="item" style="font-size:18px;top:'.$posY_numCorrelativo.';left:'.$posX_numCorrelativo.';">';
-	    	$htmlData .= utf8_decode(strtoupper_total($fila['numero_correlativo']));
-	    	$htmlData .= '</div>';
+	    	if( $configTD['detalle']['num_correlativo_key']['visible'] == 1 ){ 
+		    	$posX_numCorrelativo = $configTD['detalle']['num_correlativo_key']['x'].$unidadMedidaPos; 
+		    	$posY_numCorrelativo = $configTD['detalle']['num_correlativo_key']['y'].$unidadMedidaPos; 
+		    	$htmlData .= '<div class="item" style="font-size:18px;top:'.$posY_numCorrelativo.';left:'.$posX_numCorrelativo.';">';
+		    	$htmlData .= utf8_decode(strtoupper_total($fila['numero_correlativo']));
+		    	$htmlData .= '</div>';
+		    }
 
 	    	// set position nombre de cliente 
-	    	$posX_nombreCliente = '30mm';
-	    	$posY_nombreCliente = '31mm';
-	    	$htmlData .= '<div class="item" style="top:'.$posY_nombreCliente.';left:'.$posX_nombreCliente.';">';
-	    	$htmlData .= utf8_decode(strtoupper_total($fila['cliente_persona_empresa']));
-	    	$htmlData .= '</div>';
+	    	if( $configTD['detalle']['nombre_cliente_key']['visible'] == 1 ){ 
+		    	$posX_nombreCliente = $configTD['detalle']['nombre_cliente_key']['x'].$unidadMedidaPos; 
+		    	$posY_nombreCliente = $configTD['detalle']['nombre_cliente_key']['y'].$unidadMedidaPos; 
+		    	$htmlData .= '<div class="item" style="top:'.$posY_nombreCliente.';left:'.$posX_nombreCliente.';">';
+		    	$htmlData .= utf8_decode(strtoupper_total($fila['cliente_persona_empresa']));
+		    	$htmlData .= '</div>';
+		    }
 
 	    	// set position direccion 
-	    	$posX_direccion = '30mm';
-	    	$posY_direccion = '39mm';
-	    	$htmlData .= '<div class="item" style="top:'.$posY_direccion.';left:'.$posX_direccion.';">';
-	    	$htmlData .= utf8_decode(strtoupper_total($fila['direccion_legal_ce']));
-	    	$htmlData .= '</div>';
+	    	if( $configTD['detalle']['direccion_key']['visible'] == 1 ){ 
+		    	$posX_direccion = $configTD['detalle']['direccion_key']['x'].$unidadMedidaPos; 
+		    	$posY_direccion = $configTD['detalle']['direccion_key']['y'].$unidadMedidaPos; 
+		    	$htmlData .= '<div class="item" style="top:'.$posY_direccion.';left:'.$posX_direccion.';">';
+		    	$htmlData .= utf8_decode(strtoupper_total($fila['direccion_legal_ce']));
+		    	$htmlData .= '</div>';
+		    }
 
 	    	// set position RUC  
-	    	$posX_RUC = '30mm';
-	    	$posY_RUC = '47mm';
-	    	$htmlData .= '<div class="item" style="top:'.$posY_RUC.';left:'.$posX_RUC.';">';
-	    	$htmlData .= utf8_decode(strtoupper_total($fila['num_documento_persona_empresa']));
-	    	$htmlData .= '</div>';
+	    	if( $configTD['detalle']['ruc_cliente_key']['visible'] == 1 ){ 
+		    	$posX_RUC = $configTD['detalle']['ruc_cliente_key']['x'].$unidadMedidaPos; 
+		    	$posY_RUC = $configTD['detalle']['ruc_cliente_key']['y'].$unidadMedidaPos; 
+		    	$htmlData .= '<div class="item" style="top:'.$posY_RUC.';left:'.$posX_RUC.';">';
+		    	$htmlData .= utf8_decode(strtoupper_total($fila['num_documento_persona_empresa']));
+		    	$htmlData .= '</div>';
+		    }
 
 	    	// set position fecha 
-	    	$posX_fecha = '30mm';
-	    	$posY_fecha = '56mm';
-	    	$htmlData .= '<div class="item" style="top:'.$posY_fecha.';left:'.$posX_fecha.';">';
-	    	$htmlData .= formatoFechaReporte3($fila['fecha_emision']);
-	    	$htmlData .= '</div>';
+	    	if( $configTD['detalle']['fecha_emision_key']['visible'] == 1 ){ 
+		    	$posX_fecha = $configTD['detalle']['fecha_emision_key']['x'].$unidadMedidaPos; 
+		    	$posY_fecha = $configTD['detalle']['fecha_emision_key']['y'].$unidadMedidaPos; 
+		    	$htmlData .= '<div class="item" style="top:'.$posY_fecha.';left:'.$posX_fecha.';">';
+		    	$htmlData .= formatoFechaReporte3($fila['fecha_emision']);
+		    	$htmlData .= '</div>';
+		    }
 
 	    	// set position telefono 
-	    	$posX_telefono = '100mm';
-	    	$posY_telefono = '47mm';
-	    	$htmlData .= '<div class="item" style="top:'.$posY_telefono.';left:'.$posX_telefono.';">';
-	    	$htmlData .= $fila['telefono_ce'];
-	    	$htmlData .= '</div>';
+	    	if( $configTD['detalle']['telefono_key']['visible'] == 1 ){ 
+		    	$posX_telefono = $configTD['detalle']['telefono_key']['x'].$unidadMedidaPos; 
+		    	$posY_telefono = $configTD['detalle']['telefono_key']['y'].$unidadMedidaPos; 
+		    	$htmlData .= '<div class="item" style="top:'.$posY_telefono.';left:'.$posX_telefono.';">';
+		    	$htmlData .= $fila['telefono_ce'];
+		    	$htmlData .= '</div>';
+		    }
 
 	    	// set O/C 
-	    	$posX_OC = '164mm';
-	    	$posY_OC = '47mm';
-	    	$htmlData .= '<div class="item" style="top:'.$posY_OC.';left:'.$posX_OC.';">';
-	    	$htmlData .= utf8_decode(strtoupper_total($fila['numero_orden_compra']));
-	    	$htmlData .= '</div>';
-
+	    	if( $configTD['detalle']['orden_compra_key']['visible'] == 1 ){ 
+		    	$posX_OC = $configTD['detalle']['orden_compra_key']['x'].$unidadMedidaPos; 
+		    	$posY_OC = $configTD['detalle']['orden_compra_key']['y'].$unidadMedidaPos; 
+		    	$htmlData .= '<div class="item" style="top:'.$posY_OC.';left:'.$posX_OC.';">';
+		    	$htmlData .= utf8_decode(strtoupper_total($fila['numero_orden_compra']));
+		    	$htmlData .= '</div>';
+		    }
 	    	// set Condición de Pago 
-	    	$posX_condicionPago = '234mm';
-	    	$posY_condicionPago = '47mm';
-	    	$htmlData .= '<div class="item" style="top:'.$posY_condicionPago.';left:'.$posX_condicionPago.';">';
-	    	$htmlData .= utf8_decode(strtoupper_total($fila['descripcion_fp']));
-	    	$htmlData .= '</div>';
-
+		    if( $configTD['detalle']['condicion_pago_key']['visible'] == 1 ){ 
+		    	$posX_condicionPago = $configTD['detalle']['condicion_pago_key']['x'].$unidadMedidaPos; 
+		    	$posY_condicionPago = $configTD['detalle']['condicion_pago_key']['y'].$unidadMedidaPos; 
+		    	$htmlData .= '<div class="item" style="top:'.$posY_condicionPago.';left:'.$posX_condicionPago.';">';
+		    	$htmlData .= utf8_decode(strtoupper_total($fila['descripcion_fp']));
+		    	$htmlData .= '</div>';
+		    }
 	    	// set Vendedor 
-	    	$posX_vendedor = '234mm';
-	    	$posY_vendedor = '56mm';
-	    	$htmlData .= '<div class="item" style="top:'.$posY_vendedor.';left:'.$posX_vendedor.';">';
-	    	$htmlData .= utf8_decode(strtoupper_total($fila['colaborador_asig'])); 
-	    	$htmlData .= '</div>';
-
+	    	// $posX_vendedor = '234mm';
+	    	// $posY_vendedor = '56mm';
+	    	if( $configTD['detalle']['vendedor_key']['visible'] == 1 ){ 
+		    	$posX_vendedor = $configTD['detalle']['vendedor_key']['x'].$unidadMedidaPos; 
+		    	$posY_vendedor = $configTD['detalle']['vendedor_key']['y'].$unidadMedidaPos; 
+		    	$htmlData .= '<div class="item" style="top:'.$posY_vendedor.';left:'.$posX_vendedor.';">';
+		    	$htmlData .= utf8_decode(strtoupper_total($fila['colaborador_asig'])); 
+		    	$htmlData .= '</div>';
+		    }
 			// $arrData['html'] = $htmlData;
 			// $this->output
 			//     ->set_content_type('application/json')
@@ -1117,34 +1152,37 @@ class Venta extends CI_Controller {
 			// return;
 	    	/* DETALLE DE ITEMS */
 	    	$arrCol = array('60','64','845','130','130'); // ancho de las columnas 
-	    	$posX_detalle = '0mm';
-	    	$posY_detalle = '69mm';
-	    	$htmlData .= '<div class="item" style="top:'.$posY_detalle.';left:'.$posX_detalle.';">';
-		    	foreach ($arrListadoDetalle as $row) { 
-		    		$htmlData .= '<div class="rowdt">'; 
-			    		$htmlData .= '<div class="item-detalle" style="width:'. $arrCol[0] .'px;">';
-				    	$htmlData .= $row['cantidad'];
-				    	$htmlData .= '</div>';
-				    	
-				    	$htmlData .= '<div class="item-detalle" style="width:'. $arrCol[1] .'px;">';
-				    	$htmlData .= $row['unidad_medida']['abreviatura'];
-				    	$htmlData .= '</div>';
-				    	
-				    	$htmlData .= '<div class="item-detalle" style="width:'. $arrCol[2] .'px;">';
-				    	$htmlData .= $row['descripcion'];
-				    	$htmlData .= '</div>';
+	    	// $posX_detalle = '0mm';
+	    	// $posY_detalle = '69mm';
+	    	if( $configTD['detalle']['detalle_items_key']['visible'] == 1 ){ 
+		    	$posX_detalle = $configTD['detalle']['detalle_items_key']['x'].$unidadMedidaPos;// '0mm';
+		    	$posY_detalle = $configTD['detalle']['detalle_items_key']['y'].$unidadMedidaPos;// '69mm';
+		    	$htmlData .= '<div class="item" style="top:'.$posY_detalle.';left:'.$posX_detalle.';">';
+			    	foreach ($arrListadoDetalle as $row) { 
+			    		$htmlData .= '<div class="rowdt">'; 
+				    		$htmlData .= '<div class="item-detalle" style="width:'. $arrCol[0] .'px;">';
+					    	$htmlData .= $row['cantidad'];
+					    	$htmlData .= '</div>';
+					    	
+					    	$htmlData .= '<div class="item-detalle" style="width:'. $arrCol[1] .'px;">';
+					    	$htmlData .= $row['unidad_medida']['abreviatura'];
+					    	$htmlData .= '</div>';
+					    	
+					    	$htmlData .= '<div class="item-detalle" style="width:'. $arrCol[2] .'px;">';
+					    	$htmlData .= $row['descripcion'];
+					    	$htmlData .= '</div>';
 
-				    	$htmlData .= '<div class="item-detalle" style="width:'. $arrCol[3] .'px;">';
-				    	$htmlData .= $row['precio_unitario'];
+					    	$htmlData .= '<div class="item-detalle" style="width:'. $arrCol[3] .'px;">';
+					    	$htmlData .= $row['precio_unitario'];
+					    	$htmlData .= '</div>';
+
+					    	$htmlData .= '<div class="item-detalle" style="width:'. $arrCol[4] .'px;">';
+					    	$htmlData .= $row['importe_sin_igv'];
+					    	$htmlData .= '</div>'; 
 				    	$htmlData .= '</div>';
-
-				    	$htmlData .= '<div class="item-detalle" style="width:'. $arrCol[4] .'px;">';
-				    	$htmlData .= $row['importe_sin_igv'];
-				    	$htmlData .= '</div>'; 
-			    	$htmlData .= '</div>';
-		    	}
-		    $htmlData .= '</div>'; 
-
+			    	}
+			    $htmlData .= '</div>'; 
+			}
 		    $strMoneda = NULL;
 		    $strSimbolo = NULL;
 		    if( $fila['moneda']=='S' ){
@@ -1158,63 +1196,75 @@ class Venta extends CI_Controller {
 
 		    // set número de cuenta 
 		    $bancoEmpresa = $this->model_banco_empresa_admin->m_cargar_cuentas_banco_por_filtros($fila['idempresaadmin'],$fila['moneda']); 
-		    $posX_numCuenta = '2mm'; 
-	    	$posY_numCuenta = '168.5mm'; 
-	    	$htmlData .= '<div class="item" style="top:'.$posY_numCuenta.';left:'.$posX_numCuenta.';">';
-		    	$htmlData .= '<div class="rowdt compressed">'; 
-		    	foreach ($bancoEmpresa as $keyBEA => $rowBEA) { 
-		    		$htmlData .= '<div class="item-detalle" style="width:200px;">';
-			    	$htmlData .= 'Cta. Cte. '.$rowBEA['abreviatura_ba'].' '. utf8_decode($strMoneda);
-			    	$htmlData .= '</div>';  
-			    }
-			    $htmlData .= '</div>';
-		    	$htmlData .= '<div class="rowdt compressed">'; 
-		    	foreach ($bancoEmpresa as $keyBEA => $rowBEA) { 
-		    		$htmlData .= '<div class="item-detalle" style="width:200px;">';
-			    	$htmlData .= $rowBEA['num_cuenta'];
-			    	$htmlData .= '</div>';  
-			    }
-			    $htmlData .= '</div>';
-	    	$htmlData .= '</div>';
-
+	    	if( $configTD['detalle']['num_cuenta_key']['visible'] == 1 ){ 
+		    	$posX_numCuenta = $configTD['detalle']['num_cuenta_key']['x'].$unidadMedidaPos; 
+		    	$posY_numCuenta = $configTD['detalle']['num_cuenta_key']['y'].$unidadMedidaPos; 
+		    	$htmlData .= '<div class="item" style="top:'.$posY_numCuenta.';left:'.$posX_numCuenta.';">';
+			    	$htmlData .= '<div class="rowdt compressed">'; 
+			    	foreach ($bancoEmpresa as $keyBEA => $rowBEA) { 
+			    		$htmlData .= '<div class="item-detalle" style="width:200px;">';
+				    	$htmlData .= 'Cta. Cte. '.$rowBEA['abreviatura_ba'].' '. utf8_decode($strMoneda);
+				    	$htmlData .= '</div>';  
+				    }
+				    $htmlData .= '</div>';
+			    	$htmlData .= '<div class="rowdt compressed">'; 
+			    	foreach ($bancoEmpresa as $keyBEA => $rowBEA) { 
+			    		$htmlData .= '<div class="item-detalle" style="width:200px;">';
+				    	$htmlData .= $rowBEA['num_cuenta'];
+				    	$htmlData .= '</div>';  
+				    }
+				    $htmlData .= '</div>';
+		    	$htmlData .= '</div>';
+		    }
 
 		    // set Monto en letras 
 		    
 		    $en_letra = ValorEnLetras($fila['total'],$strMoneda);
-	    	$posX_montoEnLetras = '12mm';
-	    	$posY_montoEnLetras = '178.5mm';
-	    	$htmlData .= '<div class="item" style="top:'.$posY_montoEnLetras.';left:'.$posX_montoEnLetras.';">';
-	    	$htmlData .= $en_letra; 
-	    	$htmlData .= '</div>';
-
+	    	// $posX_montoEnLetras = '12mm';
+	    	// $posY_montoEnLetras = '178.5mm';
+	    	if( $configTD['detalle']['monto_letras_key']['visible'] == 1 ){ 
+		    	$posX_montoEnLetras = $configTD['detalle']['monto_letras_key']['x'].$unidadMedidaPos; 
+		    	$posY_montoEnLetras = $configTD['detalle']['monto_letras_key']['y'].$unidadMedidaPos; 
+		    	$htmlData .= '<div class="item" style="top:'.$posY_montoEnLetras.';left:'.$posX_montoEnLetras.';">';
+		    	$htmlData .= $en_letra; 
+		    	$htmlData .= '</div>';
+		    }
 	    	// set subtotal
-	    	$posX_subTotal = '296mm';
-	    	$posY_subTotal = '185.5mm';
-	    	$htmlData .= '<div class="item" style="top:'.$posY_subTotal.';left:'.$posX_subTotal.';">';
-	    	$htmlData .= $strSimbolo.$fila['subtotal']; 
-	    	$htmlData .= '</div>';
-
+	    	if( $configTD['detalle']['subtotal_key']['visible'] == 1 ){ 
+		    	$posX_subTotal = $configTD['detalle']['subtotal_key']['x'].$unidadMedidaPos; 
+		    	$posY_subTotal = $configTD['detalle']['subtotal_key']['y'].$unidadMedidaPos; 
+		    	$htmlData .= '<div class="item" style="top:'.$posY_subTotal.';left:'.$posX_subTotal.';">';
+		    	$htmlData .= $strSimbolo.$fila['subtotal']; 
+		    	$htmlData .= '</div>';
+		    }
 	    	// set % IGV
-	    	$posX_IGV = '282mm';
-	    	$posY_IGV = '190.5mm';
-	    	$htmlData .= '<div class="item" style="top:'.$posY_IGV.';left:'.$posX_IGV.';">';
-	    	$htmlData .= '18%'; 
-	    	$htmlData .= '</div>';
+	    	if( $configTD['detalle']['porc_igv_key']['visible'] == 1 ){ 
+		    	$posX_porcIGV = $configTD['detalle']['porc_igv_key']['x'].$unidadMedidaPos; 
+		    	$posY_porcIGV = $configTD['detalle']['porc_igv_key']['y'].$unidadMedidaPos; 
+		    	$htmlData .= '<div class="item" style="top:'.$posY_porcIGV.';left:'.$posX_porcIGV.';">';
+		    	$htmlData .= '18%'; 
+		    	$htmlData .= '</div>';
+		    }
 
-	    	// set IGV
-	    	$posX_IGV = '296mm';
-	    	$posY_IGV = '190.5mm';
-	    	$htmlData .= '<div class="item" style="top:'.$posY_IGV.';left:'.$posX_IGV.';">';
-	    	$htmlData .= $strSimbolo.$fila['igv']; 
-	    	$htmlData .= '</div>';
+	    	// set IGV 
+	    	if( $configTD['detalle']['igv_key']['visible'] == 1 ){ 
+		    	$posX_IGV = $configTD['detalle']['igv_key']['x'].$unidadMedidaPos; 
+		    	$posY_IGV = $configTD['detalle']['igv_key']['y'].$unidadMedidaPos; 
+		    	$htmlData .= '<div class="item" style="top:'.$posY_IGV.';left:'.$posX_IGV.';">';
+		    	$htmlData .= $strSimbolo.$fila['igv']; 
+		    	$htmlData .= '</div>';
+		    }
 
 	    	// set total
-	    	$posX_montoTotal = '296mm';
-	    	$posY_montoTotal = '195mm';
-	    	$htmlData .= '<div class="item" style="top:'.$posY_montoTotal.';left:'.$posX_montoTotal.';">';
-	    	$htmlData .= $strSimbolo.$fila['total']; 
-	    	$htmlData .= '</div>';
-
+	    	// $posX_montoTotal = '296mm';
+	    	// $posY_montoTotal = '195mm';
+	    	if( $configTD['detalle']['total_key']['visible'] == 1 ){ 
+		    	$posX_montoTotal = $configTD['detalle']['total_key']['x'].$unidadMedidaPos; 
+		    	$posY_montoTotal = $configTD['detalle']['total_key']['y'].$unidadMedidaPos; 
+		    	$htmlData .= '<div class="item" style="top:'.$posY_montoTotal.';left:'.$posX_montoTotal.';">';
+		    	$htmlData .= $strSimbolo.$fila['total']; 
+		    	$htmlData .= '</div>';
+		    }
 		$htmlData .= '</div>';
 		$arrData['flag'] = 1;
 		$arrData['html'] = $htmlData;
