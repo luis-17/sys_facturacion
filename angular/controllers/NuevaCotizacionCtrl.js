@@ -73,7 +73,7 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
   $timeout(function() { 
     $scope.fData.modo_igv = parseInt($scope.fConfigSys.precio_incluye_igv_cot); // INCLUYE IGV dinamico 
     $scope.fData.incluye_entr_dom = parseInt($scope.fConfigSys.incluye_entrega_dom_cot);  // dinamico 
-  }, 500);
+  }, 500); 
 
   $scope.fData.idcotizacionanterior = null;
   $scope.fData.isRegisterSuccess = false;
@@ -1499,7 +1499,10 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
               CotizacionServices.sObtenerEstaCotizacion(arrParams).then(function(rpta) {
                 if( rpta.flag == 1 ){
                   $timeout(function() {
-                    $scope.gridOptions.data = rpta.detalle; 
+                    //$scope.gridOptions.data = rpta.detalle; 
+                    angular.forEach(rpta.detalle, function(val,key) { 
+                      $scope.gridOptions.data.push(val); 
+                    });
                     $scope.calcularTotales();
                   }, 200);
                   pinesNotifications.notify({ title: 'OK!', text: 'Se clonaron los items a la lista', type: 'success', delay: 3000 }); 
@@ -1507,28 +1510,6 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
                 }
                 blockUI.stop(); 
               }); 
-              // console.log($scope.mySelectionGridCOT,'$scope.mySelectionGridCOT');
-              // var params = { 
-              //   searchText: $scope.mySelectionGridCOT[0].num_cotizacion, 
-              //   idcotizacion: $scope.mySelectionGridCOT[0].idcotizacion,
-              //   searchColumn: "num_cotizacion",
-              //   sensor: false,
-              //   estado: 'estado',
-              //   datos: $scope.fData, 
-              //   limit: 1  
-              // }; 
-              // console.log(params,'params'); 
-              // CotizacionServices.sBuscarNumCotizacionAutocomplete(params).then(function(rpta) { 
-              //   if( rpta.flag == 0 ){ 
-              //     pinesNotifications.notify({ title: 'OK!', text: 'No se encontraron cotizaciones', type: 'warning', delay: 3000 });
-              //   }else { 
-              //     $scope.getSelectedNumCotizacion(false,rpta.datos[0],true); 
-              //     $scope.fData.temporal.num_cotizacion = $scope.mySelectionGridCOT[0].num_cotizacion;
-              //     pinesNotifications.notify({ title: 'OK!', text: 'Se agregaron los items a la lista', type: 'success', delay: 3000 }); 
-              //     $uibModalInstance.dismiss('cancel');
-              //   }                
-              // });
-              
             });
             gridApi.selection.on.rowSelectionChangedBatch($scope,function(rows){
               $scope.mySelectionGridCOT = gridApi.selection.getSelectedRows();
