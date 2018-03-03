@@ -30,7 +30,7 @@
         <!-- / buttons -->
 
         <!-- link and dropdown -->
-        <ul class="nav navbar-nav hidden-sm"> 
+        <!-- <ul class="nav navbar-nav hidden-sm"> 
           <li class="dropdown" uib-dropdown>
             <a href class="dropdown-toggle" uib-dropdown-toggle>
               <i class="fa fa-fw fa-plus visible-xs-inline-block"></i>
@@ -44,22 +44,25 @@
               <li><a href="#">Pagos</a></li>
             </ul>
           </li>
-        </ul>
+        </ul> -->
         <!-- / link and dropdown -->
 
         <!-- search form -->
         <!-- -->
-        <form class="navbar-form navbar-form-sm navbar-left shift" ui-shift="prependTo" target=".navbar-collapse" role="search" ng-controller="TypeaheadDemoCtrl">
+        <form class="navbar-form navbar-form-sm navbar-left shift" ui-shift="prependTo" target=".navbar-collapse" >
           <div class="form-group">
             <div class="input-group">
-              <input type="text" ng-model="selected" typeahead="state for state in states | filter:$viewValue | limitTo:8" 
-                class="form-control input-sm bg-light no-border rounded padder" placeholder="Buscar cotizaciones..."> 
               <span class="input-group-btn">
-                <button type="submit" class="btn btn-sm bg-light rounded"><i class="fa fa-search"></i></button>
+                <button type="button" class="btn btn-sm rounded"> TIPO DE CAMBIO </button> 
               </span>
+              <input type="text" ng-model="fConfigSys.valor_tipo_cambio_dolar" class="form-control input-sm no-border rounded padder" 
+                style="border-bottom: 1px solid #d4dee0;
+                      border-right: 1px solid #d4dee0;
+                      border-top: 1px solid #d4dee0;
+                      width: 90px;"> 
             </div>
           </div>
-        </form> 
+        </form>  <!-- -->
         <!-- / search form -->
 
         <!-- nabar right -->

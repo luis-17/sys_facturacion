@@ -60,6 +60,8 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
   $scope.fData.fecha_registro = $filter('date')(moment().toDate(),'dd-MM-yyyy'); 
   $scope.fData.fecha_emision = $filter('date')(moment().toDate(),'dd-MM-yyyy'); 
   $scope.fData.num_serie_correlativo = '[ ............... ]'; 
+  $scope.fData.tiene_detraccion_disabled = true; 
+  $scope.fData.tiene_detraccion = 2;
 
   if(angular.isUndefined($scope.fConfigSys.precio_incluye_igv_ve) || $scope.fConfigSys.precio_incluye_igv_ve === null){ 
     //console.log('entre');
@@ -1581,7 +1583,20 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
     //$scope.fData.subtotal_temp = (total / 1.18);
     $scope.fData.subtotal = MathFactory.redondear(subtotal).toFixed($scope.fConfigSys.num_decimal_total_key);
     $scope.fData.igv = MathFactory.redondear(igv).toFixed($scope.fConfigSys.num_decimal_total_key);
-    $scope.fData.total = MathFactory.redondear(total).toFixed($scope.fConfigSys.num_decimal_total_key);
+    $scope.fData.total = MathFactory.redondear(total).toFixed($scope.fConfigSys.num_decimal_total_key); 
+    // logica de detraccion 
+    var total = angular.copy($scope.fData.total);
+    if( $scope.fData.moneda.str_moneda == 'D' ){ 
+      // console.log($scope.fConfigSys.valor_tipo_cambio_dolar,'$scope.fConfigSys.valor_tipo_cambio_dolar');
+      // console.log($scope.$parent.fConfigSys.valor_tipo_cambio_dolar,'$scope.$parent.fConfigSys.valor_tipo_cambio_dolar');
+      total = $scope.fData.total * $scope.fConfigSys.valor_tipo_cambio_dolar;
+    }
+    $scope.fData.tiene_detraccion_disabled = true; 
+    $scope.fData.tiene_detraccion = 2;
+    if( MathFactory.redondear(total).toFixed($scope.fConfigSys.num_decimal_total_key) >= 700 ){ // detraccion
+      $scope.fData.tiene_detraccion_disabled = false;
+      $scope.fData.tiene_detraccion = 1;
+    }
   }
   $scope.calcularImporte = function (){ 
     if( !$scope.fData.temporal.precio_unitario ){

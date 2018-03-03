@@ -119,7 +119,8 @@
           	</div> 
 						<div class="col-md-3">
               <label class="control-label text-ellipsis"> Moneda </label>
-              <select class="form-control input-sm" ng-model="fData.moneda" ng-options="item as item.descripcion for item in fArr.listaMoneda" tabindex="180" ng-change="cambiarSimbolo();"> </select> 
+              <select class="form-control input-sm" ng-model="fData.moneda" ng-options="item as item.descripcion for item in fArr.listaMoneda" 
+              	tabindex="180" ng-change="cambiarSimbolo();calcularTotales();"> </select> 
           	</div>
           	<div class="col-md-3 col-sm-12">
 							<label class="control-label text-ellipsis"> Forma de Pago </label> 
@@ -232,6 +233,12 @@
 				          <div class="checkbox"> 
 				          	<label>
 				              <input type="checkbox" ng-true-value="1" ng-false-value="2" ng-model="fData.incluye_entr_dom" class="" tabindex="340" /> Incluye entrega a domicilio 
+				            </label>
+				          </div> 
+				          <div class="checkbox"> 
+				          	<label>
+				              <input type="checkbox" ng-disabled="fData.tiene_detraccion_disabled" ng-true-value="1" ng-false-value="2" ng-model="fData.tiene_detraccion" 
+				              	class="" tabindex="340" /> Afecto a detracción 
 				            </label>
 				          </div> 
 								</div>

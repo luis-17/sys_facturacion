@@ -12,7 +12,7 @@ class Model_venta extends CI_Model {
 		$this->db->select("CONCAT(cp.nombres, ' ', cp.apellidos) AS cliente_persona",FALSE);
 		$this->db->select('ve.idmovimiento, ve.fecha_registro, ve.fecha_emision, ve.fecha_vencimiento, ve.fecha_ultimo_pago, ve.numero_serie, ve.numero_correlativo, 
 			ve.tipo_cliente, ve.plazo_entrega, ve.numero_orden_compra, ve.incluye_entrega_domicilio, ve.validez_oferta, ve.moneda, ve.modo_igv, ve.subtotal, 
-			ve.igv, ve.total, ve.estado_movimiento, tdm.idtipodocumentomov, tdm.descripcion_tdm, 
+			ve.igv, ve.total, ve.estado_movimiento, ve.tiene_detraccion, tdm.idtipodocumentomov, tdm.descripcion_tdm, 
 			col.idcolaborador, (col.num_documento) AS num_documento_col, us.idusuario, us.username, 
 			ea.idempresaadmin, (ea.razon_social) AS razon_social_ea, (ea.nombre_comercial) AS nombre_comercial_ea, (ea.ruc) AS ruc_ea, 
 			ce.idclienteempresa, (ce.razon_social) AS razon_social_ce, (ce.nombre_comercial) AS nombre_comercial_ce, (ce.ruc) AS ruc_ce, 
@@ -105,7 +105,7 @@ class Model_venta extends CI_Model {
 		$this->db->select("CONCAT(COALESCE(col.nombres,''), ' ', COALESCE(col.apellidos,'')) As colaborador",FALSE);
 		$this->db->select("CONCAT(COALESCE(cp.nombres,''), ' ', COALESCE(cp.apellidos,''), ' ', COALESCE(ce.razon_social,'')) As cliente_persona_empresa",FALSE);
 		$this->db->select("CONCAT(cp.nombres, ' ', cp.apellidos) As cliente_persona",FALSE);
-		$this->db->select('ved.iddetallemovimiento, ve.fecha_registro, ve.fecha_emision, ve.fecha_vencimiento, ve.fecha_ultimo_pago, ve.numero_serie, ve.numero_correlativo, ve.tipo_cliente, ve.plazo_entrega, ve.numero_orden_compra, ve.incluye_entrega_domicilio, ve.validez_oferta, ve.moneda, ve.modo_igv, ve.subtotal,ve.igv, ve.total, ve.estado_movimiento, tdm.idtipodocumentomov, tdm.descripcion_tdm, col.idcolaborador, (col.num_documento) AS num_documento_col, us.idusuario, us.username,ea.idempresaadmin, (ea.razon_social) AS razon_social_ea, (ea.nombre_comercial) AS nombre_comercial_ea, (ea.ruc) AS ruc_ea,ce.idclienteempresa, (ce.razon_social) AS razon_social_ce, (ce.nombre_comercial) AS nombre_comercial_ce, (ce.ruc) AS ruc_ce, cp.idclientepersona, (cp.num_documento) AS num_documento_cp, se.idsede, se.descripcion_se, se.abreviatura_se,fp.idformapago, fp.descripcion_fp,ele.idelemento, ele.descripcion_ele, ele.tipo_elemento,cael.idcategoriaelemento,cael.descripcion_cael,ved.cantidad,ved.importe_sin_igv,ved.importe_con_igv,ved.precio_unitario,ved.igv_detalle', FALSE); 
+		$this->db->select('ved.iddetallemovimiento, ve.fecha_registro, ve.fecha_emision, ve.fecha_vencimiento, ve.fecha_ultimo_pago, ve.numero_serie, ve.numero_correlativo, ve.tipo_cliente, ve.plazo_entrega, ve.numero_orden_compra, ve.incluye_entrega_domicilio, ve.validez_oferta, ve.moneda, ve.modo_igv, ve.subtotal,ve.igv, ve.total, ve.estado_movimiento, ve.tiene_detraccion, tdm.idtipodocumentomov, tdm.descripcion_tdm, col.idcolaborador, (col.num_documento) AS num_documento_col, us.idusuario, us.username,ea.idempresaadmin, (ea.razon_social) AS razon_social_ea, (ea.nombre_comercial) AS nombre_comercial_ea, (ea.ruc) AS ruc_ea,ce.idclienteempresa, (ce.razon_social) AS razon_social_ce, (ce.nombre_comercial) AS nombre_comercial_ce, (ce.ruc) AS ruc_ce, cp.idclientepersona, (cp.num_documento) AS num_documento_cp, se.idsede, se.descripcion_se, se.abreviatura_se,fp.idformapago, fp.descripcion_fp,ele.idelemento, ele.descripcion_ele, ele.tipo_elemento,cael.idcategoriaelemento,cael.descripcion_cael,ved.cantidad,ved.importe_sin_igv,ved.importe_con_igv,ved.precio_unitario,ved.igv_detalle', FALSE); 
 		$this->db->from('movimiento ve'); 
 		$this->db->join('tipo_documento_mov tdm','ve.idtipodocumentomov = tdm.idtipodocumentomov'); 
 		$this->db->join('usuario us','ve.idusuarioventa = us.idusuario'); 
@@ -264,7 +264,8 @@ class Model_venta extends CI_Model {
 		$this->db->select("TRIM(CONCAT(COALESCE(tdc_ce.abreviatura_tdc,''), ' ', COALESCE(tdc_cp.abreviatura_tdc,''))) AS tipo_documento_abv",FALSE);
 		$this->db->select("TRIM(CONCAT(COALESCE(ce.ruc,''), ' ', COALESCE(cp.num_documento,''))) AS num_documento_persona_empresa",FALSE);
 		$this->db->select("CONCAT(cp.nombres, ' ', cp.apellidos) AS cliente_persona",FALSE);
-		$this->db->select('ve.idmovimiento,ve.num_nota_pedido,ve.fecha_registro,ve.fecha_emision,ve.tipo_cliente,ve.plazo_entrega,ve.incluye_traslado_prov,ve.incluye_entrega_domicilio,ve.validez_oferta,
+		$this->db->select('ve.idmovimiento,ve.num_nota_pedido,ve.fecha_registro,ve.fecha_emision,ve.tipo_cliente,ve.plazo_entrega,ve.incluye_traslado_prov, 
+			ve.incluye_entrega_domicilio,ve.validez_oferta, ve.tiene_detraccion, 
 			ve.moneda,ve.modo_igv,ve.subtotal,ve.igv,ve.total,ve.estado_movimiento, ve.numero_serie, ve.numero_correlativo, ve.numero_orden_compra, 
 			us.idusuario,	us.username,ea.idempresaadmin,(ea.razon_social) AS razon_social_ea,(ea.nombre_comercial) AS nombre_comercial_ea,(ea.ruc) AS ruc_ea,	ea.nombre_logo,ea.direccion_legal, 
 			ea.pagina_web,(ea.telefono) AS telefono_ea,ce.idclienteempresa,(ce.razon_social) AS razon_social_ce,(ce.nombre_comercial) AS nombre_comercial_ce,(ce.ruc) AS ruc_ce,(ce.telefono) AS telefono_ce,	ce.direccion_guia,(ce.direccion_legal) AS direccion_legal_ce,ce.nombre_corto,ce.representante_legal,ce.dni_representante_legal,cp.idclientepersona,(cp.num_documento) AS num_documento_cp,se.idsede,se.descripcion_se,se.abreviatura_se,fp.idformapago,fp.descripcion_fp,fp.modo_fp,ct.idcontacto,ct.anexo,ct.telefono_fijo,
@@ -340,7 +341,8 @@ class Model_venta extends CI_Model {
 			'incluye_traslado_prov' => $datos['incluye_tras_prov'],
 			'incluye_entrega_domicilio' => $datos['incluye_entr_dom'], 
 			'plazo_entrega' => $datos['plazo_entrega'],
-			'validez_oferta' => $datos['validez_oferta']
+			'validez_oferta' => $datos['validez_oferta'], 
+			'tiene_detraccion'=> empty($datos['tiene_detraccion']) ? 2 : $datos['tiene_detraccion'] // 2: NO TIENE DETRACCIÓN 
 		); 
 		return $this->db->insert('movimiento', $data); 
 	}
