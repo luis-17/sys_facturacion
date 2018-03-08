@@ -66,6 +66,7 @@ class TipoDocumentoMov extends CI_Controller {
 				'descripcion' => $row['descripcion_elemento'],
 				'valor_x' => $row['valor_x'],
 				'valor_y' => $row['valor_y'],
+				'valor_w' => $row['valor_w'],
 				'visible' => (int)$row['visible']
 			);
 			$arrListado['detalle'][] = $arrAux; 

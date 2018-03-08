@@ -596,6 +596,7 @@ class GuiaRemision extends CI_Controller {
  			$configTD['detalle'][$row['key_config_detalle']] = array(
  				'x'=> $row['valor_x'],
  				'y'=> $row['valor_y'],
+ 				'w'=> $row['valor_w'],
  				'visible'=> $row['visible']
  			);
  		}
@@ -710,7 +711,8 @@ class GuiaRemision extends CI_Controller {
 	    	if( $configTD['detalle']['nombre_cliente_key']['visible'] == 1 ){ 
 		    	$posX_nombreCliente = $configTD['detalle']['nombre_cliente_key']['x'].$unidadMedidaPos; //'30mm';
 		    	$posY_nombreCliente = $configTD['detalle']['nombre_cliente_key']['y'].$unidadMedidaPos; //'31mm';
-		    	$htmlData .= '<div class="item" style="top:'.$posY_nombreCliente.';left:'.$posX_nombreCliente.';">';
+		    	$posW_nombreCliente = $configTD['detalle']['nombre_cliente_key']['w'].$unidadMedidaPos; //'200mm';
+		    	$htmlData .= '<div class="item" style="top:'.$posY_nombreCliente.';left:'.$posX_nombreCliente.';width:'.$posW_nombreCliente.'">';
 		    	$htmlData .= utf8_decode(strtoupper_total($fila['cliente_persona_empresa']));
 		    	$htmlData .= '</div>';
 		    }
@@ -719,7 +721,8 @@ class GuiaRemision extends CI_Controller {
 	    	if( $configTD['detalle']['punto_llegada_key']['visible'] == 1 ){ 
 		    	$posX_puntoLlegada = $configTD['detalle']['punto_llegada_key']['x'].$unidadMedidaPos;// '30mm';
 		    	$posY_puntoLlegada = $configTD['detalle']['punto_llegada_key']['y'].$unidadMedidaPos;// '39mm';
-		    	$htmlData .= '<div class="item" style="top:'.$posY_puntoLlegada.';left:'.$posX_puntoLlegada.';">';
+		    	$posW_puntoLlegada = $configTD['detalle']['punto_llegada_key']['w'].$unidadMedidaPos;// '200mm';
+		    	$htmlData .= '<div class="item" style="top:'.$posY_puntoLlegada.';left:'.$posX_puntoLlegada.';width:'.$posW_puntoLlegada.'">';
 		    	$htmlData .= utf8_decode(strtoupper_total($fila['punto_llegada']));
 		    	$htmlData .= '</div>';
 		    }
@@ -737,7 +740,8 @@ class GuiaRemision extends CI_Controller {
 	    	if( $configTD['detalle']['punto_partida_key']['visible'] == 1 ){ 
 		    	$posX_puntoPartida = $configTD['detalle']['punto_partida_key']['x'].$unidadMedidaPos; //'30mm';
 		    	$posY_puntoPartida = $configTD['detalle']['punto_partida_key']['y'].$unidadMedidaPos; //'56mm';
-		    	$htmlData .= '<div class="item" style="top:'.$posY_puntoPartida.';left:'.$posX_puntoPartida.';">';
+		    	$posW_puntoPartida = $configTD['detalle']['punto_partida_key']['w'].$unidadMedidaPos; //'56mm';
+		    	$htmlData .= '<div class="item" style="top:'.$posY_puntoPartida.';left:'.$posX_puntoPartida.';width:'.$posW_puntoPartida.'">';
 		    	$htmlData .= $fila['punto_partida'];
 		    	$htmlData .= '</div>';
 		    }
@@ -806,7 +810,7 @@ class GuiaRemision extends CI_Controller {
 		    }
 
 	    	/* DETALLE DE ITEMS */
-	    	$arrCol = array('60','64','975','130'); // ancho de las columnas 
+	    	$arrCol = array('60','64','975','90'); // ancho de las columnas 
 	    	if( $configTD['detalle']['detalle_items_key']['visible'] == 1 ){ 
 		    	$posX_detalle = $configTD['detalle']['detalle_items_key']['x'].$unidadMedidaPos;// '0mm';
 		    	$posY_detalle = $configTD['detalle']['detalle_items_key']['y'].$unidadMedidaPos;// '69mm';
