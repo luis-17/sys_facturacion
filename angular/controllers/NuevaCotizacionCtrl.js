@@ -64,7 +64,6 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
   $scope.fData.validez_oferta = 10;
   $scope.fData.incluye_tras_prov = 2; // no 
   // recargar fConfigSys si no se encuentra 
-  // console.log($scope.fConfigSys,'$scope.fConfigSys');
   if(angular.isUndefined($scope.fConfigSys.precio_incluye_igv_cot) || $scope.fConfigSys.precio_incluye_igv_cot === null){ 
     //console.log('entre');
     $scope.$parent.getConfiguracionSys();

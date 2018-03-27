@@ -48,7 +48,14 @@ app.controller('NotaPedidoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
   $scope.fData.classEditCliente = 'disabled';
   $scope.fData.fecha_registro = $filter('date')(moment().toDate(),'dd-MM-yyyy'); 
   $scope.fData.fecha_emision = $filter('date')(moment().toDate(),'dd-MM-yyyy'); 
-  $scope.fData.num_nota_pedido = '[ ............... ]';
+  $scope.fData.num_nota_pedido = '[ ............... ]'; 
+
+  // recargar fConfigSys si no se encuentra 
+  if(angular.isUndefined($scope.fConfigSys.num_decimal_precio_key)){ 
+    //console.log('entre');
+    $scope.$parent.getConfiguracionSys();
+  }
+
   $timeout(function() { 
     // console.log($scope.fConfigSys,'$scope.fConfigSys');
     $scope.fData.modo_igv = parseInt($scope.fConfigSys.precio_incluye_igv_np); // INCLUYE IGV dinamico 
