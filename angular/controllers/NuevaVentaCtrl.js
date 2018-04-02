@@ -1715,6 +1715,7 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
 app.service("VentaServices",function($http, $q, handleBehavior) {
     return({ 
         sImprimirComprobanteHTML: sImprimirComprobanteHTML,
+        sImprimirComprobantePDF: sImprimirComprobantePDF,
         sGenerarNumeroSerieCorrelativo: sGenerarNumeroSerieCorrelativo,
         sObtenerEstaVenta: sObtenerEstaVenta,
         sListarDetalleEstaVenta: sListarDetalleEstaVenta, 
@@ -1728,6 +1729,14 @@ app.service("VentaServices",function($http, $q, handleBehavior) {
       var request = $http({
             method : "post",
             url : angular.patchURLCI+"Venta/imprimir_comprobante_venta_html",
+            data : datos
+      });
+      return (request.then(handleBehavior.success,handleBehavior.error));
+    }
+    function sImprimirComprobantePDF(datos) {
+      var request = $http({
+            method : "post",
+            url : angular.patchURLCI+"Venta/imprimir_comprobante_venta_pdf",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));

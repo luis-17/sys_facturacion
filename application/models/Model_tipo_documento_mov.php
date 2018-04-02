@@ -71,7 +71,7 @@ class Model_tipo_documento_mov extends CI_Model {
 	}
 	public function m_cargar_configuracion_td($datos)
 	{
-		$this->db->select("tdm.idtipodocumentomov, tdm.descripcion_tdm, tdm.key_tdm, tdc.idtipodocumentoconfig, tdc.tamanio_fuente, tdc.tipo_fuente, tdc.unidad_medida");
+		$this->db->select("tdm.idtipodocumentomov, tdm.descripcion_tdm, tdm.key_tdm, tdc.idtipodocumentoconfig, tdc.tamanio_fuente, tdc.tipo_fuente, tdc.navegador");
 		$this->db->from('tipo_documento_config tdc');
 		$this->db->join('tipo_documento_mov tdm','tdc.idtipodocumentomov = tdm.idtipodocumentomov'); 
 		$this->db->where('tdc.idtipodocumentomov', $datos['idtipodocumentomov']); 
@@ -80,10 +80,10 @@ class Model_tipo_documento_mov extends CI_Model {
 	}
 	public function m_cargar_configuracion_detalle_td($datos)
 	{
-		$this->db->select("tdc.idtipodocumentoconfig, tdc.tamanio_fuente, tdc.tipo_fuente, tdc.unidad_medida, 
+		$this->db->select("tdc.idtipodocumentoconfig, tdc.tamanio_fuente, tdc.tipo_fuente, tdc.navegador, 
 			tcd.idtdconfigdetalle, tcd.descripcion_elemento, tcd.key_config_detalle, tcd.valor_x, tcd.valor_y, tcd.valor_w, tcd.visible"); 
 		$this->db->from('tipo_documento_config tdc');
-		$this->db->join('td_config_detalle tcd','tdc.idtipodocumentoconfig = tcd.idtipodocumentoconfig'); 
+		$this->db->join('td_config_detalle tcd','tdc.idtipodocumentoconfig = tcd.idtipodocumentoconfig AND tdc.navegador = tcd.navegador'); 
 		$this->db->where('tdc.idtipodocumentoconfig', $datos['idtipodocumentoconfig']); 
 		return $this->db->get()->result_array();
 	}
