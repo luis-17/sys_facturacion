@@ -1054,12 +1054,15 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
       });
     }
   };
-  $scope.getTableHeight = function() {
+  $scope.getTableHeight = function() { 
+     var maxItemsGrilla = 4; // default 
+     if($scope.fConfigSys.max_items_grilla_cot_np_gr_v){
+        maxItemsGrilla = $scope.fConfigSys.max_items_grilla_cot_np_gr_v; 
+     }
      var rowHeight = 26; // your row height 
      var headerHeight = 25; // your header height 
-     return {
-        // height: ($scope.gridOptions.data.length * rowHeight + headerHeight + 40) + "px"
-        height: (4 * rowHeight + headerHeight + 20) + "px"
+     return { 
+        height: (maxItemsGrilla * rowHeight + headerHeight + 20) + "px"
      };
   };
   $scope.btnClonarFila = function(row) { 

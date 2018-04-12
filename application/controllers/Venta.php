@@ -1023,16 +1023,20 @@ class Venta extends CI_Controller {
 		/* ESTILOS */ 
     	$htmlData = '<style type="text/css">
     		@media print{ 
+    			@page {
+			      	size: 21.59cm 21.59cm; 
+    				font-family: '.$configTD['tipo_fuente'].';
+			    }
     			@page :bottom { margin: 0cm; }
 
     			.general{
-				   	font-size:'.$configTD['tamanio_fuente'].$configTD['unidad_medida'].'; 
+				   	font-size:'.$configTD['tamanio_fuente'].$unidadMedidaPos.'; 
 				   	font-family: '.$configTD['tipo_fuente'].';
     			}
 			}
 			.general{
 				letter-spacing:5px;
-			   	font-size:'.$configTD['tamanio_fuente'].$configTD['unidad_medida'].'; 
+			   	font-size:'.$configTD['tamanio_fuente'].$unidadMedidaPos.'; 
 			   	font-family: '.$configTD['tipo_fuente'].';
 			}
 			/** { outline: 2px dotted red }
@@ -1053,7 +1057,7 @@ class Venta extends CI_Controller {
 				vertical-align: middle;
 			}
 			body { margin: 0; padding: 0; }
-			.rowdt { width: 100%; text-align:left;font-size: '.$configTD['tamanio_fuente'].$configTD['unidad_medida'].';margin-bottom: 8px; }
+			.rowdt { width: 100%; text-align:left;font-size: '.$configTD['tamanio_fuente'].$unidadMedidaPos.';margin-bottom: 8px; }
 			.rowdt.compressed { margin-bottom:0; }
 			.hidden{ visibility: hidden; } 
     	</style>';
@@ -1270,7 +1274,7 @@ class Venta extends CI_Controller {
 		    }
 		$htmlData .= '</div>';
 
-        $html2pdf = new HTML2PDF('P', array('A4'), 'es', true, 'UTF-8', array(0,0,0,0)); 
+        $html2pdf = new HTML2PDF('P', array(612.28,612.28), 'es', true, 'UTF-8', array(0,0,0,0)); 
 
 		//$html2pdf->setTestTdInOnePage(false);
 		//$html2pdf->pdf->SetDisplayMode('fullpage');
@@ -1622,6 +1626,124 @@ class Venta extends CI_Controller {
 		$arrData['flag'] = 1;
 		$arrData['html'] = $htmlData;
 
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
+	public function imprimir_comprobante_venta_json($idmovimiento)
+	{
+		$fConfig = obtener_parametros_configuracion();
+ 		$fila = $this->model_venta->m_cargar_venta_por_id($idmovimiento); 
+ 		$detalleLista = $this->model_venta->m_cargar_detalle_venta_por_id($idmovimiento); 
+ 		$allInputs['id'] = $idmovimiento;
+ 		$allInputs['idtipodocumentomov'] = $fila['idtipodocumentomov']; 
+ 		$unidadMedidaPos = 'mm'; // UNIDAD DE MEDIDA DE POSICIÓN. 
+ 		$configTD = $this->model_tipo_documento_mov->m_cargar_configuracion_td($allInputs); // CONFIGURACION DE comprobante 
+ 		$configTD['unidad_medida'] = $unidadMedidaPos; 
+ 		//var_dump($allInputs['idtipodocumentomov']); 
+ 		//var_dump($configTD); exit(); 
+ 		$arrJSONPrincipal = array(); 
+ 		$arrFusion = array();
+ 		$auxDetConfig = $this->model_tipo_documento_mov->m_cargar_configuracion_detalle_td($configTD); 
+ 		foreach ($auxDetConfig as $key => $row) {
+ 			$configTD['detalle'][$row['key_config_detalle']] = array(
+ 				'x'=> $row['valor_x'],
+ 				'y'=> $row['valor_y'],
+ 				'w'=> $row['valor_w'],
+ 				'visible'=> $row['visible'],
+ 				'valores'=> null 
+ 			);
+ 		}
+ 		$configTD['detalle']['serie_correlativo_key']['valores'] = utf8_decode(strtoupper_total($fila['numero_serie'])).'   -   ';
+ 		$configTD['detalle']['num_correlativo_key']['valores'] = utf8_decode(strtoupper_total($fila['numero_correlativo']));
+ 		$configTD['detalle']['nombre_cliente_key']['valores'] = utf8_decode(strtoupper_total($fila['cliente_persona_empresa']));
+ 		$configTD['detalle']['direccion_key']['valores'] = utf8_decode(strtoupper_total($fila['direccion_legal_ce']));
+ 		$configTD['detalle']['ruc_cliente_key']['valores'] = utf8_decode(strtoupper_total($fila['num_documento_persona_empresa']));
+ 		$configTD['detalle']['fecha_emision_key']['valores'] = formatoFechaReporte3($fila['fecha_emision']);
+ 		$configTD['detalle']['telefono_key']['valores'] = $fila['telefono_ce'];
+ 		$configTD['detalle']['orden_compra_key']['valores'] = utf8_decode(strtoupper_total($fila['numero_orden_compra']));
+ 		$configTD['detalle']['condicion_pago_key']['valores'] = utf8_decode(strtoupper_total($fila['descripcion_fp']));
+ 		$configTD['detalle']['vendedor_key']['valores'] = utf8_decode(strtoupper_total($fila['colaborador_asig'])); 
+
+ 		// PREPARACIÓN DE DATA: 
+ 		$arrListadoDetalle = array(); 
+ 		foreach ($detalleLista as $key => $row) { 
+			$arrAux = array( 
+				'iddetallemovimiento' => $row['iddetallemovimiento'],
+				'idmovimiento' => $row['idmovimiento'],
+				'idelemento' => $row['idelemento'], 
+				'elemento' => $row['descripcion_ele'], 
+				'descripcion' => $row['descripcion_ele'], 
+				'cantidad' => $row['cantidad'], 
+				'precio_unitario' => number_format($row['precio_unitario'],$fConfig['num_decimal_precio_key'],'.',''), 
+				'importe_con_igv' => number_format($row['importe_con_igv'],$fConfig['num_decimal_total_key'],'.',''), 
+				'importe_sin_igv' => number_format($row['importe_sin_igv'],$fConfig['num_decimal_total_key'],'.',''), 
+				'excluye_igv' => $row['excluye_igv'], 
+				'igv_detalle' => number_format($row['igv_detalle'],$fConfig['num_decimal_total_key'],'.',''), // agrupacion
+				'igv' => $row['igv_detalle'], 
+				'unidad_medida' => array( 
+					'id'=> $row['idunidadmedida'],
+					'descripcion'=> $row['descripcion_um'],
+					'abreviatura'=> $row['abreviatura_um'] 
+				),
+				'caracteristicas' => array() 
+			);
+			$arrListadoDetalle[$row['iddetallemovimiento']] = $arrAux; 
+		}
+		foreach ($detalleLista as $key => $row) { 
+			$arrAux2 = array(
+				'iddetallecaracteristica'=> $row['iddetallecaracteristica'],
+				'idcaracteristica'=> $row['idcaracteristica'],
+				'orden'=> $row['orden_car'],
+				'descripcion'=> $row['descripcion_car'],
+				'valor'=> $row['valor']
+			);
+			if( !empty($row['iddetallecaracteristica']) ){ 
+				$arrListadoDetalle[$row['iddetallemovimiento']]['caracteristicas'][$row['iddetallecaracteristica']] = $arrAux2; 
+				$arrListadoDetalle[$row['iddetallemovimiento']]['caracteristicas'] = array_values($arrListadoDetalle[$row['iddetallemovimiento']]['caracteristicas']);
+			}
+		} 
+		// acumular caracts. en descripcion 
+		foreach ($arrListadoDetalle as $key => $row) { 
+			$strCaracteristicasComma = '';
+			foreach ($row['caracteristicas'] as $keyCT => $rowCT) {
+				$comma = ', ';
+				if( $keyCT == count($row['caracteristicas']) ){
+					$comma = NULL;
+				}
+				$strCaracteristicasComma .= $rowCT['descripcion'].' : '.$rowCT['valor'].$comma; 
+			}
+			$arrListadoDetalle[$key]['descripcion'] .= ' - '.$strCaracteristicasComma; 
+		}
+
+		$strMoneda = NULL;
+	    $strSimbolo = NULL;
+	    if( $fila['moneda']=='S' ){
+	    	$strMoneda = ' SOLES';
+	    	$strSimbolo = 'S/ ';
+	    }
+	    if( $fila['moneda']=='D' ){
+	    	$strMoneda = ' DÓLARES';
+	    	$strSimbolo = 'US$ ';
+	    }
+	    $bancoEmpresa = $this->model_banco_empresa_admin->m_cargar_cuentas_banco_por_filtros($fila['idempresaadmin'],$fila['moneda']); 
+		$configTD['detalle']['detalle_items_key']['valores'] = $arrListadoDetalle;
+		$en_letra = ValorEnLetras($fila['total'],$strMoneda);
+ 		$configTD['detalle']['monto_letras_key']['valores'] = $en_letra;
+ 		$configTD['detalle']['subtotal_key']['valores'] = $strSimbolo.$fila['subtotal'];
+ 		$configTD['detalle']['porc_igv_key']['valores'] = '18%';
+ 		$configTD['detalle']['igv_key']['valores'] = $strSimbolo.$fila['igv'];
+ 		$configTD['detalle']['total_key']['valores'] = $strSimbolo.$fila['total'];
+ 		$configTD['detalle']['num_cuenta_key']['valores'] = $bancoEmpresa;
+
+		$arrJSONPrincipal['valores'] = $arrListadoDetalle;
+		$arrJSONPrincipal['fusion'] = $configTD;
+
+		$arrData['flag'] = 1;
+		if( empty($fila) ){
+			$arrData['flag'] = 0;
+		}
+		$arrData['datos'] = $arrJSONPrincipal;
 		$this->output
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));

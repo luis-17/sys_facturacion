@@ -810,15 +810,26 @@ app.controller('EditarGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$bo
       });
     }
   };
-  $scope.getTableHeight = function() {
+  // $scope.getTableHeight = function() {
+  //    var rowHeight = 26; // your row height 
+  //    var headerHeight = 25; // your header height 
+  //    return { 
+  //       height: (4 * rowHeight + headerHeight + 20) + "px"
+  //    };
+  // };
+  $scope.getTableHeight = function() { 
+     var maxItemsGrilla = 4; // default 
+     if($scope.fConfigSys.max_items_grilla_cot_np_gr_v){
+        maxItemsGrilla = $scope.fConfigSys.max_items_grilla_cot_np_gr_v; 
+     }
      var rowHeight = 26; // your row height 
      var headerHeight = 25; // your header height 
      return { 
-        height: (4 * rowHeight + headerHeight + 20) + "px"
+        height: (maxItemsGrilla * rowHeight + headerHeight + 20) + "px"
      };
   };
   $scope.btnClonarFila = function(row) { 
-    console.log(row,'row');
+    // console.log(row,'row');
     var arrFClon = { 
       'id' : row.entity.id,
       'idelemento' : row.entity.idelemento,
