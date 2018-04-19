@@ -199,18 +199,40 @@
 			</div> <!-- --> 
 			<div class="col-xs-6" >
 				<fieldset >
-					<legend class="lead lead-sm"> Datos de Transportista </legend>
+					<legend class="lead lead-sm"> Datos de Transportista/Transporte </legend> 
 					<div class="form-group-sm pull-in clearfix"> 
-						<div class="col-md-6 col-sm-12">
-              <label class="control-label text-ellipsis"> Nombre o Razon Social </label> 
-              <input type="text" class="form-control input-sm" ng-model="fData.nombres_razon_social_trans" tabindex="230" placeholder="Nombre o razon social del transportista" />
+						<div class="col-md-10 col-sm-12">
+              <label class="control-label text-ellipsis"> Seleccione Transportista </label> 
+              <div class="input-group">
+                <input type="text" class="form-control input-sm" ng-model="fData.transportista.descripcion" tabindex="230" disabled /> 
+                <span class="input-group-btn">
+                  <button ng-show="fData.transportista.descripcion" class="btn btn-default btn-sm" uib-tooltip="Quitar" type="button" ng-click="btnQuitarTransportista();" tabindex="258">
+                    <i class="fa fa-trash text-danger"></i> </button>
+                  <button class="btn btn-default btn-sm" uib-tooltip="Buscar Transportista" type="button" ng-click="btnBusquedaTransportista();" tabindex="250">
+                    <i class="fa fa-search"></i> </button>
+                </span>
+              </div>
           	</div>
-          	<div class="col-md-6 col-sm-12">
+          </div>
+          <div class="form-group-sm pull-in clearfix"> 
+            <div class="col-md-10 col-sm-12">
+              <label class="control-label text-ellipsis"> Seleccione Transporte </label> 
+              <div class="input-group">
+                <input type="text" class="form-control input-sm" ng-model="fData.transporte.descripcion" tabindex="260" disabled /> 
+                <span class="input-group-btn">
+                  <button ng-show="fData.transporte.descripcion" class="btn btn-default btn-sm" uib-tooltip="Quitar" type="button" ng-click="btnQuitarTransporte();" tabindex="265">
+                    <i class="fa fa-trash text-danger"></i> </button>
+                  <button class="btn btn-default btn-sm" uib-tooltip="Buscar Transporte" type="button" ng-click="btnBusquedaTransporte();" tabindex="270">
+                    <i class="fa fa-search"></i> </button>                
+                </span>
+              </div>
+            </div>
+          </div>
+          <!-- <div class="col-md-6 col-sm-12">
               <label class="control-label text-ellipsis"> Domicilio </label> 
               <input type="text" class="form-control input-sm" ng-model="fData.domicilio_trans" tabindex="230" placeholder="Domiclio del transportista" /> 
-          	</div> 
-          </div>
-          <div class="form-group pull-in clearfix"> 
+            </div>  -->
+          <!-- <div class="form-group pull-in clearfix"> 
           	<div class="col-md-3 col-sm-12">
               <label class="control-label text-ellipsis"> RUC/DNI </label> 
               <input type="text" class="form-control input-sm" ng-model="fData.ruc_dni_trans" tabindex="230" placeholder="RUC o DNI del transportista" />
@@ -223,7 +245,7 @@
               <label class="control-label text-ellipsis"> N° Cert. Inscripción </label> 
               <input type="text" class="form-control input-sm" ng-model="fData.cert_inscripcion" tabindex="230" placeholder="N° de Certificado de Inscripción" />
           	</div> 
-          </div>
+          </div> -->
 	    	</fieldset>
 			</div>
 			<div class="col-xs-6" >
@@ -239,14 +261,14 @@
               <label class="control-label text-ellipsis"> Orden de Compra </label> 
               <input type="text" class="form-control input-sm" ng-model="fData.orden_compra" tabindex="228" placeholder="N° de Orden de Compra" />
           	</div>
-						<div class="col-md-3 col-sm-12">
+						<!-- <div class="col-md-3 col-sm-12">
 			        <label class="control-label text-ellipsis"> Marca de Unidad</label> 
 			        <input type="text" class="form-control input-sm" ng-model="fData.marca_unidad" tabindex="230" placeholder="Marca" />
 			    	</div>
 			    	<div class="col-md-3 col-sm-12">
 			        <label class="control-label text-ellipsis"> Placa de Unidad</label> 
 			        <input type="text" class="form-control input-sm" ng-model="fData.placa_unidad" tabindex="235" placeholder="Placa" />
-			    	</div>
+			    	</div> -->
 			    	<div class="col-md-3 col-sm-12">
 			        <label class="control-label text-ellipsis"> Peso Total </label> 
 			        <input type="text" class="form-control input-sm" ng-model="fData.peso_total" tabindex="240" placeholder="Peso total" />

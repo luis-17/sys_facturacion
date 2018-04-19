@@ -120,14 +120,22 @@ class GuiaRemision extends CI_Controller {
 				'id'=> (int)$fila['idcolaborador'],
 				'colaborador'=> strtoupper($fila['colaborador']) 
 			),
+			'transportista' => array( 
+				'id'=> $fila['idtransportista'],
+				'descripcion' => $fila['nombres_trans'].' - '.$fila['ruc_trans'] 
+			),
+			'transporte' => array(
+				'id'=> $fila['idtransporte'],
+				'descripcion' => $fila['placa_transporte'].' '.$fila['marca_transporte'] 
+			),
 			'punto_partida'=> $fila['punto_partida'],
 			'punto_llegada'=> $fila['punto_llegada'],
 			'orden_compra'=> $fila['numero_orden_compra'],
-			'nombres_razon_social_trans'=> $fila['nombres_razon_social_trans'],
+			'nombres_razon_social_trans'=> $fila['nombres_trans'],
 			'domicilio_trans'=> $fila['domicilio_trans'],
 			'ruc_dni_trans'=> $fila['ruc_trans'],
-			'num_licencia_conducir'=> $fila['num_licencia_conducir'],
-			'cert_inscripcion'=> $fila['num_constancia_inscripcion'],
+			'num_licencia_conducir'=> $fila['num_lic_conducir'],
+			'cert_inscripcion'=> $fila['num_cert_inscripcion'],
 			'fecha_inicio_traslado'=> $fila['fecha_inicio_traslado'],
 			'marca_unidad'=> $fila['marca_transporte'],
 			'placa_unidad'=> $fila['placa_transporte'],
@@ -856,7 +864,7 @@ class GuiaRemision extends CI_Controller {
 		    	$posX_nombresTrans = $configTD['detalle']['nombre_trans_key']['x'].$unidadMedidaPos; // '112mm';
 		    	$posY_nombresTrans = $configTD['detalle']['nombre_trans_key']['y'].$unidadMedidaPos; // '180.5mm';
 		    	$htmlData .= '<div class="item" style="top:'.$posY_nombresTrans.';left:'.$posX_nombresTrans.';">';
-		    	$htmlData .= $fila['nombres_razon_social_trans']; 
+		    	$htmlData .= $fila['nombres_trans']; 
 		    	$htmlData .= '</div>';
 		    }
 

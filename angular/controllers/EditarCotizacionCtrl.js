@@ -592,7 +592,7 @@ app.controller('EditarCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$boot
     enableFiltering: false,
     enableFullRowSelection: false,
     data: null,
-    rowHeight: 26,
+    rowHeight: 30,
     enableCellEditOnFocus: true,
     multiSelect: false,
     columnDefs: [
@@ -692,14 +692,13 @@ app.controller('EditarCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$boot
      if($scope.fConfigSys.max_items_grilla_cot_np_gr_v){
         maxItemsGrilla = $scope.fConfigSys.max_items_grilla_cot_np_gr_v; 
      }
-     var rowHeight = 26; // your row height 
-     var headerHeight = 25; // your header height 
+     var rowHeight = 30; // your row height 
+     var headerHeight = 30; // your header height 
      return { 
-        height: (maxItemsGrilla * rowHeight + headerHeight + 20) + "px"
+        height: (maxItemsGrilla * rowHeight + headerHeight) + "px"
      };
   };
   $scope.btnClonarFila = function(row) { 
-    console.log(row,'row');
     var arrFClon = { 
       'id' : row.entity.idelemento,
       'idelemento' : row.entity.idelemento,
@@ -716,6 +715,7 @@ app.controller('EditarCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$boot
       'caracteristicas': angular.copy(row.entity.caracteristicas)
     }; 
     $scope.gridOptions.data.push(arrFClon); 
+    $scope.calcularTotales(); 
   }
   $scope.agregarItem = function () {
     $('#temporalElemento').focus();

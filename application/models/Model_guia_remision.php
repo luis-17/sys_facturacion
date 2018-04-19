@@ -10,14 +10,15 @@ class Model_guia_remision extends CI_Model {
 		$this->db->select("CONCAT(COALESCE(col_asig.nombres,''), ' ', COALESCE(col_asig.apellidos,'')) AS colaborador_asig",FALSE);
 		$this->db->select("CONCAT(COALESCE(cp.nombres,''), ' ', COALESCE(cp.apellidos,''), ' ', COALESCE(ce.razon_social,'')) AS cliente_persona_empresa",FALSE);
 		$this->db->select("CONCAT(cp.nombres, ' ', cp.apellidos) AS cliente_persona",FALSE);
-		$this->db->select('gr.idguiaremision, gr.tipo_cliente, gr.numero_serie, gr.numero_correlativo, gr.marca_transporte, 
-			gr.placa_transporte, gr.num_constancia_inscripcion, gr.num_licencia_conducir, gr.punto_partida, gr.punto_llegada, 
-			gr.fecha_registro, gr.fecha_emision, gr.fecha_inicio_traslado, gr.costo_minimo, gr.motivo_otros, gr.numero_guia, 
-			gr.peso_total, gr.numero_orden_compra, gr.nombres_razon_social_trans, gr.domicilio_trans, gr.ruc_trans, gr.estado_gr, 
+		$this->db->select('gr.idguiaremision, gr.tipo_cliente, gr.numero_serie, gr.numero_correlativo, gr.punto_partida, gr.punto_llegada, 
+			gr.fecha_registro, gr.fecha_emision, gr.fecha_inicio_traslado, gr.costo_minimo, gr.motivo_otros, gr.numero_guia, gr.peso_total, 
+			gr.numero_orden_compra, gr.estado_gr, 
 			col.idcolaborador, (col.num_documento) AS num_documento_col, us.idusuario, us.username, 
 			ea.idempresaadmin, (ea.razon_social) AS razon_social_ea, (ea.nombre_comercial) AS nombre_comercial_ea, (ea.ruc) AS ruc_ea, 
 			ce.idclienteempresa, (ce.razon_social) AS razon_social_ce, (ce.nombre_comercial) AS nombre_comercial_ce, (ce.ruc) AS ruc_ce, 
-			cp.idclientepersona, (cp.num_documento) AS num_documento_cp, mt.idmotivotraslado, mt.descripcion_mt', FALSE); 
+			cp.idclientepersona, (cp.num_documento) AS num_documento_cp, mt.idmotivotraslado, mt.descripcion_mt, 
+			tra.idtransportista, tra.nombres_trans, tra.domicilio_trans, tra.ruc_trans, tra.num_lic_conducir, 
+			tre.idtransporte, tre.marca_transporte, tre.placa_transporte, tre.num_cert_inscripcion', FALSE); 
 		$this->db->from('guia_remision gr'); 
 		$this->db->join('usuario us','gr.idusuarioregistro = us.idusuario'); 
 		$this->db->join('colaborador col','us.idusuario = col.idusuario'); 
@@ -28,6 +29,8 @@ class Model_guia_remision extends CI_Model {
 		$this->db->join('motivo_traslado mt','gr.idmotivotraslado = mt.idmotivotraslado');
 		$this->db->join('movimiento mov','gr.idmovimiento = mov.idmovimiento','left');
 		$this->db->join('tipo_documento_mov tdmov','mov.idtipodocumentomov = tdmov.idtipodocumentomov','left');
+		$this->db->join('transportista tra','gr.idtransportista = tra.idtransportista','left');
+		$this->db->join('transporte tre','gr.idtransporte = tre.idtransporte','left');
 		if( !empty($paramDatos['cliente']) ){
 			if( $paramDatos['cliente']['tipo_cliente'] == 'ce' ){
 				$this->db->where('ce.idclienteempresa',$paramDatos['cliente']['id']);
@@ -70,6 +73,8 @@ class Model_guia_remision extends CI_Model {
 		$this->db->join('motivo_traslado mt','gr.idmotivotraslado = mt.idmotivotraslado');
 		$this->db->join('movimiento mov','gr.idmovimiento = mov.idmovimiento','left');
 		$this->db->join('tipo_documento_mov tdmov','mov.idtipodocumentomov = tdmov.idtipodocumentomov','left');
+		$this->db->join('transportista tra','gr.idtransportista = tra.idtransportista','left');
+		$this->db->join('transporte tre','gr.idtransporte = tre.idtransporte','left');
 		if( !empty($paramDatos['cliente']) ){
 			if( $paramDatos['cliente']['tipo_cliente'] == 'ce' ){
 				$this->db->where('ce.idclienteempresa',$paramDatos['cliente']['id']);
@@ -96,20 +101,16 @@ class Model_guia_remision extends CI_Model {
 	}
 	public function m_cargar_guia_remision_por_id($idguiaremision) 
 	{
-		//$this->db->select("CONCAT(COALESCE(ct.nombres,''), ' ', COALESCE(ct.apellidos,'')) AS contacto",FALSE);
+		
 		$this->db->select("CONCAT(COALESCE(col.nombres,''), ' ', COALESCE(col.apellidos,'')) AS colaborador",FALSE);
 		$this->db->select("TRIM(CONCAT(COALESCE(cp.nombres,''), ' ', COALESCE(cp.apellidos,''), ' ', COALESCE(ce.razon_social,''))) AS cliente_persona_empresa",FALSE);
-		//$this->db->select("TRIM(CONCAT(COALESCE(cp.email,''), ' ', COALESCE(ct.email,''))) AS email_persona_empresa",FALSE);
 		$this->db->select("TRIM(CONCAT(COALESCE(tdc_ce.idtipodocumentocliente,''), ' ', COALESCE(tdc_cp.idtipodocumentocliente,''))) AS idtipodocumentocliente",FALSE);
 		$this->db->select("TRIM(CONCAT(COALESCE(tdc_ce.abreviatura_tdc,''), ' ', COALESCE(tdc_cp.abreviatura_tdc,''))) AS tipo_documento_abv",FALSE);
 		$this->db->select("TRIM(CONCAT(COALESCE(ce.ruc,''), ' ', COALESCE(cp.num_documento,''))) AS num_documento_persona_empresa",FALSE);
 		$this->db->select("CONCAT(cp.nombres, ' ', cp.apellidos) AS cliente_persona",FALSE);
-		$this->db->select('gr.idguiaremision, gr.tipo_cliente, gr.numero_serie, gr.numero_correlativo, gr.marca_transporte, 
-			gr.placa_transporte, gr.num_constancia_inscripcion, gr.num_licencia_conducir, gr.punto_partida, gr.punto_llegada, 
-			gr.fecha_registro, gr.fecha_emision, gr.fecha_inicio_traslado, gr.costo_minimo, gr.motivo_otros, gr.numero_guia, 
-			gr.peso_total, gr.numero_orden_compra, gr.nombres_razon_social_trans, gr.domicilio_trans, gr.ruc_trans, gr.estado_gr, 
-			col.idcolaborador, (col.num_documento) AS num_documento_col, col.email, col.cargo, col.telefono, col.abreviatura_nombre, 
-			us.idusuario, us.username, 
+		$this->db->select('gr.idguiaremision, gr.tipo_cliente, gr.numero_serie, gr.numero_correlativo, gr.punto_partida, gr.punto_llegada, 
+			gr.fecha_registro, gr.fecha_emision, gr.fecha_inicio_traslado, gr.costo_minimo, gr.motivo_otros, gr.numero_guia, gr.peso_total, gr.numero_orden_compra, gr.estado_gr, 
+			col.idcolaborador, (col.num_documento) AS num_documento_col, col.email, col.cargo, col.telefono, col.abreviatura_nombre, us.idusuario, us.username, 
 			ea.idempresaadmin, (ea.razon_social) AS razon_social_ea, (ea.nombre_comercial) AS nombre_comercial_ea, (ea.ruc) AS ruc_ea, 
 			ea.nombre_logo, ea.direccion_legal, ea.pagina_web, (ea.telefono) AS telefono_ea, 
 			ce.idclienteempresa, (ce.razon_social) AS razon_social_ce, (ce.nombre_comercial) AS nombre_comercial_ce, (ce.ruc) AS ruc_ce, (ce.telefono) AS telefono_ce, 
@@ -117,8 +118,9 @@ class Model_guia_remision extends CI_Model {
 			ce.direccion_legal AS direccion_legal_ce, cp.idclientepersona, (cp.num_documento) AS num_documento_cp, cp.sexo, cp.nombres AS nombres_cp, 
 			cp.apellidos AS apellidos_cp, cp.fecha_nacimiento, cp.telefono_fijo AS telefono_fijo_cp, cp.telefono_movil AS telefono_movil_cp, 
 			mt.idmotivotraslado, mt.descripcion_mt, mov.idmovimiento, (mov.numero_serie) AS numero_serie_venta, 
-			(mov.numero_correlativo) AS numero_correlativo_venta, (tdmov.idtipodocumentomov) AS idtipodocumentoventa, 
-			(tdmov.descripcion_tdm) AS tipodocumentoventa', FALSE); 
+			(mov.numero_correlativo) AS numero_correlativo_venta, (tdmov.idtipodocumentomov) AS idtipodocumentoventa, (tdmov.descripcion_tdm) AS tipodocumentoventa, 
+			tra.idtransportista, tra.nombres_trans, tra.domicilio_trans, tra.ruc_trans, tra.num_lic_conducir, 
+			tre.idtransporte, tre.marca_transporte, tre.placa_transporte, tre.num_cert_inscripcion', FALSE); 
 		$this->db->from('guia_remision gr'); 
 		$this->db->join('colaborador col','gr.idcolaborador = col.idcolaborador'); 
 		$this->db->join('usuario us','gr.idusuarioregistro = us.idusuario'); 
@@ -127,10 +129,11 @@ class Model_guia_remision extends CI_Model {
 		$this->db->join("tipo_documento_cliente tdc_ce","ce.idtipodocumentocliente = tdc_ce.idtipodocumentocliente",'left'); 
 		$this->db->join("cliente_persona cp","gr.idcliente = cp.idclientepersona AND gr.tipo_cliente = 'P'",'left'); 
 		$this->db->join("tipo_documento_cliente tdc_cp","cp.idtipodocumentocliente = tdc_cp.idtipodocumentocliente",'left'); 
-		//$this->db->join('contacto ct','gr.idcontacto = ct.idcontacto','left'); 
 		$this->db->join('motivo_traslado mt','gr.idmotivotraslado = mt.idmotivotraslado');
 		$this->db->join('movimiento mov','gr.idmovimiento = mov.idmovimiento','left');
 		$this->db->join('tipo_documento_mov tdmov','mov.idtipodocumentomov = tdmov.idtipodocumentomov','left');
+		$this->db->join('transportista tra','gr.idtransportista = tra.idtransportista','left');
+		$this->db->join('transporte tre','gr.idtransporte = tre.idtransporte','left');
 		$this->db->where_in( 'gr.idguiaremision', array($idguiaremision) ); 
 		$this->db->limit(1);
 		$fData = $this->db->get()->row_array();
@@ -196,10 +199,6 @@ class Model_guia_remision extends CI_Model {
 			'numero_correlativo' => $datos['num_correlativo'],
 			'tipo_guia'=> 1, // guia remitente 
 			'idmotivotraslado'=> $datos['motivo_traslado']['id'],
-			'marca_transporte'=> empty($datos['marca_unidad']) ? NULL : $datos['marca_unidad'],
-			'placa_transporte'=> empty($datos['placa_unidad']) ? NULL : $datos['placa_unidad'],
-			'num_constancia_inscripcion'=> empty($datos['cert_inscripcion']) ? NULL : $datos['cert_inscripcion'],
-			'num_licencia_conducir'=> empty($datos['num_licencia_conducir']) ? NULL : $datos['num_licencia_conducir'],
 			'punto_partida'=> empty($datos['punto_partida']) ? NULL : $datos['punto_partida'],
 			'punto_llegada'=> empty($datos['punto_llegada']) ? NULL : $datos['punto_llegada'],
 			'fecha_emision' => darFormatoYMD($datos['fecha_emision']),
@@ -212,9 +211,8 @@ class Model_guia_remision extends CI_Model {
 			'idcolaborador' => $datos['colaborador']['id'],
 			'numero_orden_compra' => empty($datos['orden_compra']) ? NULL : $datos['orden_compra'],
 			'idempresaadmin' => $this->sessionFactur['idempresaadmin'],
-			'nombres_razon_social_trans'=> empty($datos['nombres_razon_social_trans']) ? NULL : $datos['nombres_razon_social_trans'],
-			'domicilio_trans'=> empty($datos['domicilio_trans']) ? NULL : $datos['domicilio_trans'],
-			'ruc_trans'=> empty($datos['ruc_dni_trans']) ? NULL : $datos['ruc_dni_trans']
+			'idtransporte' => empty($datos['transporte']['id']) ? NULL : $datos['transporte']['id'],
+			'idtransportista' => empty($datos['transportista']['id']) ? NULL : $datos['transportista']['id'] 
 		); 
 		return $this->db->insert('guia_remision', $data); 
 	}
@@ -252,21 +250,16 @@ class Model_guia_remision extends CI_Model {
 		$data = array( 
 			'idmovimiento' => empty($datos['idmovimiento']) ? NULL : $datos['idmovimiento'], 
 			'idmotivotraslado'=> $datos['motivo_traslado']['id'],
-			'marca_transporte'=> empty($datos['marca_unidad']) ? NULL : $datos['marca_unidad'],
-			'placa_transporte'=> empty($datos['placa_unidad']) ? NULL : $datos['placa_unidad'],
-			'num_constancia_inscripcion'=> empty($datos['cert_inscripcion']) ? NULL : $datos['cert_inscripcion'],
-			'num_licencia_conducir'=> empty($datos['num_licencia_conducir']) ? NULL : $datos['num_licencia_conducir'],
 			'punto_partida'=> empty($datos['punto_partida']) ? NULL : $datos['punto_partida'],
 			'punto_llegada'=> empty($datos['punto_llegada']) ? NULL : $datos['punto_llegada'],
 			'fecha_emision' => darFormatoYMD($datos['fecha_emision']),
 			'fecha_inicio_traslado'=> empty($datos['fecha_inicio_traslado']) ? NULL : darFormatoYMD($datos['fecha_inicio_traslado']),
 			'costo_minimo'=> empty($datos['costo_minimo']) ? NULL : $datos['costo_minimo'], 
 			'peso_total'=> empty($datos['peso_total']) ? NULL : $datos['peso_total'], 
-			'idcolaborador' => $datos['colaborador']['id'],
+			'idcolaborador' => $datos['colaborador']['id'], 
 			'numero_orden_compra' => empty($datos['orden_compra']) ? NULL : $datos['orden_compra'],
-			'nombres_razon_social_trans'=> empty($datos['nombres_razon_social_trans']) ? NULL : $datos['nombres_razon_social_trans'],
-			'domicilio_trans'=> empty($datos['domicilio_trans']) ? NULL : $datos['domicilio_trans'],
-			'ruc_trans'=> empty($datos['ruc_dni_trans']) ? NULL : $datos['ruc_dni_trans']
+			'idtransporte' => empty($datos['transporte']['id']) ? NULL : $datos['transporte']['id'],
+			'idtransportista' => empty($datos['transportista']['id']) ? NULL : $datos['transportista']['id'] 
 		); 
 		$this->db->where('idguiaremision',$datos['idguiaremision']);
 		return $this->db->update('guia_remision', $data); 

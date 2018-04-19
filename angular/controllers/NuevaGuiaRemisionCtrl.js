@@ -5,6 +5,8 @@ app.controller('NuevaGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$boo
     'ProductoFactory',
     'CaracteristicaFactory',
     'ContactoEmpresaFactory',
+    'TransporteFactory',
+    'TransportistaFactory',
     'ModalReporteFactory',
     'MathFactory',
 		'GuiaRemisionServices',
@@ -25,6 +27,8 @@ app.controller('NuevaGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$boo
     'ContactoEmpresaServices',
     'VariableCarServices',
     'NotaPedidoServices',
+    'TransportistaServices',
+    'TransporteServices',
 	function($scope, $filter, $uibModal, $bootbox, $log, $timeout, pinesNotifications, uiGridConstants, blockUI, 
     ClientePersonaFactory,
     ClienteEmpresaFactory,
@@ -32,6 +36,8 @@ app.controller('NuevaGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$boo
     ProductoFactory,
     CaracteristicaFactory,
     ContactoEmpresaFactory,
+    TransporteFactory,
+    TransportistaFactory,
     ModalReporteFactory,
     MathFactory,
 		GuiaRemisionServices,
@@ -51,7 +57,9 @@ app.controller('NuevaGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$boo
     CaracteristicaServices,
     ContactoEmpresaServices,
     VariableCarServices,
-    NotaPedidoServices
+    NotaPedidoServices,
+    TransportistaServices,
+    TransporteServices
 ) {
   
   $scope.metodos = {}; // contiene todas las funciones 
@@ -295,6 +303,260 @@ app.controller('NuevaGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$boo
       }
       blockUI.stop(); 
     }); 
+  }
+  // BUSCAR TRANSPORTISTA 
+  $scope.btnBusquedaTransportista = function() { 
+    blockUI.start('Procesando información...'); 
+    $uibModal.open({ 
+      templateUrl: angular.patchURLCI+'Transportista/ver_popup_busqueda_transportista',
+      size: 'lg',
+      backdrop: 'static',
+      keyboard:false,
+      scope: $scope,
+      controller: function ($scope, $uibModalInstance) { 
+        blockUI.stop(); 
+        $scope.fBusqueda = {}; 
+        $scope.titleForm = 'Búsqueda de Transportista'; 
+        var paginationOptionsTRA = {
+          pageNumber: 1,
+          firstRow: 0,
+          pageSize: 100,
+          sort: uiGridConstants.ASC,
+          sortName: null,
+          search: null
+        };
+        $scope.mySelectionGridTRA = [];
+        $scope.fArr.gridOptionsTRA = {
+          //rowHeight36,
+          paginationPageSizes: [100, 500, 1000, 10000],
+          paginationPageSize: 100,
+          useExternalPagination: true,
+          useExternalSorting: true,
+          enableGridMenu: true,
+          enableRowSelection: true,
+          enableSelectAll: false,
+          enableFiltering: true,
+          enableFullRowSelection: true,
+          multiSelect: false,
+          columnDefs: [],
+          onRegisterApi: function(gridApi) { // gridComboOptions
+            $scope.gridApi = gridApi;
+            gridApi.selection.on.rowSelectionChanged($scope,function(row){
+              $scope.mySelectionGridTRA = gridApi.selection.getSelectedRows();
+              $scope.fData.transportista = $scope.mySelectionGridTRA[0]; 
+
+              $uibModalInstance.dismiss('cancel');
+              // $timeout(function() {
+              //   $('#temporalElemento').focus(); //console.log('focus me',$('#temporalElemento'));
+              // }, 1000);
+            });
+            $scope.gridApi.core.on.sortChanged($scope, function(grid, sortColumns) {
+              if (sortColumns.length == 0) {
+                paginationOptionsTRA.sort = null;
+                paginationOptionsTRA.sortName = null;
+              } else {
+                paginationOptionsTRA.sort = sortColumns[0].sort.direction;
+                paginationOptionsTRA.sortName = sortColumns[0].name;
+              }
+              $scope.metodos.getPaginationServerSideTRA(true);
+            });
+            gridApi.pagination.on.paginationChanged($scope, function (newPage, pageSize) {
+              paginationOptionsTRA.pageNumber = newPage;
+              paginationOptionsTRA.pageSize = pageSize;
+              paginationOptionsTRA.firstRow = (paginationOptionsTRA.pageNumber - 1) * paginationOptionsTRA.pageSize;
+              $scope.metodos.getPaginationServerSideTRA(true);
+            });
+            $scope.gridApi.core.on.filterChanged( $scope, function(grid, searchColumns) {
+              var grid = this.grid;
+              paginationOptionsTRA.search = true;
+              paginationOptionsTRA.searchColumn = { 
+                'idtransportista' : grid.columns[1].filters[0].term,
+                'nombres_trans' : grid.columns[2].filters[0].term,
+                'domicilio_trans' : grid.columns[3].filters[0].term,
+                'ruc_trans' : grid.columns[4].filters[0].term,
+                'num_lic_conducir' : grid.columns[5].filters[0].term 
+              }
+              $scope.metodos.getPaginationServerSideTRA();
+            });
+          }
+        }; 
+        //$scope.metodos.cambioColumnas = function() { 
+          $scope.fArr.gridOptionsTRA.columnDefs = [
+            { field: 'id', name: 'idtransportista', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
+            { field: 'nombre_razon_social', name: 'nombres_trans', displayName: 'Nombre / Razón Social', minWidth: 160 },
+            { field: 'domicilio', name: 'domicilio_trans', displayName: 'Domicilio', minWidth: 160 },
+            { field: 'ruc_transport', name: 'ruc_trans', displayName: 'R.U.C', minWidth: 120 },
+            { field: 'num_lic_conducir', name: 'num_lic_conducir', displayName: 'N° Lic. Conducir', minWidth: 120 } 
+          ];
+          paginationOptionsTRA.sortName = $scope.fArr.gridOptionsTRA.columnDefs[0].name;
+        //}
+        //$scope.metodos.cambioColumnas(); 
+        $scope.metodos.getPaginationServerSideTRA = function(loader) { 
+          if(loader){
+            blockUI.start('Procesando información...'); 
+          }
+          var arrParams = {
+            paginate : paginationOptionsTRA
+            //datos: $scope.fBusqueda 
+          };
+          TransportistaServices.sListar(arrParams).then(function (rpta) {
+            $scope.fArr.gridOptionsTRA.totalItems = rpta.paginate.totalRows;
+            $scope.fArr.gridOptionsTRA.data = rpta.datos;
+            if(loader){
+              blockUI.stop(); 
+            }
+          }); 
+        }
+        $scope.metodos.getPaginationServerSideTRA(true); 
+        $scope.cancel = function () {
+          $uibModalInstance.dismiss('cancel');
+        }
+        
+      }
+    });
+  }
+  
+  // NUEVO TRANSPORTISTA 
+  $scope.btnNuevoTransportista = function() { 
+    var arrParams = { 
+      'metodos': $scope.metodos,
+      'fArr': $scope.fArr,
+      callbacks:function() {
+        if( typeof $scope.metodos.getPaginationServerSideTRA == 'function' ){
+          $scope.metodos.getPaginationServerSideTRA(); 
+        }
+      }
+    }
+    TransportistaFactory.regTransportistaModal(arrParams); 
+  }
+  // BUSCAR TRANSPORTE 
+  $scope.btnBusquedaTransporte = function() { 
+    blockUI.start('Procesando información...'); 
+    $uibModal.open({ 
+      templateUrl: angular.patchURLCI+'Transporte/ver_popup_busqueda_transporte', 
+      size: 'lg',
+      backdrop: 'static',
+      keyboard:false,
+      scope: $scope,
+      controller: function ($scope, $uibModalInstance) { 
+        blockUI.stop(); 
+        $scope.fBusqueda = {}; 
+        $scope.titleForm = 'Búsqueda de Transporte'; 
+        var paginationOptionsTRE = { 
+          pageNumber: 1,
+          firstRow: 0,
+          pageSize: 100,
+          sort: uiGridConstants.ASC,
+          sortName: null,
+          search: null
+        };
+        $scope.mySelectionGridTRE = [];
+        $scope.fArr.gridOptionsTRE = { 
+          paginationPageSizes: [100, 500, 1000, 10000],
+          paginationPageSize: 100,
+          useExternalPagination: true,
+          useExternalSorting: true,
+          enableGridMenu: true,
+          enableRowSelection: true,
+          enableSelectAll: false,
+          enableFiltering: true,
+          enableFullRowSelection: true,
+          multiSelect: false,
+          columnDefs: [],
+          onRegisterApi: function(gridApi) { // gridComboOptions
+            $scope.gridApi = gridApi;
+            gridApi.selection.on.rowSelectionChanged($scope,function(row){
+              $scope.mySelectionGridTRE = gridApi.selection.getSelectedRows();
+              $scope.fData.transporte = $scope.mySelectionGridTRE[0]; 
+
+              $uibModalInstance.dismiss('cancel');
+              // $timeout(function() {
+              //   $('#temporalElemento').focus(); //console.log('focus me',$('#temporalElemento'));
+              // }, 1000);
+            });
+            $scope.gridApi.core.on.sortChanged($scope, function(grid, sortColumns) {
+              if (sortColumns.length == 0) {
+                paginationOptionsTRE.sort = null;
+                paginationOptionsTRE.sortName = null;
+              } else {
+                paginationOptionsTRE.sort = sortColumns[0].sort.direction;
+                paginationOptionsTRE.sortName = sortColumns[0].name;
+              }
+              $scope.metodos.getPaginationServerSideTRE(true);
+            });
+            gridApi.pagination.on.paginationChanged($scope, function (newPage, pageSize) {
+              paginationOptionsTRE.pageNumber = newPage;
+              paginationOptionsTRE.pageSize = pageSize;
+              paginationOptionsTRE.firstRow = (paginationOptionsTRE.pageNumber - 1) * paginationOptionsTRE.pageSize;
+              $scope.metodos.getPaginationServerSideTRE(true);
+            });
+            $scope.gridApi.core.on.filterChanged( $scope, function(grid, searchColumns) {
+              var grid = this.grid;
+              paginationOptionsTRE.search = true;
+              paginationOptionsTRE.searchColumn = { 
+                'idtransporte' : grid.columns[1].filters[0].term,
+                'marca_transporte' : grid.columns[2].filters[0].term,
+                'placa_transporte' : grid.columns[3].filters[0].term,
+                'num_cert_inscripcion' : grid.columns[4].filters[0].term 
+              }
+              $scope.metodos.getPaginationServerSideTRE();
+            });
+          }
+        }; 
+        //$scope.metodos.cambioColumnas = function() { 
+          $scope.fArr.gridOptionsTRE.columnDefs = [
+            { field: 'id', name: 'idtransporte', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
+            { field: 'marca_transporte', name: 'marca_transporte', displayName: 'Marca', minWidth: 160 },
+            { field: 'placa_transporte', name: 'placa_transporte', displayName: 'Placa', minWidth: 160 },
+            { field: 'num_cert_inscripcion', name: 'num_cert_inscripcion', displayName: 'N° Cert. Inscripción', minWidth: 120 } 
+          ];
+          paginationOptionsTRE.sortName = $scope.fArr.gridOptionsTRE.columnDefs[0].name;
+        //}
+        //$scope.metodos.cambioColumnas(); 
+        $scope.metodos.getPaginationServerSideTRE = function(loader) { 
+          if(loader){
+            blockUI.start('Procesando información...'); 
+          }
+          var arrParams = {
+            paginate : paginationOptionsTRE
+            //datos: $scope.fBusqueda 
+          };
+          TransporteServices.sListar(arrParams).then(function (rpta) {
+            $scope.fArr.gridOptionsTRE.totalItems = rpta.paginate.totalRows;
+            $scope.fArr.gridOptionsTRE.data = rpta.datos;
+            if(loader){
+              blockUI.stop(); 
+            }
+          }); 
+        }
+        $scope.metodos.getPaginationServerSideTRE(true); 
+        $scope.cancel = function () {
+          $uibModalInstance.dismiss('cancel');
+        }
+        
+      }
+    });
+  }
+  // NUEVO TRANSPORTE 
+  $scope.btnNuevoTransporte = function() { 
+    var arrParams = { 
+      'metodos': $scope.metodos,
+      'fArr': $scope.fArr,
+      callbacks:function() { 
+        console.log($scope.metodos.getPaginationServerSideTRE,'$scope.metodos.getPaginationServerSideTRE'); 
+        if( typeof $scope.metodos.getPaginationServerSideTRE == 'function' ){
+          $scope.metodos.getPaginationServerSideTRE(); 
+        }
+      }
+    }
+    TransporteFactory.regTransporteModal(arrParams); 
+  }
+  // QUITAR TRANSPORTISTA TEMPORAL 
+  $scope.btnQuitarTransportista = function() {
+    $scope.fData.transportista = {}; 
+  }
+  $scope.btnQuitarTransporte = function() {
+    $scope.fData.transporte = {}; 
   }
   // BUSCAR CLIENTE 
   $scope.btnBusquedaCliente = function() { 
@@ -812,7 +1074,7 @@ app.controller('NuevaGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$boo
               }).shift(); 
               $scope.fData.colaborador = objIndex; 
               // cargar direcciones: 
-              $scope.metodos.listaPuntosDeLlegada(null, $scope.mySelectionGridCO[0].idclienteempresa); 
+              $scope.metodos.listaPuntosDeLlegada(null, $scope.mySelectionGridCO[0].cliente_empresa.id); 
               $uibModalInstance.dismiss('cancel');
             });
             $scope.gridApi.core.on.sortChanged($scope, function(grid, sortColumns) {
@@ -1095,7 +1357,6 @@ app.controller('NuevaGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '$boo
       $scope.gridOptions.data = [];
     }
     $scope.gridOptions.data.push($scope.arrTemporal);
-    $scope.calcularTotales(); 
     $scope.fData.temporal = {
       cantidad: 1,
       descripcion: null,

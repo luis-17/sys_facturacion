@@ -222,7 +222,9 @@ angular.module('app')
               'angular/controllers/UnidadMedidaCtrl.js',
               'angular/controllers/ContactoEmpresaCtrl.js',
               'angular/controllers/VariableCarCtrl.js',
-              'angular/controllers/NotaPedidoCtrl.js'  
+              'angular/controllers/NotaPedidoCtrl.js',
+              'angular/controllers/TransporteCtrl.js',
+              'angular/controllers/TransportistaCtrl.js'    
             ])
           })
           .state('app.editar-guia-remision', {
@@ -249,7 +251,9 @@ angular.module('app')
               'angular/controllers/SerieCtrl.js',
               'angular/controllers/UnidadMedidaCtrl.js',
               'angular/controllers/ContactoEmpresaCtrl.js',
-              'angular/controllers/VariableCarCtrl.js' 
+              'angular/controllers/VariableCarCtrl.js',
+              'angular/controllers/TransporteCtrl.js',
+              'angular/controllers/TransportistaCtrl.js' 
             ])
           })
           .state('app.historial-ventas', { 
@@ -271,6 +275,20 @@ angular.module('app')
               //'angular/controllers/SedeCtrl.js',
               //'angular/controllers/CategoriaElementoCtrl.js'
             ])
+          })
+          .state('app.transporte', {
+            url: '/transporte',
+            templateUrl: 'tpl/transporte.html',
+            resolve: load([
+              'angular/controllers/TransporteCtrl.js' 
+            ]) 
+          })
+          .state('app.transportista', {
+            url: '/transportista',
+            templateUrl: 'tpl/transportista.html',
+            resolve: load([
+              'angular/controllers/TransportistaCtrl.js' 
+            ]) 
           })
           .state('app.producto', {
             url: '/producto',

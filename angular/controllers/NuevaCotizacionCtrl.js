@@ -959,7 +959,7 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
     enableFiltering: false,
     enableFullRowSelection: false,
     data: null,
-    rowHeight: 26,
+    rowHeight: 30,
     enableCellEditOnFocus: true,
     multiSelect: false,
     columnDefs: [
@@ -1059,14 +1059,13 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
      if($scope.fConfigSys.max_items_grilla_cot_np_gr_v){
         maxItemsGrilla = $scope.fConfigSys.max_items_grilla_cot_np_gr_v; 
      }
-     var rowHeight = 26; // your row height 
+     var rowHeight = 30; // your row height 
      var headerHeight = 25; // your header height 
      return { 
-        height: (maxItemsGrilla * rowHeight + headerHeight + 20) + "px"
+        height: (maxItemsGrilla * rowHeight + headerHeight ) + "px"
      };
   };
   $scope.btnClonarFila = function(row) { 
-    console.log(row,'row');
     var arrFClon = { 
       'id' : row.entity.id,
       'idelemento' : row.entity.idelemento,
@@ -1083,6 +1082,7 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
       'caracteristicas': angular.copy(row.entity.caracteristicas)
     }; 
     $scope.gridOptions.data.push(arrFClon); 
+    $scope.calcularTotales(); 
   }
   $scope.agregarItem = function () {
     $('#temporalElemento').focus();
@@ -1114,30 +1114,6 @@ app.controller('NuevaCotizacionCtrl', ['$scope', '$filter', '$uibModal', '$bootb
       pinesNotifications.notify({ title: 'Advertencia.', text: 'Ingrese una cantidad válida', type: 'warning', delay: 2000 });
       return false;
     }
-
-
-    // var elementoNew = true;
-    // angular.forEach($scope.gridOptions.data, function(value, key) { 
-    //   if(value.id == $scope.fData.temporal.elemento.id ){ 
-    //     elementoNew = false;
-    //   }
-    // });
-    // if( elementoNew === false ){
-    //   $scope.fData.temporal = {
-    //     cantidad: 1,
-    //     descuento: 0,
-    //     importe_con_igv: null,
-    //     importe_sin_igv: null,
-    //     elemento: null,
-    //     excluye_igv: 2,
-    //     agrupacion: 0,
-    //     unidad_medida : $scope.fArr.listaUnidadMedida[0],
-    //     caracteristicas: null
-    //   };
-    //   $('#temporalElemento').focus();
-    //   pinesNotifications.notify({ title: 'Advertencia.', text: 'El elemento ya ha sido agregado a la cesta.', type: 'warning', delay: 2000 });
-    //   return false;
-    // } 
     // empieza el juego... 
     $scope.arrTemporal = { 
       'id' : $scope.fData.temporal.elemento.id,
