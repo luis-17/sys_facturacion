@@ -335,7 +335,7 @@ app.controller('HistorialVentasCtrl', ['$scope', '$filter', '$uibModal', '$bootb
   $scope.btnImprimir = function(tipo) { 
     console.log(tipo,'tipo');
     var tipo = tipo || 'html';
-    if( tipo === 'html' ){
+    if( tipo === 'html' ){ 
       var arrParams = {
         id: $scope.mySelectionGrid[0].idmovimiento, 
         codigo_reporte: 'VEN-COMPR' 
@@ -358,7 +358,19 @@ app.controller('HistorialVentasCtrl', ['$scope', '$filter', '$uibModal', '$bootb
           pinesNotifications.notify({ title: pTitle, text: pText, type: pType, delay: 3500 });
         }
       });
-    }else if( tipo === 'pdf' ){
+    }else if( tipo === 'pdf' ){ 
+      var arrParams = { 
+        titulo: 'VISTA PREVIA DE IMPRESIÓN',
+        datos:{
+          id: $scope.mySelectionGrid[0].idmovimiento, 
+          codigo_reporte: 'VEN-COMPR' 
+        },
+        envio_correo: 'no',
+        salida: 'pdf',
+        url: angular.patchURLCI + "Venta/imprimir_comprobante_venta_pdf" 
+      }
+      ModalReporteFactory.getPopupReporte(arrParams);
+    }else if( tipo === 'rtf' ){ 
       var arrParams = { 
         titulo: 'VISTA PREVIA DE IMPRESIÓN',
         datos:{

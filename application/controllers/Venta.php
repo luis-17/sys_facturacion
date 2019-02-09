@@ -3,7 +3,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 use Spipu\Html2Pdf\Html2Pdf;
 use Spipu\Html2Pdf\Exception\Html2PdfException;
 use Spipu\Html2Pdf\Exception\ExceptionFormatter;
-class Venta extends CI_Controller {
+
+require_once(APPPATH.'libraries/html2pdf_composer/vendor/autoload.php'); 
+
+class Venta extends CI_Controller { 
 	public function __construct()
     {
         parent::__construct(); 
@@ -11,6 +14,7 @@ class Venta extends CI_Controller {
         $this->load->model(array('model_venta','model_categoria_cliente','model_cliente_persona','model_cliente_empresa','model_configuracion',
         	'model_variable_car','model_banco_empresa_admin','model_serie','model_nota_pedido','model_caracteristica','model_tipo_documento_mov')); 
         $this->load->library('excel');
+        $this->load->library('word');
     	$this->load->library('Fpdfext');
         //cache
 		$this->output->set_header("Cache-Control: no-store, no-cache, must-revalidate, no-transform, max-age=0, post-check=0, pre-check=0");
@@ -1629,6 +1633,12 @@ class Venta extends CI_Controller {
 		$this->output
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
+	}
+	public function imprimir_comprobante_venta_rtf()
+	{
+		$this->wordTemplate = new word('L','mm',array(235,210)); 
+
+		var_dump($this->wordTemplate); exit(); 
 	}
 	public function imprimir_comprobante_venta_json($idmovimiento)
 	{
