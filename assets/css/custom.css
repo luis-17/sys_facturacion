@@ -117,3 +117,25 @@ form.edit-form input, form.edit-form select {
 .ui-grid-canvas{ 
     overflow: hidden !important;
 }
+
+/* fix bg-warning*/
+.bg-warning {
+    color: #7266ba;
+}
+.bg-warning .text-muted {
+    color: #23b7e5 !important;
+}
+
+/* DASHBOARD */
+.dashboard h4{
+    color: #564aa3;
+    font-weight: 400;
+}
+
+.dashboard .text-help{
+    line-height: 1;
+    font-size: 13px;
+}
+.dashboard .dash-group .text-porcentaje{
+    text-shadow: 0.5px 0.5px 0 #1c2b36;
+}
