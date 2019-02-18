@@ -274,6 +274,15 @@ class Model_guia_remision extends CI_Model {
 		$this->db->where('idguiaremisiondetalle',$datos['idguiaremisiondetalle']); 
 		return $this->db->update('guia_remision_detalle', $data); 
 	}
+	public function m_asociar_comprobante($datos)
+	{
+		$data = array(
+			'idmovimiento' => $datos['idcomprobante'],
+			'estado_gr' => 2 // asociado a comp.  
+		);
+		$this->db->where('idguiaremision',$datos['idguiaremision']); 
+		return $this->db->update('guia_remision', $data); 
+	}
 	public function m_anular($datos)
 	{
 		$data = array(

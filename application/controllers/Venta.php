@@ -12,7 +12,7 @@ class Venta extends CI_Controller {
         parent::__construct(); 
         $this->load->helper(array('fechas','otros','pdf','contable','config')); 
         $this->load->model(array('model_venta','model_categoria_cliente','model_cliente_persona','model_cliente_empresa','model_configuracion',
-        	'model_variable_car','model_banco_empresa_admin','model_serie','model_nota_pedido','model_caracteristica','model_tipo_documento_mov')); 
+        	'model_variable_car','model_banco_empresa_admin','model_serie','model_nota_pedido','model_caracteristica','model_tipo_documento_mov','model_guia_remision')); 
         $this->load->library('excel');
         $this->load->library('word');
     	$this->load->library('Fpdfext');
@@ -712,7 +712,20 @@ class Venta extends CI_Controller {
 					$arrData['flag'] = 1; 
 					}
 				}
-			}			
+			}
+
+			// ASOCIAR GUIAS DE REMISION 
+			if( $allInputs['hay_guias'] === TRUE && !empty($allInputs['arrGuias']) ){
+				foreach ($allInputs['arrGuias'] as $key => $row) { 
+					$arrDataGR = array(
+						'idguiaremision' => $row['idguiaremision'], 
+						'idcomprobante' => $arrData['idmovimiento'] 
+					);
+					if($this->model_guia_remision->m_asociar_comprobante($arrDataGR)){
+						$arrData['message'] .= '<br /> - Se asociaron la(s) guía(s) correctamente'; 
+					}
+				}
+			}
 		} 
 		$this->db->trans_complete();
 		$this->output
@@ -853,18 +866,9 @@ class Venta extends CI_Controller {
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		$arrData['message'] = 'No se pudo anular los datos';
     	$arrData['flag'] = 0;
-    	// var_dump($allInputs);exit();
-    	// validar que no sea una cotización enviada 
+
     	$fVenta = $this->model_venta->m_cargar_esta_venta_por_id_simple($allInputs['idventa']);
 
-    	if( $fVenta['estado_movimiento'] == 2 ){ // enviado 
-    		$arrData['message'] = 'Esta Venta ya ha sido enviada como Nota de Pedido. No se puede modificar.'; 
-    		$arrData['flag'] = 0;
-    		$this->output
-		    	->set_content_type('application/json')
-		    	->set_output(json_encode($arrData));
-		    return;
-    	} 
     	// validar que no sea una venta anulada 
     	if( $fVenta['estado_movimiento'] == 0 ){ // anulado 
     		$arrData['message'] = 'Esta Venta ya ha sido anulada anteriormente. No se puede modificar.'; 

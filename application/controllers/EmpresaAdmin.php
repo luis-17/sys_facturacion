@@ -61,7 +61,7 @@ class EmpresaAdmin extends CI_Controller {
     	// VALIDACIONES
     	
     	$this->db->trans_start();
-		if($this->model_empresa_admin->m_registrar($allInputs)) { // registro de elemento
+		if($this->model_empresa_admin->m_registrar($allInputs)) { 
 			$arrData['message'] = 'Se registraron los datos correctamente';
 			$arrData['flag'] = 1;
 		}
@@ -79,7 +79,7 @@ class EmpresaAdmin extends CI_Controller {
     	// VALIDACIONES
     	
     	$this->db->trans_start();
-		if($this->model_empresa_admin->m_editar($allInputs)) { // edicion de elemento
+		if($this->model_empresa_admin->m_editar($allInputs)) { 
 			$arrData['message'] = 'Se editaron los datos correctamente';
 			$arrData['flag'] = 1;
 		}

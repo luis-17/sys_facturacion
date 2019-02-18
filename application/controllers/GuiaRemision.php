@@ -16,6 +16,10 @@ class GuiaRemision extends CI_Controller {
 		$this->sessionFactur = @$this->session->userdata('sess_fact_'.substr(base_url(),-20,7));
 		date_default_timezone_set("America/Lima");
     }
+    public function ver_popup_busqueda_gr()
+	{
+		$this->load->view('guia-remision/busq_gr_popup'); 
+	}
     public function listar_guias_remision_historial()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true); // var_dump($allInputs); exit(); 
@@ -35,6 +39,11 @@ class GuiaRemision extends CI_Controller {
 				$objEstado['claseIcon'] = 'fa-ban';
 				$objEstado['claseLabel'] = 'label-danger';
 				$objEstado['labelText'] = 'ANULADO';
+			}
+			if( $row['estado_gr'] == 2 ){ // ASOCIADO  
+				$objEstado['claseIcon'] = 'fa-check';
+				$objEstado['claseLabel'] = 'label-info';
+				$objEstado['labelText'] = 'ASOCIADO';
 			}
 			array_push($arrListado, 
 				array(

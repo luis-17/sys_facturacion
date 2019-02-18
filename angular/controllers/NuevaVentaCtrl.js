@@ -24,6 +24,7 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
     'ContactoEmpresaServices',
     'VariableCarServices',
     'NotaPedidoServices', 
+    'GuiaRemisionServices',
 	function($scope, $filter, $uibModal, $bootbox, $log, $timeout, pinesNotifications, uiGridConstants, blockUI, 
     ClientePersonaFactory,
     ClienteEmpresaFactory,
@@ -49,7 +50,8 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
     CaracteristicaServices,
     ContactoEmpresaServices,
     VariableCarServices,
-    NotaPedidoServices 
+    NotaPedidoServices, 
+    GuiaRemisionServices
 ) {
    
   $scope.metodos = {}; // contiene todas las funciones 
@@ -82,6 +84,9 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
   $scope.fData.temporal = {};
   $scope.fData.temporal.cantidad = 1;
   $scope.fData.temporal.caracteristicas = null; 
+  $scope.fData.arrGuias = [];
+  $scope.fData.num_guias_asociadas = 0;
+  $scope.fData.hay_guias = false;
   $scope.metodos.listaCategoriasCliente = function(myCallback) {
     var myCallback = myCallback || function() { };
     CategoriaClienteServices.sListarCbo().then(function(rpta) {
@@ -1224,8 +1229,6 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
     };
 
     $scope.fData.classValid = ' input-normal-border'; 
-    // $scope.fData.temporal.caracteristicas = null;
-    // console.log($scope.fData.classValid,'$scope.fData.classValid');
   }
   $scope.btnGestionCaracteristicasDetalle = function(row) { 
     // console.log(row,'row');
@@ -1655,7 +1658,7 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
   }
   $scope.grabar = function() { 
     if($scope.fData.isRegisterSuccess){
-      pinesNotifications.notify({ title: 'Advertencia.', text: 'La cotización ya fue registrada', type: 'warning', delay: 3000 });
+      pinesNotifications.notify({ title: 'Advertencia.', text: 'El comprobante ya fue generado', type: 'warning', delay: 3000 });
       return false;
     }
     if( $scope.fData.tipo_documento_cliente.destino == 1 ){ // empresa 
@@ -1721,6 +1724,165 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
         pinesNotifications.notify({ title: pTitle, text: pText, type: pType, delay: 3500 });
       }
     });
+  }
+  /* ASOCIAR GUIA */ 
+  $scope.btnAsociarGR = function() { 
+    blockUI.start('Cargando guias de remisión...'); 
+    $uibModal.open({ 
+      templateUrl: angular.patchURLCI+'GuiaRemision/ver_popup_busqueda_gr',
+      size: 'lg',
+      backdrop: 'static',
+      keyboard:false,
+      scope: $scope,
+      controller: function ($scope, $uibModalInstance) { 
+        blockUI.stop(); 
+        $scope.fBusqueda = {}; 
+        $scope.fBusqueda.desde = $filter('date')(new Date(),'01-MM-yyyy');
+        $scope.fBusqueda.desdeHora = '00';
+        $scope.fBusqueda.desdeMinuto = '00';
+        $scope.fBusqueda.hastaHora = 23;
+        $scope.fBusqueda.hastaMinuto = 59;
+        $scope.fBusqueda.hasta = $filter('date')(new Date(),'dd-MM-yyyy');
+          
+        // SEDE 
+        $scope.metodos.listaSedes = function(myCallback) { 
+          var myCallback = myCallback || function() { };
+          SedeServices.sListarCbo().then(function(rpta) { 
+            if( rpta.flag == 1){
+              $scope.fArr.listaSedes = rpta.datos; 
+              myCallback();
+            } 
+          });
+        }
+        var myCallback = function() { 
+          $scope.fArr.listaSedes.splice(0,0,{ id : 'ALL', descripcion:'--TODOS--'}); 
+          $scope.fBusqueda.sede = $scope.fArr.listaSedes[0]; 
+        }
+        $scope.metodos.listaSedes(myCallback); 
+
+        $scope.titleForm = 'Búsqueda de Guías de Remisión'; 
+        var paginationOptionsGR = {
+          pageNumber: 1,
+          firstRow: 0,
+          pageSize: 100,
+          sort: uiGridConstants.DESC,
+          sortName: null,
+          search: null
+        };
+        $scope.mySelectionGridGR = [];
+        $scope.gridOptionsGR = {
+          paginationPageSizes: [100, 500, 1000, 10000],
+          paginationPageSize: 100,
+          useExternalPagination: true,
+          useExternalSorting: true,
+          enableGridMenu: true,
+          enableRowSelection: true,
+          enableSelectAll: false,
+          enableFiltering: true,
+          enableFullRowSelection: true,
+          multiSelect: true,
+          columnDefs: [ 
+            { field: 'idguiaremision', name: 'gr.idguiaremision', displayName: 'ID', width: '75', visible: false,  sort: { direction: uiGridConstants.DESC} },
+            { field: 'serie', name: 'gr.numero_serie', displayName: 'SERIE', width: 60 },
+            { field: 'correlativo', name: 'gr.numero_correlativo', displayName: 'CORRELATIVO', width: 100 },
+            { field: 'fecha_emision', name: 'gr.fecha_emision', displayName: 'F. Emisión', minWidth: 100, enableFiltering: false },
+            { field: 'cliente', name: 'cliente_persona_empresa', displayName: 'Cliente', minWidth: 180 },
+            { field: 'estado', type: 'object', name: 'estado', displayName: 'ESTADO', width: '95', enableFiltering: false, enableSorting: false, enableColumnMenus: false, 
+              enableColumnMenu: false, cellTemplate:'<div class="">' + 
+                '<label tooltip-placement="left" tooltip="{{ COL_FIELD.labelText }}" class="label {{ COL_FIELD.claseLabel }} ml-xs">'+ 
+                '<i class="fa {{ COL_FIELD.claseIcon }}"></i> {{COL_FIELD.labelText}} </label>'+ 
+                '</div>' 
+            }
+          ],
+          onRegisterApi: function(gridApi) { // gridComboOptions 
+            $scope.gridApi = gridApi;
+            gridApi.selection.on.rowSelectionChanged($scope,function(row){
+              $scope.mySelectionGridGR = gridApi.selection.getSelectedRows(); 
+            });
+            $scope.gridApi.core.on.sortChanged($scope, function(grid, sortColumns) {
+              if (sortColumns.length == 0) {
+                paginationOptionsGR.sort = null;
+                paginationOptionsGR.sortName = null;
+              } else {
+                paginationOptionsGR.sort = sortColumns[0].sort.direction;
+                paginationOptionsGR.sortName = sortColumns[0].name;
+              }
+              $scope.metodos.getPaginationServerSideGR(true);
+            });
+            gridApi.pagination.on.paginationChanged($scope, function (newPage, pageSize) {
+              paginationOptionsGR.pageNumber = newPage;
+              paginationOptionsGR.pageSize = pageSize;
+              paginationOptionsGR.firstRow = (paginationOptionsGR.pageNumber - 1) * paginationOptionsGR.pageSize;
+              $scope.metodos.getPaginationServerSideGR(true);
+            });
+            $scope.gridApi.core.on.filterChanged( $scope, function(grid, searchColumns) {
+              var grid = this.grid;
+              paginationOptionsGR.search = true;
+              paginationOptionsGR.searchColumn = { 
+                'gr.idguiaremision' : grid.columns[1].filters[0].term,
+                'gr.numero_serie' : grid.columns[2].filters[0].term,
+                'gr.numero_correlativo' : grid.columns[3].filters[0].term,
+                "CONCAT(COALESCE(cp.nombres,''), ' ', COALESCE(cp.apellidos,''), ' ', COALESCE(ce.razon_social,''))" : grid.columns[4].filters[0].term 
+              }; 
+              $scope.metodos.getPaginationServerSideGR();
+            });
+          }
+        }; 
+        paginationOptionsGR.sortName = $scope.gridOptionsGR.columnDefs[0].name; 
+        $scope.metodos.getPaginationServerSideGR = function(loader) { 
+          if(loader){
+            blockUI.start('Procesando información...'); 
+          }
+          $scope.fBusqueda.estado_guia_remision = {
+            id: 1 // solo registrado 
+          };
+          // solo cliente seleccionado  
+          $scope.fBusqueda.cliente = {
+            tipo_cliente: $scope.fData.cliente.tipo_cliente, 
+            id: $scope.fData.cliente.id 
+          }; 
+          var arrParams = {
+            paginate : paginationOptionsGR,
+            datos: $scope.fBusqueda 
+          };
+          GuiaRemisionServices.sListarHistorialGuiaRemision(arrParams).then(function (rpta) { 
+            if( rpta.datos.length == 0 ){
+              rpta.paginate = { totalRows: 0 };
+            }
+            $scope.gridOptionsGR.totalItems = rpta.paginate.totalRows;
+            $scope.gridOptionsGR.data = rpta.datos; 
+            if( loader ){
+              blockUI.stop(); 
+            }
+          });
+          $scope.mySelectionGridGR = [];
+        }
+        $scope.metodos.getPaginationServerSideGR(true); 
+        $scope.aceptar = function () { 
+          if($scope.mySelectionGridGR.length > 0){
+            $scope.fData.arrGuias = $scope.mySelectionGridGR; 
+            $scope.fData.num_guias_asociadas = $scope.fData.arrGuias.length; 
+            $scope.fData.hay_guias = true; 
+            $uibModalInstance.dismiss('cancel');
+          }else{
+            var pTitle = 'Advertencia!';
+            var pType = 'warning';
+            pinesNotifications.notify({ title: pTitle, text: 'Seleccione al menos un item para asociar', type: pType, delay: 3500 }); 
+            return; 
+          }
+          
+        }
+        $scope.cancel = function () {
+          $uibModalInstance.dismiss('cancel');
+        }
+        
+      }
+    });  
+  }
+  $scope.btnQuitarGR = function() {
+    $scope.fData.arrGuias = [];
+    $scope.fData.num_guias_asociadas = 0;
+    $scope.fData.hay_guias = false;
   }
 }]);
 app.service("VentaServices",function($http, $q, handleBehavior) {

@@ -1136,8 +1136,8 @@ class Cotizacion extends CI_Controller {
 	    $moneda= @$allInputs['moneda'];
 
 	    // RECUPERACIÓN DE DATOS 
-	    $fConfig = obtener_parametros_configuracion();
-	    $datosEmpresa = $this->model_empresa_admin->m_cargar_empresa_admin_por_id($this->sessionFactur['idempresaadmin']);	 
+	    $fConfig = obtener_parametros_configuracion(); 
+	    $datosEmpresa = $this->model_empresa_admin->m_cargar_empresa_admin_por_id($this->sessionFactur['idempresaadmin']); 
 	    $moneda['moneda_str'] = NULL; 
 	    $simbolo = NULL;
 	    if($moneda['str_moneda'] == 'S'){

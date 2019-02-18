@@ -90,7 +90,7 @@ class Model_empresa_admin extends CI_Model {
 
 	public function m_cargar_empresa_admin_por_id($idempresaadmin)
 	{
-		$this->db->select("ea.idempresaadmin,ea.razon_social,ea.telefono,ea.nombre_logo,ea.pagina_web,ea.direccion_legal",FALSE);
+		$this->db->select("ea.idempresaadmin,ea.razon_social,ea.ruc,ea.telefono,ea.nombre_logo,ea.pagina_web,ea.direccion_legal",FALSE);
 		$this->db->from('empresa_admin ea'); 
 		$this->db->where( 'ea.idempresaadmin', $idempresaadmin); 
 		$this->db->limit(1);

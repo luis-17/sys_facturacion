@@ -23,7 +23,8 @@
     "OTROS_MANT" : "Otros",
     "COTIZACION" : "Cotizaciones",
     "NOTA_PEDIDO" : "Notas de Pedido",
-    "CAJA_VENTA" : "Cajas y Ventas",
+    "COMPROBANTE" : "Comprobantes",
+    "CAJA" : "Cajas",
     "GUIA_REM" : "Guía de Rem.",
     "TESORERIA" : "Tesorería",
     "CONSULTAS" : "Consultas",
@@ -31,30 +32,6 @@
     "EMAIL" : "Email", 
     "components" : {
       "COMPONENTS" : "Components",
-      "ui_kits" : {
-        "UI_KITS" : "UI Kits",
-        "BUTTONS" : "Buttons",
-        "ICONS" : "Icons",
-        "GRID" : "Grid",
-        "BOOTSTRAP" : "Bootstrap",
-        "SORTABLE" : "Sortable",
-        "PORTLET" : "Portlet",
-        "TIMELINE" : "Timeline",
-        "VECTOR_MAP" : "Vector Map"
-      },
-      "table" : {
-        "TABLE" : "Table",
-        "TABLE_STATIC" : "Table static",
-        "DATATABLE" : "Datatable",
-        "FOOTABLE" : "Footable"
-      },
-      "form" : {
-        "FORM" : "Form",
-        "FORM_ELEMENTS" : "Form elements",
-        "FORM_VALIDATION" : "Form validation",
-        "FORM_WIZARD" : "Form wizard"
-      },
-      "CHART" : "Chart",
       "pages" : {
         "PAGES" : "Pages",
         "PROFILE" : "Profile",

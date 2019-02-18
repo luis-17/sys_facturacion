@@ -125,6 +125,11 @@ form.edit-form input, form.edit-form select {
 .bg-warning .text-muted {
     color: #23b7e5 !important;
 }
+/* COMPROBANTE */
+.box-nueva-venta .box-guia-remision{
+    margin-bottom: 15px;
+}
+
 
 /* DASHBOARD */
 .dashboard h4{
