@@ -14,7 +14,7 @@ class Venta extends CI_Controller {
         $this->load->model(array('model_venta','model_categoria_cliente','model_cliente_persona','model_cliente_empresa','model_configuracion',
         	'model_variable_car','model_banco_empresa_admin','model_serie','model_nota_pedido','model_caracteristica','model_tipo_documento_mov','model_guia_remision')); 
         $this->load->library('excel');
-        $this->load->library('word');
+        // $this->load->library('word');
     	$this->load->library('Fpdfext');
         //cache
 		$this->output->set_header("Cache-Control: no-store, no-cache, must-revalidate, no-transform, max-age=0, post-check=0, pre-check=0");
