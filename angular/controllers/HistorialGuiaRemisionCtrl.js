@@ -22,39 +22,8 @@ app.controller('HistorialGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '
   $scope.fBusqueda.hastaHora = 23;
   $scope.fBusqueda.hastaMinuto = 59;
   $scope.fBusqueda.hasta = $filter('date')(new Date(),'dd-MM-yyyy');
-    
-  // SEDE 
-  // $scope.metodos.listaSedes = function(myCallback) { 
-  //   var myCallback = myCallback || function() { };
-  //   SedeServices.sListarCbo().then(function(rpta) { 
-  //     if( rpta.flag == 1){
-  //       $scope.fArr.listaSedes = rpta.datos; 
-  //       myCallback();
-  //     } 
-  //   });
-  // }
-  // var myCallback = function() { 
-  //   $scope.fArr.listaSedes.splice(0,0,{ id : 'ALL', descripcion:'--TODOS--'}); 
-  //   $scope.fBusqueda.sede = $scope.fArr.listaSedes[0]; 
-  // }
-  // $scope.metodos.listaSedes(myCallback); 
-
-  // CATEGORIA ELEMENTO
-  // $scope.metodos.listaCategoriasElemento = function(myCallback) {
-  //   var myCallback = myCallback || function() { };
-  //   CategoriaElementoServices.sListarCbo().then(function(rpta) {
-  //     $scope.fArr.listaCategoriasElemento = rpta.datos;
-  //     myCallbackElemento();
-  //   });
-  // };
-
-  // var myCallbackElemento = function() { 
-  //   $scope.fArr.listaCategoriasElemento.splice(0,0,{ id : 'ALL', descripcion:'--TODOS--'}); 
-  //   $scope.fBusqueda.categoria_elemento = $scope.fArr.listaCategoriasElemento[0]; 
-  // }
-  // $scope.metodos.listaCategoriasElemento(myCallbackElemento); 
   
-  // ESTADO DE COTIZACION 
+  // ESTADO DE GR 
   $scope.fArr.listaEstadosGuiaRemision = [
     {'id' : 'ALL', 'descripcion' : '--TODOS--'},
     {'id' : 0, 'descripcion' : 'ANULADO'},
@@ -340,5 +309,17 @@ app.controller('HistorialGuiaRemisionCtrl', ['$scope', '$filter', '$uibModal', '
     $scope.mySelectionGrid = [];
   };
   $scope.metodos.getPaginationServerSideGRDet(true); 
-
+  $scope.btnGenerarPDF = function() { 
+    var arrParams = { 
+      titulo: 'CONTROL - GUIA DE REMISIÓN',
+      datos:{
+        id: $scope.mySelectionGrid[0].idguiaremision, 
+        codigo_reporte: 'GR-FGR'
+      },
+      //envio_correo: 'si',
+      salida: 'pdf',
+      url: angular.patchURLCI + "GuiaRemision/generar_pdf" 
+    }
+    ModalReporteFactory.getPopupReporte(arrParams);
+  }
 }]); 

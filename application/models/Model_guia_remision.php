@@ -99,7 +99,7 @@ class Model_guia_remision extends CI_Model {
 		$fData = $this->db->get()->row_array();
 		return $fData; 
 	}
-	public function m_cargar_guia_remision_por_id($idguiaremision) 
+	public function m_cargar_guia_remision_por_id($idguiaremision) // 
 	{
 		
 		$this->db->select("CONCAT(COALESCE(col.nombres,''), ' ', COALESCE(col.apellidos,'')) AS colaborador",FALSE);

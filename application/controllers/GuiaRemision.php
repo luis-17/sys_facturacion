@@ -618,7 +618,7 @@ class GuiaRemision extends CI_Controller {
  			);
  		}
  		// $configTD['detalle'] = 
- 		// print_r($configTD); exit();
+ 		// print_r($configTD); exit(); 
  		// PREPARACIÓN DE DATA: 
  		$arrListadoDetalle = array(); 
  		foreach ($detalleLista as $key => $row) { 
@@ -666,6 +666,7 @@ class GuiaRemision extends CI_Controller {
 		}
 		// print_r($arrListadoDetalle); exit();
   		/* ESTILOS */ 
+  		$configTD['unidad_medida'] = 'px'; 
     	$htmlData = '<style type="text/css">
     		@media print{ 
     			@page :bottom { margin: 0cm; }
@@ -909,7 +910,7 @@ class GuiaRemision extends CI_Controller {
 		    	$posX_certInscripcion = $configTD['detalle']['cert_inscripcion_key']['x'].$unidadMedidaPos; //'260mm';
 		    	$posY_certInscripcion = $configTD['detalle']['cert_inscripcion_key']['y'].$unidadMedidaPos; //'185mm';
 		    	$htmlData .= '<div class="item" style="top:'.$posY_certInscripcion.';left:'.$posX_certInscripcion.';">';
-		    	$htmlData .= $fila['num_constancia_inscripcion']; 
+		    	$htmlData .= $fila['num_cert_inscripcion']; 
 		    	$htmlData .= '</div>';
 		    }
 
@@ -918,7 +919,7 @@ class GuiaRemision extends CI_Controller {
 		    	$posX_licConducir = $configTD['detalle']['lic_conducir_key']['x'].$unidadMedidaPos; // '260mm';
 		    	$posY_licConducir = $configTD['detalle']['lic_conducir_key']['y'].$unidadMedidaPos; // '189.5mm';
 		    	$htmlData .= '<div class="item" style="top:'.$posY_licConducir.';left:'.$posX_licConducir.';">';
-		    	$htmlData .= $fila['num_licencia_conducir']; 
+		    	$htmlData .= $fila['num_lic_conducir']; 
 		    	$htmlData .= '</div>'; 
 		    }
 		$htmlData .= '</div>';
@@ -928,5 +929,395 @@ class GuiaRemision extends CI_Controller {
 		$this->output
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
+	}
+	public function generar_pdf()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true); 
+	    // RECUPERACIÓN DE DATOS 
+	    $fConfig = obtener_parametros_configuracion();
+	    $fila = $this->model_guia_remision->m_cargar_guia_remision_por_id($allInputs['id']); 
+	    
+	    // CONFIGURACION DEL PDF
+	    $this->pdf = new Fpdfext();
+	    $this->pdf->SetMargins(8,8);
+	    $this->pdf->setImagenCab('assets/dinamic/empresa/'.$fila['nombre_logo']); 
+	    // $this->pdf->setEstado($fila['estado_cot']);
+	    $this->pdf->AddPage('P','A4'); 
+	    $this->pdf->AliasNbPages();
+	    $this->pdf->SetAutoPageBreak(true,10);
+
+	    $this->pdf->SetTextColor(95,95,95);
+	    $this->pdf->SetFont('Arial','B',9);
+        $this->pdf->SetXY(8,21);
+        $this->pdf->MultiCell( 120,6,utf8_decode( $fila['razon_social_ea'] ) ); 
+        $this->pdf->SetFont('Arial','',8);
+        $this->pdf->SetXY(8,25);
+        $this->pdf->MultiCell( 120,6,utf8_decode( $fila['direccion_legal'] ),0,'L' );
+        $this->pdf->SetXY(8,29);
+        $this->pdf->MultiCell( 120,6,'Sitio Web: ',0,'L' ); 
+        $this->pdf->SetXY(36,29);
+        $this->pdf->MultiCell( 120,6,utf8_decode(strtolower($fila['pagina_web']) ),0,'L' );
+        $this->pdf->SetXY(8,33);
+        $this->pdf->MultiCell( 120,6,utf8_decode('Teléfono: '),0,'L' );
+	    $this->pdf->SetXY(36,33);
+	    $this->pdf->MultiCell( 120,6,utf8_decode( $fila['telefono_ea'] ),0,'L' );
+
+        $this->pdf->SetTextColor(0,0,0);
+        $this->pdf->SetFont('Arial','B',12);
+        $this->pdf->SetXY(100,8);
+        $this->pdf->Cell(120,10,utf8_decode( 'CONTROL - GUIA DE REMISIÓN N° '.$fila['numero_serie'].'-'.$fila['numero_correlativo'] ),0,0);
+        $this->pdf->Ln(15);
+        if( @$this->estado == 1 ){ 
+          $this->SetFont('Arial','B',50);
+          $this->SetTextColor(255,192,203);
+          $this->RotatedText(70,190,'A N U L A D O',45); 
+        } 
+      	
+      	$this->pdf->SetXY(8,40);
+      	$r = $fConfig['color_plantilla_reporte_r'];
+		$g = $fConfig['color_plantilla_reporte_g'];
+		$b = $fConfig['color_plantilla_reporte_b'];
+		$r_sec = $fConfig['color_plantilla_reporte_second_r'];
+		$g_sec = $fConfig['color_plantilla_reporte_second_g'];
+		$b_sec = $fConfig['color_plantilla_reporte_second_b'];
+		$this->pdf->SetFillColor($r,$g,$b);
+		$this->pdf->SetWidths(array(60));
+		$arrBarra = array(
+			'data'=> array(
+				utf8_decode('   DATOS DEL CLIENTE: ')
+			),
+			'textColor'=> array(
+				array('r'=> 255, 'g'=> 255, 'b'=> 255)
+			),
+			'fontSize'=> array(
+				array('family'=> NULL, 'weight'=> NULL, 'size'=> 10)
+			),
+			'bgColor'=> array(
+				array('r'=> $r, 'g'=> $g, 'b'=> $b )
+			)
+		);
+		$this->pdf->Row($arrBarra['data'],true,0,FALSE,5,$arrBarra['textColor'],$arrBarra['bgColor'],FALSE,FALSE,$arrBarra['fontSize']);
+
+		$this->pdf->SetTextColor(66,66,66);
+		$y = $this->pdf->GetY();
+		$this->pdf->SetXY(8,$y); 
+      	$this->pdf->SetFont('Arial','B',8); 
+      	$this->pdf->Cell(24,4,'CLIENTE '); 
+      	$this->pdf->Cell(3,4,':',0,0,'C'); 
+      	$this->pdf->SetFont('Arial','',8); 
+      	$this->pdf->MultiCell(55,4,strtoupper(strtoupper_total($fila['cliente_persona_empresa']))); 
+
+      	$y1 = $this->pdf->GetY();
+      	$this->pdf->SetXY(8,$y1-1); 
+      	$this->pdf->SetFont('Arial','B',8); 
+      	$this->pdf->Cell(24,6,strtoupper($fila['tipo_documento_abv'])); 
+      	$this->pdf->Cell(3,6,':',0,0,'C'); 
+      	$this->pdf->SetFont('Arial','',8); 
+      	$this->pdf->Cell(75,6,strtoupper($fila['num_documento_persona_empresa'])); 
+
+      	$y2 = $this->pdf->GetY();
+		$this->pdf->SetXY(8,$y2+5); 
+      	$this->pdf->SetFont('Arial','B',8); 
+      	$this->pdf->Cell(24,4,utf8_decode(strtoupper_total('TELÉFONO '))); 
+      	$this->pdf->Cell(3,4,':',0,0,'C'); 
+      	$this->pdf->SetFont('Arial','',8); 
+      	$this->pdf->MultiCell(55,4,utf8_decode($fila['telefono_ce'])); 
+  		
+      	$y3 = $this->pdf->GetY();
+
+      	$this->pdf->SetXY(96,$y); 
+      	$this->pdf->SetFont('Arial','B',8); 
+      	$this->pdf->Cell(30,4,utf8_decode('PUNTO DE LLEGADA ')); 
+      	$this->pdf->Cell(3,4,':',0,0,'C'); 
+      	$this->pdf->SetFont('Arial','',7); 
+      	$this->pdf->MultiCell(75,4,utf8_decode(strtoupper_total($fila['punto_llegada'])));
+
+      	$y1a = $this->pdf->GetY();
+      	$this->pdf->SetXY(96,$y1a); 
+      	$this->pdf->SetFont('Arial','B',8); 
+      	$this->pdf->Cell(30,4,utf8_decode('PUNTO DE PARTIDA')); 
+      	$this->pdf->Cell(3,4,':',0,0,'C'); 
+      	$this->pdf->SetFont('Arial','',7); 
+      	$this->pdf->MultiCell(75,4,utf8_decode(strtoupper_total($fila['punto_partida'])));
+
+      	$this->pdf->SetXY(8,$y3+2); 
+      	$this->pdf->SetFillColor($r,$g,$b);
+		$this->pdf->SetWidths(array(60));
+		$arrBarra = array(
+			'data'=> array(
+				utf8_decode('   DATOS DE LA GUIA: ') 
+			),
+			'textColor'=> array(
+				array('r'=> 255, 'g'=> 255, 'b'=> 255) 
+			),
+			'fontSize'=> array(
+				array('family'=> NULL, 'weight'=> NULL, 'size'=> 10) 
+			),
+			'bgColor'=> array(
+				array('r'=> $r, 'g'=> $g, 'b'=> $b ) 
+			)
+		);
+		$this->pdf->Row($arrBarra['data'],true,0,FALSE,5,$arrBarra['textColor'],$arrBarra['bgColor'],FALSE,FALSE,$arrBarra['fontSize']);
+
+		$this->pdf->SetTextColor(66,66,66);
+		$y4 = $this->pdf->GetY();
+		$this->pdf->SetXY(8,$y4); 
+      	$this->pdf->SetFont('Arial','B',8); 
+      	$this->pdf->Cell(38,4,'ASESOR DE VENTA '); 
+      	$this->pdf->Cell(3,4,':',0,0,'C'); 
+      	$this->pdf->SetFont('Arial','',8); 
+      	$this->pdf->MultiCell(45,4,strtoupper(strtoupper_total($fila['colaborador'])));
+
+      	$y5 = $this->pdf->GetY();
+      	$this->pdf->SetXY(8,$y5-1); 
+      	$this->pdf->SetFont('Arial','B',8); 
+      	$this->pdf->Cell(38,6,utf8_decode('FECHA DE EMISIÓN')); 
+      	$this->pdf->Cell(3,6,':',0,0,'C'); 
+      	$this->pdf->SetFont('Arial','',8); 
+      	$this->pdf->Cell(75,6,darFormatoDMY($fila['fecha_emision'])); 
+
+      	$this->pdf->SetXY(8,$y5+3); 
+      	$this->pdf->SetFont('Arial','B',8); 
+      	$this->pdf->Cell(38,6,'O/C '); 
+      	$this->pdf->Cell(3,6,':',0,0,'C'); 
+      	$this->pdf->SetFont('Arial','',8); 
+      	$this->pdf->Cell(75,6,utf8_decode($fila['numero_orden_compra'])); 
+
+      	$this->pdf->SetXY(8,$y5+7); 
+      	$this->pdf->SetFont('Arial','B',8); 
+      	$this->pdf->Cell(38,6,utf8_decode('F. INIC. TRASLADO ')); 
+      	$this->pdf->Cell(3,6,':',0,0,'C'); 
+      	$this->pdf->SetFont('Arial','',8); 
+      	$this->pdf->Cell(75,6,utf8_decode($fila['fecha_inicio_traslado'])); 
+
+      	$yToTransportista = $this->pdf->GetY();
+
+      	$this->pdf->SetXY(96,$y4+3); 
+      	$this->pdf->SetFont('Arial','B',8); 
+      	$this->pdf->Cell(34,6,utf8_decode('C. MIN. TRASL. ')); 
+      	$this->pdf->Cell(3,6,':',0,0,'C'); 
+      	$this->pdf->SetFont('Arial','',8); 
+      	$this->pdf->Cell(75,6,$fila['costo_minimo']); 
+
+      	$this->pdf->SetXY(96,$y4+7); 
+      	$this->pdf->SetFont('Arial','B',8); 
+      	$this->pdf->Cell(34,6,utf8_decode('PESO TOTAL ')); 
+      	$this->pdf->Cell(3,6,':',0,0,'C'); 
+      	$this->pdf->SetFont('Arial','',8); 
+      	$this->pdf->Cell(75,6,$fila['peso_total']); 
+
+      	$this->pdf->SetXY(96,$y4+11); 
+      	$this->pdf->SetFont('Arial','B',8); 
+      	$this->pdf->Cell(34,6,utf8_decode('MOTIVO DE TRASLADO ')); 
+      	$this->pdf->Cell(3,6,':',0,0,'C'); 
+      	$this->pdf->SetFont('Arial','',8); 
+      	$this->pdf->Cell(75,6,$fila['descripcion_mt']); 
+
+      	$this->pdf->SetXY(8,$yToTransportista + 7); 
+      	$this->pdf->SetFillColor($r,$g,$b);
+		$this->pdf->SetWidths(array(60));
+		$arrBarra = array(
+			'data'=> array(
+				utf8_decode('   DATOS DE TRANSPORTISTA: ') 
+			),
+			'textColor'=> array(
+				array('r'=> 255, 'g'=> 255, 'b'=> 255) 
+			),
+			'fontSize'=> array(
+				array('family'=> NULL, 'weight'=> NULL, 'size'=> 10) 
+			),
+			'bgColor'=> array(
+				array('r'=> $r, 'g'=> $g, 'b'=> $b ) 
+			)
+		);
+		$this->pdf->Row($arrBarra['data'],true,0,FALSE,5,$arrBarra['textColor'],$arrBarra['bgColor'],FALSE,FALSE,$arrBarra['fontSize']);
+
+		$this->pdf->SetTextColor(66,66,66);
+		$ytre4 = $this->pdf->GetY();
+		$this->pdf->SetXY(8,$ytre4); 
+      	$this->pdf->SetFont('Arial','B',8); 
+      	$this->pdf->Cell(21,4,'NOMBRE '); 
+      	$this->pdf->Cell(3,4,':',0,0,'C'); 
+      	$this->pdf->SetFont('Arial','',8); 
+      	$this->pdf->MultiCell(45,4,strtoupper(strtoupper_total($fila['nombres_trans'])));
+
+      	$ytre5 = $this->pdf->GetY();
+      	$this->pdf->SetXY(8,$ytre5-1); 
+      	$this->pdf->SetFont('Arial','B',8); 
+      	$this->pdf->Cell(21,6,utf8_decode('DOMICILIO')); 
+      	$this->pdf->Cell(3,6,':',0,0,'C'); 
+      	$this->pdf->SetFont('Arial','',8); 
+      	$this->pdf->Cell(75,6,strtoupper_total($fila['domicilio_trans'])); 
+
+      	$ytre6 = $this->pdf->GetY();
+      	$this->pdf->SetXY(8,$ytre6+4); 
+      	$this->pdf->SetFont('Arial','B',8); 
+      	$this->pdf->Cell(21,6,utf8_decode('RUC')); 
+      	$this->pdf->Cell(3,6,':',0,0,'C'); 
+      	$this->pdf->SetFont('Arial','',8); 
+      	$this->pdf->Cell(75,6,$fila['ruc_trans']); 
+
+      	$this->pdf->SetXY(96,$yToTransportista + 7); 
+      	$this->pdf->SetFillColor($r,$g,$b);
+		$this->pdf->SetWidths(array(60));
+		$arrBarra = array(
+			'data'=> array(
+				utf8_decode('   DATOS DE TRANSPORTE: ') 
+			),
+			'textColor'=> array(
+				array('r'=> 255, 'g'=> 255, 'b'=> 255) 
+			),
+			'fontSize'=> array(
+				array('family'=> NULL, 'weight'=> NULL, 'size'=> 10) 
+			),
+			'bgColor'=> array(
+				array('r'=> $r, 'g'=> $g, 'b'=> $b ) 
+			)
+		);
+		$this->pdf->Row($arrBarra['data'],true,0,FALSE,5,$arrBarra['textColor'],$arrBarra['bgColor'],FALSE,FALSE,$arrBarra['fontSize']); 
+
+		$this->pdf->SetTextColor(66,66,66);
+		$ytra4 = $this->pdf->GetY();
+		$this->pdf->SetXY(96,$ytra4); 
+      	$this->pdf->SetFont('Arial','B',8); 
+      	$this->pdf->Cell(34,4,utf8_decode('MARCA/PLACA N° ')); 
+      	$this->pdf->Cell(3,4,':',0,0,'C'); 
+      	$this->pdf->SetFont('Arial','',8); 
+      	$this->pdf->MultiCell(45,4,strtoupper(strtoupper_total($fila['placa_transporte'])));
+
+      	$ytra5 = $this->pdf->GetY();
+      	$this->pdf->SetXY(96,$ytra5-1); 
+      	$this->pdf->SetFont('Arial','B',8); 
+      	$this->pdf->Cell(34,6,utf8_decode('CERT. INSCRIPCIÓN N°')); 
+      	$this->pdf->Cell(3,6,':',0,0,'C'); 
+      	$this->pdf->SetFont('Arial','',8); 
+      	$this->pdf->Cell(75,6,strtoupper_total($fila['num_cert_inscripcion'])); 
+
+      	$ytra6 = $this->pdf->GetY();
+      	$this->pdf->SetXY(96,$ytra6+4); 
+      	$this->pdf->SetFont('Arial','B',8); 
+      	$this->pdf->Cell(34,6,utf8_decode('LIC. CONDUCIR N°')); 
+      	$this->pdf->Cell(3,6,':',0,0,'C'); 
+      	$this->pdf->SetFont('Arial','',8); 
+      	$this->pdf->Cell(75,6,strtoupper_total($fila['num_lic_conducir'])); 
+
+      	// $this->pdf->SetXY(8,$y5+13); 
+      	// $this->pdf->Cell(100,6,utf8_decode('Tenemos el agrado de presentar la siguiente nota pedido: ')); 
+
+      	$this->pdf->SetXY(8,$ytre6+12); 
+      	//$this->pdf->Ln(4);
+      	$x_final_izquierda = $this->pdf->GetX();
+      	$y_final_izquierda = $this->pdf->GetY();
+
+      	// APARTADO: DATOS DEL DETALLE
+
+      	// LOGICA POSICION 
+      	$this->pdf->SetFont('Arial','B',8);
+      	$this->pdf->SetFillColor($r,$g,$b);
+      	$this->pdf->SetTextColor(255,255,255);
+      	$this->pdf->Cell(20,6,'CANT.',1,0,'C',TRUE);
+      	$this->pdf->Cell(24,6,'UNID. MED.',1,0,'L',TRUE);
+      	$this->pdf->Cell(120,6,utf8_decode('DESCRIPCIÓN'),1,0,'L',TRUE);
+      	$this->pdf->Cell(32,6,'PAQUETES',1,0,'C',TRUE); 
+      	$this->pdf->Ln(7);
+
+      	$this->pdf->SetFont('Arial','',7);
+	    
+	    $i = 1;
+	    $detalleEle = $this->model_guia_remision->m_cargar_detalle_guia_remision_por_id($allInputs['id']);
+	    
+	    $arrGroupBy = array(); 
+	    foreach ($detalleEle as $key => $value) { 
+    		$rowAux = array(
+	    		'idguiaremisiondetalle' => $value['idguiaremisiondetalle'], 
+				'idguiaremision' => $value['idguiaremision'], 
+				'idelemento' => $value['idelemento'], 
+				'elemento' => $value['descripcion_ele'], 
+				'descripcion' => $value['descripcion_ele'], 
+				'cantidad' => $value['cantidad'], 
+				'num_paquetes' => $value['num_paquetes'], 
+				'unidad_medida' => array( 
+					'id'=> $value['idunidadmedida'], 
+					'descripcion'=> $value['descripcion_um'], 
+					'abreviatura'=> $value['abreviatura_um'] 
+				)
+	    	); 
+    		$arrGroupBy[$value['idguiaremisiondetalle']] = $rowAux;
+	    } 
+
+	    $exonerado = 0;
+	    $fill = TRUE;
+	    $this->pdf->SetDrawColor($r_sec,$g_sec,$b_sec); // gris fill 
+	    $this->pdf->SetLineWidth(.1);
+	    foreach ($arrGroupBy as $key => $value) { 
+		    $fill = !$fill;		
+		    $this->pdf->SetWidths(array(20, 24, 120, 32));
+		    $this->pdf->SetAligns(array('L', 'L', 'C', 'C'));
+		    $this->pdf->SetFillColor($r_sec,$g_sec,$b_sec);
+		    $this->pdf->SetTextColor(0,3,6);
+		    $this->pdf->SetFont('Arial','B',6); 
+		    $arrItemDetalle = array(
+				'fontSize'=> array(
+					array('family'=> NULL, 'weight'=> NULL, 'size'=> 8 ),
+					array('family'=> NULL, 'weight'=> NULL, 'size'=> 8 ),
+					array('family'=> NULL, 'weight'=> NULL, 'size'=> 8 ),
+					array('family'=> NULL, 'weight'=> NULL, 'size'=> 8 ) 
+				)
+			);
+			// if( $value['agrupado'] === FALSE ){ 
+			$this->pdf->Row( 
+		      array(
+		      	$value['cantidad'],
+				$value['unidad_medida']['abreviatura'],
+				utf8_decode($value['descripcion']),
+        		$value['num_paquetes'] 
+		      ),
+		      FALSE, 0, FALSE, 4, FALSE, FALSE, FALSE, FALSE, $arrItemDetalle['fontSize'] 
+		    );
+			// }
+		    
+		    $i++;
+		  	$this->pdf->SetTextColor(66,66,66);
+		   	$this->pdf->SetFont('Arial','',6);
+			$this->pdf->Cell(194,0.8,'','B',1,'C',0); 
+	    }
+
+	 //    $this->pdf->SetFont('Arial','B',9);
+	 //    $this->pdf->SetXY(8,-40);
+	 //    $this->pdf->Cell(20,6,"OBSERVACIONES:"); 
+	 //    $this->pdf->SetXY(8,-35); 
+		// $this->pdf->SetFont('Arial','',8);
+		// $this->pdf->SetWidths(array(138));
+		// $this->pdf->TextArea(array(empty($fila['nombres_trans'])? '':$fila['nombres_trans']),0,0,FALSE,5,20);
+
+		// $this->pdf->SetXY(8,-35); 
+		// $this->pdf->Cell(150,20,'');
+		// $this->pdf->Cell(20,6,'SUBTOTAL:','LT',0,'R');
+		// $this->pdf->SetFont('Arial','',8);
+		// $this->pdf->Cell(20,6,$simbolo . number_format($fila['subtotal'],$fConfig['num_decimal_total_key'],'.',' '),'TR',0,'R');
+		// $this->pdf->Ln(6);
+		// $this->pdf->SetFont('Arial','',8);
+		// $this->pdf->Cell(150,6,'');
+		// $this->pdf->Cell(20,6,'IGV:','L',0,'R');
+		// $this->pdf->SetFont('Arial','',8);
+		// $this->pdf->Cell(20,6,$simbolo . number_format($fila['igv'],$fConfig['num_decimal_total_key'],'.',' '),'R',0,'R');
+		// $this->pdf->Ln(6);
+		// $this->pdf->SetFont('Arial','B',9);
+		// $this->pdf->Cell(150,8,'');
+		// $this->pdf->Cell(20,8,'TOTAL:','TLB',0,'R');
+		// $this->pdf->Cell(20,8,$simbolo . number_format($fila['total'],$fConfig['num_decimal_total_key'],'.',' '),'TRB',0,'R');
+	    $arrData['message'] = 'ERROR';
+	    $arrData['flag'] = 2;
+
+	    if($this->pdf->Output( 'F','assets/dinamic/pdfTemporales/GR_'. $fila['numero_serie'].$fila['numero_correlativo'] .'.pdf' )){
+	      $arrData['message'] = 'OK';
+	      $arrData['flag'] = 1;
+	    }
+	    $arrData = array(
+	      'urlTempPDF'=> 'assets/dinamic/pdfTemporales/GR_'. $fila['numero_serie'].$fila['numero_correlativo'] .'.pdf'
+	    );
+	    $this->output
+	        ->set_content_type('application/json')
+	        ->set_output(json_encode($arrData));
 	}
 }
