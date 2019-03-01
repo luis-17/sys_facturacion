@@ -384,4 +384,19 @@ app.controller('HistorialVentasCtrl', ['$scope', '$filter', '$uibModal', '$bootb
       ModalReporteFactory.getPopupReporte(arrParams);
     }
   }
+
+  $scope.btnGenerarPDF = function() { 
+    var arrParams = { 
+      titulo: 'CONTROL - COMPROBANTE',
+      datos:{
+        id: $scope.mySelectionGrid[0].idmovimiento, 
+        codigo_reporte: 'VEN-COMPR'
+      },
+      //envio_correo: 'si',
+      salida: 'pdf',
+      url: angular.patchURLCI + "Venta/generar_pdf" 
+    }
+    ModalReporteFactory.getPopupReporte(arrParams);
+  }
+
 }]); 

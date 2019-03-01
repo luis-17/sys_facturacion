@@ -303,11 +303,13 @@
 		    		<i class="fa fa-save"> </i> VENTAS </button> 
 		    	<button type="button" class="btn-primary btn" ng-click="grabar(); $event.preventDefault();" ng-disabled="formVenta.$invalid && !fData.isRegisterSuccess" tabindex="420"> 
 		    		<i class="fa fa-save"> </i> [F2] GRABAR </button> 
-		    	<button type="button" class="btn-success btn mr-lg" ng-click="btnImprimirHTML(); $event.preventDefault();" ng-disabled="!fData.isRegisterSuccess" tabindex="430"> 
+		    	<button type="button" class="btn-success btn" ng-click="btnImprimirHTML(); $event.preventDefault();" ng-disabled="!fData.isRegisterSuccess" tabindex="430"> 
 		        	<i class="fa fa-print"> </i> [F4] IMPRIMIR </button> 
-		      <button type="button" class="btn-default btn" ng-click="reloadPage(); $event.preventDefault();" tabindex="440"> 
+		        <button type="button" class="btn-dark btn mr-lg" ng-click="imprimir(); $event.preventDefault();" ng-disabled="!fData.isRegisterSuccess" tabindex="440"> 
+		        	<i class="fa fa-eye"> </i> [F9] VER PDF </button> 	
+		      <button type="button" class="btn-default btn" ng-click="reloadPage(); $event.preventDefault();" tabindex="450"> 
 		        	<i class="fa fa-file"> </i> [F3] NUEVO </button>
-		      <button type="button" class="btn-warning btn" ng-click="mismoCliente(); $event.preventDefault();" tabindex="450" > 
+		      <button type="button" class="btn-warning btn" ng-click="mismoCliente(); $event.preventDefault();" tabindex="460" > 
 		        	<i class="fa fa-file"> </i> [F6] MISMO CLIENTE </button> 
 		    </div>
 		  </div>
