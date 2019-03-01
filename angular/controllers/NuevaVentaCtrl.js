@@ -1,4 +1,5 @@
 app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$log', '$timeout', 'pinesNotifications', 'uiGridConstants', 'blockUI', 
+    'ModalReporteFactory',
     'ClientePersonaFactory',
     'ClienteEmpresaFactory',
     'ServicioFactory',
@@ -26,6 +27,7 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
     'NotaPedidoServices', 
     'GuiaRemisionServices',
 	function($scope, $filter, $uibModal, $bootbox, $log, $timeout, pinesNotifications, uiGridConstants, blockUI, 
+    ModalReporteFactory,
     ClientePersonaFactory,
     ClienteEmpresaFactory,
     ServicioFactory,
@@ -1725,6 +1727,21 @@ app.controller('NuevaVentaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', 
       }
     });
   }
+
+  $scope.imprimir = function() {
+    var arrParams = { 
+      titulo: 'VISTA PREVIA DE COTIZACIÓN',
+      datos:{
+        id: $scope.fData.idventaanterior,
+        codigo_reporte: 'VEN-COMPR'
+      },
+      envio_correo: 'si',
+      salida: 'pdf',
+      url: angular.patchURLCI + "Venta/generar_pdf" 
+    }
+    ModalReporteFactory.getPopupReporte(arrParams);
+  }
+
   /* ASOCIAR GUIA */ 
   $scope.btnAsociarGR = function() { 
     blockUI.start('Cargando guias de remisión...'); 
