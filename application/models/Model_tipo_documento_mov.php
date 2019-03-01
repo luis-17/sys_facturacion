@@ -83,7 +83,7 @@ class Model_tipo_documento_mov extends CI_Model {
 		$this->db->select("tdc.idtipodocumentoconfig, tdc.tamanio_fuente, tdc.tipo_fuente, tdc.navegador, 
 			tcd.idtdconfigdetalle, tcd.descripcion_elemento, tcd.key_config_detalle, tcd.valor_x, tcd.valor_y, tcd.valor_w, tcd.visible"); 
 		$this->db->from('tipo_documento_config tdc');
-		$this->db->join('td_config_detalle tcd','tdc.idtipodocumentoconfig = tcd.idtipodocumentoconfig AND tdc.navegador = tcd.navegador'); 
+		$this->db->join('td_config_detalle tcd','tdc.idtipodocumentoconfig = tcd.idtipodocumentoconfig'); 
 		$this->db->where('tdc.idtipodocumentoconfig', $datos['idtipodocumentoconfig']); 
 		return $this->db->get()->result_array();
 	}

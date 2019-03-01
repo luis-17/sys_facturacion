@@ -55,20 +55,20 @@ class EmpresaAdmin extends CI_Controller {
 
 	public function registrar()
 	{
-		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
-		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
-    	$arrData['flag'] = 0;
-    	// VALIDACIONES
+		// $allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		// $arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
+  //   	$arrData['flag'] = 0;
+  //   	// VALIDACIONES
     	
-    	$this->db->trans_start();
-		if($this->model_empresa_admin->m_registrar($allInputs)) { 
-			$arrData['message'] = 'Se registraron los datos correctamente';
-			$arrData['flag'] = 1;
-		}
-		$this->db->trans_complete();
-		$this->output
-		    ->set_content_type('application/json')
-		    ->set_output(json_encode($arrData));
+  //   	$this->db->trans_start();
+		// if($this->model_empresa_admin->m_registrar($allInputs)) { 
+		// 	$arrData['message'] = 'Se registraron los datos correctamente';
+		// 	$arrData['flag'] = 1;
+		// }
+		// $this->db->trans_complete();
+		// $this->output
+		//     ->set_content_type('application/json')
+		//     ->set_output(json_encode($arrData));
 	}
 
 	public function editar()
