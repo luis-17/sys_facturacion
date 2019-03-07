@@ -1769,6 +1769,8 @@ class Venta extends CI_Controller {
 	    // RECUPERACIÓN DE DATOS 
 	    $fConfig = obtener_parametros_configuracion();
 	    $fila = $this->model_venta->m_cargar_venta_por_id($allInputs['id']); 
+	    // var_dump($fila); exit(); 
+
 	    $fila['moneda_str'] = NULL; 
 	    $simbolo = NULL;
 	    if($fila['moneda'] == 'S'){
@@ -1788,7 +1790,6 @@ class Venta extends CI_Controller {
 	    if($fila['modo_igv'] == 2){ 
 	    	$strIncluyeIGV = 'NO';
 	    } 	    
-	    // var_dump($fila);exit();
 	    
 	    // CONFIGURACION DEL PDF
 	    $this->pdf = new Fpdfext();
@@ -1928,6 +1929,14 @@ class Venta extends CI_Controller {
       	$this->pdf->SetFont('Arial','',8); 
       	$this->pdf->Cell(75,6,utf8_decode($fila['numero_orden_compra'])); 
 
+      	$this->pdf->SetXY(8,$y5+7); 
+      	$this->pdf->SetFont('Arial','B',8); 
+      	$this->pdf->Cell(38,6,'GUIA '); 
+      	$this->pdf->Cell(3,6,':',0,0,'C'); 
+      	$this->pdf->SetFont('Arial','',8); 
+      	$this->pdf->Cell(75,6,utf8_decode($fila['numero_serie'].'-'.$fila['numero_correlativo'])); 
+
+
       	$yToComprobante= $this->pdf->GetY();
 
       	$this->pdf->SetXY(96,$y4+3); 
@@ -1942,10 +1951,18 @@ class Venta extends CI_Controller {
       	$this->pdf->Cell(34,6,utf8_decode('MONEDA')); 
       	$this->pdf->Cell(3,6,':',0,0,'C'); 
       	$this->pdf->SetFont('Arial','',8); 
-      	$this->pdf->Cell(75,6,$fila['moneda']); 
+      	$this->pdf->Cell(75,6,utf8_decode($fila['moneda_str_completo'])); 
+
+      	$this->pdf->SetXY(96,$y4+11); 
+      	$this->pdf->SetFont('Arial','B',8); 
+      	$this->pdf->Cell(34,6,utf8_decode('C.V')); 
+      	$this->pdf->Cell(3,6,':',0,0,'C'); 
+      	$this->pdf->SetFont('Arial','',8); 
+      	$this->pdf->Cell(75,6,utf8_decode($fila['cod_vendedor'])); 
+
+
 
       	$this->pdf->SetXY(8,$yToComprobante+8); 
-      	//$this->pdf->Ln(4);
       	$x_final_izquierda = $this->pdf->GetX();
       	$y_final_izquierda = $this->pdf->GetY();
 
@@ -1966,38 +1983,85 @@ class Venta extends CI_Controller {
 
 	    $i = 1;
 	    $detalleEle = $this->model_venta->m_cargar_detalle_venta_por_id($allInputs['id']);
-	    
+	    // var_dump($detalleEle); exit(); 
 	    $arrGroupBy = array(); 
+
 	    foreach ($detalleEle as $key => $value) { 
-    		$rowAux = array(
-	    		'iddetallemovimiento' => $value['iddetallemovimiento'], 
-				'idmovimiento' => $value['idmovimiento'], 
-				'idelemento' => $value['idelemento'], 
-				'elemento' => $value['descripcion_ele'], 
-				'descripcion' => $value['descripcion_ele'], 
-				'cantidad' => $value['cantidad'], 
-				'precio_unitario' => $value['precio_unitario'], 
-				'importe_con_igv' => $value['importe_con_igv'], 
-				'subtotal' => $value['subtotal'], 
-				'total' => $value['total'],
-				'igv' => $value['igv'], 				 								
-				'unidad_medida' => array( 
-					'id'=> $value['idunidadmedida'], 
-					'descripcion'=> $value['descripcion_um'], 
-					'abreviatura'=> $value['abreviatura_um'] 
-				)
-	    	); 
-    		$arrGroupBy[$value['iddetallemovimiento']] = $rowAux;
+	    	if( !empty($value['agrupador_totalizado']) ){ 
+	    		$rowAux = array(
+		    		'iddetallemovimiento' =>$value['iddetallemovimiento'],
+		    		'descripcion_ele' =>$value['descripcion_ele'],
+		    		'num_agrupacion' =>$value['agrupador_totalizado'],
+		    		'agrupado' => TRUE,
+		    		'detallesubitems' => array(),
+		    		'detallecaracteristica' =>array()
+		    	); 
+	    		$arrGroupBy[$value['agrupador_totalizado'].'.dif'] = $rowAux;
+	    	}else{
+	    		$rowAux = array(
+		    		'iddetallemovimiento' =>$value['iddetallemovimiento'],
+		    		'descripcion_ele' =>$value['descripcion_ele'],
+		    		'cantidad' =>$value['cantidad'],
+		    		'abreviatura_um' =>$value['abreviatura_um'],
+		    		'precio_unitario' =>$value['precio_unitario'],
+		    		'importe_con_igv' =>$value['importe_con_igv'],
+		    		'importe_sin_igv' =>$value['importe_sin_igv'],
+		    		'num_agrupacion' =>$value['agrupador_totalizado'],
+		    		'agrupado' => FALSE,
+		    		'detallesubitems' => array(),
+		    		'detallecaracteristica' =>array()
+		    	); 
+	    		$arrGroupBy[$value['iddetallemovimiento']] = $rowAux;
+	    	}
+	    	
 	    } 
+
+	    // caracteristicas
+		foreach ($detalleEle as $key => $value) { 
+			if( !empty($value['iddetallecaracteristica']) ){ 
+				$rowAux = array( 
+		    		'iddetallecaracteristica' => $value['iddetallecaracteristica'],
+		    		'descripcion_car' => $value['descripcion_car'],
+		    		'valor' => $value['valor'] 
+		    	);
+		    	if( !empty($value['agrupador_totalizado']) ){ 
+		    		$arrGroupBy[$value['agrupador_totalizado'].'.dif']['detallecaracteristica'][$value['idcaracteristica']] = $rowAux; 
+		    	}else{
+		    		$arrGroupBy[$value['iddetallemovimiento']]['detallecaracteristica'][$value['iddetallecaracteristica']] = $rowAux; 
+	    		}
+
+	    	} 
+		}
+		// subitems 
+		foreach ($detalleEle as $key => $value) {
+			if( !empty($value['agrupador_totalizado']) ){ 
+				$rowAux = array( 
+		    		'cantidad' =>$value['cantidad'],
+	    			'abreviatura_um' =>$value['abreviatura_um'],
+	    			'precio_unitario' =>$value['precio_unitario'],
+	    			'importe_con_igv' =>$value['importe_con_igv'],
+	    			'importe_sin_igv' =>$value['importe_sin_igv']
+		    	);
+		    	$arrGroupBy[$value['agrupador_totalizado'].'.dif']['detallesubitems'][$value['iddetallemovimiento']] = $rowAux; 
+	    	} 
+		}
 
 	    $exonerado = 0;
 	    $fill = TRUE;
 	    $this->pdf->SetDrawColor($r_sec,$g_sec,$b_sec); // gris fill 
 	    $this->pdf->SetLineWidth(.1);
 	    foreach ($arrGroupBy as $key => $value) { 
+	    	if( $value['agrupado'] === FALSE ){ 
+		    	if( $fila['modo_igv'] == 1){ 
+		    		$valImporte = $value['importe_con_igv'];
+		    	}
+		    	if( $fila['modo_igv'] == 2 ){
+		    		$valImporte = $value['importe_sin_igv'];
+		    	}
+		    }
 		    $fill = !$fill;		
 		    $this->pdf->SetWidths(array(14, 24, 120, 19,19));
-		    $this->pdf->SetAligns(array('L', 'L', 'C', 'C','c'));
+		    $this->pdf->SetAligns(array('L', 'L', 'L', 'C', 'R'));
 		    $this->pdf->SetFillColor($r_sec,$g_sec,$b_sec);
 		    $this->pdf->SetTextColor(0,3,6);
 		    $this->pdf->SetFont('Arial','B',6); 
@@ -2007,25 +2071,98 @@ class Venta extends CI_Controller {
 					array('family'=> NULL, 'weight'=> NULL, 'size'=> 8 ),
 					array('family'=> NULL, 'weight'=> NULL, 'size'=> 8 ),
 					array('family'=> NULL, 'weight'=> NULL, 'size'=> 8 ),
-					array('family'=> NULL, 'weight'=> NULL, 'size'=> 8 )  
+					array('family'=> NULL, 'weight'=> NULL, 'size'=> 8 )
 				)
 			);
-			// if( $value['agrupado'] === FALSE ){ 
-			$this->pdf->Row( 
-		      array(
-		      	$value['cantidad'],
-				$value['unidad_medida']['abreviatura'],
-				utf8_decode($value['descripcion']),
-        		$value['precio_unitario'],
-        		$value['importe_con_igv'] 
-		      ),
-		      FALSE, 0, FALSE, 4, FALSE, FALSE, FALSE, FALSE, $arrItemDetalle['fontSize'] 
-		    );
-			// }
+			if( $value['agrupado'] === FALSE ){ 
+				$this->pdf->Row( 
+			      array(
+			        $value['cantidad'],
+			        strtoupper($value['abreviatura_um']),
+			        utf8_decode($value['descripcion_ele']),			       
+			        number_format($value['precio_unitario'],$fConfig['num_decimal_precio_key'],'.',' '),
+			        number_format($valImporte,$fConfig['num_decimal_total_key'],'.',' ')
+			      ),
+			      FALSE, 0, FALSE, 4, FALSE, FALSE, FALSE, FALSE, $arrItemDetalle['fontSize'] 
+			    );
+			}
+			if( $value['agrupado'] === TRUE ){ 
+				$this->pdf->Row( 
+			      array(
+			        $value['cantidad'],
+			        utf8_decode($value['descripcion_ele']),
+			        '',
+			        '',
+			        ''
+			      ),
+			      FALSE, 0, FALSE, 4, FALSE, FALSE, FALSE, FALSE, $arrItemDetalle['fontSize'] 
+			    );
+			    $GetYElement = $this->pdf->GetY()-2; 
+			    $GetXElement = $this->pdf->GetX() + 110; 
+			}
 		    
 		    $i++;
 		  	$this->pdf->SetTextColor(66,66,66);
 		   	$this->pdf->SetFont('Arial','',6);
+			foreach ($value['detallecaracteristica'] as $key => $row) { 
+				$this->pdf->SetWidths(array(10, 32, 5, 100));
+		    	$this->pdf->SetAligns(array('L', 'L', 'L', 'L'));
+				$arrCaracts = array( 
+					'data'=> array(
+						'',
+						utf8_decode($row['descripcion_car']),
+						':',
+						utf8_decode($row['valor']) 
+					),
+					'fontSize'=> array(
+						array('family'=> NULL, 'weight'=> NULL, 'size'=> 6 ),
+						array('family'=> NULL, 'weight'=> NULL, 'size'=> 6 ),
+						array('family'=> NULL, 'weight'=> NULL, 'size'=> 6 ),
+						array('family'=> NULL, 'weight'=> NULL, 'size'=> 6 )
+					)
+				);
+				$this->pdf->Row( $arrCaracts['data'],FALSE,'0',FALSE,3,FALSE,FALSE,FALSE,FALSE,$arrCaracts['fontSize'] ); 
+			}
+			$GetYElementCaracts = $this->pdf->GetY(); 
+			if( $value['agrupado'] === TRUE ){ 
+				$this->pdf->SetY($GetYElement);
+				foreach ($value['detallesubitems'] as $key => $row) { 
+					$this->pdf->SetX($GetXElement);
+					$this->pdf->SetWidths(array(20, 18, 20, 26));
+			    	$this->pdf->SetAligns(array('C', 'C', 'R', 'R')); 
+			    	if( $fila['modo_igv'] == 1){ 
+			    		$valImporte = $row['importe_con_igv'];
+			    	}
+			    	if( $fila['modo_igv'] == 2 ){
+			    		$valImporte = $row['importe_sin_igv'];
+			    	}
+					$arrCaracts = array( 
+						'data'=> array( 
+							strtoupper($row['abreviatura_um']),
+							$row['cantidad'],
+							number_format($row['precio_unitario'],$fConfig['num_decimal_precio_key'],'.',' '),
+			        		number_format($valImporte,$fConfig['num_decimal_total_key'],'.',' ')
+						),
+						'fontSize'=> array( 
+							array('family'=> NULL, 'weight'=> NULL, 'size'=> 9 ),
+							array('family'=> NULL, 'weight'=> NULL, 'size'=> 9 ),
+							array('family'=> NULL, 'weight'=> NULL, 'size'=> 9 ),
+							array('family'=> NULL, 'weight'=> NULL, 'size'=> 9 )
+						)
+					);
+					$this->pdf->Row( $arrCaracts['data'],FALSE,'0',FALSE,6,FALSE,FALSE,FALSE,FALSE,$arrCaracts['fontSize'] ); 
+				} 
+			}
+			$GetYElementSubItems = $this->pdf->GetY(); 
+			if( $value['agrupado'] === TRUE ){ 
+				if( $GetYElementSubItems > $GetYElementCaracts ){
+					$GetYElementSelected = $GetYElementSubItems;
+				}else{
+					$GetYElementSelected = $GetYElementCaracts;
+				}
+				
+				$this->pdf->SetY($GetYElementSelected); 
+			}
 			$this->pdf->Cell(194,0.8,'','B',1,'C',0); 
 	    }
 
@@ -2033,11 +2170,9 @@ class Venta extends CI_Controller {
 	    $this->pdf->SetY(-34); 
 	    $this->pdf->SetFont('Arial','B',9);
 	    
-
 	    $en_letra = ValorEnLetras($fila['total'],$fila['moneda_str_completo']);
 	    $this->pdf->Cell(140,5,'TOTAL SON: ' . utf8_decode($en_letra));
 	    
-
 		$this->pdf->SetXY(8,-35); 
 		$this->pdf->Cell(150,20,'');
 		$this->pdf->Cell(20,6,'SUBTOTAL:','LT',0,'R');
