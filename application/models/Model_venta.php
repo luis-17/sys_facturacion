@@ -269,7 +269,7 @@ class Model_venta extends CI_Model {
 			ve.moneda,ve.modo_igv,ve.subtotal,ve.igv,ve.total,ve.estado_movimiento, ve.numero_serie, ve.numero_correlativo, ve.numero_orden_compra, 
 			us.idusuario,	us.username,ea.idempresaadmin,(ea.razon_social) AS razon_social_ea,(ea.nombre_comercial) AS nombre_comercial_ea,(ea.ruc) AS ruc_ea,	ea.nombre_logo,ea.direccion_legal, 
 			ea.pagina_web,(ea.telefono) AS telefono_ea,ce.idclienteempresa,(ce.razon_social) AS razon_social_ce,(ce.nombre_comercial) AS nombre_comercial_ce,(ce.ruc) AS ruc_ce,(ce.telefono) AS telefono_ce,	ce.direccion_guia,(ce.direccion_legal) AS direccion_legal_ce,ce.nombre_corto,ce.representante_legal,ce.dni_representante_legal,cp.idclientepersona,(cp.num_documento) AS num_documento_cp,se.idsede,se.descripcion_se,se.abreviatura_se,fp.idformapago,fp.descripcion_fp,fp.modo_fp,ct.idcontacto,ct.anexo,ct.telefono_fijo,
-				tdm.idtipodocumentomov,tdm.descripcion_tdm, s.idserie', FALSE); 
+				tdm.idtipodocumentomov,tdm.descripcion_tdm, s.idserie,(col_asig.num_documento) AS cod_vendedor', FALSE); 
 		$this->db->from('movimiento ve'); 
 		$this->db->join('tipo_documento_mov tdm','ve.idtipodocumentomov = tdm.idtipodocumentomov'); 
 		$this->db->join('usuario us','ve.idusuarioventa = us.idusuario'); 
