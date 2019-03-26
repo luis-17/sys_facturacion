@@ -1111,7 +1111,7 @@ class GuiaRemision extends CI_Controller {
       	$this->pdf->Cell(34,6,utf8_decode('MOTIVO DE TRASLADO ')); 
       	$this->pdf->Cell(3,6,':',0,0,'C'); 
       	$this->pdf->SetFont('Arial','',8); 
-      	$this->pdf->Cell(75,6,$fila['descripcion_mt']); 
+      	$this->pdf->Cell(75,6,utf8_decode($fila['descripcion_mt'])); 
 
       	$this->pdf->SetXY(8,$yToTransportista + 7); 
       	$this->pdf->SetFillColor($r,$g,$b);
@@ -1225,34 +1225,71 @@ class GuiaRemision extends CI_Controller {
 	    
 	    $i = 1;
 	    $detalleEle = $this->model_guia_remision->m_cargar_detalle_guia_remision_por_id($allInputs['id']);
-	    
+
 	    $arrGroupBy = array(); 
+
 	    foreach ($detalleEle as $key => $value) { 
-    		$rowAux = array(
-	    		'idguiaremisiondetalle' => $value['idguiaremisiondetalle'], 
-				'idguiaremision' => $value['idguiaremision'], 
-				'idelemento' => $value['idelemento'], 
-				'elemento' => $value['descripcion_ele'], 
-				'descripcion' => $value['descripcion_ele'], 
-				'cantidad' => $value['cantidad'], 
-				'num_paquetes' => $value['num_paquetes'], 
-				'unidad_medida' => array( 
-					'id'=> $value['idunidadmedida'], 
-					'descripcion'=> $value['descripcion_um'], 
-					'abreviatura'=> $value['abreviatura_um'] 
-				)
-	    	); 
-    		$arrGroupBy[$value['idguiaremisiondetalle']] = $rowAux;
+	    		$rowAux = array(
+		    		'idguiaremisiondetalle' =>$value['idguiaremisiondetalle'],
+					'idguiaremision' => $value['idguiaremision'], 
+					'idelemento' => $value['idelemento'], 
+					'elemento' => $value['descripcion_ele'], 
+					'descripcion' => $value['descripcion_ele'], 
+					'cantidad' => $value['cantidad'], 
+					'num_paquetes' => $value['num_paquetes'], 
+					'unidad_medida' => array( 
+						'id'=> $value['idunidadmedida'], 
+						'descripcion'=> $value['descripcion_um'], 
+						'abreviatura'=> $value['abreviatura_um'] 
+					),
+		    		'agrupado' => FALSE,
+		    		'detallesubitems' => array(),
+		    		'detallecaracteristica' =>array()
+		    	); 
+	    		$arrGroupBy[$value['idguiaremisiondetalle']] = $rowAux;
+    	
 	    } 
+
+	    // caracteristicas
+		foreach ($detalleEle as $key => $value) { 
+			if( !empty($value['iddetallecaracteristica']) ){ 
+				$rowAux = array( 
+		    		'iddetallecaracteristica' => $value['iddetallecaracteristica'],
+		    		'descripcion_car' => $value['descripcion_car'],
+		    		'valor' => $value['valor'] 
+		    	);
+		    	$arrGroupBy[$value['idguiaremisiondetalle']]['detallecaracteristica'][$value['iddetallecaracteristica']] = $rowAux; 
+	    		
+
+	    	} 
+		}
+		// subitems 
+		foreach ($detalleEle as $key => $value) {
+			if( !empty($value['agrupador_totalizado']) ){ 
+				$rowAux = array( 
+					'elemento' => $value['descripcion_ele'], 
+					'descripcion' => $value['descripcion_ele'], 
+					'cantidad' => $value['cantidad'], 
+					'num_paquetes' => $value['num_paquetes'], 
+					'unidad_medida' => array( 
+						'id'=> $value['idunidadmedida'], 
+						'descripcion'=> $value['descripcion_um'], 
+						'abreviatura'=> $value['abreviatura_um'] 
+					),
+		    	);
+		    	$arrGroupBy[$value['agrupador_totalizado'].'.dif']['detallesubitems'][$value['idguiaremisiondetalle']] = $rowAux; 
+	    	} 
+		}
 
 	    $exonerado = 0;
 	    $fill = TRUE;
 	    $this->pdf->SetDrawColor($r_sec,$g_sec,$b_sec); // gris fill 
 	    $this->pdf->SetLineWidth(.1);
 	    foreach ($arrGroupBy as $key => $value) { 
+
 		    $fill = !$fill;		
 		    $this->pdf->SetWidths(array(20, 24, 120, 32));
-		    $this->pdf->SetAligns(array('L', 'L', 'C', 'C'));
+		    $this->pdf->SetAligns(array('L', 'L', 'L', 'C', 'R'));
 		    $this->pdf->SetFillColor($r_sec,$g_sec,$b_sec);
 		    $this->pdf->SetTextColor(0,3,6);
 		    $this->pdf->SetFont('Arial','B',6); 
@@ -1261,24 +1298,43 @@ class GuiaRemision extends CI_Controller {
 					array('family'=> NULL, 'weight'=> NULL, 'size'=> 8 ),
 					array('family'=> NULL, 'weight'=> NULL, 'size'=> 8 ),
 					array('family'=> NULL, 'weight'=> NULL, 'size'=> 8 ),
-					array('family'=> NULL, 'weight'=> NULL, 'size'=> 8 ) 
-				)
-			);
-			// if( $value['agrupado'] === FALSE ){ 
-			$this->pdf->Row( 
-		      array(
-		      	$value['cantidad'],
-				$value['unidad_medida']['abreviatura'],
-				utf8_decode($value['descripcion']),
-        		$value['num_paquetes'] 
-		      ),
-		      FALSE, 0, FALSE, 4, FALSE, FALSE, FALSE, FALSE, $arrItemDetalle['fontSize'] 
-		    );
-			// }
-		    
+					array('family'=> NULL, 'weight'=> NULL, 'size'=> 8 ),
+					array('family'=> NULL, 'weight'=> NULL, 'size'=> 8 )
+				)			);
+	
+				$this->pdf->Row( 
+			      array(
+			        $value['cantidad'],
+			        strtoupper($value['unidad_medida']['abreviatura']),
+			        utf8_decode($value['descripcion']),			       
+			        utf8_decode($value['num_paquetes']),
+			   
+			      ),
+			      FALSE, 0, FALSE, 4, FALSE, FALSE, FALSE, FALSE, $arrItemDetalle['fontSize'] 
+			    );
+			    
 		    $i++;
 		  	$this->pdf->SetTextColor(66,66,66);
 		   	$this->pdf->SetFont('Arial','',6);
+			foreach ($value['detallecaracteristica'] as $key => $row) { 
+				$this->pdf->SetWidths(array(10, 32, 5, 100));
+		    	$this->pdf->SetAligns(array('L', 'L', 'L', 'L'));
+				$arrCaracts = array( 
+					'data'=> array(
+						'',
+						utf8_decode($row['descripcion_car']),
+						':',
+						utf8_decode($row['valor']) 
+					),
+					'fontSize'=> array(
+						array('family'=> NULL, 'weight'=> NULL, 'size'=> 6 ),
+						array('family'=> NULL, 'weight'=> NULL, 'size'=> 6 ),
+						array('family'=> NULL, 'weight'=> NULL, 'size'=> 6 ),
+						array('family'=> NULL, 'weight'=> NULL, 'size'=> 6 )
+					)
+				);
+				$this->pdf->Row( $arrCaracts['data'],FALSE,'0',FALSE,3,FALSE,FALSE,FALSE,FALSE,$arrCaracts['fontSize'] ); 
+			}
 			$this->pdf->Cell(194,0.8,'','B',1,'C',0); 
 	    }
 
